@@ -1,0 +1,95 @@
+/**
+* Mixin to generate a transition
+*
+* @param     {string}    $transitionProperties...    The properties to animate
+*
+* @return    {void}
+*/
+/**
+* Spin for WebKit
+*/
+@-webkit-keyframes spin {
+  0% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  50% {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg); }
+  100% {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+/**
+* Spin for Firefox
+*/
+@-moz-keyframes spin {
+  0% {
+    -moz-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  50% {
+    -moz-transform: rotate(180deg);
+    transform: rotate(180deg); }
+  100% {
+    -moz-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+/**
+* Spin for Opera (who's still using this?)
+*/
+@-o-keyframes spin {
+  0% {
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg); }
+  50% {
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg); }
+  100% {
+    -o-transform: rotate(360deg);
+    transform: rotate(360deg); } }
+/**
+* Spin for generic stuff
+*/
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  50% {
+    transform: rotate(180deg); }
+  100% {
+    transform: rotate(360deg); } }
+.notice {
+  opacity: 1;
+  -webkit-transition: opacity 500ms;
+  -moz-transition: opacity 500ms;
+  -ms-transition: opacity 500ms;
+  -o-transition: opacity 500ms;
+  transition: opacity 500ms; }
+  .notice.notice-invisible {
+    opacity: 0; }
+  .notice.notice-hidden {
+    display: none; }
+
+.site-refresh-inner {
+  padding: 10px;
+  text-align: center;
+  border: 1px solid #d8d8d8;
+  background-color: #fff;
+  -webkit-backface-visibility: hidden; }
+  .site-refresh-inner .logo {
+    font-size: 40px;
+    width: 40px;
+    height: 40px; }
+    .site-refresh-inner .logo.logo-spin {
+      -webkit-animation-name: spin;
+      -moz-animation-name: spin;
+      animation-name: spin;
+      -webkit-animation-duration: 1s;
+      -moz-animation-duration: 1s;
+      animation-duration: 1s;
+      -webkit-animation-timing-function: linear;
+      -moz-animation-timing-function: linear;
+      animation-timing-function: linear;
+      -webkit-animation-iteration-count: 1;
+      -moz-animation-iteration-count: 1;
+      animation-iteration-count: 1; }
+  .site-refresh-inner .button {
+    font-size: 20px;
+    display: inline;
+    cursor: pointer; }
