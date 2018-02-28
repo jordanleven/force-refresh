@@ -253,19 +253,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            // Debug doesn't work in pre ES6
-            if (Modernizr.es6object){
-
-                
-
-            }
-
-            // Otherwise, we can only use console log
-            else {
-
-                
-
-            }
+            
 
         },
 
@@ -305,21 +293,9 @@
 
     $(function(){
 
-        try {
+        var force_reload_object = Object.create(ForceReload);
 
-            var force_reload_object = Object.create(ForceReload);
-
-            force_reload_object.init();
-
-        }
-
-        catch(e){
-
-            console.error("Error creating object (" + ForceReload.class_name + ")! See error below for details.");
-
-            console.error(e);
-
-        }
+        force_reload_object.init();
 
     });
 
