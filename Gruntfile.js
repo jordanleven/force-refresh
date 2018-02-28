@@ -6,7 +6,7 @@ module.exports = function(grunt) {
                     sourcemap : 'none'
                 },  
                 files: {                         
-                    'library/dist/css/force-reload-admin.built.css' : 'library/src/sass/force-reload-admin.scss'
+                    'library/dist/css/force-refresh-admin.built.css' : 'library/src/sass/force-refresh-admin.scss'
                 }
             }
         },
@@ -35,17 +35,17 @@ module.exports = function(grunt) {
             // Admin JS
             admin_js: {
                 src: [
-                'library/src/js/force-reload-admin.js'
+                'library/src/js/force-refresh-admin.js'
                 ],
-                dest: 'library/dist/js/force-reload-admin.built.js',
+                dest: 'library/dist/js/force-refresh-admin.built.js',
             },
 
             // Regular JS
             regular_js: {
                 src: [
-                'library/src/js/force-reload.js'
+                'library/src/js/force-refresh.js'
                 ],
-                dest: 'library/dist/js/force-reload.built.js',
+                dest: 'library/dist/js/force-refresh.built.js',
             }
 
         },

@@ -8,7 +8,7 @@ define("WP_FORCE_REFRESH_ACTION", "wp_force_refresh");
 Plugin Name: Force Refresh
 Plugin URI: 
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
-Version: 1.0.0
+Version: 1.1.1
 Author: Jordan Leven
 Author URI: github.com/jordanleven
 Contributors: 
@@ -21,9 +21,9 @@ add_action( 'admin_menu', function(){
         'tools.php',
         'Force Refresh',
         'Force Refresh',
-        'exists',
         'activate_plugins',
-        __NAMESPACE__ . '\\manage_force_reload'
+        'force_refresh',
+        __NAMESPACE__ . '\\manage_force_refresh'
     );
 
 });
@@ -34,7 +34,7 @@ add_action( 'admin_menu', function(){
 add_action("wp_enqueue_scripts", function(){
 
     // Include the normal JS
-    add_script("force-refresh-js", "force-reload.built.min.js", true);
+    add_script("force-refresh-js", "force-refresh.built.min.js", true);
 
     // Localize the admin ajax URL. This doesn't sound like the best idea but WP is into it (https://codex.wordpress.org/AJAX_in_Plugins)
     wp_localize_script(
@@ -202,17 +202,17 @@ add_action( 'wp_ajax_force_refresh_update_site_version', function(){
 });
 
 /** 
-* Main function to manage settings for Force Reload.
+* Main function to manage settings for Force Refresh.
 *
 * @return    void    
 */
-function manage_force_reload(){
+function manage_force_refresh(){
 
     // Include the admin CSS
-    add_style("force-refresh-admin-css", "force-reload-admin.built.min.css");
+    add_style("force-refresh-admin-css", "force-refresh-admin.built.min.css");
 
     // Include the admin JS
-    add_script("force-refresh-admin-js", "force-reload-admin.built.min.js", true);
+    add_script("force-refresh-admin-js", "force-refresh-admin.built.min.js", true);
 
     // Create the data we're going to localize to the script
     $localized_data = array();
@@ -240,7 +240,7 @@ function manage_force_reload(){
 
     <div class="wrap">
 
-        <h2>Site Reload</h2>
+        <h2>Site Refresh</h2>
 
         <div id="alert-container">
 
@@ -294,7 +294,7 @@ function add_style($handle, $path){
         $file_version = filemtime($file_path);
 
         // Enqueue the style
-        wp_enqueue_style("force-refresh-admin", plugins_url("force-refresh/library/dist/css/$path"), array(), $file_version);
+        wp_enqueue_style("force-refresh-admin", plugins_url("/library/dist/css/$path", __FILE__), array(), $file_version);
 
     }
 
@@ -331,7 +331,7 @@ function add_script($handle, $path, $register = false){
         // If we want to only register the script
         if ($register){
 
-            wp_register_script($handle, plugins_url("force-refresh/library/dist/js/$path"), array(), $file_version);
+            wp_register_script($handle, plugins_url("/library/dist/js/$path", __FILE__), array("jquery"), $file_version);
 
         }
 
@@ -339,7 +339,7 @@ function add_script($handle, $path, $register = false){
         else {
 
             // Enqueue the style
-            wp_enqueue_script($handle, plugins_url("force-refresh/library/dist/js/$path"), array(), $file_version);
+            wp_enqueue_script($handle, plugins_url("/library/dist/js/$path", __FILE__), array("jquery"), $file_version);
 
         }
 
