@@ -6,6 +6,7 @@ Force Refresh is a simple plugin that allows you to force a page refresh for use
 ## Features
 * Support for both parent and child themes
 * Allows an admin to simply click a button to request browsers to refresh their page. This is done within two minutes after making the request.
+* Ability to add refreshing capabilities to any role using the "Invoke Force Refresh" capability.
 
 ## How it works
 It's pretty simple. When you click "Refresh Site," a hash is created and stored of the current time so no two hashes will be the same. On the front end of things, users will check for the current hash every two minutes. If the hash is different than the one that is stored - poof - the browser refreshes!
