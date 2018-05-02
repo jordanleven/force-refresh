@@ -3,7 +3,7 @@ Contributors: jordanleven
 Tags: force, refresh, reload, single, page, application, ajax
 Requires at least: 4.0.0
 Tested up to: 4.9.4
-Stable tag: 1.1.2
+Stable tag: 1.2
 License: GPLv2 or later
 
 

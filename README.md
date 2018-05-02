@@ -1,5 +1,5 @@
 # Force Refresh
->v 1.1.2
+>v 1.2
 
 Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
 
