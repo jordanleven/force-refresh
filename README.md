@@ -13,18 +13,24 @@ It's pretty simple. When you click "Refresh Site," a hash is created and stored 
 
 To force a refresh, just activate the plugin, navigate to "Tools" and click on "Force Refresh."
 
-## Changelog ##
+## Feature Requests and Bug Reports
 
-### 1.2 ###
+Please report any bugs you encounter via the [under the Support tab](https://wordpress.org/support/plugin/force-refresh) or [GitHub](https://github.com/jordanleven/wp-force-refresh/issues/).
+
+You can also request new features via [GitHub](https://github.com/jordanleven/wp-force-refresh/issues/). This is a new plugin and I'm hoping to add more user-requested features to make this useful to developers.
+
+## Changelog
+
+### 1.2
 * The ability to perform a refresh is now assigned to a capability called, "Invoke Force Refresh" – allowing you to granularly control what types of users and roles can invoke a refresh.
 
-### 1.1.2 ###
+### 1.1.2
 * Update dependencies
 
-### 1.1.1 ###
+### 1.1.1
 * Code cleanup
 
-### 1.1 ###
+### 1.1
 * Bug fixes
 
 ## License
