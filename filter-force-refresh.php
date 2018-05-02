@@ -2,17 +2,19 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
-define("WP_FORCE_REFRESH_ACTION", "wp_force_refresh");
-
 /*
 Plugin Name: Force Refresh
 Plugin URI: 
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
-Version: 1.1.2
+Version: 1.2
 Author: Jordan Leven
 Author URI: https://github.com/jordanleven
 Contributors: 
 */
+
+define("WP_FORCE_REFRESH_ACTION", "wp_force_refresh");
+
+define("WP_FORCE_REFRESH_CAPABILITY", "invoke_force_refresh");
 
 // Add the menu where we'll configure the settings
 add_action( 'admin_menu', function(){
@@ -21,13 +23,20 @@ add_action( 'admin_menu', function(){
         'tools.php',
         'Force Refresh',
         'Force Refresh',
-        'activate_plugins',
+        WP_FORCE_REFRESH_CAPABILITY,
         'force_refresh',
         __NAMESPACE__ . '\\manage_force_refresh'
     );
 
 });
 
+add_action("admin_init", function(){
+
+  $role = get_role("administrator");
+
+  $role->add_cap(WP_FORCE_REFRESH_CAPABILITY);
+
+});
 /**
  * Add the script for normal frontfacing pages (non-admin)
  */
@@ -41,7 +50,7 @@ add_action("wp_enqueue_scripts", function(){
         "force-refresh-js",
         "force_refresh_js_object",
         array(
-            "ajax_url" => admin_url( 'admin-ajax.php' )
+            "ajax_url" => admin_url('admin-ajax.php')
         )
     );
 

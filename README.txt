@@ -33,6 +33,18 @@ Upload the Force Refresh plugin to your site, and then simply activate it. To fo
 
 == Changelog ==
 
+= 1.2 =
+* The ability to perform a refresh is now assigned to a capability called, "Invoke Force Refresh" – allowing you to granularly control what types of users and roles can invoke a refresh.
+
+= 1.1.2 =
+* Update dependencies
+
+= 1.1.1 =
+* Code cleanup
+
+= 1.1 =
+* Bug fixes
+
 = 1.0 =
 * Initial release
 
