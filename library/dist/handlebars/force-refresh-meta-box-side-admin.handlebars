@@ -1,0 +1,36 @@
+<p>
+    <label for="force-refresh-meta-box-refresh-type-selector">To apply a specific type of refresh to this {{post_type}}, choose from the selection below.</label>
+    <select id="force-refresh-meta-box-refresh-type-selector">
+        <option value="default">Default</option>
+        {{!--<option value="post">This {{post_type}} only</option>--}}
+        {{!--<option value="date">On date</option>--}}
+        <option value="repeat">Repeat</option>
+    </select>
+</p>
+<ul id="force-refresh-meta-box-refresh-type-descriptions">
+    <li data-refresh-type="default">
+        This page will reload only when a refresh is inititated site-wide.
+    </li>
+    <li data-refresh-type="post">
+        This page, and only this page, will reload by clicking the Refresh buttton below or when a refresh is inititated site-wide.
+    </li>
+    <li data-refresh-type="date">
+        This page, and only this page, will reload on the specified date or when a refresh is inititated site-wide.
+    </li>
+    <li data-refresh-type="repeat">
+        This page, and only this page, will reload on the specified interval or when a refresh is inititated site-wide.
+    </li>
+</ul>
+<div id="force-refresh-meta-box-refresh-type-options-container" class="hidden">
+    <div class="force-refresh-meta-box-refresh-type-options" data-refresh-type="post">
+        <form id="force-refresh-admin" action="#" method="POST" > 
+            <button type="submit" class="button button-primary">Refresh {{post_type}}</button>
+        </form>
+    </div>
+    <div class="force-refresh-meta-box-refresh-type-options" data-refresh-type="date">
+        date
+    </div>
+    <div class="force-refresh-meta-box-refresh-type-options" data-refresh-type="repeat">
+        <p>Refresh this page every day at</p>
+        </div>
+    </div>

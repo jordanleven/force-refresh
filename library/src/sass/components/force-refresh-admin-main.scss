@@ -1,0 +1,67 @@
+.force-refresh-admin-container {
+    display: flex;
+
+    width: 100%;
+    margin-top: 10px;
+
+    .force-refresh-admin-main {
+        width: 100% * (8/12);
+        margin: 0 auto;
+        padding: 10px;
+
+        text-align: center;
+
+        border: 2px solid $light_grey;
+        border-radius: 10px;
+        background-color: white;
+
+        -webkit-backface-visibility: hidden;
+        .logo {
+            font-size: 40px;
+
+            width: 40px;
+            height: 40px;
+        }
+        .button {
+            font-size: 20px;
+
+            display: inline;
+
+            cursor: pointer;
+        }
+        .force-refresh-admin-main-inner {
+            padding: 20px 0 30px;
+        }
+    }
+    .force-refresh-admin-options {
+        width: 100% * (4/12);
+        margin: 0 auto;
+        .force-refresh-admin-options-inner {
+            margin: 0 20px;
+            padding: 0 20px 10px;
+
+            border: 2px solid white;
+            border-radius: 10px;
+            background-color: white;
+            .option-group {
+                margin-top: 10px;
+            }
+            select {
+                font-size: 14px;
+
+                height: 22px;
+            }
+            .force-refresh-options-header {
+                text-align: center;
+            }
+        }
+        .force-refresh-admin-options-footer {
+            margin-top: 20px;
+
+            text-align: right;
+            button {
+                margin-top: 10px;
+            }
+        }
+    }
+}

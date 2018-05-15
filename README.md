@@ -1,36 +1,32 @@
 # Force Refresh
->v 1.2
+>v 2.0
 
 Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
 
 ## Features
 * Support for both parent and child themes
 * Allows an admin to simply click a button to request browsers to refresh their page. This is done within two minutes after making the request.
-* Ability to add refreshing capabilities to any role using the "Invoke Force Refresh" capability.
 
 ## How it works
 It's pretty simple. When you click "Refresh Site," a hash is created and stored of the current time so no two hashes will be the same. On the front end of things, users will check for the current hash every two minutes. If the hash is different than the one that is stored - poof - the browser refreshes!
 
 To force a refresh, just activate the plugin, navigate to "Tools" and click on "Force Refresh."
 
-## Feature Requests and Bug Reports
+## Changelog ##
 
-Please report any bugs you encounter via the [under the Support tab](https://wordpress.org/support/plugin/force-refresh) or [GitHub](https://github.com/jordanleven/wp-force-refresh/issues/).
+### 2.0 ###
+* TBD
 
-You can also request new features via [GitHub](https://github.com/jordanleven/wp-force-refresh/issues/). This is a new plugin and I'm hoping to add more user-requested features to make this useful to developers.
-
-## Changelog
-
-### 1.2
+### 1.2 ###
 * The ability to perform a refresh is now assigned to a capability called, "Invoke Force Refresh" – allowing you to granularly control what types of users and roles can invoke a refresh.
 
-### 1.1.2
+### 1.1.2 ###
 * Update dependencies
 
-### 1.1.1
+### 1.1.1 ###
 * Code cleanup
 
-### 1.1
+### 1.1 ###
 * Bug fixes
 
 ## License

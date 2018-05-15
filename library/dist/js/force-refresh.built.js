@@ -25,7 +25,7 @@
             },
             timing : {
 
-                update_site_version_interval_in_seconds : 120
+                update_site_version_interval_in_seconds : force_refresh_js_object.refresh_interval
 
             }
 
@@ -37,18 +37,16 @@
             // Add our options to the object
             this.options = this.default_options;
 
-            
-
             // Update the current version of the site
             this.bindGetSiteVersion();
 
         },
 
         /**
-        * Method to bind actions to get the current site version.
-        *
-        * @return    {void}    
-        */
+         * Method to bind actions to get the current site version.
+         *
+         * @return    {void}    
+         */
         bindGetSiteVersion : function(){
 
             // Localize this since we'll be putting it inside of setInterval
@@ -67,13 +65,13 @@
         },
 
         /**
-        * Method to make call to get the current site version
-        *
-        * @return    {void}    
-        */
+         * Method to make call to get the current site version
+         *
+         * @return    {void}    
+         */
         getSiteVersion : function(){
 
-            
+            console.log(this.options.api_url);
 
             // Make the call
             this.ajaxCall(
@@ -146,18 +144,18 @@
         },
 
         /**
-        * Method used to submit AJAX calls and execute promises
-        *
-        * @param     {string}    action                  The action for the call to execute
-        * @param     {object}    callback_object         An object of done and always callbacks
-        * @param     {object}    data_object             An object of data to send to the API
-        * @param     {object}    additional_arguments    An object of data to send to the done callback
-        *                                              after the call is complete
-        * @return    {void}
-        *
-        * 
-        * @instance
-        */
+         * Method used to submit AJAX calls and execute promises
+         *
+         * @param     {string}    action                  The action for the call to execute
+         * @param     {object}    callback_object         An object of done and always callbacks
+         * @param     {object}    data_object             An object of data to send to the API
+         * @param     {object}    additional_arguments    An object of data to send to the done callback
+         *                                              after the call is complete
+         * @return    {void}
+         *
+         * 
+         * @instance
+         */
         ajaxCall : function(api_url, method, callback_object, data_object, additional_arguments){
 
             // If data_object is null, than create an empty object
@@ -253,7 +251,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            
+            console.log(this.class_name + " - " + message);
 
         },
 

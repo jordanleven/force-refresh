@@ -1,0 +1,42 @@
+<div class="wrap">
+    <h2>Force Refresh</h2>
+    <div class="force-refresh-admin-container">
+        <div class="force-refresh-admin-main">
+            <div class="force-refresh-admin-main-inner">
+                <p><span class="dashicons dashicons-update logo"></span></p>
+                <p>Here, you can force all user to manually reload the site "{{site_name}}".</p>
+                <form id="force-refresh-admin-main" action="#" method="POST"> 
+                    <button type="submit" class="button button-primary">Refresh site</button>
+                </form>
+            </div>
+        </div>
+        <div class="force-refresh-admin-options">
+            <div class="force-refresh-admin-options-inner">
+                <h3 class="force-refresh-options-header">Options</h3>
+                <form id="force-refresh-admin-options" action="#" method="POST">
+                    <div class="option-group">
+                        <label for="show-in-wp-admin-bar">Refresh from Admin Bar</label>
+                        <select type="select" name="show-in-wp-admin-bar">
+                            <option value="true" {{options.preset_value_force_refresh_in_admin_bar_show}}>Show</option>
+                            <option value="false" {{options.preset_value_force_refresh_in_admin_bar_hide}}>Hide</option>
+                        </select>
+                    </div>
+                    <div class="option-group">
+                        <label for="show-in-wp-admin-bar">Refresh interval</label>
+                        <select type="select" name="refresh-interval">
+                            <option value="30" {{options.preset_value_force_refresh_refresh_interval_30}}>30 seconds</option>
+                            <option value="60" {{options.preset_value_force_refresh_refresh_interval_60}}>60 seconds</option>
+                            <option value="90" {{options.preset_value_force_refresh_refresh_interval_90}}>90 seconds</option>
+                            <option value="120" {{options.preset_value_force_refresh_refresh_interval_120}}>120 seconds</option>
+                        </select>
+                    </div>
+                    <div class="force-refresh-admin-options-footer">
+                        <hr />
+                        <button type="submit" class="button button-primary">Update</button>
+                        <input name="force-refresh-admin-options-save" value="true" type="hidden" />
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

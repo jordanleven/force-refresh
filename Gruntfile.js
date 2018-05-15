@@ -33,11 +33,19 @@ module.exports = function(grunt) {
             },
 
             // Admin JS
+            admin_main_js: {
+                src: [
+                'library/src/js/force-refresh-main-admin.js'
+                ],
+                dest: 'library/dist/js/force-refresh-main-admin.built.js',
+            },
+
+            // Admin JS
             admin_js: {
                 src: [
-                'library/src/js/force-refresh-admin.js'
+                'library/src/js/force-refresh-meta-box-admin.js'
                 ],
-                dest: 'library/dist/js/force-refresh-admin.built.js',
+                dest: 'library/dist/js/force-refresh-meta-box-admin.built.js',
             },
 
             // Regular JS

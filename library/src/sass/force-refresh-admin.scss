@@ -1,10 +1,23 @@
+// Color variables
+$light_grey : #d8d8d8;
+
+// Viewport variables
+$xxs                      : 0;
+$xs                       : 610px;
+$sm                       : 768px;
+$md                       : 992px;
+$lg                       : 1200px;
+
+// Include all mixins
+@import "force-refresh-base-mixins";
+
 /**
-* Mixin to generate a transition
-*
-* @param     {string}    $transitionProperties...    The properties to animate
-*
-* @return    {void}
-*/
+ * Mixin to generate a transition
+ *
+ * @param     {string}    $transitionProperties...    The properties to animate
+ *
+ * @return    {void}
+ */
 @mixin transition($transitionProperties...) {
     -webkit-transition: $transitionProperties;
     -moz-transition: $transitionProperties;
@@ -14,8 +27,8 @@
 }
 
 /**
-* Spin for WebKit
-*/
+ * Spin for WebKit
+ */
 @-webkit-keyframes spin {
     0% {
         -webkit-transform: rotate(0deg);
@@ -32,8 +45,8 @@
 }
 
 /**
-* Spin for Firefox
-*/
+ * Spin for Firefox
+ */
 @-moz-keyframes spin {
     0% {
         -moz-transform: rotate(0deg);
@@ -50,8 +63,8 @@
 }
 
 /**
-* Spin for Opera (who's still using this?)
-*/
+ * Spin for Opera (who's still using this?)
+ */
 @-o-keyframes spin {
     0% {
         -o-transform: rotate(0deg);
@@ -68,8 +81,8 @@
 }
 
 /**
-* Spin for generic stuff
-*/
+ * Spin for generic stuff
+ */
 @keyframes spin {
     0% {
         transform: rotate(0deg);
@@ -80,6 +93,26 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+.logo-spin {
+    -webkit-animation-name: spin;
+    -moz-animation-name: spin;
+    animation-name: spin;
+    -webkit-animation-duration: 1s;
+    -moz-animation-duration: 1s;
+    animation-duration: 1s;
+    -webkit-animation-timing-function: linear;
+    -moz-animation-timing-function: linear;
+    animation-timing-function: linear;
+    -webkit-animation-iteration-count: 1;
+    -moz-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+    -webkit-transform-origin: 50% 47.5%;
+    -moz-transform-origin: 50% 47.5%;
+    -ms-transform-origin: 50% 47.5%;
+    -o-transform-origin: 50% 47.5%;
+    transform-origin: 50% 47.5%;
 }
 
 .notice {
@@ -94,41 +127,11 @@
     }
 }
 
+// The main window styles
+@import "components/force-refresh-admin-main";
 
-.site-refresh-inner {
-    padding: 10px;
+// The meta box styles (available in specific posts)
+@import "components/force-refresh-admin-meta-box";
 
-    text-align: center;
-
-    border: 1px solid #d8d8d8;
-    background-color: #fff;
-
-    -webkit-backface-visibility: hidden;
-    .logo {
-        font-size: 40px;
-
-        width: 40px;
-        height: 40px;
-        &.logo-spin {
-            -webkit-animation-name: spin;
-            -moz-animation-name: spin;
-            animation-name: spin;
-            -webkit-animation-duration: 1s;
-            -moz-animation-duration: 1s;
-            animation-duration: 1s;
-            -webkit-animation-timing-function: linear;
-            -moz-animation-timing-function: linear;
-            animation-timing-function: linear;
-            -webkit-animation-iteration-count: 1;
-            -moz-animation-iteration-count: 1;
-            animation-iteration-count: 1;
-        }
-    }
-    .button {
-        font-size: 20px;
-
-        display: inline;
-
-        cursor: pointer;
-    }
-}
+// The WP Admin Bar styles
+@import "components/force-refresh-admin-wordpress-admin-bar";

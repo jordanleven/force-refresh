@@ -1,0 +1,29 @@
+#force-refresh-meta-box-refresh-type-selector {
+    width: 100%;
+    margin: 10px 0 0;
+}
+
+// Styles for the descriptions for each type of refresh
+#force-refresh-meta-box-refresh-type-descriptions {
+    li {
+        font-size: 0.7rem;
+        line-height: 1.4;
+
+        display: none;
+
+        color: #a2a2a2;
+
+        &.selected {
+            display: block;
+        }
+    }
+}
+
+#force-refresh-meta-box-refresh-type-options-container {
+    .force-refresh-meta-box-refresh-type-options {
+        display: none;
+        &.selected {
+            display: block;
+        }
+    }
+}

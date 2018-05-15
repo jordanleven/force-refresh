@@ -1,0 +1,375 @@
+/**
+ * Mixin for outputting border radius with vendor prefixes.
+ *
+ * @param {int} $radius The border radius
+ *
+ * @deprecated This is no longer necessary [https://css-tricks.com/do-we-need-box-shadow-prefixes/]
+ * 
+ */
+@mixin border-radius($radius) {
+    -webkit-border-radius: $radius;
+       -moz-border-radius: $radius;
+            border-radius: $radius;
+
+        -ms-border-radius: $radius;
+}
+
+/**
+ * Mixin for outputting box shadows with vendor prefixes.
+ *
+ * @param {string} $width The width to apply to the box shadow
+ *
+ * @deprecated This is no longer necessary [https://css-tricks.com/do-we-need-box-shadow-prefixes/]
+ * 
+ */
+@mixin box-shadow($width) {
+    -webkit-box-shadow: 0 0 $width #a2a2a2;
+       -moz-box-shadow: 0 0 $width #a2a2a2;
+            box-shadow: 0 0 $width #a2a2a2;
+}
+
+/**
+ * Advanced mixin for outputting box shadows with vendor prefixes.
+ *
+ * @param {string} $top             The top box shadow amount
+ * @param {string} $left            The left box shadow amount
+ * @param {int} $blur               The amount to blur
+ * @param {string} $color           The color to use
+ * @param {boolean} $inset: false   Whether or not to inset
+ *
+ * @deprecated This is no longer necessary [https://css-tricks.com/do-we-need-box-shadow-prefixes/]
+ *
+ */
+@mixin box-shadow-advanced($top, $left, $blur, $color, $inset: false) {
+    @if $inset {
+        -webkit-box-shadow: inset $top $left $blur $color;
+           -moz-box-shadow: inset $top $left $blur $color;
+                box-shadow: inset $top $left $blur $color;
+    }
+    @else {
+        -webkit-box-shadow: $top $left $blur $color;
+           -moz-box-shadow: $top $left $blur $color;
+                box-shadow: $top $left $blur $color;
+    }
+}
+
+/**
+ * Mixin for outputting transition properties with vendor prefixes.
+ *
+ * @param {string} $transitionProperties... Different transition properties, separated by commas
+ *
+ */
+@mixin transition($transitionProperties...) {
+    -webkit-transition: $transitionProperties;
+       -moz-transition: $transitionProperties;
+        -ms-transition: $transitionProperties;
+         -o-transition: $transitionProperties;
+            transition: $transitionProperties;
+}
+
+/**
+ * Mixin for making an element unselectable by the user.
+ *
+ */
+@mixin user-select-none() {
+    -webkit-user-select: none;
+       -moz-user-select: none;
+        -ms-user-select: none;
+            user-select: none;
+
+         -o-user-select: none;
+}
+
+/**
+ * Mixin for outputting rotation properties with vendor prefixes.
+ *
+ * @param {int} $degrees The degrees to rotate the element
+ *
+ */
+@mixin rotate($degrees) {
+    -webkit-transform: rotate($degrees + deg);
+       -moz-transform: rotate($degrees + deg);
+        -ms-transform: rotate($degrees + deg);
+         -o-transform: rotate($degrees + deg);
+            transform: rotate($degrees + deg);
+}
+
+/**
+ * Mixin for outputting scale properties with vendor prefixes.
+ *
+ * @param {int} $scale_amount The amount to scale
+ *
+ */
+@mixin scale($scale_amount) {
+    -webkit-transform: scale($scale_amount);
+       -moz-transform: scale($scale_amount);
+        -ms-transform: scale($scale_amount);
+         -o-transform: scale($scale_amount);
+            transform: scale($scale_amount);
+}
+
+/**
+ * Mixin for outputting placeholder text used with inputs.
+ *
+ */
+@mixin input-placeholder() {
+    &::-webkit-input-placeholder {
+        @content;
+    }
+    &:-moz-placeholder {
+        @content;
+    }
+    &::-moz-placeholder {
+        @content;
+    }
+    &:-ms-input-placeholder {
+        @content;
+    }
+}
+
+/**
+ * Mixin for outputting an element opacity (good for old versions of IE).
+ *
+ * @param {float} $opacity The opacity
+ *
+ */
+@mixin opacity($opacity) {
+           opacity: $opacity;
+
+    $non_decimal_opacity: $opacity * 100;
+    -ms-filter: 'progid:DXImageTransform.Microsoft.Alpha(Opacity=$non_decimal_opacity)';
+      -moz-opacity: $opacity;
+    -khtml-opacity: $opacity;
+        filter: alpha(opacity=$non_decimal_opacity);
+}
+
+/**
+ * Mixin to output a Font Awesome icon. This must be placed inside of a pseudo-element
+ *
+ * @param {string} $icon_code  The icon code (with the preceding escape character)
+ * @param {array} $overrides: ()            Any overrides for the default attributes with Font Awesome
+ */
+@mixin font-awesome-icon($icon_code, $overrides: ()) {
+    font-family: FontAwesome;
+
+    content: $icon_code;
+    // Declare the defaults that can be overridden
+
+    $font_awesome_defaults: (
+    font-style             : normal,
+    font-weight            : normal,
+    font-stretch           : normal,
+    line-height            : 1,
+    text-rendering         : auto,
+    -webkit-font-smoothing : antialiased,
+    );
+    // Loop through each default. If one is overridden, then use the overriden value instead
+    @each $key, $value in $font_awesome_defaults {
+        // If the value is in the overrides, use that value instead
+        @if map-has-key($overrides, $key) {
+            #{$key}: map-get($overrides, $key);
+        }
+        // Otherwise, use the default values
+        @else {
+            #{$key}: #{$value};
+        }
+    }
+}
+
+/**
+ * Mixin used to generate an animation. The content will be repeated for all of the vendor prefixes.
+ *
+ * @param {string} $animation_name The name of the animation
+ *
+ * @see animation
+ *
+ */
+@mixin generate_animation($animation_name) {
+    @-webkit-keyframes #{$animation_name} {
+        @content;
+    }
+    @-moz-keyframes #{$animation_name} {
+        @content;
+    }
+    @-o-keyframes #{$animation_name} {
+        @content;
+    }
+    @keyframes #{$animation_name} {
+        @content;
+    }
+}
+
+/**
+ * Mixin used to output the CSS to invoke an animation.
+ *
+ * @param {string} $animation_name                  The animation name to use
+ * @param {string] $speed: 2s                       The speed of the animation
+ * @param {string} $timing_function: infinite        The timing function (if it repeats, etc)
+ * @param {string} $delay : 0s                      Any delay applied to the animation
+ *
+ */
+@mixin animation($animation_name, $speed: 2s , $timing_function: infinite, $delay : 0s) {
+    -webkit-animation: $animation_name $speed $timing_function $delay;
+       -moz-animation: $animation_name $speed $timing_function $delay;
+         -o-animation: $animation_name $speed $timing_function $delay;
+            animation: $animation_name $speed $timing_function $delay;
+}
+
+/**
+ * Mixin used to vertical-align an element
+ *
+ */
+@mixin valign() {
+    display: table;
+
+    width: 100%;
+    height: 100%;
+     > div,
+     > blockquote {
+        display: table-cell;
+
+        vertical-align: middle;
+    }
+}
+
+/**
+ * Mixin used to assign text color and check if the selected text color has a defined highlight color in the color map
+ *
+ */
+@mixin text-color($text_color) {
+    color: $text_color;
+    @if map-has-key($text_selection_color_map, $text_color) {
+        &::selection {
+            background: map-get($text_selection_color_map, $text_color);
+        }
+    }
+}
+
+/**
+ * Mixin used to assign special styles to high-resolution screens
+ *
+ */
+@mixin retina() {
+    @media
+    (-webkit-min-device-pixel-ratio: 2),
+    (min-resolution: 192dpi) {
+        @content;
+    }
+}
+
+/**
+ * Mixin used to apply styles to specific viewports.
+ *
+ * @param {string} $min  The min width for the query
+ * @param {string} $max: false        An optional max-width for the query
+ *
+ */
+@mixin resp($min, $max: false) {
+    @if ($max) {
+        @media (min-width: #{$min}) and (max-width: #{$max - 1px}) {
+            @content;
+        }
+    }
+    @else {
+        @media (min-width: #{$min}) {
+            @content;
+        }
+    }
+}
+
+/**
+ * Mixin used to apply styles to the XXS viewport.
+ *
+ * @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+ *
+ */
+@mixin xxsmall($limit: false) {
+    @if ($limit) {
+        @media (min-width: #{$xxs}) and (max-width: #{$xs - 1px}) {
+            @content;
+        }
+    }
+    @else {
+        @media (min-width: #{$xxs}) {
+            @content;
+        }
+    }
+}
+
+/**
+ * Mixin used to apply styles to the XS viewport.
+ *
+ * @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+ *
+ */
+@mixin xsmall($limit: false) {
+    @if ($limit) {
+        @media (min-width: #{$xs}) and (max-width: #{$sm - 1px}) {
+            @content;
+        }
+    }
+    @else {
+        @media (min-width: #{$xs}) {
+            @content;
+        }
+    }
+}
+
+/**
+ * Mixin used to apply styles to the small viewport.
+ *
+ * @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+ *
+ */
+@mixin small($limit: false) {
+    @if ($limit) {
+        @media (min-width: #{$sm}) and (max-width: #{$md - 1px}) {
+            @content;
+        }
+    }
+    @else {
+        @media (min-width: #{$sm}) {
+            @content;
+        }
+    }
+}
+
+/**
+ * Mixin used to apply styles to the medium viewport.
+ *
+ * @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+ *
+ */
+@mixin medium($limit: false) {
+    @if ($limit) {
+        @media (min-width: #{$md}) and (max-width: #{$lg - 1px}) {
+            @content;
+        }
+    }
+    @else {
+        @media (min-width: #{$md}) {
+            @content;
+        }
+    }
+}
+
+/**
+ * Mixin used to apply styles to the large viewport.
+ *
+ */
+@mixin large {
+    @media (min-width: #{$lg}) {
+        @content;
+    }
+}
+
+/**
+* Mixin to make it easy to declare a REM-based font size and get the pre-calculated font-size (for older browsers like IE)
+*
+* @param {int || float} $text_size_in_rem The font size in REM
+*
+*/
+@mixin rem-font-size($text_size_in_rem) {
+    font-size: $text_size_in_rem * $base_font_size;
+    font-size: $text_size_in_rem + rem;
+}

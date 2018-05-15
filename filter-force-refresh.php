@@ -6,15 +6,69 @@ namespace JordanLeven\Plugins\ForceRefresh;
 Plugin Name: Force Refresh
 Plugin URI: 
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
-Version: 1.2
+Version: 2.0.0-0
 Author: Jordan Leven
 Author URI: https://github.com/jordanleven
 Contributors: 
 */
 
+// Define the name of the action for the refresh. This is used with the nonce to create a unique action
+// when admins request a refresh.
 define("WP_FORCE_REFRESH_ACTION", "wp_force_refresh");
 
+// Define the name of the capability used to invoke a refresh. This is used for developers who want to fine-tune
+// control of what types of users and roles can request a refresh.
 define("WP_FORCE_REFRESH_CAPABILITY", "invoke_force_refresh");
+
+// Define the ID for the Handlebars admin notice. This is used to add notifications to the admin screen when a user requests a refresh.
+define("WP_FORCE_REFRESH_HANDLEBARS_ADMIN_NOTICE_TEMPLATE_ID", "invoke_force_refresh");
+
+// Define the option for showing the Force Refresh button in the WordPress Admin Bar
+define("WP_FORCE_REFRESH_OPTION_SHOW_IN_WP_ADMIN_BAR", "force_refresh_show_in_wp_admin_bar");
+
+// Define the option for the refresh interval (how often the site should check for a new version)
+define("WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS", "force_refresh_refresh_interval");
+
+// Define the default refresh interval
+define("WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT", 120);
+
+// Make sure we include the composer autoload file
+require_once __DIR__ . "/library/vendor/autoload.php";
+
+// Include the functions file
+require_once __DIR__ . "/library/custom/functions.php";
+
+/**
+ * Function for getting the directory for this plugin
+ *
+ * @return string The full directory this plugin is located in (including the plugin directory)
+ *
+ * @version 2.0 Introducted in version 2.0
+ */
+function get_force_refresh_plugin_directory(){
+
+    // Declare our plugin directory
+    $plugin_directory = plugin_dir_path(__FILE__);
+
+    return $plugin_directory;
+}
+
+/**
+ * Function for getting the uri for this plugin
+ *
+ * @param  string $file The optional file path you want to append to the urldecode(str)
+ * 
+ * @return string The full url for the root of this plugin is located in (including the plugin directory)
+ *
+ * @version 2.0 Introducted in version 2.0
+ */
+function get_force_refresh_plugin_url($file = null){
+
+    // Declare our plugin directory
+    $plugin_url = plugins_url($file, __FILE__);
+
+    return $plugin_url;
+}
 
 // Add the menu where we'll configure the settings
 add_action( 'admin_menu', function(){
@@ -30,6 +84,8 @@ add_action( 'admin_menu', function(){
 
 });
 
+// Add the action to add the Force Refresh capability to allow developers to customize which users and roles
+// can init a Force Refresh
 add_action("admin_init", function(){
 
   $role = get_role("administrator");
@@ -37,20 +93,22 @@ add_action("admin_init", function(){
   $role->add_cap(WP_FORCE_REFRESH_CAPABILITY);
 
 });
-/**
- * Add the script for normal frontfacing pages (non-admin)
- */
+
+// Add the script for normal frontfacing pages (non-admin)
 add_action("wp_enqueue_scripts", function(){
 
     // Include the normal JS
-    add_script("force-refresh-js", "force-refresh.built.min.js", true);
+    add_script("force-refresh-js", "/library/dist/js/force-refresh.built.min.js", true);
 
     // Localize the admin ajax URL. This doesn't sound like the best idea but WP is into it (https://codex.wordpress.org/AJAX_in_Plugins)
     wp_localize_script(
         "force-refresh-js",
         "force_refresh_js_object",
         array(
-            "ajax_url" => admin_url('admin-ajax.php')
+            // Get the ajax URL
+            "ajax_url"         => admin_url('admin-ajax.php'),
+            // Get the refresh interval
+            "refresh_interval" => get_option(WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS, WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT)
         )
     );
 
@@ -59,301 +117,22 @@ add_action("wp_enqueue_scripts", function(){
 
 });
 
-/**
-* The function used by ajax requests to get the current site version.
-*
-* @return    void
-*/
-function ajax_request_get_site_version(){
-
-    // Get the data
-    $data = $_REQUEST;
-
-    // Declare our return
-    $return_array = array();
-
-    // Whether or not the call was successful
-    $success = true;
-
-    // The HTTP status code
-    $status_code = 200;
-
-    // The status text
-    $status_text = "The current site version has been successfully retrieved.";
-
-    // The return data
-    $return_data = array();
-
-    // Get the current site version
-    $current_site_version = get_option("force_refresh_current_site_version");
-
-    // If no current site version exists, then the site version will default to version 0. This should be a string and not an integer
-    if (!$current_site_version){
-
-        $current_site_version = "0";
-    }
-
-    $return_data['current_site_version'] = $current_site_version;
-
-    // Set the HTTP code
-    status_header($status_code);
-
-    // Return the success
-    $return_array['success']     = $success;
-    
-    // Return the status code
-    $return_array['status_code'] = $status_code;
-    
-    // Return the status text
-    $return_array['status_text'] = $status_text;
-    
-    // Return the return data
-    $return_array['return_data'] = $return_data;
-
-    print json_encode($return_array);
-
-    wp_die(); 
-}
-
-/**
-* The call used for users requesting the current site version from non-admins
-*/
-add_action( 'wp_ajax_nopriv_force_refresh_get_site_version', __NAMESPACE__ . "\\ajax_request_get_site_version");
-
-/**
-* The call used for users requesting the current site version from admins
-*/
-add_action( 'wp_ajax_force_refresh_get_site_version', __NAMESPACE__ . "\\ajax_request_get_site_version");
-
-/**
-* The call used for admins requesting a site be refreshed
-*/
-add_action( 'wp_ajax_force_refresh_update_site_version', function(){
-
-    // Get the data
-    $data = $_REQUEST;
-
-    // Declare our return
-    $return_array = array();
-
-    // Get the nonce
-    $nonce = $data['nonce'];
-
-    // Whether or not the call was successful
-    $success = false;
-
-    // The HTTP status code
-    $status_code = null;
-
-    // The status text
-    $status_text = null;
-
-    // The return data
-    $return_data = array();
-
-    // Check the nonce
-    if (wp_verify_nonce($nonce, WP_FORCE_REFRESH_ACTION)){
-
-        // If the user is authenticated, get the current site version by making a hash of the current date
-        $time = current_time("timestamp");
-
-        $site_version_hash = wp_hash($time);
-
-        // Get the first eight characters (the chance of having a duplicate hash from the first 8 characters is low)
-        $site_version = substr($site_version_hash, 0, 8);
-
-        delete_option("force_refresh_current_site_version");
-
-        add_option("force_refresh_current_site_version", $site_version, null, "no" );
-
-        // The call was successful
-        $success = true;
-
-        // Redeclare the status code as 200
-        $status_code = 200;
-
-        // Redeclare the status text
-        $status_text = "You've successfully requested all browsers to refresh (version <code>$site_version</code>).";
-
-        // Redeclare the status text
-        $return_data['new_site_version'] = $site_version;
-
-
-    }
-
-    else {
-
-        // Redeclare the status code as 401 (unauthorized)
-        $status_code = 401;
-
-        $status_text = "There was an issue verifying your nonce ($nonce).";
-
-    }
-
-    // Set the HTTP code
-    status_header($status_code);
-
-    // Return the success
-    $return_array['success']     = $success;
-    
-    // Return the status code
-    $return_array['status_code'] = $status_code;
-    
-    // Return the status text
-    $return_array['status_text'] = $status_text;
-    
-    // Return the return data
-    $return_array['return_data'] = $return_data;
-
-    print json_encode($return_array);
-
-    wp_die(); 
-});
-
-/** 
-* Main function to manage settings for Force Refresh.
-*
-* @return    void    
-*/
-function manage_force_refresh(){
-
-    // Include the admin CSS
-    add_style("force-refresh-admin-css", "force-refresh-admin.built.min.css");
-
-    // Include the admin JS
-    add_script("force-refresh-admin-js", "force-refresh-admin.built.min.js", true);
-
-    // Create the data we're going to localize to the script
-    $localized_data = array();
-
-    // Add the API URL for the script
-    $localized_data['api_url'] = get_stylesheet_directory_uri();
-
-    // Add the API URL for the script
-    $localized_data['site_id'] = get_current_blog_id();
-
-    // Create a nonce for the user
-    $localized_data['nonce'] = wp_create_nonce(WP_FORCE_REFRESH_ACTION);
-
-    // Localize the data
-    wp_localize_script(
-        "force-refresh-admin-js",
-        "force_refresh_local_js",
-        $localized_data
-    );
-
-    // Now that it's registered, enqueue the script
-    wp_enqueue_script("force-refresh-admin-js");
-
-    ?>
-
-    <div class="wrap">
-
-        <h2>Site Refresh</h2>
-
-        <div id="alert-container">
-
-        </div>
-
-        <div style="text-align: left">
-
-            <div class="site-refresh-inner" style="font-size:16px;">
-
-                <p><span class="dashicons dashicons-update logo"></span></p>
-
-                <p>Here, you can force all user to manually reload the site "<?php echo get_bloginfo();?>".</p>
-
-                <form id="force-refresh-admin" action="#" method="POST" > 
-
-                    <button type="submit" class="button button-primary">Refresh site</button>
-
-                </form>
-            </div>
-        </div>
-
-    </div>
-    <?php
-}
-
-/**
-* Function for enqueueing styles for this plugin.
-*
-* @param     string    $handle    The stylesheet handle
-* @param     string    $path      The path to the stylesheet (relative to the CSS dist directory)
-*
-* @return    void               
-*/
-function add_style($handle, $path){
-
-    // Get the file path
-    $file_path = plugin_dir_path(__FILE__) . "library/dist/css/$path";
-
-    // If the file doesn't exist, throw an error
-    if (!file_exists($file_path)){
-
-        echo "<div class=\"notice notice-error\">";
-        echo "<p>$path is missing.</p>";
-        echo "</div>";
-
-    }
-    // Otherwise, work normally
-    else {
-
-        // Get the file version
-        $file_version = filemtime($file_path);
-
-        // Enqueue the style
-        wp_enqueue_style("force-refresh-admin", plugins_url("/library/dist/css/$path", __FILE__), array(), $file_version);
-
-    }
-
-}
-
-/**
-* Function for adding scripts for this plugin.
-*
-* @param     string     $handle      The script handle
-* @param     string     $path        The path to the script (relative to the JS dist directory)
-* @param     boolean    $register    Whether we should simply register the script instead of enqueing it
-*
-* @return    void               
-*/
-function add_script($handle, $path, $register = false){
-
-    // Get the file path
-    $file_path = plugin_dir_path(__FILE__) . "library/dist/js/$path";
-
-    // If the file doesn't exist, throw an error
-    if (!file_exists($file_path)){
-
-        echo "<div class=\"notice notice-error\">";
-        echo "<p>$path is missing.</p>";
-        echo "</div>";
-
-    }
-    // Otherwise, work normally
-    else {
-
-        // Get the file version
-        $file_version = filemtime($file_path);
-
-        // If we want to only register the script
-        if ($register){
-
-            wp_register_script($handle, plugins_url("/library/dist/js/$path", __FILE__), array("jquery"), $file_version);
-
-        }
-
-        // Otherwise, we want to enqueue the script
-        else {
-
-            // Enqueue the style
-            wp_enqueue_script($handle, plugins_url("/library/dist/js/$path", __FILE__), array("jquery"), $file_version);
-
-        }
-
-    }
-
-}
+// Add meta boxes for specific pages that we want to refresh
+// add_action('add_meta_boxes',  function(){
+
+//     // An array of all screens where we want to implement the meta box
+//     $screens = array("page", "post");
+
+//     foreach ($screens as $screen) {
+//         // Add the box
+//         add_meta_box(
+//             'force_refresh_specific_page_refresh',
+//             'Force Refresh',
+//             __NAMESPACE__ . '\\force_refresh_specific_page_refresh_html',
+//             $screen,
+//             'side'
+//         );  
+//     }
+// });
 
 ?>
