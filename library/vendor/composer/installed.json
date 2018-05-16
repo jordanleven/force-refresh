@@ -1,29 +1,36 @@
 [
     {
-        "name": "xamin/handlebars.php",
+        "name": "zordius/lightncandy",
         "version": "dev-master",
         "version_normalized": "9999999-dev",
         "source": {
             "type": "git",
-            "url": "https://github.com/XaminProject/handlebars.php.git",
-            "reference": "38c743f79b8a2b501d9be97a413a56e5c2ed3e0f"
+            "url": "https://github.com/zordius/lightncandy.git",
+            "reference": "0301a34501819af7f04adbed524b3fdc9061d8fe"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/XaminProject/handlebars.php/zipball/38c743f79b8a2b501d9be97a413a56e5c2ed3e0f",
-            "reference": "38c743f79b8a2b501d9be97a413a56e5c2ed3e0f",
+            "url": "https://api.github.com/repos/zordius/lightncandy/zipball/0301a34501819af7f04adbed524b3fdc9061d8fe",
+            "reference": "0301a34501819af7f04adbed524b3fdc9061d8fe",
             "shasum": ""
         },
-        "require-dev": {
-            "phpunit/phpunit": "~4.4",
-            "squizlabs/php_codesniffer": "~1.5"
+        "require": {
+            "php": ">=5.4.0"
         },
-        "time": "2016-12-27 09:15:36",
+        "require-dev": {
+            "phpunit/phpunit": "4.8.35"
+        },
+        "time": "2018-03-23 09:14:34",
         "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.2.3-dev"
+            }
+        },
         "installation-source": "source",
         "autoload": {
-            "psr-0": {
-                "Handlebars": "src/"
+            "psr-4": {
+                "LightnCandy\\": "src"
             }
         },
         "notification-url": "https://packagist.org/downloads/",
@@ -32,15 +39,18 @@
         ],
         "authors": [
             {
-                "name": "fzerorubigd",
-                "email": "fzerorubigd@gmail.com"
-            },
-            {
-                "name": "Behrooz Shabani (everplays)",
-                "email": "everplays@gmail.com"
+                "name": "Zordius Chen",
+                "email": "zordius@gmail.com"
             }
         ],
-        "description": "Handlebars processor for php",
-        "homepage": "https://github.com/XaminProject/handlebars.php"
+        "description": "An extremely fast PHP implementation of handlebars ( http://handlebarsjs.com/ ) and mustache ( http://mustache.github.io/ ).",
+        "homepage": "https://github.com/zordius/lightncandy",
+        "keywords": [
+            "handlebars",
+            "logicless",
+            "mustache",
+            "php",
+            "template"
+        ]
     }
 ]

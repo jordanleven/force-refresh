@@ -4,22 +4,27 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit975450e4479348df16a79c073a350b5c
+class ComposerStaticInitc61230fb6bd85b73b4c00796f1ff9853
 {
-    public static $prefixesPsr0 = array (
-        'H' => 
+    public static $prefixLengthsPsr4 = array (
+        'L' => 
         array (
-            'Handlebars' => 
-            array (
-                0 => __DIR__ . '/..' . '/xamin/handlebars.php/src',
-            ),
+            'LightnCandy\\' => 12,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'LightnCandy\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/zordius/lightncandy/src',
         ),
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixesPsr0 = ComposerStaticInit975450e4479348df16a79c073a350b5c::$prefixesPsr0;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitc61230fb6bd85b73b4c00796f1ff9853::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitc61230fb6bd85b73b4c00796f1ff9853::$prefixDirsPsr4;
 
         }, null, ClassLoader::class);
     }
