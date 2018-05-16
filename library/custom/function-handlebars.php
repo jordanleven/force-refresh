@@ -2,7 +2,7 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
-use Handlebars\Handlebars;
+use LightnCandy as ZordiusLightnCandy;
 
 // The location of the handlebars directory relative to the plugin root
 define("FORCE_REFRESH_HANDLEBARS_DIRECTORY", "library/dist/handlebars/");
@@ -49,30 +49,8 @@ function add_handlebars($id, $src){
 */
 function render_handlebars($template_name, $replacements_array = array(), $return = false){
 
-    global $force_refresh_force_refresh_handlebars_engine;
-
     // Get the directory of the plugin
     $directory = get_force_refresh_plugin_directory();
-
-    if (!$force_refresh_handlebars_engine || $force_refresh_handlebars_engine->templateDirectory !== $directory){
-
-        $force_refresh_handlebars_engine = new Handlebars(
-            array(
-                'loader' => new \Handlebars\Loader\FilesystemLoader(
-                    $directory . FORCE_REFRESH_HANDLEBARS_DIRECTORY
-                    ),
-
-                'partials_loader' => new \Handlebars\Loader\FilesystemLoader(
-                    $directory . FORCE_REFRESH_HANDLEBARS_DIRECTORY,
-                    array(
-                        'prefix' => 'partial-'
-                        )
-                    )
-                )
-            );
-
-        $force_refresh_handlebars_engine->templateDirectory = $directory;
-    }
 
     // Add the template directory to the replacements
     $replacements_array["template_directory_uri"] = get_template_directory_uri();
@@ -83,10 +61,19 @@ function render_handlebars($template_name, $replacements_array = array(), $retur
 
     if (file_exists($file_location)){
 
-        $rendered_html = $force_refresh_handlebars_engine->render(
-            $template_name,
-            $replacements_array
-            );
+        // Get the file contents
+        $handlebar_contents = file_get_contents($file_location);
+
+        $php = ZordiusLightnCandy\LightnCandy::compile(
+            $handlebar_contents, array(
+                'flags' => ZordiusLightnCandy\LightnCandy::FLAG_RENDER_DEBUG | ZordiusLightnCandy\LightnCandy::FLAG_HANDLEBARSJS
+            )
+        );
+
+        // Get the render function
+        $renderer = ZordiusLightnCandy\LightnCandy::prepare($php);
+
+        $rendered_html = $renderer($replacements_array);
 
         // If return is true, then return the HTML
         if ($return){
