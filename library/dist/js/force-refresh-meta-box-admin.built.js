@@ -333,7 +333,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            console.debug(this.class_name + " - " + message);
+            
 
         },
 

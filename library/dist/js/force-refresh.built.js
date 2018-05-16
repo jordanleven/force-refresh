@@ -71,7 +71,7 @@
          */
         getSiteVersion : function(){
 
-            console.log(this.options.api_url);
+            
 
             // Make the call
             this.ajaxCall(
@@ -251,7 +251,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            console.log(this.class_name + " - " + message);
+            
 
         },
 
