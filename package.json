@@ -25,6 +25,7 @@
     },
     "dependencies": {
         "bootstrap-timepicker": "^0.5.2",
-        "font-awesome": "^4.7.0"
+        "font-awesome": "^4.7.0",
+        "handlebars": "^4.0.11"
     }
 }
