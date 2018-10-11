@@ -245,7 +245,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            console.log(this.class_name + " - " + message);
+            
 
         },
 
