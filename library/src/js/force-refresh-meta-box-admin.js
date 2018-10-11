@@ -21,11 +21,13 @@
 
             elements : {
 
-                force_refresh_meta_box : "#force_refresh_specific_page_refresh",
-
-                meta_box_refresh_type : "#force-refresh-meta-box-refresh-type-selector",
-
-                meta_box_refresh_options_container : "#force-refresh-meta-box-refresh-type-options-container"
+                force_refresh_meta_box             : "#force_refresh_specific_page_refresh",
+                
+                meta_box_refresh_type              : "#force-refresh-meta-box-refresh-type-selector",
+                
+                meta_box_refresh_options_container : "#force-refresh-meta-box-refresh-type-options-container",
+                
+                meta_box_refresh_button            : '#force-refresh-admin-page'
 
             }
 
@@ -37,25 +39,102 @@
          * @return    {void}    
          */
          init : function () {
-
             var base = this;
-
             // Add options to the class
             this.options          = this.default_options;
-
             // Bind the form updates button
-            this.bindMetaBoxRefreshTypeUpdates(this.options.elements.meta_box_refresh_type);
+            // this.bindMetaBoxRefreshTypeUpdates(this.options.elements.meta_box_refresh_type);
+            // $(window)
+            // .load(function(){
+            //     // Unhide the options
+            //     $(base.options.elements.meta_box_refresh_options_container)
+            //     .removeClass("hidden");
+            // });
+            $( this.options.elements.meta_box_refresh_button )
+            .click(function(e){
+                e.preventDefault();
 
-            $(window)
-            .load(function(){
+                // Signal the refresh
+                base.ajaxCall(
+                    base.options.api_url,
+                    "POST",
+                    {
+                        success: base.adminBarRefreshPageCallbackSuccess,
 
-                // Unhide the options
-                $(base.options.elements.meta_box_refresh_options_container)
-                .removeClass("hidden");
+                        fail: base.adminBarRefreshPageCallbackFailure
 
+                    },
+                    {
+                        action : "force_refresh_update_page_version",
+                        page_id : force_refresh_local_js.post_id,
+                        nonce : force_refresh_local_js.nonce
+
+                    }
+                    );
             });
-
         },
+
+        /**
+         * Method used as a callback for succesful requests originating from the WordPress Admin Ba
+         *
+         * @param     {object}    return_data    The return data
+         *
+         * @return    {void}                   
+         */
+         adminBarRefreshPageCallbackSuccess : function(return_data){
+            // Declare base outside of block
+            var base = this;
+            // Wait until the spin logo is done to add the admin notice
+            setTimeout(function(){
+                // Add the admin notice
+                base.addAdminNotice("You've successfully refreshed this page. All connected browsers will refresh within " + force_refresh_local_js.refresh_interval + " seconds.");
+            }, 1500);
+        },
+
+        /**
+         * Method used to add an Admin notice after a Force Refresh is requested.
+         *
+         * @param {string} message The message to display
+         * @param {string} type    The type of message
+         *
+         * @return {void} 
+         *
+         * @version  1.0 Added in version 2.0
+         */
+         addAdminNotice: function(message, type){
+
+            // By default, the message is a success
+            type = type ? type : "success";
+
+            // Get the template
+            var source   = document.getElementById(force_refresh_local_js.handlebars_admin_notice_template_id).innerHTML;
+
+            // Compile with Handlebars
+            var template = Handlebars.compile(source);
+
+            // Add the variables 
+            var context = {
+                message: message
+            };
+
+            // Get the HTML from the template and variables
+            var html    = template(context);
+
+            $("#force_refresh_specific_page_refresh")
+            .before(html)
+            .next();
+        },
+
+        /**
+         * Method used as a callback for failed requests originating from the WordPress Admin Bar.
+         *
+         * @param     {object}    return_data    The return data
+         *
+         * @return    {void}                   
+         */
+         adminBarRefreshPageCallbackFailure : function(){
+
+         },
 
         /**
          * Method for binding actions type of refresh on the meta box

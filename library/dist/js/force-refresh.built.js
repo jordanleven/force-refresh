@@ -38,7 +38,7 @@
             this.options = this.default_options;
 
             // Update the current version of the site
-            this.bindGetSiteVersion();
+            this.bindGetVersion();
 
         },
 
@@ -47,21 +47,18 @@
          *
          * @return    {void}    
          */
-        bindGetSiteVersion : function(){
-
+         bindGetVersion : function(){
             // Localize this since we'll be putting it inside of setInterval
             var base = this;
-
             // Do the initial call
-            base.getSiteVersion();
-
+            base.getVersion();
+            // Console
+            base.debug( "Refreshing every " + base.options.timing.update_site_version_interval_in_seconds + " seconds...");
             // We need this to run on a regular interval
             setInterval(function(){
-
-                base.getSiteVersion();
-
+                // Check the site version
+                base.getVersion();
             }, base.options.timing.update_site_version_interval_in_seconds * 1000);
-
         },
 
         /**
@@ -69,24 +66,21 @@
          *
          * @return    {void}    
          */
-        getSiteVersion : function(){
-
-            
+         getVersion : function(){
 
             // Make the call
             this.ajaxCall(
                 this.options.api_url,
                 "GET",
                 { 
-
                     // The success callback
-                    success : this.getSiteVersionCallbackSuccess,
-                    
+                    success : this.getVersionCallbackSuccess,
                     // The failure callback
-                    fail    : this.getSiteVersionCallbackSuccess
+                    fail    : this.getVersionCallbackSuccess
                 },
                 {
-                    action : "force_refresh_get_site_version"
+                    action : "force_refresh_get_version",
+                    post_id: force_refresh_js_object.post_id
                 }
                 );
 
@@ -99,48 +93,48 @@
          *
          * @return    {void}
          */
-         getSiteVersionCallbackSuccess : function(return_object){
-
+         getVersionCallbackSuccess : function(return_object){
             // Get the return data
-            var return_data = return_object.ajax_data.return_data;
-
+            var return_data      = return_object.ajax_data.return_data,
             // Declare the site version we just found
-            var current_site_version = return_data.current_site_version;
-            
+            current_site_version = return_data.current_site_version,
+            // Declare the page version we just found
+            current_page_version = return_data.current_page_version,
             // Retrieve the current site version
-            var stored_site_version  = $("html").data("site-version");
-
+            stored_site_version  = $( 'html' ).data( 'site-version' ),
+            // Retrieve the current site version
+            stored_page_version  = $( 'html' ).data( 'page-version' );
             // If there isn't a stored site version, we haven't attached it to the html
-            if (!stored_site_version){
-
-                this.debug("No stored version. Storing new version (ver. " + current_site_version + ")");
-
+            if ( !stored_site_version ){
+                this.debug("No stored site version. Storing new version (ver. " + current_site_version + ")");
                 $("html")
                 .data("site-version", current_site_version);
-
             }
-
+            // If there isn't a stored page version, we haven't attached it to the html
+            if ( !stored_page_version ){
+                this.debug("No stored page version. Storing new version (ver. " + current_page_version + ")");
+                $("html")
+                .data("page-version", current_page_version);
+            }
             // Otherwise, there is a stored site version we can compare
             else {
-
-                // Now, compare the two versions. If the current version is different than the stored version, we need to refresh the page
+                // Now, compare the two site versions. If the current version is different than the stored version, we need to refresh the page
                 if (current_site_version !== stored_site_version){
-
-                    this.debug("New version available. Refreshing...");
-
+                    this.debug("New site version available. Refreshing...");
                     // Reload the page
                     location.reload();
-
                 }
-
+                // Now, compare the two page versions. If the current version is different than the stored version, we need to refresh the page
+                else if (current_page_version !== stored_page_version){
+                    this.debug("New page version available. Refreshing...");
+                    // Reload the page
+                    location.reload();
+                }
                 // Otherwise, we're up to date!
                 else {
-
                     this.debug("Site up-to-date (ver. " + current_site_version + ")");
-
                 }
             }
-
         },
 
         /**
@@ -156,7 +150,7 @@
          * 
          * @instance
          */
-        ajaxCall : function(api_url, method, callback_object, data_object, additional_arguments){
+         ajaxCall : function(api_url, method, callback_object, data_object, additional_arguments){
 
             // If data_object is null, than create an empty object
             data_object = data_object ? data_object : {};
@@ -251,7 +245,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            
+            console.log(this.class_name + " - " + message);
 
         },
 

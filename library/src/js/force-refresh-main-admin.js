@@ -25,7 +25,7 @@
 
                 force_refresh_admin_wp_admin_bar_spin_logo: "#wp-admin-bar-force-refresh .fa-refresh",
 
-                force_refresh_admin_form : "#force-refresh-admin",
+                force_refresh_admin_form : "#force-refresh-admin-main",
 
                 force_refresh_admin_notice_container : "#alert-container"
             }
@@ -78,19 +78,9 @@
             // Get the HTML from the template and variables
             var html    = template(context);
 
-            $(".wrapn .wp-header-end")
-            .after(html)
-            .next()
-            // Bind the dismiss button
-            .find(".notice-dismiss")
-            .click(function(){
-
-                // Remove this item
-                $(this)
-                .parents(".notice")
-                .remove();
-
-            });
+            $(".wrap")
+            .prepend(html)
+            .next();
         },
 
         /**
@@ -221,7 +211,7 @@
             var base = this;
 
             // Do the spin
-            this.spinLogo(".site-refresh-inner .logo");
+            this.spinLogo(".force-refresh-admin-main-inner .logo");
 
             // Wait unti the logo is done spinning to alert the user
             setTimeout(function(){
@@ -230,7 +220,7 @@
                 var ajax_data = return_data.ajax_data;
 
                 // Add the notice
-                base.addNotice(return_data.ajax_data.status_text);
+                base.addNotice("You've successfully refreshed the site. All connected browsers will refresh within " + force_refresh_local_js.refresh_interval + " seconds.");
 
             }, 1000);
 
@@ -264,45 +254,26 @@
          */
          addNotice : function(notice_text, notice_type){
 
-            // Declaure our default
+            // By default, the message is a success
             notice_type = notice_type ? notice_type : "success";
 
-            // Create the notice
-            var notice_html = "<div class=\"notice notice-invisible notice-hidden notice-" + notice_type + " is-dismissible\"><p><strong>" + notice_text + "</strong></p></div>";
+            // Get the template
+            var source   = document.getElementById(force_refresh_local_js.handlebars_admin_notice_template_id).innerHTML;
 
-            // We need to get the height for this element. To do this, append it to the HTML and get the height (before removing it, of course)
-            $("body")
-            .append(notice_html)
-            .find(".notice")
-            .removeClass("notice-invisible")
-            .addClass("notice-force-refresh-tmp");
+            // Compile with Handlebars
+            var template = Handlebars.compile(source);
 
-            // Get the height (it can change depending on the return message)
-            var alert_height = $("body").find(".notice-force-refresh-tmp").outerHeight();
+            // Add the variables 
+            var context = {
+                message: notice_text
+            };
 
-            // Remove the alert
-            $("body")
-            .find(".notice-force-refresh-tmp")
-            .remove();
+            // Get the HTML from the template and variables
+            var html    = template(context);
 
-            // Add the real alert
-            $(this.options.elements.force_refresh_admin_notice_container)
-            .empty()
-            .html(notice_html)
-            .find(".notice")
-            .css("height", 0)
-            .removeClass("notice-hidden")
-            .animate({
-                "height": alert_height + "px"
-            }, 500, function(){
-
-                // Fade in after height animation completes
-                $(this)
-                .removeClass("notice-invisible")
-                // Set the heigh to auto
-                .css("height", "auto");
-
-            });
+            $(".wrap")
+            .prepend(html)
+            .next();
 
         },
 

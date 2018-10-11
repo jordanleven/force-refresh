@@ -6,7 +6,7 @@ namespace JordanLeven\Plugins\ForceRefresh;
 Plugin Name: Force Refresh
 Plugin URI: 
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
-Version: 2.0.0-0
+Version: 2.0.0
 Author: Jordan Leven
 Author URI: https://github.com/jordanleven
 Contributors: 
@@ -15,20 +15,15 @@ Contributors:
 // Define the name of the action for the refresh. This is used with the nonce to create a unique action
 // when admins request a refresh.
 define("WP_FORCE_REFRESH_ACTION", "wp_force_refresh");
-
 // Define the name of the capability used to invoke a refresh. This is used for developers who want to fine-tune
 // control of what types of users and roles can request a refresh.
 define("WP_FORCE_REFRESH_CAPABILITY", "invoke_force_refresh");
-
 // Define the ID for the Handlebars admin notice. This is used to add notifications to the admin screen when a user requests a refresh.
 define("WP_FORCE_REFRESH_HANDLEBARS_ADMIN_NOTICE_TEMPLATE_ID", "invoke_force_refresh");
-
 // Define the option for showing the Force Refresh button in the WordPress Admin Bar
 define("WP_FORCE_REFRESH_OPTION_SHOW_IN_WP_ADMIN_BAR", "force_refresh_show_in_wp_admin_bar");
-
 // Define the option for the refresh interval (how often the site should check for a new version)
 define("WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS", "force_refresh_refresh_interval");
-
 // Define the default refresh interval
 define("WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT", 120);
 
@@ -106,9 +101,11 @@ add_action("wp_enqueue_scripts", function(){
         "force_refresh_js_object",
         array(
             // Get the ajax URL
-            "ajax_url"         => admin_url('admin-ajax.php'),
+            'ajax_url'         => admin_url( 'admin-ajax.php' ),
+            // Get the post ID
+            'post_id'          => get_the_ID(),
             // Get the refresh interval
-            "refresh_interval" => get_option(WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS, WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT)
+            'refresh_interval' => get_option( WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS, WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT )
         )
     );
 
@@ -118,21 +115,21 @@ add_action("wp_enqueue_scripts", function(){
 });
 
 // Add meta boxes for specific pages that we want to refresh
-// add_action('add_meta_boxes',  function(){
+add_action('add_meta_boxes',  function(){
 
-//     // An array of all screens where we want to implement the meta box
-//     $screens = array("page", "post");
+    // An array of all screens where we want to implement the meta box
+    $screens = array("page", "post");
 
-//     foreach ($screens as $screen) {
-//         // Add the box
-//         add_meta_box(
-//             'force_refresh_specific_page_refresh',
-//             'Force Refresh',
-//             __NAMESPACE__ . '\\force_refresh_specific_page_refresh_html',
-//             $screen,
-//             'side'
-//         );  
-//     }
-// });
+    foreach ($screens as $screen) {
+        // Add the box
+        add_meta_box(
+            'force_refresh_specific_page_refresh',
+            'Force Refresh',
+            __NAMESPACE__ . '\\force_refresh_specific_page_refresh_html',
+            $screen,
+            'side'
+        );  
+    }
+});
 
 ?>
