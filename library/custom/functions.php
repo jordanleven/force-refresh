@@ -139,10 +139,10 @@ function manage_force_refresh(){
                 "preset_value_force_refresh_in_admin_bar_hide" => $preset_option_show_force_refresh_in_wp_admin_bar === 'false' ? "selected" : null,
 
                 // For the refresh interval option
-                "preset_value_force_refresh_refresh_interval_30"  => $preset_option_refresh_interval === 30 ? "selected" : null,
-                "preset_value_force_refresh_refresh_interval_60"  => $preset_option_refresh_interval === 60 ? "selected" : null,
-                "preset_value_force_refresh_refresh_interval_90"  => $preset_option_refresh_interval === 90 ? "selected" : null,
-                "preset_value_force_refresh_refresh_interval_120" => $preset_option_refresh_interval === 120 ? "selected" : null
+                "preset_value_force_refresh_refresh_interval_30"  => $preset_option_refresh_interval === '30' ? "selected" : null,
+                "preset_value_force_refresh_refresh_interval_60"  => $preset_option_refresh_interval === '60' ? "selected" : null,
+                "preset_value_force_refresh_refresh_interval_90"  => $preset_option_refresh_interval === '90' ? "selected" : null,
+                "preset_value_force_refresh_refresh_interval_120" => $preset_option_refresh_interval === '120' ? "selected" : null
             )
         )
     );
