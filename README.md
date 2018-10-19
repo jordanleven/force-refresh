@@ -1,5 +1,5 @@
 # Force Refresh
->v 2.0
+>v 2.1
 
 Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site. Additionally, you may force refreshes on a per-page or post basis.
 
@@ -18,6 +18,9 @@ To force a site-wide refresh, just activate the plugin, navigate to "Tools" and 
 To force a refresh for a specific post or page, just navigate to the Admin section of the post or page, go to the "Force Refresh" metabox and click "Refresh".
 
 ## Changelog ##
+
+### 2.1 ###
+* Adds support for refreshing custom post types
 
 ### 2.0 ###
 * Adds the ability to choose from one of four pre-set refresh intervals, from 30 seconds up to 120 seconds.

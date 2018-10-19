@@ -1,6 +1,6 @@
 {
     "name": "Force_Refresh",
-    "version": "2.0.0",
+    "version": "2.1",
     "description": "Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.",
     "url": "https://github.com/jordanleven/wp-force-refresh",
     "repository": {

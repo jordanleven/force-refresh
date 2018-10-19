@@ -3,7 +3,7 @@ Contributors: jordanleven
 Tags: force, refresh, reload, single, page, application, ajax
 Requires at least: 4.0.0
 Tested up to: 4.9.8
-Stable tag: 2.0
+Stable tag: 2.1
 License: GPLv2 or later
 
 Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site. Additionally, you may force refreshes on a per-page or post basis.
@@ -32,6 +32,9 @@ Upload the Force Refresh plugin to your site, and then simply activate it. To fo
 2. After clicking the button, you'll receive confirmation that you've requested connected browsers to refresh.
 
 == Changelog ==
+
+= 2.1 =
+* Adds support for refreshing custom post types
 
 = 2.0 =
 * Adds the ability to choose from one of four pre-set refresh intervals, from 30 seconds up to 120 seconds.
