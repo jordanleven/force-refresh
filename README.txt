@@ -11,6 +11,7 @@ Force Refresh is a simple plugin that allows you to force a page refresh for use
 == Description ==
 Force Refresh is the best plugin for requesting browsers to refresh their page. Perfect for single-page applications or pages that bring in feeds, this simple plugin will allow you to force a page refresh for users currently visiting any page of your site.
 
+
 **Features**
 
 - Support for both parent and child themes.

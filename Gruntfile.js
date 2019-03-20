@@ -1,5 +1,12 @@
 module.exports = function(grunt) {
     grunt.initConfig({
+        wp_readme_to_markdown: {
+            your_target: {
+                files: {
+                    'README.md' : 'README.txt'
+                }
+            }
+        },
         sass: {   
             dist: {   
                 options : {
@@ -158,11 +165,12 @@ grunt.loadNpmTasks('grunt-contrib-sass');
 grunt.loadNpmTasks('grunt-contrib-jshint');
 grunt.loadNpmTasks('grunt-contrib-csslint');
 grunt.loadNpmTasks("grunt-remove-logging");
+grunt.loadNpmTasks('grunt-wp-readme-to-markdown');
 
 grunt.task.registerTask('buildDev', ['buildDevJS', 'buildDevCSS']);
 grunt.task.registerTask('buildDevCSS',  ['sass', 'copy', 'csslint'])
 grunt.task.registerTask('buildDevJS',   ['concat', 'copy', 'jshint']);
 grunt.task.registerTask('buildAlpha', ['concat', 'copy','uglify', 'sass', 'cssmin','jshint', 'csslint']);
-grunt.task.registerTask('buildProd', ['concat', 'copy', 'removelogging', 'uglify', 'sass', 'cssmin','jshint', 'csslint']);
+grunt.task.registerTask('buildProd', ['concat', 'copy', 'removelogging', 'uglify', 'sass', 'cssmin','jshint', 'csslint', 'wp_readme_to_markdown']);
 
 };

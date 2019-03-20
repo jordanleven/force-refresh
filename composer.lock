@@ -4,8 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "750e34849eb83b566abc01295698e3be",
-    "content-hash": "232c8140e06d5f97947b486fe6963071",
+    "content-hash": "9b35093f74464039b0e9c1a7e54a1b32",
     "packages": [
         {
             "name": "zordius/lightncandy",
@@ -57,7 +56,7 @@
                 "php",
                 "template"
             ],
-            "time": "2018-03-23 09:14:34"
+            "time": "2018-03-23T09:14:34+00:00"
         }
     ],
     "packages-dev": [],
