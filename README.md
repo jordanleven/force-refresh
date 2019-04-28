@@ -2,7 +2,7 @@
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)  
 **Tags:** force, refresh, reload, single, page, application, ajax  
 **Requires at least:** 4.0.0  
-**Tested up to:** 5.1.1  
+**Tested up to:** 5.2  
 **Stable tag:** 2.1  
 **License:** GPLv2 or later  
 
