@@ -10,7 +10,8 @@
   "author": "Jordan Leven",
   "license": "MIT",
   "scripts": {
-    "build": "npx webpack --mode=production"
+    "build": "npx webpack --mode=production",
+    "dev": "npx webpack --watch --mode=development"
   },
   "dependencies": {
     "bootstrap-timepicker": "^0.5.2",
@@ -27,6 +28,7 @@
     "node-sass": "^4.14.1",
     "sass-loader": "^10.0.2",
     "webpack": "^4.44.1",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "webpack-livereload-plugin": "^2.3.0"
   }
 }

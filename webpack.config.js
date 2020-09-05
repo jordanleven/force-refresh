@@ -1,5 +1,6 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   entry: {
@@ -50,5 +51,8 @@ module.exports = {
         },
       ],
     }),
+    new LiveReloadPlugin({
+      appendScriptTag: true,
+    })
   ]
 };
