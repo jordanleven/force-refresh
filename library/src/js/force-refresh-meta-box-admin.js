@@ -1,10 +1,10 @@
 (function ($, window, document) {
 
-    /** 
+    /**
     * Class handling for the admin portion of ForceReloadMetaBoxAdmin
     *
     * @type    {Object}
-    * 
+    *
     * @class
     * @global
     *
@@ -13,7 +13,7 @@
     var ForceReloadMetaBoxAdmin = {
 
         class_name         : "ForceReloadMetaBoxAdmin",
-        
+
         default_options : {
 
             // Global variable from WordPress
@@ -22,11 +22,11 @@
             elements : {
 
                 force_refresh_meta_box             : "#force_refresh_specific_page_refresh",
-                
+
                 meta_box_refresh_type              : "#force-refresh-meta-box-refresh-type-selector",
-                
+
                 meta_box_refresh_options_container : "#force-refresh-meta-box-refresh-type-options-container",
-                
+
                 meta_box_refresh_button            : '#force-refresh-admin-page'
 
             }
@@ -36,7 +36,7 @@
         /**
          * Our init method
          *
-         * @return    {void}    
+         * @return    {void}
          */
          init : function () {
             var base = this;
@@ -79,7 +79,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          adminBarRefreshPageCallbackSuccess : function(return_data){
             // Declare base outside of block
@@ -97,7 +97,7 @@
          * @param {string} message The message to display
          * @param {string} type    The type of message
          *
-         * @return {void} 
+         * @return {void}
          *
          * @version  1.0 Added in version 2.0
          */
@@ -112,7 +112,7 @@
             // Compile with Handlebars
             var template = Handlebars.compile(source);
 
-            // Add the variables 
+            // Add the variables
             var context = {
                 message: message
             };
@@ -130,7 +130,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          adminBarRefreshPageCallbackFailure : function(){
 
@@ -141,7 +141,7 @@
          *
          * @param   {string} element The select element where the types of refreshes are made
          *
-         * @return    {void}    
+         * @return    {void}
          */
          bindMetaBoxRefreshTypeUpdates : function(element){
 
@@ -193,7 +193,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          refreshSiteCallbackSuccess: function(return_data){
 
@@ -222,7 +222,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          refreshSiteCallbackFailure : function(return_data){
 
@@ -289,7 +289,7 @@
         /**
          * Method used for animating the logo.
          *
-         * @return    {void}   
+         * @return    {void}
          */
          spinLogo : function(){
 
@@ -317,7 +317,7 @@
          *                                              after the call is complete
          * @return    {void}
          *
-         * 
+         *
          * @instance
          */
          ajaxCall : function(api_url, method, callback_object, data_object, additional_arguments){

@@ -44,7 +44,7 @@ function add_handlebars($id, $src){
 * @param     string     $template_name         The name of the template
 * @param     array      $replacements_array    The replacements
 * @param     boolean    $return                Whether to return the HTML or print it
-* 
+*
 * @return    string The HTML
 */
 function render_handlebars($template_name, $replacements_array = array(), $return = false){
@@ -85,7 +85,7 @@ function render_handlebars($template_name, $replacements_array = array(), $retur
         else {
 
             echo $rendered_html;
-            
+
         }
 
     }

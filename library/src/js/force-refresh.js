@@ -1,10 +1,10 @@
 (function ($, window, document) {
 
-    /** 
+    /**
      * Class for handeling forced site reloads.
      *
      * @type    {Object}
-     * 
+     *
      * @class
      * @global
      */
@@ -45,7 +45,7 @@
         /**
          * Method to bind actions to get the current site version.
          *
-         * @return    {void}    
+         * @return    {void}
          */
          bindGetVersion : function(){
             // Localize this since we'll be putting it inside of setInterval
@@ -64,7 +64,7 @@
         /**
          * Method to make call to get the current site version
          *
-         * @return    {void}    
+         * @return    {void}
          */
          getVersion : function(){
 
@@ -72,7 +72,7 @@
             this.ajaxCall(
                 this.options.api_url,
                 "GET",
-                { 
+                {
                     // The success callback
                     success : this.getVersionCallbackSuccess,
                     // The failure callback
@@ -147,7 +147,7 @@
          *                                              after the call is complete
          * @return    {void}
          *
-         * 
+         *
          * @instance
          */
          ajaxCall : function(api_url, method, callback_object, data_object, additional_arguments){
@@ -244,8 +244,7 @@
          debug: function(message){
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
-
-            console.log(this.class_name + " - " + message);
+            if (process.env.NODE_ENV === "development") console.debug(this.class_name + " - " + message);
 
         },
 

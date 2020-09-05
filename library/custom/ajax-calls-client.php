@@ -52,7 +52,7 @@ function ajax_request_get_version(){
     // Return the return data
     $return_array['return_data'] = $return_data;
     print json_encode($return_array);
-    wp_die(); 
+    wp_die();
 }
 
 ?>

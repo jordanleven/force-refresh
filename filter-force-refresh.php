@@ -4,12 +4,12 @@ namespace JordanLeven\Plugins\ForceRefresh;
 
 /*
 Plugin Name: Force Refresh
-Plugin URI: 
+Plugin URI:
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
 Version: 2.1
 Author: Jordan Leven
 Author URI: https://github.com/jordanleven
-Contributors: 
+Contributors:
 */
 
 // Define the name of the action for the refresh. This is used with the nonce to create a unique action
@@ -54,7 +54,7 @@ function get_force_refresh_plugin_directory(){
  * Function for getting the uri for this plugin
  *
  * @param  string $file The optional file path you want to append to the urldecode(str)
- * 
+ *
  * @return string The full url for the root of this plugin is located in (including the plugin directory)
  *
  * @version 2.0 Introducted in version 2.0
@@ -95,7 +95,7 @@ add_action("admin_init", function(){
 add_action("wp_enqueue_scripts", function(){
 
     // Include the normal JS
-    add_script("force-refresh-js", "/library/dist/js/force-refresh.built.min.js", true);
+    add_script("force-refresh-js", "/library/dist/js/force-refresh.js", true);
 
     // Localize the admin ajax URL. This doesn't sound like the best idea but WP is into it (https://codex.wordpress.org/AJAX_in_Plugins)
     wp_localize_script(
@@ -126,7 +126,7 @@ add_action('add_meta_boxes',  function(){
         $post_type_attributes = get_post_type_object( $post_type );
         // The post types public attribute
         $post_type_is_public = $post_type_attributes->public;
-        // Only add the box if the post type is public and we're not excluding 
+        // Only add the box if the post type is public and we're not excluding
         // the post type
         if ( $post_type_is_public && !in_array($post_type, WP_FORCE_REFRESH_EXCLUDE_FROM_POST_TYPES )){
             // Add the box
@@ -136,7 +136,7 @@ add_action('add_meta_boxes',  function(){
                 __NAMESPACE__ . '\\force_refresh_specific_page_refresh_html',
                 $post_type,
                 'side'
-            );  
+            );
         }
     }
 });

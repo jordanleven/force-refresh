@@ -1,10 +1,10 @@
 (function ($, window, document) {
 
-    /** 
+    /**
     * Class handling for the admin portion of ForceReloadAdmin
     *
     * @type    {Object}
-    * 
+    *
     * @class
     * @global
     *
@@ -13,7 +13,7 @@
     var ForceReloadAdmin = {
 
         class_name         : "ForceReloadAdmin",
-        
+
         default_options : {
 
             // Global variable from WordPress
@@ -35,7 +35,7 @@
         /**
          * Our init method
          *
-         * @return    {void}    
+         * @return    {void}
          */
          init : function () {
 
@@ -55,7 +55,7 @@
          * @param {string} message The message to display
          * @param {string} type    The type of message
          *
-         * @return {void} 
+         * @return {void}
          *
          * @version  1.0 Added in version 2.0
          */
@@ -70,7 +70,7 @@
             // Compile with Handlebars
             var template = Handlebars.compile(source);
 
-            // Add the variables 
+            // Add the variables
             var context = {
                 message: message
             };
@@ -125,7 +125,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          adminBarRefreshSiteCallbackSuccess : function(return_data){
 
@@ -149,7 +149,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          adminBarRefreshSiteCallbackFailure : function(){
 
@@ -160,7 +160,7 @@
          *
          * @param   {string} element The form element
          *
-         * @return    {void}    
+         * @return    {void}
          */
          bindFormUpdates : function(element){
 
@@ -203,7 +203,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          refreshSiteCallbackSuccess: function(return_data){
 
@@ -232,7 +232,7 @@
          *
          * @param     {object}    return_data    The return data
          *
-         * @return    {void}                   
+         * @return    {void}
          */
          refreshSiteCallbackFailure : function(return_data){
 
@@ -263,7 +263,7 @@
             // Compile with Handlebars
             var template = Handlebars.compile(source);
 
-            // Add the variables 
+            // Add the variables
             var context = {
                 message: notice_text
             };
@@ -280,7 +280,7 @@
         /**
          * Method used for animating the logo.
          *
-         * @return    {void}   
+         * @return    {void}
          */
          spinLogo : function(element){
 
@@ -308,7 +308,7 @@
          *                                              after the call is complete
          * @return    {void}
          *
-         * 
+         *
          * @instance
          */
          ajaxCall : function(api_url, method, callback_object, data_object, additional_arguments){

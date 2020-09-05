@@ -53,7 +53,7 @@ add_action( 'wp_ajax_force_refresh_update_site_version', function() {
     // Return the return data
     $return_array['return_data'] = $return_data;
     print json_encode($return_array);
-    wp_die(); 
+    wp_die();
 });
 
 // The call used for admins requesting a site be refreshed
@@ -111,7 +111,7 @@ add_action( 'wp_ajax_force_refresh_update_page_version', function(){
     // Return the return data
     $return_array['return_data'] = $return_data;
     print json_encode($return_array);
-    wp_die(); 
+    wp_die();
 });
 
 

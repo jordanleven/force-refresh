@@ -19,7 +19,7 @@ function force_refresh_specific_page_refresh_html(){
     // Get the current post type
     $current_post_type = $current_screen->post_type;
     // Include the admin JS
-    add_script( 'force-refresh-meta-box-admin-js', '/library/dist/js/force-refresh-meta-box-admin.built.min.js', true );
+    add_script( 'force-refresh-meta-box-admin-js', '/library/dist/js/force-refresh-meta-box-admin.js', true );
     // Create the data we're going to localize to the script
     $localized_data            = array();
     // Add the API URL for the script
@@ -48,7 +48,7 @@ function force_refresh_specific_page_refresh_html(){
         'post_name' => get_the_title(),
     );
     render_handlebars(
-        "force-refresh-meta-box-side-admin.handlebars", 
+        "force-refresh-meta-box-side-admin.handlebars",
         $handlebars_replacements
     );
 }
@@ -69,7 +69,7 @@ add_action('admin_head', function(){
     // Include Font Awesome
     add_style("force-refresh-meta-box-admin-css", "/node_modules/font-awesome/css/font-awesome.min.css");
     // Include the admin CSS
-    add_style("force-refresh-admin-css", "/library/dist/css/force-refresh-admin.built.min.css");
+    add_style("force-refresh-admin-css", "/library/dist/css/force-refresh-admin.css");
     // Add the Force Refresh script
     add_force_refresh_script();
 
@@ -98,7 +98,7 @@ add_action('admin_init', function(){
 /**
  * Function to show the Force Refresh option in the WP Admin bar.
  *
- * @return void 
+ * @return void
  *
  * @version 1.0 Added in version 2.0
  */
@@ -115,10 +115,10 @@ function show_force_refresh_in_wp_admin_bar(){
     $wp_admin_bar->add_menu( $args );
 }
 
-/** 
+/**
  * Main function to manage settings for Force Refresh.
  *
- * @return    void  
+ * @return    void
  *
  * @version 1.0 Introducted in version 1.0
  */
@@ -130,7 +130,7 @@ function manage_force_refresh(){
     // Add the script
     add_force_refresh_script();
     // Render the HTML
-    render_handlebars("force-refresh-main-admin.handlebars", 
+    render_handlebars("force-refresh-main-admin.handlebars",
         array(
             "site_name" => get_bloginfo(),
             "options" => array(
@@ -156,17 +156,17 @@ function manage_force_refresh(){
 function add_force_refresh_script(){
 
     // Include the admin JS
-    add_script("force-refresh-main-admin-js", "/library/dist/js/force-refresh-main-admin.built.min.js", true);
+    add_script("force-refresh-main-admin-js", "/library/dist/js/force-refresh-main-admin.js", true);
 
     // Create the data we're going to localize to the script
     $localized_data = array();
 
     // Add the API URL for the script
     $localized_data['api_url'] = get_stylesheet_directory_uri();
-    
+
     // Add the API URL for the script
     $localized_data['site_id'] = get_current_blog_id();
-    
+
     // Create a nonce for the user
     $localized_data['nonce']   = wp_create_nonce(WP_FORCE_REFRESH_ACTION);
 
@@ -194,7 +194,7 @@ function add_force_refresh_script(){
  * @param     string    $handle    The stylesheet handle
  * @param     string    $path      The path to the stylesheet (relative to the CSS dist directory)
  *
- * @return    void  
+ * @return    void
  *
  * @version 1.0 Introducted in version 1.0
  */
@@ -232,7 +232,7 @@ function add_style($handle, $path){
  * @param     string     $path        The path to the script (relative to the JS dist directory)
  * @param     boolean    $register    Whether we should simply register the script instead of enqueing it
  *
- * @return    void 
+ * @return    void
  *
  * @version 1.0 Introducted in version 1.0
  */
