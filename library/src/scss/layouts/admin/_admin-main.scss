@@ -1,0 +1,43 @@
+@use '../../utilities/' as utils;
+@use '../../variables/' as var;
+
+$ANIMATION_NAME_NOTIFICATION_SPIN: 'force-refresh-notification-spin';
+
+@include utils.generate-animation($ANIMATION_NAME_NOTIFICATION_SPIN) {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  50% {
+    transform: rotate(180deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.force-refresh-admin__main-inner {
+  width: 100%;
+  padding: 20px 0 30px;
+  text-align: center;
+  border: 2px solid var.$light_grey;
+  border-radius: 10px;
+  background-color: white;
+}
+
+.logo {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+
+  &.logo-spin {
+    @include utils.animation($ANIMATION_NAME_NOTIFICATION_SPIN);
+  }
+}
+
+.button {
+  font-size: 20px;
+  display: inline;
+  cursor: pointer;
+}

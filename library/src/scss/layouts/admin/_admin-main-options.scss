@@ -1,0 +1,26 @@
+@use '../../utilities/' as utils;
+@use '../../variables/' as var;
+
+.force-refresh-admin__options-inner {
+  padding: 0 20px 10px;
+  background-color: white;
+  border: 2px solid var.$light_grey;
+  border-radius: 10px;
+
+  @include utils.small() {
+    margin: 0 20px;
+  }
+
+  .force-refresh-options-header {
+    text-align: center;
+  }
+}
+
+.force-refresh-admin-options-footer {
+  margin-top: 20px;
+  text-align: right;
+
+  button {
+    margin-top: 10px;
+  }
+}

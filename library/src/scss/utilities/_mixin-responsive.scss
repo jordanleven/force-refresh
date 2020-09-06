@@ -1,0 +1,110 @@
+@use '../variables/index.scss' as viewport;
+
+@function strip-unit($number) {
+  @if type-of($number) == 'number' and not unitless($number) {
+    @return $number / ($number * 0 + 1);
+  }
+
+  @return $number;
+}
+
+@function get-rem-from-px($remValue) {
+  @return strip-unit($remValue) * 16px;
+}
+
+/**
+ * Mixin used to apply styles to specific viewports.
+ * @param {string} $min  The min width for the query
+ * @param {string} $max: false        An optional max-width for the query
+ *
+ */
+@mixin resp($min, $max: false) {
+  @if ($max) {
+    @media (min-width: #{$min}) and (max-width: #{get-rem-from-px($max) - 1px}) {
+      @content;
+    }
+  }
+  @else {
+    @media (min-width: #{$min}) {
+      @content;
+    }
+  }
+}
+
+
+/**
+* Mixin used to apply styles to the XXS viewport.
+* @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+*/
+@mixin xxsmall($limit: false) {
+  @if ($limit) {
+    @media (min-width: #{viewport.$viewport-xxs}) and (max-width: #{get-rem-from-px(viewport.$viewport-xs) - 1px}) {
+      @content;
+    }
+  }
+  @else {
+    @media (min-width: #{viewport.$viewport-xxs}) {
+      @content;
+    }
+  }
+}
+
+/**
+* Mixin used to apply styles to the XS viewport.
+* @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+*/
+@mixin xsmall($limit: false) {
+  @if ($limit) {
+    @media (min-width: #{viewport.$viewport-xs}) and (max-width: #{get-rem-from-px(viewport.$viewport-sm) - 1px}) {
+      @content;
+    }
+  }
+  @else {
+    @media (min-width: #{viewport.$viewport-xs}) {
+      @content;
+    }
+  }
+}
+
+/**
+* Mixin used to apply styles to the small viewport.
+* @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+*/
+@mixin small($limit: false) {
+  @if ($limit) {
+    @media (min-width: #{viewport.$viewport-sm}) and (max-width: #{get-rem-from-px(viewport.$viewport-md) - 1px}) {
+      @content;
+    }
+  }
+  @else {
+    @media (min-width: #{viewport.$viewport-sm}) {
+      @content;
+    }
+  }
+}
+
+/**
+* Mixin used to apply styles to the medium viewport.
+* @param {boolean} $limit Whether to only apply the style to the specified viewport and apply a max-width argument
+*/
+@mixin medium($limit: false) {
+  @if ($limit) {
+    @media (min-width: #{viewport.$viewport-md}) and (max-width: #{(viewport.$viewport-lg) - 1px}) {
+      @content;
+    }
+  }
+  @else {
+    @media (min-width: #{viewport.$viewport-md}) {
+      @content;
+    }
+  }
+}
+
+/**
+* Mixin used to apply styles to the large viewport.
+*/
+@mixin large {
+  @media (min-width: #{viewport.$viewport-lg}) {
+    @content;
+  }
+}

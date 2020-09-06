@@ -1,0 +1,33 @@
+/**
+ * Mixin used to generate an animation. The content will be repeated for all of the vendor prefixes.
+ * @param {string} $animation-name The name of the animation
+ * @see animation
+ */
+@mixin generate-animation($animation-name) {
+  @-webkit-keyframes #{$animation-name} {
+    @content;
+  }
+  @-moz-keyframes #{$animation-name} {
+    @content;
+  }
+  @-o-keyframes #{$animation-name} {
+    @content;
+  }
+  @keyframes #{$animation-name} {
+    @content;
+  }
+}
+
+/**
+ * Mixin used to output the CSS to invoke an animation.
+ * @param {string} $animation-name                  The animation name to use
+ * @param {string] $speed: 2s                       The speed of the animation
+ * @param {string} $timing-function: infinite        The timing function (if it repeats, etc)
+ * @param {string} $delay : 0s                      Any delay applied to the animation
+ */
+@mixin animation($animation-name, $speed: 2s , $timing-function: infinite, $delay : null) {
+  -webkit-animation: $animation-name $speed $timing-function $delay;
+  -moz-animation: $animation-name $speed $timing-function $delay;
+  -o-animation: $animation-name $speed $timing-function $delay;
+  animation: $animation-name $speed $timing-function $delay;
+}

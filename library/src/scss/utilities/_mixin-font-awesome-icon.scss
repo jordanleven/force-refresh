@@ -1,0 +1,32 @@
+/**
+ * Mixin to output a Font Awesome icon. This must be placed inside of a pseudo-element
+ *
+ * @param {string} $icon_code  The icon code (with the preceding escape character)
+ * @param {array} $overrides: ()            Any overrides for the default attributes with Font Awesome
+ */
+@mixin font-awesome-icon($icon_code, $overrides: ()) {
+  font-family: FontAwesome, sans-serif;
+
+  content: $icon_code;
+  // Declare the defaults that can be overridden
+
+  $font_awesome_defaults: (
+    font-style             : normal,
+    font-weight            : normal,
+    font-stretch           : normal,
+    line-height            : 1,
+    text-rendering         : auto,
+    -webkit-font-smoothing : antialiased,
+  );
+  // Loop through each default. If one is overridden, then use the overriden value instead
+  @each $key, $value in $font_awesome_defaults {
+    // If the value is in the overrides, use that value instead
+    @if map-has-key($overrides, $key) {
+      #{$key}: map-get($overrides, $key);
+    }
+    // Otherwise, use the default values
+    @else {
+      #{$key}: #{$value};
+    }
+  }
+}

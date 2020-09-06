@@ -11,7 +11,9 @@
   "license": "MIT",
   "scripts": {
     "build": "npx webpack --mode=production",
-    "dev": "npx webpack --watch --mode=development"
+    "dev": "npx webpack --watch --mode=development",
+    "lint": "npm run lint:css",
+    "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose"
   },
   "dependencies": {
     "bootstrap-timepicker": "^0.5.2",
@@ -22,11 +24,13 @@
     "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.6",
     "@babel/preset-env": "^7.11.5",
+    "@sparkbox/stylelint-config-sparkbox": "^1.0.2",
     "babel-loader": "^8.1.0",
     "copy-webpack-plugin": "^6.1.0",
     "file-loader": "^6.1.0",
-    "node-sass": "^4.14.1",
+    "sass": "^1.26.10",
     "sass-loader": "^10.0.2",
+    "stylelint": "^13.7.0",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-livereload-plugin": "^2.3.0"

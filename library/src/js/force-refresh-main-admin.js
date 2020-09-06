@@ -131,7 +131,6 @@
 
             // Declare base outside of block
             var base = this;
-
             // Do the spin
             this.spinLogo(this.options.elements.force_refresh_admin_wp_admin_bar_spin_logo);
 
@@ -211,7 +210,7 @@
             var base = this;
 
             // Do the spin
-            this.spinLogo(".force-refresh-admin-main-inner .logo");
+            this.spinLogo(".force-refresh-admin__main .logo");
 
             // Wait unti the logo is done spinning to alert the user
             setTimeout(function(){
