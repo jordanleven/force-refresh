@@ -17,9 +17,13 @@
     "lint:js": "eslint --ext .js --ignore-path .gitignore ."
   },
   "dependencies": {
+    "axios": "^0.20.0",
     "bootstrap-timepicker": "^0.5.2",
     "font-awesome": "^4.7.0",
-    "handlebars": "^4.7.6"
+    "handlebars": "^4.7.6",
+    "sprintf-js": "^1.1.2",
+    "vue": "^2.6.12",
+    "vue-types": "^2.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -28,13 +32,20 @@
     "@sparkbox/stylelint-config-sparkbox": "^1.0.2",
     "babel-loader": "^8.1.0",
     "copy-webpack-plugin": "^6.1.0",
+    "css-loader": "^4.2.2",
     "eslint": "^7.8.1",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-vue": "^7.0.0-beta.3",
     "file-loader": "^6.1.0",
+    "node-sass": "^4.14.1",
     "sass": "^1.26.10",
     "sass-loader": "^10.0.2",
+    "style-loader": "^1.2.1",
     "stylelint": "^13.7.0",
+    "vue-eslint-parser": "^7.1.0",
+    "vue-loader": "^15.9.3",
+    "vue-template-compiler": "^2.6.12",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-livereload-plugin": "^2.3.0"

@@ -94,6 +94,8 @@ add_action( 'wp_ajax_force_refresh_update_page_version', function(){
         $status_text = 'You\'ve successfully requested all browsers to refresh this page (version <code>' . $page_version . '</code>).';
         // Redeclare the status text
         $return_data['new_page_version'] = $page_version;
+        $return_data['refresh_interval'] = (int) get_option(WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS, WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT);
+
     }
     else {
         // Redeclare the status code as 401 (unauthorized)

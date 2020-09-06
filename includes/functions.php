@@ -11,46 +11,41 @@ require_once __DIR__ . "/ajax-calls-client.php";
 // All ajax calls from admins
 require_once __DIR__ . "/ajax-calls-admin.php";
 
-function force_refresh_specific_page_refresh_html(){
-    // Since a Force Refresh can take place from any page, we also need to add the Handlebars template for a notice
-    add_handlebars( WP_FORCE_REFRESH_HANDLEBARS_ADMIN_NOTICE_TEMPLATE_ID, 'force-refresh-main-admin-notice.handlebars' );
-    // Get the current screen
-    $current_screen = get_current_screen();
-    // Get the current post type
-    $current_post_type = $current_screen->post_type;
-    // Include the admin JS
-    add_script( 'force-refresh-meta-box-admin-js', '/dist/js/force-refresh-meta-box-admin.js', true );
-    // Create the data we're going to localize to the script
-    $localized_data            = array();
-    // Add the API URL for the script
-    $localized_data['api_url'] = get_stylesheet_directory_uri();
-    // Add the API URL for the script
-    $localized_data['site_id'] = get_current_blog_id();
-    // Create a nonce for the user
-    $localized_data['nonce']   = wp_create_nonce(WP_FORCE_REFRESH_ACTION);
-    // Create a nonce for the user
-    $localized_data['post_id'] = get_the_ID();
-    // Add the ID of the handlebars notice
-    $localized_data['handlebars_admin_notice_template_id'] = WP_FORCE_REFRESH_HANDLEBARS_ADMIN_NOTICE_TEMPLATE_ID;
-    // Add the refresh interval
-    $localized_data['refresh_interval'] = get_option(WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS, WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT);
-    // Localize the data
-    wp_localize_script(
-        "force-refresh-meta-box-admin-js",
-        "force_refresh_local_js",
-        $localized_data
-    );
-    // Now that it's registered, enqueue the script
-    wp_enqueue_script("force-refresh-meta-box-admin-js");
-    // Create all of the replacements
-    $handlebars_replacements = array(
-        'post_type' => $current_post_type,
-        'post_name' => get_the_title(),
-    );
-    render_handlebars(
-        "force-refresh-meta-box-side-admin.handlebars",
-        $handlebars_replacements
-    );
+function force_refresh_specific_page_refresh_html() {
+  define('HTML_CLASS_META_BOX', 'force-refresh-meta-box');
+  define('FILE_NAME_META_BOX_ADMIN', 'force-refresh-meta-box-admin-js');
+  // Include the admin JS
+  add_script( FILE_NAME_META_BOX_ADMIN, '/dist/js/force-refresh-meta-box-admin.js', true );
+  // Get the current screen
+  $current_screen = get_current_screen();
+  // Create the data we're going to localize to the script
+  $localized_data = array(
+    // Wrap in inner array to preserve primitive types
+    'localData' => array(
+      // Add the API URL for the script
+      'apiUrl' => get_stylesheet_directory_uri(),
+      // Add the API URL for the script
+      'siteId' => get_current_blog_id(),
+      // Create a nonce for the user
+      'nonce' => wp_create_nonce(WP_FORCE_REFRESH_ACTION),
+      // Create a nonce for the user
+      'postId' => get_the_ID(),
+      'postType' => $current_screen->post_type,
+      'postName' => get_the_title(),
+      'targetClass' => HTML_CLASS_META_BOX,
+      // Add the refresh interval
+      'refreshInterval' => get_option(WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS, WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT),
+    )
+  );
+  // Localize the data
+  wp_localize_script(
+    FILE_NAME_META_BOX_ADMIN,
+    "forceRefreshLocalJs",
+    $localized_data
+  );
+  // Now that it's registered, enqueue the script
+  wp_enqueue_script(FILE_NAME_META_BOX_ADMIN);
+  echo "<div class=\"" . HTML_CLASS_META_BOX . "\"></div>";
 }
 
 /**

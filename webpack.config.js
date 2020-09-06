@@ -1,12 +1,13 @@
 const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
+const VueLoaderPlugin = require('vue-loader/lib/plugin');
 
 module.exports = {
   entry: {
     './js/force-refresh': './src/js/force-refresh.js',
     './js/force-refresh-main-admin': './src/js/force-refresh-main-admin.js',
-    './js/force-refresh-meta-box-admin': './src/js/force-refresh-meta-box-admin.js',
+    './js/force-refresh-meta-box-admin': './src/layouts/admin-meta-box',
     './css/force-refresh-admin': './src/scss/force-refresh-admin.scss',
   },
   output: {
@@ -27,7 +28,26 @@ module.exports = {
         ],
       },
       {
+        test: /\.vue$/,
+        loader: 'vue-loader',
+      },
+      {
         test: /\.scss$/,
+        exclude: [
+          path.resolve(__dirname, 'src/scss'),
+          /node_modules/,
+        ],
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader',
+        ],
+      },
+      {
+        test: /\.scss$/,
+        include: [
+          path.resolve(__dirname, 'src/scss'),
+        ],
         exclude: /node_modules/,
         use: [
           {
@@ -40,6 +60,7 @@ module.exports = {
           'sass-loader',
         ],
       },
+
     ],
   },
   plugins: [
@@ -54,5 +75,6 @@ module.exports = {
     new LiveReloadPlugin({
       appendScriptTag: true,
     }),
+    new VueLoaderPlugin(),
   ],
 };
