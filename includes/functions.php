@@ -61,8 +61,6 @@ add_action('admin_head', function(){
     }
     // Since a Force Refresh can take place from any page, we also need to add the Handlebars template for a notice
     add_handlebars( WP_FORCE_REFRESH_HANDLEBARS_ADMIN_NOTICE_TEMPLATE_ID, 'force-refresh-main-admin-notice.handlebars' );
-    // Include Font Awesome
-    add_style("force-refresh-meta-box-admin-css", "/node_modules/font-awesome/css/font-awesome.min.css");
     // Include the admin CSS
     add_style("force-refresh-admin-css", "/dist/css/force-refresh-admin.css");
     // Add the Force Refresh script

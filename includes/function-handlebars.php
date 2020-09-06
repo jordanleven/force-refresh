@@ -14,10 +14,6 @@ define("FORCE_REFRESH_HANDLEBARS_DIRECTORY", "/dist/handlebars/");
  * @param    string     $src               The location of the handlebars template relative to the predefined handlebars template directory
  */
 function add_handlebars($id, $src){
-
-    // If we're adding handlebars, then we need to make sure we are also including the handlebars framework
-    add_script("force-refresh-handlebars", "/node_modules/handlebars/dist/handlebars.min.js");
-
     // Get the directory of the plugin
     $directory = get_force_refresh_plugin_directory();
 

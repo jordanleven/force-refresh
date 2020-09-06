@@ -9,6 +9,7 @@ module.exports = {
     './js/force-refresh-main-admin': './src/js/force-refresh-main-admin.js',
     './js/force-refresh-meta-box-admin': './src/layouts/admin-meta-box',
     './css/force-refresh-admin': './src/scss/force-refresh-admin.scss',
+    './': './node_modules/font-awesome/fonts/fontawesome-webfont.woff2',
   },
   output: {
     path: path.resolve(__dirname, 'dist/'),
@@ -60,7 +61,18 @@ module.exports = {
           'sass-loader',
         ],
       },
-
+      {
+        test: /\.(woff|woff2)(\?.*$|$)/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: '/fonts/',
+            },
+          },
+        ],
+      },
     ],
   },
   plugins: [

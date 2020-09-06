@@ -1,3 +1,5 @@
+import Handlebars from 'handlebars';
+
 /* eslint-disable */
 (function ($, window, document) {
 
@@ -259,7 +261,6 @@
 
             // Get the template
             var source   = document.getElementById(force_refresh_local_js.handlebars_admin_notice_template_id).innerHTML;
-
             // Compile with Handlebars
             var template = Handlebars.compile(source);
 
@@ -407,7 +408,7 @@
 
             message = typeof(message) === "string" ? message : JSON.stringify(message);
 
-            console.debug(this.class_name + " - " + message);
+            if (process.env.NODE_ENV === "development") console.debug(this.class_name + " - " + message);
 
         },
 
