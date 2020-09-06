@@ -19,7 +19,7 @@ function force_refresh_specific_page_refresh_html(){
     // Get the current post type
     $current_post_type = $current_screen->post_type;
     // Include the admin JS
-    add_script( 'force-refresh-meta-box-admin-js', '/library/dist/js/force-refresh-meta-box-admin.js', true );
+    add_script( 'force-refresh-meta-box-admin-js', '/dist/js/force-refresh-meta-box-admin.js', true );
     // Create the data we're going to localize to the script
     $localized_data            = array();
     // Add the API URL for the script
@@ -69,7 +69,7 @@ add_action('admin_head', function(){
     // Include Font Awesome
     add_style("force-refresh-meta-box-admin-css", "/node_modules/font-awesome/css/font-awesome.min.css");
     // Include the admin CSS
-    add_style("force-refresh-admin-css", "/library/dist/css/force-refresh-admin.css");
+    add_style("force-refresh-admin-css", "/dist/css/force-refresh-admin.css");
     // Add the Force Refresh script
     add_force_refresh_script();
 
@@ -156,7 +156,7 @@ function manage_force_refresh(){
 function add_force_refresh_script(){
 
     // Include the admin JS
-    add_script("force-refresh-main-admin-js", "/library/dist/js/force-refresh-main-admin.js", true);
+    add_script("force-refresh-main-admin-js", "/dist/js/force-refresh-main-admin.js", true);
 
     // Create the data we're going to localize to the script
     $localized_data = array();

@@ -1,6 +1,6 @@
-.sass-cache
 .DS_Store
 .docker-build
-library/dist
-library/vendor/zordius/lightncandy/tests
+.sass-cache
+/dist
+/vendor
 node_modules

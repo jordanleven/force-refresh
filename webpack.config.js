@@ -4,13 +4,13 @@ const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   entry: {
-    './js/force-refresh': './library/src/js/force-refresh.js',
-    './js/force-refresh-main-admin': './library/src/js/force-refresh-main-admin.js',
-    './js/force-refresh-meta-box-admin': './library/src/js/force-refresh-meta-box-admin.js',
-    './css/force-refresh-admin': './library/src/scss/force-refresh-admin.scss',
+    './js/force-refresh': './src/js/force-refresh.js',
+    './js/force-refresh-main-admin': './src/js/force-refresh-main-admin.js',
+    './js/force-refresh-meta-box-admin': './src/js/force-refresh-meta-box-admin.js',
+    './css/force-refresh-admin': './src/scss/force-refresh-admin.scss',
   },
   output: {
-    path: path.resolve(__dirname, 'library/dist/'),
+    path: path.resolve(__dirname, 'dist/'),
   },
   module: {
     rules: [
@@ -46,7 +46,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         {
-          from: './library/src/handlebars',
+          from: './src/handlebars',
           to: './handlebars',
         },
       ],

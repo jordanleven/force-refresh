@@ -30,10 +30,10 @@ define( 'WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT', 120 );
 define( 'WP_FORCE_REFRESH_EXCLUDE_FROM_POST_TYPES', array( 'attachment' ) );
 
 // Make sure we include the composer autoload file
-require_once __DIR__ . "/library/vendor/autoload.php";
+require_once __DIR__ . "/vendor/autoload.php";
 
 // Include the functions file
-require_once __DIR__ . "/library/custom/functions.php";
+require_once __DIR__ . "/includes/functions.php";
 
 /**
  * Function for getting the directory for this plugin
@@ -95,7 +95,7 @@ add_action("admin_init", function(){
 add_action("wp_enqueue_scripts", function(){
 
     // Include the normal JS
-    add_script("force-refresh-js", "/library/dist/js/force-refresh.js", true);
+    add_script("force-refresh-js", "/dist/js/force-refresh.js", true);
 
     // Localize the admin ajax URL. This doesn't sound like the best idea but WP is into it (https://codex.wordpress.org/AJAX_in_Plugins)
     wp_localize_script(

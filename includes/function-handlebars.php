@@ -5,7 +5,7 @@ namespace JordanLeven\Plugins\ForceRefresh;
 use LightnCandy as ZordiusLightnCandy;
 
 // The location of the handlebars directory relative to the plugin root
-define("FORCE_REFRESH_HANDLEBARS_DIRECTORY", "library/dist/handlebars/");
+define("FORCE_REFRESH_HANDLEBARS_DIRECTORY", "/dist/handlebars/");
 
 /**
  * Function used to add a handlebars template to the DOM (to be used by JavaScript).
