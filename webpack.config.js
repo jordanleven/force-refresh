@@ -21,10 +21,10 @@ module.exports = {
           {
             loader: 'babel-loader',
             options: {
-              presets: ['@babel/preset-env']
+              presets: ['@babel/preset-env'],
             },
           },
-        ]
+        ],
       },
       {
         test: /\.scss$/,
@@ -34,12 +34,12 @@ module.exports = {
             loader: 'file-loader',
             options: {
               outputPath: 'css/',
-              name: '[name].css'
-            }
+              name: '[name].css',
+            },
           },
-          'sass-loader'
-        ]
-      }
+          'sass-loader',
+        ],
+      },
     ],
   },
   plugins: [
@@ -53,6 +53,6 @@ module.exports = {
     }),
     new LiveReloadPlugin({
       appendScriptTag: true,
-    })
-  ]
+    }),
+  ],
 };

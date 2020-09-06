@@ -12,8 +12,9 @@
   "scripts": {
     "build": "npx webpack --mode=production",
     "dev": "npx webpack --watch --mode=development",
-    "lint": "npm run lint:css",
-    "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose"
+    "lint": "npm run lint:css && npm run lint:js",
+    "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose",
+    "lint:js": "eslint --ext .js --ignore-path .gitignore ."
   },
   "dependencies": {
     "bootstrap-timepicker": "^0.5.2",
@@ -27,6 +28,9 @@
     "@sparkbox/stylelint-config-sparkbox": "^1.0.2",
     "babel-loader": "^8.1.0",
     "copy-webpack-plugin": "^6.1.0",
+    "eslint": "^7.8.1",
+    "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-plugin-import": "^2.22.0",
     "file-loader": "^6.1.0",
     "sass": "^1.26.10",
     "sass-loader": "^10.0.2",
