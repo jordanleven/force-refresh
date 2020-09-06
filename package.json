@@ -18,7 +18,7 @@
   "dependencies": {
     "bootstrap-timepicker": "^0.5.2",
     "font-awesome": "^4.7.0",
-    "handlebars": "^4.0.11"
+    "handlebars": "^4.7.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
