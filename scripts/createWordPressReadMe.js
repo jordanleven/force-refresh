@@ -12,7 +12,7 @@ const pluginVersion = require('../package.json').version;
  * types of commits. In these cases, this message will be used in lieu of the contents
  * of the change.
  */
-const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Notes for this release are unavailable';
+const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Performance enhancements and bug fixes.';
 
 /**
  * Function to remove the bold formatting in Markdown.
@@ -124,6 +124,7 @@ const getFormattedReleaseNote = (release, releaseHeader) => {
     replace(/-/g, '*'),
     formatMarkdownSections,
     // Remove contents inside of a link
+    replace(/\[\]/g, ''),
     replace(/ \(.*\)\)/g, ''),
     removeMdFormattingMultipleLineBreaks,
   )(release)
