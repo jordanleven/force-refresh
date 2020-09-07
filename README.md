@@ -35,3 +35,4 @@ Upload the Force Refresh plugin to your site, and then simply activate it. To fo
 
 1. Under Tools, you can click "Refresh Site"
 2. After clicking the button, you'll receive confirmation that you've requested connected browsers to refresh.
+3. To refresh a single page or post, locate the "Force Refresh" section under any page.
