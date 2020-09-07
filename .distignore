@@ -10,11 +10,11 @@
 /src
 CHANGELOG.md
 CONTRIBUTING.md
-Gruntfile.js
 README.md
 composer.json
 composer.lock
 db
 docker-compose.yml
 package*.json
+phpcs.xml
 webpack.config.js

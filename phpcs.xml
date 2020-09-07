@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Force Refresh Coding Standards" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/squizlabs/PHP_CodeSniffer/master/phpcs.xsd">
+	<file>.</file>
+	<!-- Exclude Composer vendor directory. -->
+	<exclude-pattern>*/vendor/*</exclude-pattern>
+  <rule ref="WordPress">
+      <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
+      <exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found" />
+  </rule>
+  <rule ref="Generic.WhiteSpace.ScopeIndent">
+      <properties>
+          <property name="indent" value="2"/>
+          <property name="tabIndent" value="false"/>
+      </properties>
+  </rule>
+  <rule ref="Generic.WhiteSpace.DisallowTabIndent" />
+      <rule ref="Generic.Files.LineLength">
+        <properties>
+            <property name="lineLimit" value="100"/>
+            <property name="absoluteLineLimit" value="120"/>
+        </properties>
+     </rule>
+</ruleset>

@@ -27,6 +27,8 @@ jobs:
         npm ci
         composer install
     - name: Lint
-      run: npm run lint
+      run:  |
+        npm run lint
+        composer lint
     - name: Build the application
       run: npm run build --if-present
