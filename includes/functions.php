@@ -9,13 +9,6 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
-// Include the handlebars function.
-require_once __DIR__ . '/function-handlebars.php';
-// All ajax calls from browsers.
-require_once __DIR__ . '/ajax-calls-client.php';
-// All ajax calls from admins.
-require_once __DIR__ . '/ajax-calls-admin.php';
-
 /**
  * Main function to generate the admin HTML.
  *
@@ -129,17 +122,32 @@ add_action(
  * @return void
  */
 function show_force_refresh_in_wp_admin_bar() {
-    // Globalize the WP Admin Bar object.
-    global $wp_admin_bar;
-    // Add the item to show up in the WP Admin Bar.
-    $args = array(
-        'id'    => 'force-refresh',
-        'title' =>
-          '<i class="fa fa-refresh" aria-hidden="true"></i> <span>Force Refresh Site</span>',
-        'href'  => null,
-    );
-    // Add the menu.
-    $wp_admin_bar->add_menu( $args );
+  // Globalize the WP Admin Bar object.
+  global $wp_admin_bar;
+
+  // If the user isn't able to request a refresh, then stop eval.
+  if ( ! user_can_request_force_refresh() ) {
+    return;
+  }
+
+  // Add the item to show up in the WP Admin Bar.
+  $args = array(
+      'id'    => 'force-refresh',
+      'title' =>
+        '<i class="fa fa-refresh" aria-hidden="true"></i> <span>Force Refresh Site</span>',
+      'href'  => null,
+  );
+  // Add the menu.
+  $wp_admin_bar->add_menu( $args );
+}
+
+/**
+ * Function to determine whether or not the currently logged-in user is able to request a refresh.
+ *
+ * @return  bool true if the use is able to request a refresh
+ */
+function user_can_request_force_refresh() {
+  return current_user_can( WP_FORCE_REFRESH_CAPABILITY );
 }
 
 /**
@@ -281,3 +289,10 @@ function add_script( $handle, $path, $register = false ) {
     }
   }
 }
+
+// Include the handlebars function.
+require_once __DIR__ . '/function-handlebars.php';
+// All ajax calls from browsers.
+require_once __DIR__ . '/ajax-calls-client.php';
+// All ajax calls from admins.
+require_once __DIR__ . '/ajax-calls-admin.php';

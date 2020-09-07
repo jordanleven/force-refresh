@@ -25,7 +25,10 @@ add_action(
       // The return data.
       $return_data = array();
       // Check the nonce.
-      if ( wp_verify_nonce( $nonce, WP_FORCE_REFRESH_ACTION ) ) {
+      if (
+        wp_verify_nonce( $nonce, WP_FORCE_REFRESH_ACTION )
+        && user_can_request_force_refresh()
+      ) {
         // Get the data.
         $data = $_REQUEST;
           // If the user is authenticated, get the current site version by
@@ -87,7 +90,10 @@ add_action(
       // The return data.
       $return_data = array();
       // Check the nonce.
-      if ( wp_verify_nonce( $nonce, WP_FORCE_REFRESH_ACTION ) ) {
+      if (
+        wp_verify_nonce( $nonce, WP_FORCE_REFRESH_ACTION )
+        && user_can_request_force_refresh()
+      ) {
         // Get the data.
         $data = $_REQUEST;
         // Get the page id.
