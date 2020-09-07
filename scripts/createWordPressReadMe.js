@@ -12,7 +12,7 @@ const pluginVersion = require('../package.json').version;
  * types of commits. In these cases, this message will be used in lieu of the contents
  * of the change.
  */
-const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Performance enhancements and bug fixes.';
+const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Performance enhancements and bug fixes';
 
 /**
  * Function to remove the bold formatting in Markdown.
@@ -101,6 +101,8 @@ const getFormattedSectionContent = (sections) => pipe(
   replace(/\\/g, ''),
 )(sections);
 
+const getFormattedReleaseContent = (content) => content.replace(/\n/g,'');
+
 /**
  * Function to get the release details of a specific release in the changelog.
  * @param   {object}  content     The section content object
@@ -131,7 +133,7 @@ const getFormattedReleaseNote = (release, releaseHeader) => {
   // If the release details are null, then it means the content for this release is
   // unavailable and we should instead use the `MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE`
   // message
-  || MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE;
+  || `* ${MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE}`;
 
   return releaseHeader !== 'raw' && `= ${releaseHeader} = \n${releaseDetails}\n`;
 };
@@ -148,7 +150,8 @@ const getFormattedChangelog = (changelog) => pipe(
   toString,
   formatMarkdownSections,
   removeMdFormattingMultipleLineBreaks,
-  replace(/\\/g, ''),
+  // replace(/\\/g, ''),
+  replace(/(?<=\n)\n\*/g, '*'),
 )(changelog);
 
 /**
@@ -217,8 +220,7 @@ const createWordPressReadMeFile = () => {
     Stable tag: ${pluginVersion}${getFormattedPluginInfo(pluginInfo)}\n
     ${formattedSectionContent}
     == Changelog ==\n
-    ${getFormattedChangelog(changelogContents.Changelog)}
-    `,
+    ${getFormattedChangelog(changelogContents.Changelog)}`,
   );
   writeWordPressReadMeFile(newReadmeContents);
 };
