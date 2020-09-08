@@ -1,4 +1,5 @@
 .DS_Store
+.vscode
 .docker-build
 .sass-cache
 README.txt
