@@ -1,7 +1,10 @@
 /* eslint-disable */
 const fs = require('fs');
+const simpleGit = require('simple-git');
+const moment = require('moment')
+const git = simpleGit();
 const {
-  __, reject, curry, mapObjIndexed, pipe, is, values, replace, toString,
+  __, reject, mapObjIndexed, pipe, is, isNil, values, replace, toString,
 } = require('ramda');
 const dedent = require('dedent-js');
 const md2json = require('md-2-json');
@@ -118,7 +121,9 @@ const getReleaseDetails = ({ raw }, releaseCategory) => `${raw}\n`;
  * @param   {string}  releaseHeader  The release header
  * @return  {string}                 The formatted release note
  */
-const getFormattedReleaseNote = (release, releaseHeader) => {
+const getFormattedReleaseNote = async (release, releaseVersion) => {
+  if (!releaseVersion || releaseVersion === 'raw') return;
+
   const releaseDetails = pipe(
     mapObjIndexed(getReleaseDetails),
     values,
@@ -135,7 +140,15 @@ const getFormattedReleaseNote = (release, releaseHeader) => {
   // message
   || `* ${MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE}`;
 
-  return releaseHeader !== 'raw' && `= ${releaseHeader} = \n${releaseDetails}\n`;
+  const releaseDate = await git.log([ `v${releaseVersion}`])
+  const formattedReleaseDate = moment(releaseDate.latest.date).format('MMMM D, YYYY');
+
+  return `
+    = ${releaseVersion} =
+    *Released on ${formattedReleaseDate}*
+
+    ${releaseDetails}\n
+  `;
 };
 
 /**
@@ -143,16 +156,17 @@ const getFormattedReleaseNote = (release, releaseHeader) => {
  * @param   {object}  changelog  The parsed changelog
  * @return  {string}             The formatted changelog
  */
-const getFormattedChangelog = (changelog) => pipe(
-  mapObjIndexed(getFormattedReleaseNote),
-  values,
-  reject(is(Boolean)),
-  toString,
-  formatMarkdownSections,
-  removeMdFormattingMultipleLineBreaks,
-  // replace(/\\/g, ''),
-  replace(/(?<=\n)\n\*/g, '*'),
-)(changelog);
+const getFormattedChangelog = async (changelog) => {
+  const content = await Promise.all(values(mapObjIndexed(getFormattedReleaseNote, changelog)));
+  return pipe(
+    reject(isNil),
+    toString,
+    formatMarkdownSections,
+    removeMdFormattingMultipleLineBreaks,
+    replace(/\\/g, ''),
+    replace(/(?<=\n)\n\*/g, '*'),
+  )(content);
+}
 
 /**
  * Function to convert a heading three to a heading two if its followed by
@@ -206,7 +220,7 @@ const getParsedChangeLog = () => pipe(
  * Main function to create the WordPress file
  * @return  {void}
  */
-const createWordPressReadMeFile = () => {
+const createWordPressReadMeFile = async () => {
   const readmeContents = getParsedReadMe();
   const changelogContents = getParsedChangeLog();
 
@@ -219,8 +233,8 @@ const createWordPressReadMeFile = () => {
     `=== ${pluginName} ===
     Stable tag: ${pluginVersion}${getFormattedPluginInfo(pluginInfo)}\n
     ${formattedSectionContent}
-    == Changelog ==\n
-    ${getFormattedChangelog(changelogContents.Changelog)}`,
+    == Changelog ==
+    ${await getFormattedChangelog(changelogContents.Changelog)}`,
   );
   writeWordPressReadMeFile(newReadmeContents);
 };

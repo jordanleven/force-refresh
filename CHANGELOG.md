@@ -34,12 +34,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 * Bug fixes
 
-## 1.1.0
-
-### Fix
-
-* Performance enhancements and bug fixes
-
 ## 1.0.0
 
 ### Feat
