@@ -2,7 +2,7 @@
 
 ![Build](https://github.com/jordanleven/force-refresh/workflows/Build/badge.svg)\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
-**Tags:** force, refresh, reload, single, page, application, ajax\
+**Tags:** refresh, reload, single page application\
 **Requires PHP:** 5.6.0\
 **Requires at least:** 5.2\
 **Tested up to:** 5.5.1\
