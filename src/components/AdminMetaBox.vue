@@ -62,8 +62,8 @@ export default {
       } = this;
 
       requestPostRefreshByPostID(postId, { nonce })
-        .then(({ success, return_data: returnData }) => {
-          this.refreshInterval = returnData.refresh_interval;
+        .then(({ success, data }) => {
+          this.refreshInterval = data.refresh_interval;
           this.notificationVisible = true;
           this.refreshStatus = success;
         });

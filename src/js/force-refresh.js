@@ -81,6 +81,7 @@
                 },
                 {
                     action : "force_refresh_get_version",
+                    nonce: force_refresh_js_object.nonce,
                     post_id: force_refresh_js_object.post_id
                 }
                 );
@@ -96,7 +97,7 @@
          */
          getVersionCallbackSuccess : function(return_object){
             // Get the return data
-            var return_data      = return_object.ajax_data.return_data,
+            var return_data      = return_object.ajax_data.data,
             // Declare the site version we just found
             current_site_version = return_data.current_site_version,
             // Declare the page version we just found
