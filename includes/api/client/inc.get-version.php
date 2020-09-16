@@ -12,7 +12,7 @@
  */
 function get_current_version_site() {
     $current_site_version = get_option( 'force_refresh_current_site_version' );
-    return $current_site_version ?? '0';
+    return ! ! $current_site_version ? $current_site_version : '0';
 }
 
 /**
@@ -24,7 +24,7 @@ function get_current_version_site() {
  */
 function get_current_version_post( int $post_id ) {
     $current_page_version = get_post_meta( $post_id, 'force_refresh_current_page_version', true );
-    return $current_page_version ?? '0';
+    return ! ! $current_page_version ? $current_page_version : '0';
 }
 
 /**
