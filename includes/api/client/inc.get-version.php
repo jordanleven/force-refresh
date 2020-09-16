@@ -43,15 +43,15 @@ function get_version() {
     // phpcs:disable WordPress.Security.NonceVerification
 
     // Get the post ID.
-    $post_id = isset( $_REQUEST['post_id'] )
-        ? sanitize_text_field( wp_unslash( $_REQUEST['post_id'] ) )
+    $post_id = isset( $_REQUEST['postId'] )
+        ? sanitize_text_field( wp_unslash( $_REQUEST['postId'] ) )
         : null;
     return_api_response(
         200,
         'The current site version has been successfully retrieved.',
         array(
-            'current_site_version' => get_current_version_site(),
-            'current_page_version' => get_current_version_post( $post_id ),
+            'currentVersionSite' => get_current_version_site(),
+            'currentVersionPage' => get_current_version_post( $post_id ),
         )
     );
 

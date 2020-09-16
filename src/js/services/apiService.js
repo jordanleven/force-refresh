@@ -2,10 +2,6 @@ import axios from 'axios';
 import qs from 'querystring';
 import { error } from './loggingService';
 
-// ajaxurl is a global WordPress variable
-// eslint-disable-next-line no-undef
-const WORDPRESS_AJAX_URL = ajaxurl;
-
 const axiosConfig = {
   headers: {
     'Content-Type': 'application/x-www-form-urlencoded',
@@ -13,10 +9,21 @@ const axiosConfig = {
 };
 
 export default ({
-  post: async (payloadData) => axios.post(
-    WORDPRESS_AJAX_URL,
-    qs.stringify(payloadData),
+  post: async (url, payload) => axios.post(
+    url,
+    qs.stringify(payload),
     axiosConfig,
+  )
+    .then(({ data }) => data)
+    .catch((errorResponse) => {
+      error(errorResponse);
+      throw errorResponse;
+    }),
+  get: async (url, params) => axios.get(
+    url,
+    {
+      params,
+    },
   )
     .then(({ data }) => data)
     .catch((errorResponse) => {

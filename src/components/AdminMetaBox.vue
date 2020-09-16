@@ -22,7 +22,7 @@
 <script>
 import VueTypes from 'vue-types';
 import { sprintf } from 'sprintf-js';
-import { requestPostRefreshByPostID } from '../js/services/refreshService';
+import { requestPostRefreshByPostID } from '../js/services/admin/refreshService';
 import AdminNotification from './AdminNotification.vue';
 
 const MESSAGE_REFRESH_SUCCESS = 'You\'ve successfully refreshed this page. All connected browsers will refresh within %s seconds.';

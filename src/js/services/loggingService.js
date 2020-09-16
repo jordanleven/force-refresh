@@ -6,12 +6,15 @@ const toPascalCase = (text) => text.replace(/(^\w|-\w)/g, clearAndUpper);
 
 const formattedPackageName = toPascalCase(packageName);
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 /**
  * Method used to debug info to console
  * @param     {string | object }   message    The message or object to log
  * @return    {void}
  */
 export const debug = (message) => {
+  if (!isDevelopment) return;
   console.debug(`${formattedPackageName} - ${message}`);
 };
 
