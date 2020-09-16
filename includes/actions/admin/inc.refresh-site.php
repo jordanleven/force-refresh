@@ -19,7 +19,7 @@ function manage_force_refresh() {
         false,
     );
     // See what the existing settings are for the refresh interval.
-    $preset_option_refresh_interval = get_option(
+    $preset_option_refresh_interval = (string) get_option(
         WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS,
         WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT
     );
