@@ -9,7 +9,7 @@ module.exports = {
     './js/force-refresh-main-admin': './src/js/admin/admin.js',
     './js/force-refresh-meta-box-admin': './src/layouts/admin-meta-box',
     './css/force-refresh-admin': './src/scss/force-refresh-admin.scss',
-    './': './node_modules/font-awesome/fonts/fontawesome-webfont.woff2',
+    './fonts/fontawesome': './node_modules/font-awesome/fonts/fontawesome-webfont.woff2',
   },
   output: {
     path: path.resolve(__dirname, 'dist/'),
