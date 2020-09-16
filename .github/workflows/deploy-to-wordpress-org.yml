@@ -21,6 +21,7 @@ jobs:
         npm run build
         npm run createWpReadme
         npm prune --production
+        composer install --no-dev --no-scripts
     - name: Deploy plugin to WordPress.org
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:
