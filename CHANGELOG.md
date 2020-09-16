@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.4](https://github.com/jordanleven/force-refresh/compare/v2.1.3...v2.1.4) (2020-09-16)
+
+
+### Bug Fixes
+
+* Address refresh loop bug when activating ([c70fc22](https://github.com/jordanleven/force-refresh/commit/c70fc22ba9ebaa1cb56b15b744be4521b7e306f9))
+* Issue displaying default refresh intervals ([95fe173](https://github.com/jordanleven/force-refresh/commit/95fe17394f7f884977e69f5f86a4a53b66cb727a))
+
 ### [2.1.3](https://github.com/jordanleven/force-refresh/compare/v2.1.2...v2.1.3) (2020-09-16)
 
 
