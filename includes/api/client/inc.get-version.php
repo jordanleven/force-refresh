@@ -36,7 +36,7 @@ function get_version() {
     if ( ! is_client_nonce_valid() ) {
         return_api_response(
             403,
-            'The nonce you provided is invalid.',
+            'The nonce you provided is invalid.'
         );
     }
     // The nonce is validated as part of `is_client_nonce_valid`.

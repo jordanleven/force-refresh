@@ -37,5 +37,5 @@ function request_refresh_site() {
 // Register the action used by administrators to refresh the site.
 add_action(
     'wp_ajax_force_refresh_update_site_version',
-    __NAMESPACE__ . '\\request_refresh_site',
+    __NAMESPACE__ . '\\request_refresh_site'
 );

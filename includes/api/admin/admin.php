@@ -9,17 +9,17 @@ namespace JordanLeven\Plugins\ForceRefresh;
 
 define(
     'MESSAGE_SUCCESS_SITE',
-    'You\'ve successfully requested all browsers to refresh.',
+    'You\'ve successfully requested all browsers to refresh.'
 );
 
 define(
     'MESSAGE_SUCCESS_PAGE',
-    'You\'ve successfully requested all browsers to refresh this page.',
+    'You\'ve successfully requested all browsers to refresh this page.'
 );
 
 define(
     'MESSAGE_ERROR_UNAUTHORIZED',
-    'I\'m sorry, but you are not authorized to request refreshes.',
+    'I\'m sorry, but you are not authorized to request refreshes.'
 );
 
 /**

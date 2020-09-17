@@ -16,7 +16,7 @@ function manage_force_refresh() {
     // See what the existing settings are for showing Force Refresh in the WordPress Admin bar.
     $preset_option_show_force_refresh_in_wp_admin_bar = get_option(
         WP_FORCE_REFRESH_OPTION_SHOW_IN_WP_ADMIN_BAR,
-        false,
+        false
     );
     // See what the existing settings are for the refresh interval.
     $preset_option_refresh_interval = (string) get_option(

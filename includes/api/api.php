@@ -24,7 +24,7 @@ function return_api_response( int $status_code, string $message, $data = array()
             'status_text' => $message,
             'success'     => 200 === $status_code,
             'data'        => $data,
-        ),
+        )
     );
     wp_die();
 }

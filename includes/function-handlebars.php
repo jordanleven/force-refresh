@@ -73,7 +73,7 @@ function render_handlebars(
             array(
                 'flags' => ZordiusLightnCandy\LightnCandy::FLAG_RENDER_DEBUG
                 | ZordiusLightnCandy\LightnCandy::FLAG_HANDLEBARSJS,
-            ),
+            )
         );
         // Get the render function.
         $renderer      = ZordiusLightnCandy\LightnCandy::prepare( $php );

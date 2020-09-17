@@ -45,7 +45,7 @@ function request_refresh_page() {
             'force_refresh_current_page_version',
             $page_version,
             null,
-            'no',
+            'no'
         );
         return_api_response(
             200,
@@ -64,5 +64,5 @@ function request_refresh_page() {
 // Register the action used by administrators to refresh a specific page.
 add_action(
     'wp_ajax_force_refresh_update_page_version',
-    __NAMESPACE__ . '\\request_refresh_page',
+    __NAMESPACE__ . '\\request_refresh_page'
 );

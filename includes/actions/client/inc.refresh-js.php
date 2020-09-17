@@ -28,7 +28,7 @@ add_action(
                 // Get the refresh interval.
                 'refreshInterval' => get_option(
                     WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS,
-                    WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT,
+                    WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT
                 ),
             )
         );

@@ -34,7 +34,7 @@ function add_script( $handle, $path, $register = false ) {
                 get_force_refresh_plugin_url( $path ),
                 array( 'jquery', 'jquery-ui-core' ),
                 $file_version,
-                true,
+                true
             );
         } else {
             // Enqueue the style.
@@ -43,7 +43,7 @@ function add_script( $handle, $path, $register = false ) {
                 get_force_refresh_plugin_url( $path ),
                 array( 'jquery', 'jquery-ui-core' ),
                 $file_version,
-                true,
+                true
             );
         }
     }
