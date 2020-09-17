@@ -6,7 +6,8 @@
     "post-update-cmd" : "composer run config-phpcs",
     "config-phpcs": "phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs",
     "lint": "phpcs filter-force-refresh.php ./includes",
-    "beta": "wp dist-archive"
+    "beta": "wp dist-archive",
+    "test": "phpunit includes"
   },
   "require": {
     "php": ">=5.6"
