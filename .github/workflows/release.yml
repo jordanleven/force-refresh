@@ -25,6 +25,9 @@ jobs:
         composer lint
         npm run lint
 
+    - name: Test
+      run: composer test
+
     - name: Build the plugin
       run: npm run build
 
