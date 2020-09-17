@@ -5,13 +5,15 @@
     "post-install-cmd": "composer run config-phpcs",
     "post-update-cmd" : "composer run config-phpcs",
     "config-phpcs": "phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs",
-    "lint": "phpcs filter-force-refresh.php ./includes"
+    "lint": "phpcs filter-force-refresh.php ./includes",
+    "beta": "wp dist-archive"
   },
   "require": {
     "php": ">=5.6"
   },
   "require-dev": {
     "squizlabs/php_codesniffer": "^3.5",
-    "wp-coding-standards/wpcs": "^2.3"
+    "wp-coding-standards/wpcs": "^2.3",
+    "wp-cli/dist-archive-command": "^2.0"
   }
 }

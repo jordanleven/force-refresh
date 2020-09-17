@@ -1,8 +1,9 @@
 .DS_Store
-.vscode
 .docker-build
 .sass-cache
-README.txt
+.vscode
 /dist
 /vendor
+Force-Refresh-*.zip
+README.txt
 node_modules

@@ -1,6 +1,6 @@
 # Force Refresh
 
-![Build](https://github.com/jordanleven/force-refresh/workflows/Build/badge.svg)\
+![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** refresh, reload, single page application\
 **Requires PHP:** 7.2\

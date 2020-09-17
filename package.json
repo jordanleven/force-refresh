@@ -11,12 +11,14 @@
   "license": "MIT",
   "scripts": {
     "build": "npx webpack --mode=production",
-    "dev": "npx webpack --watch --mode=development",
+    "build:beta": "npx webpack --mode=development",
+    "dev": "npm run build:beta -- --watch",
     "lint": "npm run lint:css && npm run lint:js",
     "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose",
     "lint:js": "eslint --ext .js --ignore-path .gitignore .",
     "createWpReadme": "node ./scripts/createWordPressReadMe.js",
-    "release": "./scripts/release.sh"
+    "release": "./scripts/release.sh",
+    "release:beta": "./scripts/releaseBeta.sh"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.32",

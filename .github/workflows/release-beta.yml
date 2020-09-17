@@ -1,0 +1,60 @@
+name: Release Beta Build
+on:
+  pull_request:
+    tags:
+      - "v[0-9].[0-9].[0-9]-*.[0-9]"
+  push:
+    tags:
+      - "v[0-9].[0-9].[0-9]-*.[0-9]"
+
+jobs:
+  build:
+    name: Release Beta Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [10.x]
+
+    steps:
+
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Get Release Number
+      id: package-version
+      uses: martinbeentjes/npm-get-version-action@master
+
+    - name: Install dependencies
+      run: |
+        npm install
+        composer install
+
+    - name: Lint
+      run: |
+        composer lint
+        npm run lint
+
+    - name: Create release notes
+      run: npm run createWpReadme
+
+    - name: Build the plugin
+      run: |
+        npm run build:beta
+        composer beta ./ ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
+
+    - name: Create GitHub release
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
+        asset_name: Force_Refresh_v${{ steps.package-version.outputs.current-version}}.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+        prerelease: true
+        body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and should not be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh/. \n\nPlease note that beta releases will, on average, be larger in size due to the inclusion of dependencies not usually included in production builds and omission of minification."
