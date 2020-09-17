@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.5](https://github.com/jordanleven/force-refresh/compare/v2.1.4...v2.1.5) (2020-09-17)
+
+
+### Bug Fixes
+
+* Address issue running plugin in PHP 7.2 ([62229d3](https://github.com/jordanleven/force-refresh/commit/62229d3b094b7c9330138768b111ac58986a79d5))
+
 ### [2.1.4](https://github.com/jordanleven/force-refresh/compare/v2.1.3...v2.1.4) (2020-09-16)
 
 
