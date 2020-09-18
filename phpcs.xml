@@ -7,16 +7,25 @@
       <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
       <exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found" />
   </rule>
+  <rule ref="WordPress.Files.FileName.NotHyphenatedLowercase">
+  	<exclude-pattern>*.Test.php</exclude-pattern>
+  </rule>
+  <rule ref="Squiz.Commenting">
+  	<exclude-pattern>*.Test.php</exclude-pattern>
+  </rule>
+  <rule ref="PEAR.NamingConventions.ValidClassName.StartWithCapital">
+  	<exclude-pattern>*.Test.php</exclude-pattern>
+  </rule>
   <rule ref="Generic.WhiteSpace.ScopeIndent">
       <properties>
           <property name="tabIndent" value="false"/>
       </properties>
   </rule>
   <rule ref="Generic.WhiteSpace.DisallowTabIndent" />
-      <rule ref="Generic.Files.LineLength">
-        <properties>
-            <property name="lineLimit" value="100"/>
-            <property name="absoluteLineLimit" value="120"/>
-        </properties>
-     </rule>
+  <rule ref="Generic.Files.LineLength">
+    <properties>
+      <property name="lineLimit" value="100"/>
+      <property name="absoluteLineLimit" value="120"/>
+    </properties>
+  </rule>
 </ruleset>
