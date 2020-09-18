@@ -58,7 +58,7 @@ function request_refresh_page() {
                 ),
             )
         );
-    }
+    }//end if
 }
 
 // Register the action used by administrators to refresh a specific page.

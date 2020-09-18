@@ -46,7 +46,7 @@ function add_script( $handle, $path, $register = false ) {
                 true
             );
         }
-    }
+    }//end if
 }
 
 /**
