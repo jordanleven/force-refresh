@@ -16,6 +16,7 @@
     "squizlabs/php_codesniffer": "^3.5",
     "wp-coding-standards/wpcs": "^2.3",
     "wp-cli/dist-archive-command": "^2.0",
-    "phpunit/phpunit": "^9.5"
+    "phpunit/phpunit": "^9.5",
+    "phpunit/php-code-coverage": "^9.2"
   }
 }
