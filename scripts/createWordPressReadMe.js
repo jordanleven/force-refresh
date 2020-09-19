@@ -62,7 +62,7 @@ const getFormattedPluginInfo = (content) => pipe(
   replace(/\n\n/g, ''),
   replace(/\\/g, ''),
   // Remove build badges
-  replace(/!.*/, ''),
+  replace(/\[?!.*/g, ''),
   replace(/\n\s*\n/g, ''),
   removeMdFormattingBold,
   removeMdFormattingHeadings,
@@ -231,8 +231,9 @@ const createWordPressReadMeFile = async () => {
 
   const newReadmeContents = dedent(
     `=== ${pluginName} ===
-    Stable tag: ${pluginVersion}${getFormattedPluginInfo(pluginInfo)}\n
-    ${formattedSectionContent}
+   Stable tag: ${pluginVersion}
+   ${getFormattedPluginInfo(pluginInfo)}\n
+   ${formattedSectionContent}
     == Changelog ==
     ${await getFormattedChangelog(changelogContents.Changelog)}`,
   );

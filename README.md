@@ -1,6 +1,9 @@
 # Force Refresh
 
 ![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
+[![Maintainability](https://api.codeclimate.com/v1/badges/d0560130587c7ebd31b1/maintainability)](https://codeclimate.com/github/jordanleven/force-refresh/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/d0560130587c7ebd31b1/test_coverage)](https://codeclimate.com/github/jordanleven/force-refresh/test_coverage)\
+\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** refresh, reload, single page application\
 **Requires PHP:** 7.2\
