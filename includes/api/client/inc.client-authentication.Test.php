@@ -30,7 +30,7 @@ function wp_unslash( $text ): string {
     return $text;
 }
 
-class inc extends TestCase {
+class ClientAuthentication extends TestCase {
 
     public function testReturnsFalseWhenNonceIsMissing() {
         // Nonce doesn't exist
