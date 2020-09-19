@@ -9,7 +9,6 @@ jobs:
   check-commit-message:
     name: Check Commit Message
     runs-on: ubuntu-latest
-
     steps:
       - name: Proofread commit types
         uses: gsactions/commit-message-checker@v1
@@ -24,33 +23,44 @@ jobs:
   build:
     name: CI
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
         node-version: [10.x]
-
     steps:
-
     - name: Checkout repository
       uses: actions/checkout@v2
-
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-
     - name: Install dependencies
       run: |
         npm ci
         composer install
-
     - name: Lint
       run:  |
         npm run lint
         composer lint
-
-    - name: Test
-      run: composer test
-
     - name: Build the application
       run: npm run build --if-present
+
+  coverage:
+    needs: [ build ]
+    name: Test Coverage
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+    - name: Install dependencies
+      run: composer install
+    - name: Test & publish code coverage
+      uses: paambaati/codeclimate-action@v2.6.0
+      env:
+        CC_TEST_REPORTER_ID: ${{ secrets.CODE_CLIMATE_TEST_REPORTER }}
+      with:
+        coverageCommand: composer test
+        coverageLocations: ${{github.workspace}}/clover.xml:clover

@@ -1,9 +1,13 @@
 .DS_Store
 .docker-build
+.phpunit.result.cache
 .sass-cache
 .vscode
 /dist
 /vendor
 Force-Refresh-*.zip
 README.txt
+clover.xml
+coverage
+html-coverage
 node_modules
