@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage cacheDirectory="/test"
+            processUncoveredFiles="true"
+            includeUncoveredFiles="true"
+            pathCoverage="false"
+            ignoreDeprecatedCodeUnits="true"
+            disableCodeCoverageIgnore="true"
+  >
+    <report>
+      <clover outputFile="clover.xml"/>
+    </report>
+    <include>
+        <directory suffix=".php">./includes/*</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="Force Refresh PHP">
+      <directory>./includes</directory>
+    </testsuite>
+  </testsuites>
+</phpunit>
