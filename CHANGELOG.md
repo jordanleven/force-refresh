@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.1.6](https://github.com/jordanleven/force-refresh/compare/v2.1.5...v2.1.6) (2020-09-29)
+
+
+### Bug Fixes
+
+* Issue with refresh interval being ignored ([22507af](https://github.com/jordanleven/force-refresh/commit/22507af9eda0febc66bdff3ad0c7b7c857b84f95))
+
 ### [2.1.5](https://github.com/jordanleven/force-refresh/compare/v2.1.4...v2.1.5) (2020-09-17)
 
 
