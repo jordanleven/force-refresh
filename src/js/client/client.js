@@ -82,9 +82,9 @@ const checkForRefresh = () => {
 
 // eslint-disable-next-line no-undef
 const { refreshInterval } = forceRefreshLocalizedData;
+const refreshIntervalInMicroseconds = refreshInterval * 1000;
 
 debug(`Refreshing every ${refreshInterval} seconds.`);
 
 checkForRefresh();
-// setInterval(checkForRefresh, refreshInterval * 1000);
-checkVersionInterval = setInterval(checkForRefresh, 5000);
+checkVersionInterval = setInterval(checkForRefresh, refreshIntervalInMicroseconds);
