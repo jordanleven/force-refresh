@@ -27,9 +27,6 @@ define( 'WP_FORCE_REFRESH_ACTION', 'wp_force_refresh' );
 // Define the name of the capability used to invoke a refresh. This is used for developers who want
 // to fine-tune control of what types of users and roles can request a refresh.
 define( 'WP_FORCE_REFRESH_CAPABILITY', 'invoke_force_refresh' );
-// Define the ID for the Handlebars admin notice. This is used to add notifications to the admin
-// screen when a user requests a refresh.
-define( 'WP_FORCE_REFRESH_HANDLEBARS_ADMIN_NOTICE_TEMPLATE_ID', 'invoke_force_refresh' );
 // Define the option for showing the Force Refresh button in the WordPress Admin Bar.
 define( 'WP_FORCE_REFRESH_OPTION_SHOW_IN_WP_ADMIN_BAR', 'force_refresh_show_in_wp_admin_bar' );
 // Define the option for the refresh interval (how often the site should check for a new version).
@@ -56,8 +53,6 @@ function get_main_plugin_file() {
 require_once __DIR__ . '/vendor/autoload.php';
 // Include the functions file.
 require_once __DIR__ . '/includes/functions.php';
-// Include the handlebars function.
-require_once __DIR__ . '/includes/function-handlebars.php';
 // Register all of our actions.
 require_once __DIR__ . '/includes/actions/actions.php';
 // Include the API call functions.
