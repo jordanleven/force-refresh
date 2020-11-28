@@ -8,12 +8,12 @@
           @notification-closed="hideNotification"
         />
       </transition>
-      <p>Force all users to manually reload the {{ postType }} "{{ postName }}".</p>
+      <p>Force all users to manually reload the {{ postType }} "{{ postNameDecoded }}".</p>
       <button
         class="button button-primary"
         @click="refreshPage"
       >
-        Refresh {{ postName }}
+        Refresh {{ postNameDecoded }}
       </button>
     </div>
   </div>
@@ -21,6 +21,7 @@
 
 <script>
 import VueTypes from 'vue-types';
+import { AllHtmlEntities } from 'html-entities';
 import { sprintf } from 'sprintf-js';
 import { requestPostRefreshByPostID } from '../js/services/admin/refreshService';
 import AdminNotification from './AdminNotification.vue';
@@ -47,6 +48,9 @@ export default {
     };
   },
   computed: {
+    postNameDecoded() {
+      return AllHtmlEntities.decode(this.postName);
+    },
     notificationMessage() {
       return sprintf(MESSAGE_REFRESH_SUCCESS, this.refreshInterval);
     },
