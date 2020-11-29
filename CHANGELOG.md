@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.2.0](https://github.com/jordanleven/force-refresh/compare/v2.1.6...v2.2.0) (2020-11-29)
+
+
+### Features
+
+* Add support for WordPress 5.5.3 ([2cc2bb0](https://github.com/jordanleven/force-refresh/commit/2cc2bb0011fba80dabd66101a3957c9068a239f3))
+* Update Admin UI to use Vue instead of Handlebars ([0f3a899](https://github.com/jordanleven/force-refresh/commit/0f3a899c9257e4ff36c78fe4ee3804a20ba440ac))
+
+
+### Bug Fixes
+
+* Address issue with encoded post names ([0cc8989](https://github.com/jordanleven/force-refresh/commit/0cc8989458b43dfd6a7ea7ebb1d51cbde01de1be))
+
 ### [2.1.6](https://github.com/jordanleven/force-refresh/compare/v2.1.5...v2.1.6) (2020-09-29)
 
 
