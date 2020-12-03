@@ -9,7 +9,7 @@
         :class="logoClass"
         :icon="forceRefreshIcon"
       />
-      Force Refresh Sites
+      Force Refresh Site
     </span>
   </span>
 </template>
