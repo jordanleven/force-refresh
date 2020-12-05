@@ -1,12 +1,9 @@
-<!-- PR title -->
-# _TITLE_
-
 ## Description
 <!-- Add description of work done here -->
 
 ## Spec
 
-See Issue: [ISSUE_NUMBER](https://github.com/jordanleven/force-refresh/issues/[ISSUE_-_NUMBER])
+See Issue: [ISSUE_NUMBER](https://github.com/jordanleven/force-refresh/issues/ISSUE_NUMBER)
 
 ## Validation
 <!-- delete anything irrelevant to this PR -->

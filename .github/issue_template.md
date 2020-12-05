@@ -1,6 +1,3 @@
-<!-- Please provide a descriptive title for your feedback -->
-# _TITLE_
-
 ## Basic Information
 
 ### Which area are you seeing an issue with
