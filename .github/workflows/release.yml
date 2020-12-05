@@ -2,26 +2,50 @@ name: Release
 on:
   push:
     tags:
-    - "*"
+    - "v*"
 jobs:
   tag:
     name: Deploy to WordPress.org
     runs-on: ubuntu-latest
     steps:
+
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
-    - name: Build the plugin
+
+    - name: Install dependencies
       run: |
-        composer install
-        composer lint
         npm install
+        composer install
+
+    - name: Lint
+      run: |
+        composer lint
         npm run lint
-        npm run build
-        npm run createWpReadme
+
+    - name: Build the plugin
+      run: npm run build
+
+    - name: Create release notes
+      run: npm run createWpReadme
+
+    - name: Prune dependencies
+      run: |
         npm prune --production
         composer install --no-dev --no-scripts
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Force Refresh ${{ github.ref }}
+        draft: false
+        prerelease: false
+
     - name: Deploy plugin to WordPress.org
       uses: 10up/action-wordpress-plugin-deploy@stable
       env:

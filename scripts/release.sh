@@ -6,7 +6,7 @@ NEXT_VERSION=$(npx next-standard-version)
 
 if [[ $CURRENT_BRANCH != $PRODUCTION_BRANCH ]]
   then
-  echo "\033[1;31mCannot release while on branch $branchName\033[0m"
+  echo "\033[1;31mCannot release while on branch $CURRENT_BRANCH\033[0m"
   exit 1
 fi
 
