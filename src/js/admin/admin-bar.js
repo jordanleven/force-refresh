@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Vue from 'vue';
-import AdminBar from '@/layouts/AdminBar.vue';
+import LayoutAdminBar from '@/layouts/LayoutAdminBar.vue';
 
 // This data are localized from the functions file
 // eslint-disable-next-line no-undef
@@ -13,7 +13,7 @@ Vue.component('FontAwesomeIcon', FontAwesomeIcon);
 new Vue({
   el: target,
   render: (createElement) => createElement(
-    AdminBar,
+    LayoutAdminBar,
     {
       props: localizedData,
     },
