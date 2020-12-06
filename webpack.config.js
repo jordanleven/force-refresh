@@ -12,6 +12,18 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts/',
+            },
+          },
+        ],
+      },
+      {
         exclude: /node_modules/,
         test: /\.js$/,
         use: [
@@ -32,7 +44,7 @@ module.exports = {
           path.resolve(__dirname, 'src/scss'),
           /node_modules/,
         ],
-        test: /\.scss$/,
+        test: /\.(css|scss)$/,
         use: [
           'style-loader',
           'css-loader',

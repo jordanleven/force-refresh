@@ -7,6 +7,8 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
+require __DIR__ . '/inc.troubleshooting.php';
+
 // The ID of the container we'll append our force refresh component to.
 define( 'HTML_ID_MAIN', 'force-refresh-main' );
 // The name of the main admin JS file.
@@ -32,6 +34,8 @@ function manage_force_refresh() {
     // Include the admin JS.
     add_script( FILE_NAME_ADMIN_MAIN, '/dist/js/force-refresh-main.js', true );
 
+    $force_refresh_plugin_data = get_plugin_data( get_main_plugin_file() );
+
     $localized_data = array(
         // Wrap in inner array to preserve primitive types.
         'localData' => array(
@@ -40,10 +44,27 @@ function manage_force_refresh() {
             'nonce'          => wp_create_nonce( WP_FORCE_REFRESH_ACTION ),
             'siteName'       => get_bloginfo(),
             'target'         => '#' . HTML_ID_MAIN,
+            'isDebugActive'  => get_option_debug_mode(),
             'refreshOptions' => array(
                 // Add the refresh interval.
                 'refreshInterval'      => (int) $refresh_interval,
                 'showRefreshInMenuBar' => 'true' === $show_force_refresh_in_menu_bar,
+            ),
+            'isMultiSite'    => (bool) is_multisite(),
+            'currentSiteId'  => (int) get_current_blog_id(),
+            'versions'       => array(
+                'php'          => array(
+                    'version'         => (string) phpversion(),
+                    'versionRequired' => (string) $force_refresh_plugin_data['RequiresPHP'],
+                ),
+                'wordPress'    => array(
+                    'version'         => (string) get_bloginfo( 'version' ),
+                    'versionRequired' => (string) $force_refresh_plugin_data['RequiresWP'],
+                ),
+                'forceRefresh' => array(
+                    'version'         => (string) $force_refresh_plugin_data['Version'],
+                    'versionRequired' => (string) get_latest_plugin_version(),
+                ),
             ),
         ),
     );

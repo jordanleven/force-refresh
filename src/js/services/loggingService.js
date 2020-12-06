@@ -1,3 +1,5 @@
+import { getDebugMode } from '@/js/services/debugService.js';
+
 /* eslint-disable no-console */
 const { name: packageName } = require('../../../package.json');
 
@@ -6,7 +8,7 @@ const toPascalCase = (text) => text.replace(/(^\w|-\w)/g, clearAndUpper);
 
 const formattedPackageName = toPascalCase(packageName);
 
-const isDevelopment = process.env.NODE_ENV === 'development';
+const isDebugLoggingActive = () => process.env.NODE_ENV === 'development' || getDebugMode();
 
 /**
  * Method used to debug info to console
@@ -14,7 +16,7 @@ const isDevelopment = process.env.NODE_ENV === 'development';
  * @return    {void}
  */
 export const debug = (message) => {
-  if (!isDevelopment) return;
+  if (!isDebugLoggingActive()) return;
   console.debug(`${formattedPackageName} - ${message}`);
 };
 
