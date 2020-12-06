@@ -2,10 +2,10 @@
   <div class="force-refresh-admin__options">
     <div class="force-refresh-admin__options-inner">
       <h3 class="force-refresh-options-header">
-        Options
+        {{ $t('ADMIN_SETTINGS.OPTIONS_HEADER') }}
       </h3>
       <div class="option-group">
-        <label for="show-in-wp-admin-bar">Refresh from Admin Bar</label>
+        <label for="show-in-wp-admin-bar">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_FROM_ADMIN_BAR') }}</label>
         <select
           v-model="optionSelectedShowRefreshInMenuBar"
           type="select"
@@ -20,7 +20,7 @@
         </select>
       </div>
       <div class="option-group">
-        <label for="show-in-wp-admin-bar">Refresh interval</label>
+        <label for="show-in-wp-admin-bar">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_INTERVAL') }}</label>
         <select
           v-model="optionSelectedRefreshInterval"
           type="select"
@@ -41,7 +41,7 @@
           class="button button-primary"
           @click="updateOptionsWasClicked"
         >
-          Update
+          {{ $t('FORM_BUTTONS_GENERIC.UPDATE') }}
         </button>
       </div>
     </div>

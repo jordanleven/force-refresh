@@ -1,0 +1,7 @@
+@use '../variables' as var;
+@import "~@fontsource/fira-code/index.css";
+
+
+@mixin typeface-code() {
+  font-family: var.$font-family-code;
+}

@@ -1,0 +1,42 @@
+{
+  "PLUGIN_NAME_FORCE_REFRESH": "Force Refresh",
+  "ADMIN_NOTIFICATIONS": {
+    "DISMISS_NOTIFICATION": "Dismiss this notice.",
+    "DEBUG_MODE_ACTIVE": "Force Refresh is currently in Debug Mode.",
+    "SITE_DEBUG_MODE_FAILURE": "There was an issue updating settings for debug mode. Please try again.",
+    "SITE_REFRESHED_FAILURE": "There was an issue refreshing your site. Please try again.",
+    "SITE_REFRESHED_SUCCESS": "You've successfully refreshed your site. All connected browsers will refresh within %{refreshInterval} seconds.",
+    "PAGE_REFRESHED_FAILURE": "There was an issue refreshing your page. Please try again.",
+    "PAGE_REFRESHED_SUCCESS": "You've successfully refreshed your page. All connected browsers will refresh within %{refreshInterval} seconds.",
+    "SITE_SETTINGS_UPDATED_FAILURE": "There was an issue updating your settings. Please try again.",
+    "SITE_SETTINGS_UPDATED_SUCCESS": "You've successfully updated settings for Force Refresh."
+  },
+  "ADMIN_SETTINGS": {
+    "OPTIONS_HEADER": "Options",
+    "OPTION_REFRESH_FROM_ADMIN_BAR": "Refresh from Admin Bar",
+    "OPTION_REFRESH_INTERVAL": "Refresh interval"
+  },
+  "ADMIN_TROUBLESHOOTING": {
+    "DEBUG_MODE_DESCRIPTION_ACTIVE": "Debugging mode is currently turned on. This means that Force Refresh will log additional output to the browser console and will not refresh connected browsers.",
+    "DEBUG_MODE_DESCRIPTION_INACTIVE": "Debugging mode is currently turned off. This means that Force Refresh will operate normally.",
+    "TROUBLESHOOTING_HEADER": "Troubleshooting",
+    "TROUBLESHOOTING_HEADER_HEALTH": "Health",
+    "TROUBLESHOOTING_HEADER_SITE_SETTINGS": "Site Settings",
+    "TROUBLESHOOTING_DEBUG_MODE": "Debug Mode",
+    "BUTTON_EXIT_TROUBLESHOOTING_MODE": "Exit troubleshooting",
+    "TROUBLESHOOTING_LABEL_VERSION": "Version",
+    "TROUBLESHOOTING_LABEL_WORDPRESS": "WordPress",
+    "TROUBLESHOOTING_LABEL_PHP": "PHP",
+    "TROUBLESHOOTING_LABEL_SITE_NAME": "Site Name",
+    "TROUBLESHOOTING_LABEL_MULTISITE_INSTALLATION": "Multisite Installation",
+    "TROUBLESHOOTING_LABEL_CURRENT_SITE_ID": "Current Site ID"
+  },
+  "ADMIN_REFRESH_MAIN": {
+    "REFRESH_DIRECTIONS": "Here, you can force all currently-connected users to manually reload the site \"%{siteName}\"."
+  },
+  "FORM_BUTTONS_GENERIC": {
+    "FORCE_REFRESH_SITE": "Force Refresh Site",
+    "UPDATE": "Update",
+    "TOGGLE": "Toggle"
+  }
+}

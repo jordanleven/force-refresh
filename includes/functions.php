@@ -32,7 +32,7 @@ function add_script( $handle, $path, $register = false ) {
             wp_register_script(
                 $handle,
                 get_force_refresh_plugin_url( $path ),
-                array( 'jquery', 'jquery-ui-core' ),
+                array(),
                 $file_version,
                 true
             );
@@ -41,7 +41,7 @@ function add_script( $handle, $path, $register = false ) {
             wp_enqueue_script(
                 $handle,
                 get_force_refresh_plugin_url( $path ),
-                array( 'jquery', 'jquery-ui-core' ),
+                array(),
                 $file_version,
                 true
             );
@@ -106,3 +106,34 @@ function get_force_refresh_plugin_url( $file = null ) {
     $plugin_url = plugins_url( $file, get_main_plugin_file() );
     return $plugin_url;
 }
+
+/**
+ * Function to retrieve the current set refresh interval.
+ *
+ * @return  int     The set refresh interval
+ */
+function get_force_refresh_option_refresh_interval(): int {
+    $refresh_interval = (string) get_option(
+        WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS,
+        WP_FORCE_REFRESH_OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT
+    );
+
+    return $refresh_interval;
+}
+
+
+/**
+ * Function to retrieve whether or not the refresh button should appear in the
+ * admin bar.
+ *
+ * @return  bool     True if we should show the refresh button in the admin bar
+ */
+function get_force_refresh_option_show_in_admin_bar(): bool {
+    $show_in_admin_bar = get_option(
+        WP_FORCE_REFRESH_OPTION_SHOW_IN_WP_ADMIN_BAR,
+        'false'
+    );
+
+    return 'true' === $show_in_admin_bar;
+}
+
