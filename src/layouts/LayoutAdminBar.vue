@@ -29,7 +29,7 @@ const MESSAGE_SITE_REFRESHED_SUCCESS = "You've successfully refreshed your site.
 const MESSAGE_SITE_REFRESHED_FAILURE = 'There was an issue refreshing your site. Please try again.';
 
 export default {
-  name: 'AdminBar',
+  name: 'LayoutAdminBar',
   props: {
     nonce: VueTypes.string.isRequired,
     refreshInterval: VueTypes.integer.isRequired,

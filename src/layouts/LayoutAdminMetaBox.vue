@@ -29,7 +29,7 @@ import { requestPostRefreshByPostID } from '@/js/services/admin/refreshService';
 const MESSAGE_REFRESH_SUCCESS = 'You\'ve successfully refreshed this page. All connected browsers will refresh within %s seconds.';
 
 export default {
-  name: 'AdminMetaBox',
+  name: 'LayoutAdminMetaBox',
   components: {
     AdminNotification,
   },

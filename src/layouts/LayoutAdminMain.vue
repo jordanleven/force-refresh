@@ -6,27 +6,19 @@
       :message="notificationMessage"
       @notification-closed="notificationWasClosed"
     />
-    <div class="force-refresh__container">
-      <AdminMainRefresh
-        class="force-refresh__main"
-        :site-name="siteName"
-        @refresh-requested="refreshSite"
-      />
-      <AdminMainOptions
-        v-if="options"
-        class="force-refresh__options"
-        :refresh-options="options"
-        @options-were-updated="updateOptions"
-      />
-    </div>
+    <AdminMain
+      :refresh-options="refreshOptions"
+      :site-name="siteName"
+      @refresh-requested="refreshSite"
+      @options-were-updated="updateOptions"
+    />
   </div>
 </template>
 
 <script>
 import { sprintf } from 'sprintf-js';
 import VueTypes from 'vue-types';
-import AdminMainOptions from '@/components/AdminMainOptions/AdminMainOptions.vue';
-import AdminMainRefresh from '@/components/AdminMainRefresh/AdminMainRefresh.vue';
+import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import { requestSiteRefresh, updateForceRefreshOptions } from '@/js/services/admin/refreshService';
 
@@ -36,10 +28,9 @@ const MESSAGE_SITE_SETTINGS_UPDATED_SUCCESS = "You've successfully updated setti
 const MESSAGE_SITE_SETTINGS_UPDATED_FAILURE = 'There was an issue updating your settings. Please try again.';
 
 export default {
-  name: 'AdminMain',
+  name: 'LayoutAdminMain',
   components: {
-    AdminMainOptions,
-    AdminMainRefresh,
+    AdminMain,
     AdminNotification,
   },
   props: {
@@ -49,6 +40,7 @@ export default {
   },
   data() {
     return {
+      debuggingActive: false,
       notificationMessage: null,
       options: null,
     };

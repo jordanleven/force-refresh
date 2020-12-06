@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import AdminMetaBox from '@/layouts/AdminMetaBox.vue';
+import LayoutAdminMetaBox from '@/layouts/LayoutAdminMetaBox.vue';
 // This data are localized from the functions file
 // eslint-disable-next-line no-undef
 const localizedData = forceRefreshLocalJs.localData;
@@ -9,7 +9,7 @@ const { targetClass } = localizedData;
 new Vue({
   el: `.${targetClass}`,
   render: (createElement) => createElement(
-    AdminMetaBox,
+    LayoutAdminMetaBox,
     {
       props: localizedData,
     },
