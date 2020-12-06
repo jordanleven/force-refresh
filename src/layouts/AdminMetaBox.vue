@@ -24,7 +24,7 @@ import { AllHtmlEntities } from 'html-entities';
 import { sprintf } from 'sprintf-js';
 import VueTypes from 'vue-types';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
-import { requestPostRefreshByPostID } from '@/js/services/admin/refreshService';
+import { requestPostRefreshByPostID } from '@/js/services/admin/refreshService.js';
 
 const MESSAGE_REFRESH_SUCCESS = 'You\'ve successfully refreshed this page. All connected browsers will refresh within %s seconds.';
 

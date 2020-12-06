@@ -1,5 +1,5 @@
-import ApiService from '@/js/services/apiService';
-import { debug } from '@/js/services/loggingService';
+import ApiService from '@/js/services/apiService.js';
+import { debug } from '@/js/services/loggingService.js';
 
 export const getCurrentVersion = async () => {
   // eslint-disable-next-line no-undef

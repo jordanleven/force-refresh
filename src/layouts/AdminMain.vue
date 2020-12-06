@@ -28,7 +28,7 @@ import VueTypes from 'vue-types';
 import AdminMainOptions from '@/components/AdminMainOptions/AdminMainOptions.vue';
 import AdminMainRefresh from '@/components/AdminMainRefresh/AdminMainRefresh.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
-import { requestSiteRefresh, updateForceRefreshOptions } from '@/js/services/admin/refreshService';
+import { requestSiteRefresh, updateForceRefreshOptions } from '@/js/services/admin/refreshService.js';
 
 const MESSAGE_SITE_REFRESHED_SUCCESS = "You've successfully refreshed your site. All connected browsers will refresh within %s seconds.";
 const MESSAGE_SITE_REFRESHED_FAILURE = 'There was an issue refreshing your site. Please try again.';

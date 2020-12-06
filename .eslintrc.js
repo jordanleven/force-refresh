@@ -6,7 +6,7 @@ module.exports = {
   },
   extends: [
     'eslint-config-airbnb-base',
-    'plugin:vue/vue3-recommended',
+    'plugin:vue/recommended',
   ],
   ignorePatterns: [
   ],

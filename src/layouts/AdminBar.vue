@@ -21,7 +21,7 @@ import { sprintf } from 'sprintf-js';
 import Vue from 'vue';
 import VueTypes from 'vue-types';
 import AdminFooterNotification from '@/components/AdminFooterNotification/AdminFooterNotification.vue';
-import { requestSiteRefresh } from '@/js/services/admin/refreshService';
+import { requestSiteRefresh } from '@/js/services/admin/refreshService.js';
 
 library.add([faSyncAlt]);
 
