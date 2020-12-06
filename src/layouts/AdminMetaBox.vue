@@ -20,11 +20,11 @@
 </template>
 
 <script>
-import VueTypes from 'vue-types';
 import { AllHtmlEntities } from 'html-entities';
 import { sprintf } from 'sprintf-js';
-import { requestPostRefreshByPostID } from '@/js/services/admin/refreshService';
+import VueTypes from 'vue-types';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
+import { requestPostRefreshByPostID } from '@/js/services/admin/refreshService';
 
 const MESSAGE_REFRESH_SUCCESS = 'You\'ve successfully refreshed this page. All connected browsers will refresh within %s seconds.';
 
@@ -43,16 +43,16 @@ export default {
   data() {
     return {
       notificationVisible: false,
-      refreshStatus: null,
       refreshInterval: null,
+      refreshStatus: null,
     };
   },
   computed: {
-    postNameDecoded() {
-      return AllHtmlEntities.decode(this.postName);
-    },
     notificationMessage() {
       return sprintf(MESSAGE_REFRESH_SUCCESS, this.refreshInterval);
+    },
+    postNameDecoded() {
+      return AllHtmlEntities.decode(this.postName);
     },
   },
   methods: {

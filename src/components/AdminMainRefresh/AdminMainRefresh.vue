@@ -17,9 +17,9 @@
 </template>
 
 <script>
-import VueTypes from 'vue-types';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+import VueTypes from 'vue-types';
 
 library.add([faSyncAlt]);
 

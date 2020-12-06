@@ -1,5 +1,5 @@
-import Vue from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import Vue from 'vue';
 import AdminBar from '@/layouts/AdminBar.vue';
 
 // This data are localized from the functions file

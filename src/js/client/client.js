@@ -8,13 +8,13 @@ import {
   tap,
 } from 'ramda';
 import { debug, error } from '@/js/services/loggingService';
+import { getCurrentVersion } from './currentVersions.js';
 import {
   getStoredVersionPage,
   getStoredVersionSite,
   setStoredVersionPage,
   setStoredVersionSite,
-} from './storedVersions';
-import { getCurrentVersion } from './currentVersions';
+} from './storedVersions.js';
 
 let checkVersionInterval;
 

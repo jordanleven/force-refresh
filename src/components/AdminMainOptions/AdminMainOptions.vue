@@ -85,17 +85,17 @@ export default {
   name: 'AdminMainOptions',
   props: {
     refreshOptions: VueTypes.shape({
-      showRefreshInMenuBar: VueTypes.bool.isRequired,
       refreshInterval: VueTypes.integer.isRequired,
+      showRefreshInMenuBar: VueTypes.bool.isRequired,
     }),
   },
   emits: ['options-were-updated'],
   data() {
     return {
+      optionSelectedRefreshInterval: null,
+      optionSelectedShowRefreshInMenuBar: null,
       optionsForceRefreshInMenuBar: OPTIONS_REFRESH_FROM_ADMIN_BAR,
       optionsRefreshIntervals: OPTIONS_REFRESH_INTERVALS,
-      optionSelectedShowRefreshInMenuBar: null,
-      optionSelectedRefreshInterval: null,
     };
   },
   created() {
@@ -105,8 +105,8 @@ export default {
   methods: {
     updateOptionsWasClicked() {
       this.$emit('options-were-updated', {
-        showRefreshInMenuBar: this.optionSelectedShowRefreshInMenuBar,
         refreshInterval: this.optionSelectedRefreshInterval,
+        showRefreshInMenuBar: this.optionSelectedShowRefreshInMenuBar,
       });
     },
   },

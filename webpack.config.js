@@ -1,27 +1,19 @@
 const path = require('path');
-const LiveReloadPlugin = require('webpack-livereload-plugin');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const LiveReloadPlugin = require('webpack-livereload-plugin');
 
 module.exports = {
   entry: {
     './js/force-refresh': './src/js/client/client.js',
     './js/force-refresh-admin-bar': './src/js/admin/admin-bar.js',
-    './js/force-refresh-meta-box-admin': './src/js/admin/admin-meta-box',
     './js/force-refresh-main': './src/js/admin/admin-main',
-  },
-  output: {
-    path: path.resolve(__dirname, 'dist/'),
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src/'),
-    },
+    './js/force-refresh-meta-box-admin': './src/js/admin/admin-meta-box',
   },
   module: {
     rules: [
       {
-        test: /\.js$/,
         exclude: /node_modules/,
+        test: /\.js$/,
         use: [
           {
             loader: 'babel-loader',
@@ -32,15 +24,15 @@ module.exports = {
         ],
       },
       {
-        test: /\.vue$/,
         loader: 'vue-loader',
+        test: /\.vue$/,
       },
       {
-        test: /\.scss$/,
         exclude: [
           path.resolve(__dirname, 'src/scss'),
           /node_modules/,
         ],
+        test: /\.scss$/,
         use: [
           'style-loader',
           'css-loader',
@@ -49,10 +41,18 @@ module.exports = {
       },
     ],
   },
+  output: {
+    path: path.resolve(__dirname, 'dist/'),
+  },
   plugins: [
     new LiveReloadPlugin({
       appendScriptTag: true,
     }),
     new VueLoaderPlugin(),
   ],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, 'src/'),
+    },
+  },
 };

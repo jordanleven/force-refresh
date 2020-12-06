@@ -15,11 +15,11 @@
 </template>
 
 <script>
-import Vue from 'vue';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-import VueTypes from 'vue-types';
 import { sprintf } from 'sprintf-js';
+import Vue from 'vue';
+import VueTypes from 'vue-types';
 import AdminFooterNotification from '@/components/AdminFooterNotification/AdminFooterNotification.vue';
 import { requestSiteRefresh } from '@/js/services/admin/refreshService';
 
@@ -38,10 +38,10 @@ export default {
   data() {
     return {
       forceRefreshIcon: faSyncAlt,
-      refreshTriggered: false,
+      isNotificationActive: false,
       notificationInstance: null,
       notificationMessage: null,
-      isNotificationActive: false,
+      refreshTriggered: false,
     };
   },
   computed: {
@@ -59,11 +59,11 @@ export default {
         if (!this.isNotificationActive) return null;
         return h(AdminFooterNotification,
           {
-            props: {
-              message: this.notificationMessage,
-            },
             on: {
               'notification-closed': this.closeNotification,
+            },
+            props: {
+              message: this.notificationMessage,
             },
           });
       },
@@ -75,9 +75,6 @@ export default {
       setTimeout(() => {
         this.refreshTriggered = false;
       }, 2000);
-    },
-    showNotification() {
-      this.isNotificationActive = true;
     },
     closeNotification() {
       this.isNotificationActive = false;
@@ -97,6 +94,9 @@ export default {
           }
           this.showNotification();
         });
+    },
+    showNotification() {
+      this.isNotificationActive = true;
     },
   },
 };

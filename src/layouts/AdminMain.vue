@@ -23,11 +23,11 @@
 </template>
 
 <script>
-import VueTypes from 'vue-types';
 import { sprintf } from 'sprintf-js';
-import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
-import AdminMainRefresh from '@/components/AdminMainRefresh/AdminMainRefresh.vue';
+import VueTypes from 'vue-types';
 import AdminMainOptions from '@/components/AdminMainOptions/AdminMainOptions.vue';
+import AdminMainRefresh from '@/components/AdminMainRefresh/AdminMainRefresh.vue';
+import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import { requestSiteRefresh, updateForceRefreshOptions } from '@/js/services/admin/refreshService';
 
 const MESSAGE_SITE_REFRESHED_SUCCESS = "You've successfully refreshed your site. All connected browsers will refresh within %s seconds.";
@@ -38,14 +38,14 @@ const MESSAGE_SITE_SETTINGS_UPDATED_FAILURE = 'There was an issue updating your 
 export default {
   name: 'AdminMain',
   components: {
+    AdminMainOptions,
     AdminMainRefresh,
     AdminNotification,
-    AdminMainOptions,
   },
   props: {
-    siteName: VueTypes.string.isRequired,
     nonce: VueTypes.string.isRequired,
     refreshOptions: VueTypes.object.isRequired,
+    siteName: VueTypes.string.isRequired,
   },
   data() {
     return {
@@ -89,8 +89,8 @@ export default {
 
       updateForceRefreshOptions({
         nonce,
-        showRefreshInMenuBar: updatedOptions?.showRefreshInMenuBar,
         refreshInterval: updatedOptions?.refreshInterval,
+        showRefreshInMenuBar: updatedOptions?.showRefreshInMenuBar,
       })
         .then(({ success }) => {
           if (success) {

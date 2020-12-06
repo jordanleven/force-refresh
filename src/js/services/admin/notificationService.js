@@ -7,9 +7,9 @@ export const dispatchEditorNotification = (message, type = 'success', options = 
   type,
   message,
   {
-    type: 'snackbar',
-    isDismissible: options?.isDismissible ?? true,
     // Any actions the user can perform.
     actions: options?.actions,
+    isDismissible: options?.isDismissible ?? true,
+    type: 'snackbar',
   },
 );

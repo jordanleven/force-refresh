@@ -1,5 +1,5 @@
-import ApiService from '../apiService';
-import { debug } from '../loggingService';
+import ApiService from '../apiService.js';
+import { debug } from '../loggingService.js';
 
 const ACTION_FORCE_REFRESH_UPDATE_OPTIONS = 'force_refresh_update_site_options';
 const ACTION_FORCE_REFRESH_UPDATE_SITE_VERSION = 'force_refresh_update_site_version';
@@ -10,8 +10,8 @@ export const updateForceRefreshOptions = async (data) => {
   const payload = {
     action: ACTION_FORCE_REFRESH_UPDATE_OPTIONS,
     nonce: data.nonce,
-    show_refresh_in_admin_bar: data?.showRefreshInMenuBar,
     refresh_interval: data?.refreshInterval,
+    show_refresh_in_admin_bar: data?.showRefreshInMenuBar,
   };
 
   // ajaxurl is a global WordPress variable
@@ -37,8 +37,8 @@ export const requestPostRefreshByPostID = async (postId, data) => {
   debug(`Requesting refresh for post ${postId}`);
   const payload = {
     action: ACTION_FORCE_REFRESH_UPDATE_PAGE_VERSION,
-    post_id: postId,
     nonce: data.nonce,
+    post_id: postId,
   };
 
   // ajaxurl is a global WordPress variable

@@ -1,6 +1,6 @@
-import axios from 'axios';
 import qs from 'querystring';
-import { error } from './loggingService';
+import axios from 'axios';
+import { error } from './loggingService.js';
 
 const axiosConfig = {
   headers: {
@@ -9,21 +9,21 @@ const axiosConfig = {
 };
 
 export default ({
-  post: async (url, payload) => axios.post(
+  get: async (url, params) => axios.get(
     url,
-    qs.stringify(payload),
-    axiosConfig,
+    {
+      params,
+    },
   )
     .then(({ data }) => data)
     .catch((errorResponse) => {
       error(errorResponse);
       throw errorResponse;
     }),
-  get: async (url, params) => axios.get(
+  post: async (url, payload) => axios.post(
     url,
-    {
-      params,
-    },
+    qs.stringify(payload),
+    axiosConfig,
   )
     .then(({ data }) => data)
     .catch((errorResponse) => {
