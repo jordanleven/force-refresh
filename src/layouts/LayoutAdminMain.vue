@@ -1,52 +1,92 @@
 <template>
   <div class="wrap">
-    <h1>Force Refresh</h1>
-    <AdminNotification
-      v-if="notificationMessage"
-      :message="notificationMessage"
-      @notification-closed="notificationWasClosed"
-    />
-    <AdminMain
-      :refresh-options="refreshOptions"
-      :site-name="siteName"
-      @refresh-requested="refreshSite"
-      @options-were-updated="updateOptions"
-    />
+    <h1 class="header" @click="headerClicked">
+      {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
+    </h1>
+    <div class="admin_section__notifications">
+      <AdminNotification
+        v-if="isDebugActive"
+        :message="$t('ADMIN_NOTIFICATIONS.DEBUG_MODE_ACTIVE')"
+        :is-dismissible="false"
+        type="warning"
+        size="large"
+      />
+      <AdminNotification v-if="notificationMessage" :message="notificationMessage" @notification-closed="notificationWasClosed" />
+    </div>
+    <div class="admin-section">
+      <transition name="fade-and-scale__troubleshooting">
+        <AdminTroubleshooting
+          v-if="troubleshootingActive"
+          class="admin-section__troubleshooting"
+          :is-debug-active="isDebugActive"
+          :troubleshooting-info="troubleshootingInformation"
+          @exit-troubleshooting="exitTroubleshooting"
+          @debug-mode-was-updated="updateDebugMode"
+        />
+      </transition>
+      <transition name="fade-and-scale__main">
+        <AdminMain
+          v-if="!troubleshootingActive"
+          class="admin-section__main"
+          :refresh-options="refreshOptions"
+          :site-name="siteName"
+          @refresh-requested="refreshSite"
+          @options-were-updated="updateOptions"
+        />
+      </transition>
+    </div>
   </div>
 </template>
 
 <script>
-import { sprintf } from 'sprintf-js';
-import VueTypes from 'vue-types';
+import { mapActions, mapGetters } from 'vuex';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
-import { requestSiteRefresh, updateForceRefreshOptions } from '@/js/services/admin/refreshService.js';
+import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 
-const MESSAGE_SITE_REFRESHED_SUCCESS = "You've successfully refreshed your site. All connected browsers will refresh within %s seconds.";
-const MESSAGE_SITE_REFRESHED_FAILURE = 'There was an issue refreshing your site. Please try again.';
-const MESSAGE_SITE_SETTINGS_UPDATED_SUCCESS = "You've successfully updated settings for Force Refresh.";
-const MESSAGE_SITE_SETTINGS_UPDATED_FAILURE = 'There was an issue updating your settings. Please try again.';
+/**
+ * The number of clicks required before the troubleshooting page show up.
+ * @var {Number}
+ */
+const TROUBLESHOOTING_NUMBER_OF_CLICKS_REQUIRED_TO_VIEW = 3;
+
+/**
+ * The number of milliseconds before a single click expires (to ensure clicks are deliberate to enter
+ * the troubleshooting page).
+ * @var {Number}
+ */
+const TROUBLESHOOTING_TIMOUT_IN_MS = 1000;
 
 export default {
   name: 'LayoutAdminMain',
   components: {
     AdminMain,
     AdminNotification,
-  },
-  props: {
-    nonce: VueTypes.string.isRequired,
-    refreshOptions: VueTypes.object.isRequired,
-    siteName: VueTypes.string.isRequired,
+    AdminTroubleshooting,
   },
   data() {
     return {
-      debuggingActive: false,
       notificationMessage: null,
-      options: null,
+      troubleshootingNumberOfClicks: 0,
+      troubleshootingPageIsActive: false,
     };
   },
-  created() {
-    this.options = this.refreshOptions;
+  computed: {
+    headerClass() {
+      return [
+        this.troubleshootingPageIsActive && 'header--troubleshooting-active',
+      ];
+    },
+    refreshOptions() {
+      return {
+        refreshInterval: this.refreshInterval,
+        showRefreshInMenuBar: this.refreshFromAdminBar,
+      };
+    },
+    troubleshootingActive() {
+      return this.troubleshootingPageIsActive;
+    },
+    ...mapGetters(['isDebugActive', 'refreshFromAdminBar', 'refreshInterval', 'siteName', 'troubleshootingInformation', 'wordPressNonce']),
   },
   mounted() {
     this.checkForOptionsUpdated();
@@ -54,80 +94,162 @@ export default {
   methods: {
     checkForOptionsUpdated() {
       if (window.location.href.indexOf('optionsUpdated') > -1) {
-        this.notificationMessage = MESSAGE_SITE_SETTINGS_UPDATED_SUCCESS;
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS');
       }
+    },
+    exitTroubleshooting() {
+      this.troubleshootingPageIsActive = false;
+    },
+    /**
+     * Method used to handle when users are trying to invoke the troubleshooting page. If the header is clicked
+     * a certain number of times within a set interval, we'll reveal the troubleshooting page.
+     * @return  {void}
+     */
+    headerClicked() {
+      this.troubleshootingNumberOfClicks += 1;
+
+      if (this.troubleshootingNumberOfClicks >= TROUBLESHOOTING_NUMBER_OF_CLICKS_REQUIRED_TO_VIEW) {
+        this.troubleshootingPageIsActive = true;
+      }
+
+      setTimeout(() => {
+        this.troubleshootingNumberOfClicks -= 1;
+      }, TROUBLESHOOTING_TIMOUT_IN_MS);
     },
     notificationWasClosed() {
       this.notificationMessage = null;
     },
-    refreshSite() {
-      const {
-        nonce,
-      } = this;
+    async refreshSite() {
+      const success = await this.requestRefreshSite();
 
-      requestSiteRefresh({ nonce })
-        .then(({ success }) => {
-          if (success) {
-            this.notificationMessage = sprintf(MESSAGE_SITE_REFRESHED_SUCCESS, this.options?.refreshInterval);
-          } else {
-            this.notificationMessage = MESSAGE_SITE_REFRESHED_FAILURE;
-          }
-        });
+      if (success) {
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval });
+      } else {
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE');
+      }
     },
-    updateOptions(updatedOptions) {
-      const {
-        nonce,
-      } = this;
+    async updateDebugMode(newValue) {
+      const success = await this.updateForceRefreshDebugMode(newValue);
 
-      updateForceRefreshOptions({
-        nonce,
-        refreshInterval: updatedOptions?.refreshInterval,
-        showRefreshInMenuBar: updatedOptions?.showRefreshInMenuBar,
-      })
-        .then(({ success }) => {
-          if (success) {
-            // If we've updated the menu bar option, we need to manually reload the page in order
-            // to have at item rerendered server side
-            if (updatedOptions.showRefreshInMenuBar !== this.options.showRefreshInMenuBar) {
-              window.location.search += '&optionsUpdated';
-              return;
-            }
-            this.notificationMessage = MESSAGE_SITE_SETTINGS_UPDATED_SUCCESS;
-            this.options = updatedOptions;
-          } else {
-            this.notificationMessage = MESSAGE_SITE_SETTINGS_UPDATED_FAILURE;
-          }
-        });
+      if (success) {
+        this.notificationMessage = '';
+      } else {
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_DEBUG_MODE_FAILURE');
+      }
     },
+    async updateOptions(updatedOptions) {
+      const previousRefreshFromAdminBar = this.refreshFromAdminBar;
+      const success = await this.updateForceRefreshSettings(updatedOptions);
+      if (success) {
+        // If we've updated the menu bar option, we need to manually reload the page in order
+        // to have the menu item rerendered server side
+        if (updatedOptions.showRefreshInMenuBar !== previousRefreshFromAdminBar) {
+          window.location.search += '&optionsUpdated';
+          return;
+        }
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS');
+      } else {
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_FAILURE');
+      }
+    },
+    ...mapActions(['requestRefreshSite', 'updateForceRefreshSettings', 'updateForceRefreshDebugMode']),
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
 @use '@/scss/variables' as var;
+@use '@/scss/utilities' as utils;
 
-$MAIN_WINDOW_WIDTH: 65%;
-
-.force-refresh__container {
-  @include utils.small() {
-    align-items: flex-start;
-    display: flex;
-  }
+.header {
+  display: inline;
+  user-select: none;
 }
 
-.force-refresh__main,
-.force-refresh-admin__options {
+.admin_section__notifications {
+  margin-top: 1rem;
+}
+
+.admin-section {
+  position: relative;
+  padding-top: var.$space-medium;
+}
+
+.admin-section__main,
+.admin-section__troubleshooting {
   width: 100%;
 }
 
-@include utils.small() {
-  .force-refresh__main {
-    width: $MAIN_WINDOW_WIDTH;
+.admin-section__main {
+  z-index: 1;
+}
+
+.admin-section__troubleshooting {
+  z-index: 2;
+}
+
+@keyframes fade-and-scale-main {
+  from {
+    opacity: 0;
+    transform: scale(2) translateY(-100px);
   }
 
-  .force-refresh-admin__options {
-    width: 100% - $MAIN_WINDOW_WIDTH;
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
+}
+
+@keyframes fade-and-scale-troubleshooting {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+
+  100% {
+    opacity: 1;
+  }
+}
+
+.fade-and-scale__main-enter-active,
+.fade-and-scale__main-leave-active,
+.fade-and-scale__troubleshooting-enter-active,
+.fade-and-scale__troubleshooting-leave-active {
+  animation-fill-mode: both;
+  position: absolute;
+}
+
+.fade-and-scale__main-enter-active,
+.fade-and-scale__main-leave-active {
+  animation-name: fade-and-scale-main;
+}
+
+.fade-and-scale__main-enter-active {
+  animation-delay: var.$transition-medium;
+  animation-duration: var.$transition-medium;
+}
+
+.fade-and-scale__main-leave-active {
+  animation-duration: var.$transition-medium;
+}
+
+.fade-and-scale__troubleshooting-enter-active,
+.fade-and-scale__troubleshooting-leave-active {
+  animation-duration: var.$transition-long;
+  animation-name: fade-and-scale-troubleshooting;
+}
+
+.fade-and-scale__troubleshooting-enter-active {
+  animation-delay: var.$transition-medium;
+  animation-duration: var.$transition-long;
+}
+
+.fade-and-scale__troubleshooting-leave-active {
+  animation-duration: var.$transition-medium;
+}
+
+.fade-and-scale__main-leave-active,
+.fade-and-scale__troubleshooting-leave-active {
+  animation-direction: reverse;
 }
 </style>

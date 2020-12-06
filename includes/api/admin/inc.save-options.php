@@ -24,8 +24,7 @@ function save_option_show_in_admin_bar() {
     ? sanitize_text_field( wp_unslash( $_REQUEST['show_refresh_in_admin_bar'] ) )
     : null;
     // phpcs:enable WordPress.Security.NonceVerification
-
-    if ( $refresh_option_show_in_admin_bar ) {
+    if ( null !== $refresh_option_show_in_admin_bar ) {
         update_option(
             WP_FORCE_REFRESH_OPTION_SHOW_IN_WP_ADMIN_BAR,
             $refresh_option_show_in_admin_bar

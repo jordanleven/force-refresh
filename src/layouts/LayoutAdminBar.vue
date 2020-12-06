@@ -1,5 +1,6 @@
 <template>
   <span
+    v-if="refreshFromAdminBar"
     class="force-refresh__admin-bar"
     @click="refreshSite"
   >
@@ -9,7 +10,7 @@
         :class="logoClass"
         :icon="forceRefreshIcon"
       />
-      Force Refresh Site
+      {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE') }}
     </span>
   </span>
 </template>
@@ -17,29 +18,22 @@
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-import { sprintf } from 'sprintf-js';
 import Vue from 'vue';
 import VueTypes from 'vue-types';
+import { mapActions, mapGetters } from 'vuex';
 import AdminFooterNotification from '@/components/AdminFooterNotification/AdminFooterNotification.vue';
-import { requestSiteRefresh } from '@/js/services/admin/refreshService.js';
 
 library.add([faSyncAlt]);
-
-const MESSAGE_SITE_REFRESHED_SUCCESS = "You've successfully refreshed your site. All connected browsers will refresh within %s seconds.";
-const MESSAGE_SITE_REFRESHED_FAILURE = 'There was an issue refreshing your site. Please try again.';
 
 export default {
   name: 'LayoutAdminBar',
   props: {
-    nonce: VueTypes.string.isRequired,
-    refreshInterval: VueTypes.integer.isRequired,
     targetNotificationContainer: VueTypes.string.isRequired,
   },
   data() {
     return {
       forceRefreshIcon: faSyncAlt,
       isNotificationActive: false,
-      notificationInstance: null,
       notificationMessage: null,
       refreshTriggered: false,
     };
@@ -50,6 +44,7 @@ export default {
         'force-refresh-logo--active': this.refreshTriggered,
       };
     },
+    ...mapGetters(['refreshInterval', 'refreshFromAdminBar']),
   },
   created() {
     // eslint-disable-next-line no-new
@@ -79,25 +74,22 @@ export default {
     closeNotification() {
       this.isNotificationActive = false;
     },
-    refreshSite() {
-      const {
-        nonce,
-      } = this;
+    async refreshSite() {
       this.animateLogo();
+      const success = await this.requestRefreshSite();
 
-      requestSiteRefresh({ nonce })
-        .then(({ success }) => {
-          if (success) {
-            this.notificationMessage = sprintf(MESSAGE_SITE_REFRESHED_SUCCESS, this.refreshInterval);
-          } else {
-            this.notificationMessage = MESSAGE_SITE_REFRESHED_FAILURE;
-          }
-          this.showNotification();
-        });
+      if (success) {
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval });
+      } else {
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE');
+      }
+
+      this.showNotification();
     },
     showNotification() {
       this.isNotificationActive = true;
     },
+    ...mapActions(['requestRefreshSite']),
   },
 };
 </script>

@@ -5,12 +5,22 @@ const LiveReloadPlugin = require('webpack-livereload-plugin');
 module.exports = {
   entry: {
     './js/force-refresh': './src/js/client/client.js',
-    './js/force-refresh-admin-bar': './src/js/admin/admin-bar.js',
-    './js/force-refresh-main': './src/js/admin/admin-main',
-    './js/force-refresh-meta-box-admin': './src/js/admin/admin-meta-box',
+    './js/force-refresh-admin': './src/js/admin/admin',
   },
   module: {
     rules: [
+      {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              name: '[name].[ext]',
+              outputPath: 'fonts/',
+            },
+          },
+        ],
+      },
       {
         exclude: /node_modules/,
         test: /\.js$/,
@@ -32,7 +42,7 @@ module.exports = {
           path.resolve(__dirname, 'src/scss'),
           /node_modules/,
         ],
-        test: /\.scss$/,
+        test: /\.(css|scss)$/,
         use: [
           'style-loader',
           'css-loader',

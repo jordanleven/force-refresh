@@ -7,7 +7,8 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
-require __DIR__ . '/inc.refresh-main.php';
-require __DIR__ . '/inc.refresh-post.php';
-require __DIR__ . '/inc.refresh-site-from-admin-bar.php';
+require __DIR__ . '/inc.refresh-ui.php';
+require __DIR__ . '/inc.refresh-ui-settings.php';
+require __DIR__ . '/inc.refresh-ui-meta-box.php';
+require __DIR__ . '/inc.refresh-ui-admin-bar.php';
 require __DIR__ . '/inc.roles.php';

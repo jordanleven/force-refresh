@@ -21,12 +21,9 @@
 
 <script>
 import { AllHtmlEntities } from 'html-entities';
-import { sprintf } from 'sprintf-js';
 import VueTypes from 'vue-types';
+import { mapActions, mapGetters } from 'vuex';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
-import { requestPostRefreshByPostID } from '@/js/services/admin/refreshService.js';
-
-const MESSAGE_REFRESH_SUCCESS = 'You\'ve successfully refreshed this page. All connected browsers will refresh within %s seconds.';
 
 export default {
   name: 'LayoutAdminMetaBox',
@@ -34,8 +31,6 @@ export default {
     AdminNotification,
   },
   props: {
-    apiUrl: VueTypes.string.isRequired,
-    nonce: VueTypes.string.isRequired,
     postId: VueTypes.number.isRequired,
     postName: VueTypes.string.isRequired,
     postType: VueTypes.string.isRequired,
@@ -43,35 +38,33 @@ export default {
   data() {
     return {
       notificationVisible: false,
-      refreshInterval: null,
       refreshStatus: null,
     };
   },
   computed: {
     notificationMessage() {
-      return sprintf(MESSAGE_REFRESH_SUCCESS, this.refreshInterval);
+      return this.refreshStatus
+        ? this.$t('ADMIN_NOTIFICATIONS.PAGE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval })
+        : this.$t('ADMIN_NOTIFICATIONS.PAGE_REFRESHED_FAILURE');
     },
     postNameDecoded() {
       return AllHtmlEntities.decode(this.postName);
     },
+    ...mapGetters(['refreshInterval']),
   },
   methods: {
     hideNotification() {
       this.notificationVisible = false;
     },
-    refreshPage() {
-      const {
-        postId,
-        nonce,
-      } = this;
+    async refreshPage() {
+      const { postId } = this;
 
-      requestPostRefreshByPostID(postId, { nonce })
-        .then(({ success, data }) => {
-          this.refreshInterval = data.refresh_interval;
-          this.notificationVisible = true;
-          this.refreshStatus = success;
-        });
+      const { success } = await this.requestRefreshPost(postId);
+
+      this.notificationVisible = true;
+      this.refreshStatus = success;
     },
+    ...mapActions(['requestRefreshPost']),
   },
 };
 </script>

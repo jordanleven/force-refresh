@@ -5,13 +5,13 @@
       :class="refreshLogoClass"
       :icon="refreshLogo"
     />
-    <p>Here, you can force all user to manually reload the site "{{ siteName }}".</p>
+    <p>{{ $t('ADMIN_REFRESH_MAIN.REFRESH_DIRECTIONS', { siteName }) }}</p>
     <button
       type="submit"
       class="button button-primary admin__refresh-button"
       @click="refreshButtonClicked"
     >
-      Refresh site
+      {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE', { siteName }) }}
     </button>
   </div>
 </template>

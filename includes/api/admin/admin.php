@@ -60,4 +60,5 @@ function is_user_authorized_to_request_refresh() {
 
 require_once __DIR__ . '/inc.refresh-page.php';
 require_once __DIR__ . '/inc.refresh-site.php';
+require_once __DIR__ . '/inc.save-debug.php';
 require_once __DIR__ . '/inc.save-options.php';
