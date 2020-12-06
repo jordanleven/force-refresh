@@ -1,6 +1,5 @@
 import 'regenerator-runtime/runtime';
 import {
-  always,
   anyPass,
   identity,
   ifElse,
@@ -18,11 +17,20 @@ import { getCurrentVersion } from './currentVersions';
 
 let checkVersionInterval;
 
-const isSiteVersionOutdated = ({ currentVersionSite }) => currentVersionSite !== getStoredVersionSite();
-const isPageVersionOutdated = ({ currentVersionPage }) => currentVersionPage !== getStoredVersionPage();
+const isSiteVersionOutdated = ({ currentVersionSite }) => {
+  const storedSiteVersion = getStoredVersionSite();
+  debug(`Comparing stored site version ${storedSiteVersion} with current site version ${currentVersionSite}`);
+  return currentVersionSite !== getStoredVersionSite();
+};
+
+const isPageVersionOutdated = ({ currentVersionPage }) => {
+  const storedPageVersion = getStoredVersionPage();
+  debug(`Comparing stored page version ${storedPageVersion} with current page version ${currentVersionPage}`);
+  return currentVersionPage !== storedPageVersion;
+};
 
 // eslint-disable-next-line no-restricted-globals
-const refreshPage = () => location.reload();
+const refreshPage = () => debug('Browser would refresh');
 
 const storeVersionSite = (version) => pipe(
   tap(
@@ -67,13 +75,19 @@ const compareRetrievedVersions = (versions) => pipe(
   ifElse(
     pageRequiresRefresh,
     refreshPage,
-    always(null),
+    () => debug('Site does not require refresh'),
   ),
 )(versions);
 
 const checkForRefresh = () => {
   getCurrentVersion()
-    .then(({ data }) => compareRetrievedVersions(data))
+    .then(({ data }) => {
+      // eslint-disable-next-line no-console
+      console.groupCollapsed(`Refresh request for ${new Date()}`);
+      compareRetrievedVersions(data);
+      // eslint-disable-next-line no-console
+      console.groupEnd();
+    })
     .catch(() => {
       error('Error received! Stopping the refresh interval');
       clearInterval(checkVersionInterval);
