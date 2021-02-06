@@ -22,7 +22,7 @@ function get_current_version_site() {
  *
  * @return  string The version of the provided post
  */
-function get_current_version_post( int $post_id ) {
+function get_current_version_post( $post_id ) {
     $current_page_version = get_post_meta( $post_id, 'force_refresh_current_page_version', true );
     return ! ! $current_page_version ? $current_page_version : '0';
 }
@@ -46,12 +46,14 @@ function get_version() {
     $post_id = isset( $_REQUEST['postId'] )
         ? sanitize_text_field( wp_unslash( $_REQUEST['postId'] ) )
         : null;
+
     return_api_response(
         200,
         'The current site version has been successfully retrieved.',
         array(
             'currentVersionSite' => get_current_version_site(),
             'currentVersionPage' => get_current_version_post( $post_id ),
+            'postId'             => $post_id,
         )
     );
 
