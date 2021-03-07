@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.3.0](https://github.com/jordanleven/force-refresh/compare/v2.2.0...v2.3.0) (2021-03-07)
+
+
+### Bug Fixes
+
+* Address issue with default refresh intervals ([2bd86a3](https://github.com/jordanleven/force-refresh/commit/2bd86a365a065560744350ab818b8b7016349878))
+* Update button text in Admin Bar ([2e35c26](https://github.com/jordanleven/force-refresh/commit/2e35c26a79213f6664017ebb60b55290b098d241))
+
 ## [2.2.0](https://github.com/jordanleven/force-refresh/compare/v2.1.6...v2.2.0) (2020-11-29)
 
 
