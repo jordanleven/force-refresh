@@ -76,6 +76,10 @@ const OPTIONS_REFRESH_INTERVALS = [
     value: 90,
   },
   {
+    option: '120 seconds',
+    value: 120,
+  },
+  {
     option: '180 seconds',
     value: 180,
   },
