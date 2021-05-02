@@ -38,7 +38,7 @@
     "@babel/preset-env": "^7.14.0",
     "@sparkbox/stylelint-config-sparkbox": "^1.0.3",
     "babel-loader": "^8.2.2",
-    "css-loader": "^4.3.0",
+    "css-loader": "^5.2.4",
     "dedent-js": "^1.0.1",
     "eslint": "^7.25.0",
     "eslint-config-airbnb-base": "^14.2.1",
