@@ -1,0 +1,26 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "10:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: webpack-livereload-plugin
+    versions:
+    - 3.0.1
+  - dependency-name: html-entities
+    versions:
+    - 2.3.2
+  - dependency-name: css-loader
+    versions:
+    - 5.2.4
+  - dependency-name: webpack-cli
+    versions:
+    - 4.6.0
+  - dependency-name: node-sass
+    versions:
+    - 5.0.0
+  commit-message:
+    prefix: chore
