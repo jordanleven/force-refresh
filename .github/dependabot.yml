@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "America/New_York"
+    reviewers:
+      - "jordanleven"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
+  - package-ecosystem: "composer"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "saturday"
+      time: "09:00"
+      timezone: "America/New_York"
+    reviewers:
+      - "jordanleven"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
