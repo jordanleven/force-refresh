@@ -1,5 +1,5 @@
-import qs from 'querystring';
 import axios from 'axios';
+import qs from 'qs';
 import { error } from './loggingService.js';
 
 const axiosConfig = {
