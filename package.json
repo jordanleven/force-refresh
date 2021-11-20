@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",
-    "@babel/core": "^7.14.0",
+    "@babel/core": "^7.16.0",
     "@babel/preset-env": "^7.14.0",
     "@sparkbox/stylelint-config-sparkbox": "^1.0.3",
     "babel-loader": "^8.2.2",
