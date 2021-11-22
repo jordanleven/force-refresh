@@ -7,8 +7,7 @@ function getCurrentBranchName {
 
 function getPrereleaseName {
   CURRENT_BRANCH_NAME=$(getCurrentBranchName)
-  ISSUE_NUMBER=$(echo $CURRENT_BRANCH_NAME | sed 's/--.*//')
-  echo $ISSUE_NUMBER
+  echo $CURRENT_BRANCH_NAME
 }
 
 function getCurrentPackageVersion {
