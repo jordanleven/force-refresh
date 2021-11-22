@@ -22,7 +22,7 @@ const isSiteVersionOutdated = ({ currentVersionSite }) => currentVersionSite !==
 const isPageVersionOutdated = ({ currentVersionPage }) => currentVersionPage !== getStoredVersionPage();
 
 // eslint-disable-next-line no-restricted-globals
-const refreshPage = () => location.reload();
+const refreshPage = () => debug('Site would reload');
 
 const storeVersionSite = (version) => pipe(
   tap(
