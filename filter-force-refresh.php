@@ -13,7 +13,7 @@ namespace JordanLeven\Plugins\ForceRefresh;
 Plugin Name: Force Refresh
 Plugin URI:
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
-Version: 2.3.1-fix.0
+Version: 2.3.1-fix.1
 Author: Jordan Leven
 Author URI: https://github.com/jordanleven
 Contributors:
