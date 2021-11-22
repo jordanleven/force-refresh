@@ -24,7 +24,6 @@ add_action(
                 'apiUrl'          => admin_url( 'admin-ajax.php' ),
                 // Get the post ID.
                 'postId'          => get_the_ID(),
-                'nonce'           => wp_create_nonce( WP_ACTION_GET_VERSION ),
                 'isDebugActive'   => get_option_debug_mode(),
                 // Get the refresh interval.
                 'refreshInterval' => get_option(
