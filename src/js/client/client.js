@@ -71,13 +71,18 @@ const compareRetrievedVersions = (versions) => pipe(
   ),
 )(versions);
 
-const checkForRefresh = () => {
-  getCurrentVersion()
-    .then(({ data }) => compareRetrievedVersions(data))
-    .catch(() => {
-      error('Error received! Stopping the refresh interval');
-      clearInterval(checkVersionInterval);
-    });
+const exitForceRefresh = () => {
+  error('Error received! Stopping the refresh interval');
+  clearInterval(checkVersionInterval);
+};
+
+const checkForRefresh = async () => {
+  const { success, data } = await getCurrentVersion().catch(exitForceRefresh);
+  if (!success) {
+    exitForceRefresh();
+    return;
+  }
+  compareRetrievedVersions(data);
 };
 
 // eslint-disable-next-line no-undef
