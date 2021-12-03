@@ -3,7 +3,7 @@ import {
   requestPostRefreshByPostID,
   updateForceRefreshOptions,
   updateForceRefreshDebugMode,
-} from '@/js/services/admin/refreshService';
+} from '@/js/services/admin/refreshService.js';
 
 export default {
   requestRefreshPost: ({ getters }, postId) => {
