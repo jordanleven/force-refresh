@@ -30,7 +30,7 @@
     "regenerator-runtime": "^0.13.7",
     "sprintf-js": "^1.1.2",
     "vue": "^2.6.12",
-    "vue-types": "^2.0.3"
+    "vue-types": "^4.1.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.16",
