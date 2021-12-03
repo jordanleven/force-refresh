@@ -7,15 +7,15 @@ import {
   pipe,
   tap,
 } from 'ramda';
-import { getDebugMode, setDebugMode } from '@/js/services/debugService.js';
-import { debug, error } from '@/js/services/loggingService.js';
-import { getCurrentVersion } from './currentVersions.js';
+import { getCurrentVersion } from '@/js/client/currentVersions.js';
 import {
   getStoredVersionPage,
   getStoredVersionSite,
   setStoredVersionPage,
   setStoredVersionSite,
-} from './storedVersions.js';
+} from '@/js/client/storedVersions.js';
+import { getDebugMode, setDebugMode } from '@/js/services/debugService.js';
+import { debug, error } from '@/js/services/loggingService.js';
 
 let checkVersionInterval;
 
