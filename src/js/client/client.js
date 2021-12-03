@@ -1,7 +1,9 @@
 import 'regenerator-runtime/runtime';
 import {
+  __,
   always,
   anyPass,
+  curry,
   identity,
   ifElse,
   pipe,
@@ -19,17 +21,25 @@ import { debug, error } from '@/js/services/loggingService.js';
 
 let checkVersionInterval;
 
-const isSiteVersionOutdated = ({ currentVersionSite }) => {
-  const storedVersionSite = getStoredVersionSite();
-  debug(`Site: stored version: ${storedVersionSite}, current version: ${currentVersionSite}.`);
-  return currentVersionSite !== storedVersionSite;
+const isVersionOutdated = (type, storedVersion, currentVersion) => {
+  debug(`${type}: stored version: ${storedVersion}, current version: ${currentVersion}.`);
+  return storedVersion !== currentVersion;
 };
 
-const isPageVersionOutdated = ({ currentVersionPage }) => {
-  const storedVersionPage = getStoredVersionPage();
-  debug(`Page: stored version: ${storedVersionPage}, current version: ${currentVersionPage}.`);
-  return currentVersionPage !== storedVersionPage;
-};
+const isSiteVersionOutdated = ({ currentVersionSite }) => pipe(
+  getStoredVersionSite,
+  curry(
+    isVersionOutdated,
+  )('Site', __, currentVersionSite),
+)();
+
+const isPageVersionOutdated = ({ currentVersionPage }) => pipe(
+  getStoredVersionPage,
+  curry(
+    isVersionOutdated,
+  )('Page', __, currentVersionPage),
+  () => false,
+)();
 
 const refreshPage = () => {
   if (getDebugMode()) {
