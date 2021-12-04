@@ -1,7 +1,6 @@
 import 'regenerator-runtime/runtime';
 import {
   __,
-  always,
   anyPass,
   curry,
   identity,
@@ -19,7 +18,10 @@ import {
 import { getDebugMode, setDebugMode } from '@/js/services/debugService.js';
 import { debug, error } from '@/js/services/loggingService.js';
 
+const COUNTDOWN_INTERVAL_IN_SECONDS = 5;
+
 let checkVersionInterval;
+let countdownInterval;
 
 const isVersionOutdated = (type, storedVersion, currentVersion) => {
   debug(`${type}: stored version: ${storedVersion}, current version: ${currentVersion}.`);
@@ -38,18 +40,7 @@ const isPageVersionOutdated = ({ currentVersionPage }) => pipe(
   curry(
     isVersionOutdated,
   )('Page', __, currentVersionPage),
-  () => false,
 )();
-
-const refreshPage = () => {
-  if (getDebugMode()) {
-    debug('Conditions met for reload but not executed.');
-    return;
-  }
-
-  // eslint-disable-next-line no-restricted-globals
-  location.reload();
-};
 
 const storeVersionSite = (version) => pipe(
   tap(
@@ -87,6 +78,18 @@ const maybeStoreVersions = ({ currentVersionSite, currentVersionPage }) => {
   maybeStoreVersionPage(currentVersionPage);
 };
 
+const refreshPage = ({ currentVersionSite, currentVersionPage }) => {
+  if (getDebugMode()) {
+    debug('Conditions met for reload but not executed.');
+    setStoredVersionSite(currentVersionSite);
+    setStoredVersionPage(currentVersionPage);
+    return;
+  }
+
+  // eslint-disable-next-line no-restricted-globals
+  location.reload();
+};
+
 const compareRetrievedVersions = (versions) => pipe(
   tap(
     maybeStoreVersions,
@@ -94,13 +97,14 @@ const compareRetrievedVersions = (versions) => pipe(
   ifElse(
     pageRequiresRefresh,
     refreshPage,
-    always(null),
+    () => debug('Refresh not required.'),
   ),
 )(versions);
 
 const exitForceRefresh = () => {
   error('Error received! Stopping the refresh interval.');
   clearInterval(checkVersionInterval);
+  clearInterval(countdownInterval);
 };
 
 const checkForRefresh = async () => {
@@ -112,13 +116,27 @@ const checkForRefresh = async () => {
   compareRetrievedVersions(data);
 };
 
+const setCountdownInterval = (refreshInterval) => {
+  const intervalMinusCountdownInterval = refreshInterval - COUNTDOWN_INTERVAL_IN_SECONDS;
+  let countdownSecondsUntilRefresh = intervalMinusCountdownInterval;
+
+  countdownInterval = setInterval(() => {
+    debug(`Next check in ${countdownSecondsUntilRefresh} seconds.`);
+    const remainingSeconds = countdownSecondsUntilRefresh - COUNTDOWN_INTERVAL_IN_SECONDS;
+    countdownSecondsUntilRefresh = remainingSeconds < 0 ? intervalMinusCountdownInterval : remainingSeconds;
+  }, COUNTDOWN_INTERVAL_IN_SECONDS * 1000);
+};
+
 // eslint-disable-next-line no-undef
 const { isDebugActive, refreshInterval } = forceRefreshLocalizedData;
-const refreshIntervalInMilliseconds = refreshInterval * 1000;
 
 setDebugMode(!!isDebugActive);
 debug(`Debug mode is ${isDebugActive ? 'active' : 'inactive'}.`);
 debug(`Refreshing every ${refreshInterval} seconds.`);
 
+if (isDebugActive) {
+  setCountdownInterval(refreshInterval);
+}
+
 checkForRefresh();
-checkVersionInterval = setInterval(checkForRefresh, refreshIntervalInMilliseconds);
+checkVersionInterval = setInterval(checkForRefresh, refreshInterval * 1000);

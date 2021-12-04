@@ -15,7 +15,7 @@ define( 'HTML_ID_META_BOX', 'force-refresh-meta-box' );
  * @return  void
  */
 function force_refresh_specific_page_refresh_html() {
-    echo '<div id="' . esc_html( HTML_CLASS_META_BOX ) . '"></div>';
+    echo '<div id="' . esc_html( HTML_ID_META_BOX ) . '"></div>';
 }
 
 // Add meta boxes for specific pages that we want to refresh.
