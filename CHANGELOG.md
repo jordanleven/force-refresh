@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.4.0](https://github.com/jordanleven/force-refresh/compare/v2.3.0...v2.4.0) (2021-12-04)
+
+
+### Features
+
+* Add additional debug logs ([8d880cb](https://github.com/jordanleven/force-refresh/commit/8d880cbc13940e0abf5397589c5a0e0f39dc2344))
+* Add support for troubleshooting screen ([a87ca7d](https://github.com/jordanleven/force-refresh/commit/a87ca7dcb3db65d30159aabdee512bf5070a6823))
+
+
+### Bug Fixes
+
+* Exit force refresh if success is false ([55c41f3](https://github.com/jordanleven/force-refresh/commit/55c41f32d067f1a246257726ce22ccb639368c83))
+* Remove nonce for client-side calls ([6df7016](https://github.com/jordanleven/force-refresh/commit/6df70167654f1ec4f173ff777d850765a2546bda))
+
 ## [2.3.0](https://github.com/jordanleven/force-refresh/compare/v2.2.0...v2.3.0) (2021-03-07)
 
 
