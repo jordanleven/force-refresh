@@ -20,6 +20,11 @@
     "release": "./scripts/release.sh",
     "release:beta": "./scripts/releaseBeta.sh"
   },
+  "standard-version": {
+    "scripts": {
+      "postbump": "./scripts/bumpWordPressPluginVersion.sh"
+    }
+  },
   "dependencies": {
     "@fontsource/fira-code": "^4.2.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.35",
