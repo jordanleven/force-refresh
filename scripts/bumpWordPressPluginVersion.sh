@@ -7,6 +7,7 @@ function getCurrentPackageVersion {
 function bumpVersionPlugin {
   PACKAGE_VERSION=$(getCurrentPackageVersion)
   perl -pi -e "s/(?<=Version: ).*/${PACKAGE_VERSION}/g" ${MAIN_FILE}
+  git add $MAIN_FILE
 }
 
 
