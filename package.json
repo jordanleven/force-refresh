@@ -51,7 +51,7 @@
     "babel-loader": "^8.2.2",
     "css-loader": "^4.3.0",
     "dedent-js": "^1.0.1",
-    "eslint": "^7.32.0",
+    "eslint": "^8.4.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-custom-alias": "^1.2.0",
     "eslint-plugin-import": "^2.25.3",
