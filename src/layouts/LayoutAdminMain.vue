@@ -3,6 +3,17 @@
     <h1 class="header" @click="headerClicked">
       {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
     </h1>
+    <template v-if="isPluginOutdated">
+      <p class="admin-section__warning">
+        {{
+          $t(
+            'ADMIN_REFRESH_MAIN.PLUGIN_WARNING_OUTDATED', {
+              installedVersion: troubleshootingInformation.versions.forceRefresh.version,
+              currentVersion: troubleshootingInformation.versions.forceRefresh.required
+            })
+        }}
+      </p>
+    </template>
     <div class="admin-section__notifications">
       <AdminNotification
         v-if="isDebugActive"
@@ -43,6 +54,7 @@ import { mapActions, mapGetters } from 'vuex';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
+import { versionSatisfies } from '@/js/admin/compare-versions.js';
 
 /**
  * The number of clicks required before the troubleshooting page show up.
@@ -55,7 +67,7 @@ const TROUBLESHOOTING_NUMBER_OF_CLICKS_REQUIRED_TO_VIEW = 3;
  * the troubleshooting page).
  * @var {Number}
  */
-const TROUBLESHOOTING_TIMOUT_IN_MS = 1000;
+const TROUBLESHOOTING_TIMEOUT_IN_MS = 1000;
 
 export default {
   name: 'LayoutAdminMain',
@@ -76,6 +88,10 @@ export default {
       return [
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
       ];
+    },
+    isPluginOutdated() {
+      const { required, version } = this.troubleshootingInformation.versions.forceRefresh;
+      return !versionSatisfies(required, version);
     },
     refreshOptions() {
       return {
@@ -114,7 +130,7 @@ export default {
 
       setTimeout(() => {
         this.troubleshootingNumberOfClicks -= 1;
-      }, TROUBLESHOOTING_TIMOUT_IN_MS);
+      }, TROUBLESHOOTING_TIMEOUT_IN_MS);
     },
     notificationWasClosed() {
       this.notificationMessage = null;
@@ -186,6 +202,13 @@ export default {
 
 .admin-section__troubleshooting {
   z-index: 2;
+}
+
+.admin-section__warning {
+  font-style: italic;
+  margin-bottom: 0;
+  color: var.$status-error;
+  font-size: 0.9rem;
 }
 
 @keyframes fade-and-scale-main {

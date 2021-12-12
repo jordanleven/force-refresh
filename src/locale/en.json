@@ -32,7 +32,8 @@
     "TROUBLESHOOTING_LABEL_CURRENT_SITE_ID": "Current Site ID"
   },
   "ADMIN_REFRESH_MAIN": {
-    "REFRESH_DIRECTIONS": "Here, you can force all currently-connected users to manually reload the site \"%{siteName}\"."
+    "REFRESH_DIRECTIONS": "Here, you can force all currently-connected users to manually reload the site \"%{siteName}\".",
+    "PLUGIN_WARNING_OUTDATED": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is outdated. Visit the Plugins page to update to version %{currentVersion}."
   },
   "FORM_BUTTONS_GENERIC": {
     "FORCE_REFRESH_SITE": "Force Refresh Site",

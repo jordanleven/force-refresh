@@ -24,9 +24,9 @@
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import compareVersions from 'compare-versions';
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
+import { versionSatisfies } from '@/js/admin/compare-versions.js';
 
 library.add([faCheckCircle, faTimesCircle]);
 
@@ -47,7 +47,7 @@ export default {
       ];
     },
     versionIsOutdated() {
-      return compareVersions(this.version, this.versionRequired) === -1;
+      return !versionSatisfies(this.versionRequired, this.version);
     },
     versionStatus() {
       return this.versionIsOutdated ? faTimesCircle : faCheckCircle;
