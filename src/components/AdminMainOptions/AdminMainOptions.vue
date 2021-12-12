@@ -118,8 +118,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .force-refresh-admin__options-inner {
   padding: 0 20px 10px;
@@ -127,7 +127,7 @@ export default {
   border: 2px solid var.$light_grey;
   border-radius: 10px;
 
-  @include utils.small() {
+  @include utils.small {
     margin: 0 20px;
   }
 

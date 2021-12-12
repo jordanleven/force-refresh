@@ -22,8 +22,8 @@ export default {
 </script>
 
 <style lang="scss">
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 pre,
 code {
@@ -32,14 +32,15 @@ code {
 }
 
 .console-window__code code {
-  @include utils.typeface-code();
+  @include utils.typeface-code;
+
   background-color: transparent;
 }
 </style>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .console-window {
   border-radius: 5px;

@@ -105,8 +105,8 @@ export default {
 </script>
 
 <style lang="scss">
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .notice-force-refresh {
   margin: 0 0 20px;
@@ -130,8 +130,8 @@ export default {
     background:
       repeating-linear-gradient(
         45deg,
-        #FECB2E,
-        #FECB2E 10px,
+        #fecb2e,
+        #fecb2e 10px,
         #000 10px,
         #000 20px
       );
@@ -158,7 +158,7 @@ export default {
   }
 }
 
-@include utils.generate-animation('force-refresh-fade-and-scale-admin-notification') {
+@include utils.generate-animation("force-refresh-fade-and-scale-admin-notification") {
   0% {
     transform: translateX(5rem);
     opacity: 0;
@@ -184,7 +184,8 @@ export default {
 .fade-and-slide {
   &-enter-active {
     opacity: 0;
-    @include utils.animation('force-refresh-fade-and-scale-admin-notification', 500ms, ease, 250ms);
+
+    @include utils.animation("force-refresh-fade-and-scale-admin-notification", 500ms, ease, 250ms);
   }
 
   &-enter-active,

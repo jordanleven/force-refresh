@@ -4,15 +4,7 @@
  * @see animation
  */
 @mixin generate-animation($animation-name) {
-  @-webkit-keyframes #{$animation-name} {
-    @content;
-  }
-  @-moz-keyframes #{$animation-name} {
-    @content;
-  }
-  @-o-keyframes #{$animation-name} {
-    @content;
-  }
+  /* stylelint-disable keyframes-name-pattern */
   @keyframes #{$animation-name} {
     @content;
   }
@@ -26,8 +18,5 @@
  * @param {string} $delay : 0s                      Any delay applied to the animation
  */
 @mixin animation($animation-name, $speed: 2s , $timing-function: infinite, $delay : null) {
-  -webkit-animation: $animation-name $speed $timing-function $delay;
-  -moz-animation: $animation-name $speed $timing-function $delay;
-  -o-animation: $animation-name $speed $timing-function $delay;
   animation: $animation-name $speed $timing-function $delay;
 }

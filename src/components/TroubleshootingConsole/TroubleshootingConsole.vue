@@ -60,11 +60,11 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .console-header {
-  @include utils.typeface-code();
+  @include utils.typeface-code;
 }
 
 .troubleshooting-console__admin,

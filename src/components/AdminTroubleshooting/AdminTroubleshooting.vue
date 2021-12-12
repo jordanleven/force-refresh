@@ -124,8 +124,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .force-refresh-troubleshooting {
   width: 100%;

@@ -9,6 +9,11 @@ jobs:
   deploy:
     name: Release Production Build
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
     steps:
 
     - name: Checkout repository

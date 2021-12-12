@@ -63,9 +63,9 @@ export default {
 </script>
 
 <style lang="scss">
-@use '@/scss/utilities' as utils;
+@use "@/scss/utilities" as utils;
 
-@include utils.generate-animation('force-refresh--active') {
+@include utils.generate-animation("force-refresh--active") {
   0% {
     transform: rotate(0deg);
   }
@@ -78,8 +78,8 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .admin__container {
   width: 100%;
@@ -97,7 +97,7 @@ export default {
   margin: 0;
 
   &.admin__refresh-logo--active {
-    @include utils.animation('force-refresh--active', 1000ms, ease);
+    @include utils.animation("force-refresh--active", 1000ms, ease);
   }
 }
 

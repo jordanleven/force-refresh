@@ -52,7 +52,8 @@ export default {
       el: this.targetNotificationContainer,
       render: (h) => {
         if (!this.isNotificationActive) return null;
-        return h(AdminFooterNotification,
+        return h(
+          AdminFooterNotification,
           {
             on: {
               'notification-closed': this.closeNotification,
@@ -60,7 +61,8 @@ export default {
             props: {
               message: this.notificationMessage,
             },
-          });
+          },
+        );
       },
     });
   },
@@ -95,9 +97,9 @@ export default {
 </script>
 
 <style lang="scss">
-@use '@/scss/utilities' as utils;
+@use "@/scss/utilities" as utils;
 
-@include utils.generate-animation('admin-bar-refresh--active') {
+@include utils.generate-animation("admin-bar-refresh--active") {
   0% {
     transform: rotate(0deg);
   }
@@ -110,8 +112,8 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@use '@/scss/variables' as var;
-@use '@/scss/utilities' as utils;
+@use "@/scss/variables" as var;
+@use "@/scss/utilities" as utils;
 
 #wpadminbar {
   .force-refresh__admin-bar {
@@ -141,7 +143,7 @@ export default {
     margin-right: var.$space-small;
 
     &.force-refresh-logo--active {
-      @include utils.animation('admin-bar-refresh--active', 1000ms, ease);
+      @include utils.animation("admin-bar-refresh--active", 1000ms, ease);
     }
   }
 }

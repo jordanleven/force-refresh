@@ -3,7 +3,7 @@
     <h1 class="header" @click="headerClicked">
       {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
     </h1>
-    <div class="admin_section__notifications">
+    <div class="admin-section__notifications">
       <AdminNotification
         v-if="isDebugActive"
         :message="$t('ADMIN_NOTIFICATIONS.DEBUG_MODE_ACTIVE')"
@@ -158,15 +158,15 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/variables' as var;
-@use '@/scss/utilities' as utils;
+@use "@/scss/variables" as var;
+@use "@/scss/utilities" as utils;
 
 .header {
   display: inline;
   user-select: none;
 }
 
-.admin_section__notifications {
+.admin-section__notifications {
   margin-top: 1rem;
 }
 

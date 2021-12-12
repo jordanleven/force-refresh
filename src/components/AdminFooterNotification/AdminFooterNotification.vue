@@ -52,10 +52,10 @@ export default {
 </script>
 
 <style lang="scss">
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
-@include utils.generate-animation('force-refresh-notification-enter') {
+@include utils.generate-animation("force-refresh-notification-enter") {
   0% {
     transform: translateY(200px);
     opacity: 0;
@@ -74,7 +74,7 @@ export default {
   }
 }
 
-@include utils.generate-animation('force-refresh-notification-leave') {
+@include utils.generate-animation("force-refresh-notification-leave") {
   0% {
     transform: translateY(0);
     opacity: 1;
@@ -94,15 +94,15 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .admin-notice-enter-active {
-  @include utils.animation('force-refresh-notification-enter', 350ms, ease);
+  @include utils.animation("force-refresh-notification-enter", 350ms, ease);
 }
 
 .admin-notice-leave-active {
-  @include utils.animation('force-refresh-notification-leave', 350ms, ease);
+  @include utils.animation("force-refresh-notification-leave", 350ms, ease);
 }
 
 .admin-notice--force-refresh {
@@ -120,14 +120,15 @@ export default {
 .admin-notice--force-refresh__inner {
   color: #fff;
   padding: var.$side-padding / 2 var.$side-padding;
-  border-radius: var.$border_radius;
-  background-color: rgba(var.$black, 1);
+  border-radius: var.$border-radius;
+  background-color: var.$black;
   display: flex;
 
   @supports (backdrop-filter: blur(2px)) {
     backdrop-filter: blur(2px);
     background-color: rgba(var.$black, 0.7);
   }
+
   width: auto;
 }
 

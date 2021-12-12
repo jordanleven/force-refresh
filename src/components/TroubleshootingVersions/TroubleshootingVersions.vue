@@ -67,10 +67,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
-$ICON_SIZE: 1.125rem;
+$icon-size: 1.125rem;
 
 .version-status {
   position: absolute;
@@ -79,18 +79,18 @@ $ICON_SIZE: 1.125rem;
   margin: auto;
   height: 100%;
   left: var.$space-medium;
-  font-size: $ICON_SIZE;
+  font-size: $icon-size;
   color: var.$status-success;
   display: flex;
   align-items: center;
   justify-content: center;
 
   &::before {
-    content: '';
+    content: "";
     display: block;
     border-radius: 100%;
-    height: calc(#{$ICON_SIZE} - 2px);
-    width: calc(#{$ICON_SIZE} - 2px);
+    height: calc(#{$icon-size} - 2px);
+    width: calc(#{$icon-size} - 2px);
     background-color: #fff;
     top: 0;
     bottom: 0;
@@ -116,6 +116,6 @@ $ICON_SIZE: 1.125rem;
 }
 
 .plugin-versions__version {
-  @include utils.typeface-code();
+  @include utils.typeface-code;
 }
 </style>

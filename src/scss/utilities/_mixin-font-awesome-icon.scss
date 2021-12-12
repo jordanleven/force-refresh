@@ -6,11 +6,11 @@
  */
 @mixin font-awesome-icon($icon_code, $overrides: ()) {
   font-family: FontAwesome, sans-serif;
-
   content: $icon_code;
+
   // Declare the defaults that can be overridden
 
-  $font_awesome_defaults: (
+  $font-awesome-defaults: (
     font-style             : normal,
     font-weight            : normal,
     font-stretch           : normal,
@@ -18,12 +18,14 @@
     text-rendering         : auto,
     -webkit-font-smoothing : antialiased,
   );
-  // Loop through each default. If one is overridden, then use the overriden value instead
-  @each $key, $value in $font_awesome_defaults {
+
+  // Loop through each default. If one is overridden, then use the overridden value instead
+  @each $key, $value in $font-awesome-defaults {
     // If the value is in the overrides, use that value instead
     @if map-has-key($overrides, $key) {
-      #{$key}: map-get($overrides, $key);
+      #{$key}: map.get($overrides, $key);
     }
+
     // Otherwise, use the default values
     @else {
       #{$key}: #{$value};

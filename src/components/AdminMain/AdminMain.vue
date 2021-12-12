@@ -33,13 +33,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
-$MAIN_WINDOW_WIDTH: 65%;
+$main-window-width: 65%;
 
 .force-refresh__container {
-  @include utils.small() {
+  @include utils.small {
     align-items: flex-start;
     display: flex;
   }
@@ -50,13 +50,13 @@ $MAIN_WINDOW_WIDTH: 65%;
   width: 100%;
 }
 
-@include utils.small() {
+@include utils.small {
   .force-refresh__main {
-    width: $MAIN_WINDOW_WIDTH;
+    width: $main-window-width;
   }
 
   .force-refresh-admin__options {
-    width: 100% - $MAIN_WINDOW_WIDTH;
+    width: 100% - $main-window-width;
   }
 }
 </style>

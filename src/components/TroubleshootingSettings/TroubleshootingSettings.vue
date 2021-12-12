@@ -32,9 +32,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
+@use "@/scss/utilities" as utils;
 
 .setting-value {
-  @include utils.typeface-code();
+  @include utils.typeface-code;
 }
 </style>

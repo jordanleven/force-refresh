@@ -38,7 +38,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-@use '@/scss/variables' as var;
+@use "@/scss/variables" as var;
 
 $toggle-height: 30px;
 $padding: $toggle-height * 0.1;
@@ -59,7 +59,7 @@ label {
   transition: all 200ms;
 
   &::after {
-    content: '';
+    content: "";
     position: absolute;
     top: $padding;
     left: $padding;
@@ -71,7 +71,7 @@ label {
   }
 }
 
-input[type=checkbox] {
+input[type="checkbox"] {
   position: absolute;
   top: 0;
   left: 0;

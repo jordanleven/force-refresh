@@ -16,10 +16,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use '@/scss/utilities' as utils;
-@use '@/scss/variables' as var;
-
-$ICON_SIZE: 1.125rem;
+@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .descriptive-list {
   padding: var.$space-medium;
