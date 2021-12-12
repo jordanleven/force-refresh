@@ -52,5 +52,9 @@ jobs:
       run:  |
         npm run lint
         composer lint
+
+    - name: Test
+      run:  npm run test
+
     - name: Build the application
       run: npm run build --if-present

@@ -45,6 +45,9 @@ jobs:
         composer lint
         npm run lint
 
+    - name: Test
+      run:  npm run test
+
     - name: Create release notes
       run: npm run createWpReadme
 
