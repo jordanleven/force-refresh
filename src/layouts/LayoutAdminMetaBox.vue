@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import { AllHtmlEntities } from 'html-entities';
+import { decode } from 'html-entities';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
@@ -48,7 +48,7 @@ export default {
         : this.$t('ADMIN_NOTIFICATIONS.PAGE_REFRESHED_FAILURE');
     },
     postNameDecoded() {
-      return AllHtmlEntities.decode(this.postName);
+      return decode(this.postName);
     },
     ...mapGetters(['refreshInterval']),
   },
