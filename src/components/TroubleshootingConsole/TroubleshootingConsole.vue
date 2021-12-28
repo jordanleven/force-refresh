@@ -4,26 +4,26 @@
       <h4 class="console-header">
         Admin
       </h4>
-      <Console class="console" :output="outputAdmin" />
+      <BaseConsole class="console" :output="outputAdmin" />
     </li>
     <li class="troubleshooting-console__client">
       <h4 class="console-header">
         Client
       </h4>
-      <Console class="console" :output="outputClient" />
+      <BaseConsole class="console" :output="outputClient" />
     </li>
   </ul>
 </template>
 
 <script>
-import Console from '@/components/Console/Console.vue';
+import BaseConsole from '@/components/BaseConsole/BaseConsole.vue';
 
 const currentTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export default {
   name: 'TroubleshootingConsole',
   components: {
-    Console,
+    BaseConsole,
   },
   data() {
     return {

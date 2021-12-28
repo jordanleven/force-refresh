@@ -14,7 +14,7 @@
 import VueTypes from 'vue-types';
 
 export default {
-  name: 'Console',
+  name: 'BaseConsole',
   props: {
     output: VueTypes.array.def([]),
   },

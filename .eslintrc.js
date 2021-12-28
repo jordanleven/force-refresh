@@ -38,10 +38,11 @@ module.exports = {
     ],
     'vue/max-attributes-per-line': ['error', {
       multiline: {
-        allowFirstLine: false,
         max: 5,
       },
-      singleline: 5,
+      singleline: {
+        max: 5,
+      },
     }],
     'vue/sort-keys': ['error', 'asc', {
       caseSensitive: true,
