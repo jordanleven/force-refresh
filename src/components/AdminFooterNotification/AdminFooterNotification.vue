@@ -119,7 +119,7 @@ export default {
 
 .admin-notice--force-refresh__inner {
   color: #fff;
-  padding: var.$side-padding / 2 var.$side-padding;
+  padding: calc(var.$side-padding / 2) var.$side-padding;
   border-radius: var.$border-radius;
   background-color: var.$black;
   display: flex;
