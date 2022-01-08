@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.5.0](https://github.com/jordanleven/force-refresh/compare/v2.4.0...v2.5.0) (2022-01-08)
+
+
+### Features
+
+* Alert user when plugin is outdated ([724eac5](https://github.com/jordanleven/force-refresh/commit/724eac5d5d05695a0e22dde2a2a52f273cad6feb))
+
 ## [2.4.0](https://github.com/jordanleven/force-refresh/compare/v2.3.0...v2.4.0) (2021-12-04)
 
 
