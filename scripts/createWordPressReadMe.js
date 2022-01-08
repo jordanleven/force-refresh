@@ -6,7 +6,7 @@ const git = simpleGit();
 const {
   __, reject, mapObjIndexed, pipe, is, isNil, values, replace, toString,
 } = require('ramda');
-const dedent = require('dedent-js');
+const dedent = require('dedent');
 const md2json = require('md-2-json');
 const pluginVersion = require('../package.json').version;
 
@@ -59,7 +59,7 @@ const formatMarkdownSections = (content) => pipe(
  * @return  {string}           The formatted plugin info
  */
 const getFormattedPluginInfo = (content) => pipe(
-  replace(/\n\n/g, ''),
+  replace(/\n\n/g, '\n'),
   replace(/\\/g, ''),
   // Remove build badges
   replace(/!.*/, ''),
@@ -104,8 +104,6 @@ const getFormattedSectionContent = (sections) => pipe(
   replace(/\\/g, ''),
 )(sections);
 
-const getFormattedReleaseContent = (content) => content.replace(/\n/g,'');
-
 /**
  * Function to get the release details of a specific release in the changelog.
  * @param   {object}  content     The section content object
@@ -128,7 +126,7 @@ const getFormattedReleaseNote = async (release, releaseVersion) => {
     mapObjIndexed(getReleaseDetails),
     values,
     toString,
-    replace(/-/g, '*'),
+    replace(/^\-/, '*'),
     formatMarkdownSections,
     // Remove contents inside of a link
     replace(/\[\]/g, ''),
@@ -228,14 +226,18 @@ const createWordPressReadMeFile = async () => {
   const pluginInfo = readmeContents[pluginName].raw;
   const pluginSections = readmeContents[pluginName];
   const formattedSectionContent = getFormattedSectionContent(pluginSections);
+  const changelog = await getFormattedChangelog(changelogContents.Changelog);
+  const changelogDedented = dedent(changelog);
 
-  const newReadmeContents = dedent(
-    `=== ${pluginName} ===
-    Stable tag: ${pluginVersion}${getFormattedPluginInfo(pluginInfo)}\n
-    ${formattedSectionContent}
-    == Changelog ==
-    ${await getFormattedChangelog(changelogContents.Changelog)}`,
-  );
+  const newReadmeContents = dedent(`
+  === ${pluginName} ===
+  Stable tag: ${pluginVersion}${getFormattedPluginInfo(pluginInfo)}\n
+  ${formattedSectionContent}
+
+  == Changelog ==
+  ${changelogDedented}
+  `);
+
   writeWordPressReadMeFile(newReadmeContents);
 };
 
