@@ -32,7 +32,7 @@
     "axios": "^0.24.0",
     "compare-versions": "^4.1.2",
     "html-entities": "^2.3.2",
-    "qs": "^6.10.2",
+    "qs": "^6.10.3",
     "ramda": "^0.27.1",
     "regenerator-runtime": "^0.13.9",
     "sprintf-js": "^1.1.2",
