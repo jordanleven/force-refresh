@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.5.1](https://github.com/jordanleven/force-refresh/compare/v2.5.0...v2.5.1) (2022-01-23)
+
+
+### Features
+
+* Update Heath troubleshooting section ([32ad2eb](https://github.com/jordanleven/force-refresh/commit/32ad2ebee87f2f9fcac8456b48816dcd89b5de74))
+* Update WordPress version requirements ([bdd7038](https://github.com/jordanleven/force-refresh/commit/bdd70387955474cf9898f9313c76718e580729ed))
+
 ## [2.5.0](https://github.com/jordanleven/force-refresh/compare/v2.4.0...v2.5.0) (2022-01-08)
 
 
