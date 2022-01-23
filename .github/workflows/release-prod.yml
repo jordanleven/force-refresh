@@ -26,40 +26,36 @@ jobs:
       with:
         php-version: 7.4
 
-    - name: Install dependencies
-      run: |
-        npm install
-        composer install
+    - name: Install node dependencies
+      run: npm ci
 
-    - name: Lint
-      run: |
-        composer lint
-        npm run lint
+    - name: Install composer dependencies
+      run: composer install
 
-    - name: Test
-      run:  npm run test
+    - name: Lint JavaScript source code
+      run: npm run lint
 
-    - name: Build the plugin
-      run: npm run build
+    - name: Lint PHP source code
+      run: composer lint
+
+    - name: Test JavaScript source code
+      run: npm test
+
+    - name: Build JavaScript artifact
+      run: npm run build:beta
+
+    - name: Build PHP artifact
+      run: composer build ./ ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
 
     - name: Create release notes
       run: npm run createWpReadme
 
-    - name: Prune dependencies
-      run: |
-        npm prune --production
-        composer install --no-dev --no-scripts
+    - name: Prune JavaScript dependencies
+      run: npm prune --production
 
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Force Refresh ${{ github.ref }}
-        draft: false
-        prerelease: false
+
+    - name: Prune PHP dependencies
+      run: composer install --no-dev --no-scripts
 
     # - name: Deploy plugin to WordPress.org
     #   uses: 10up/action-wordpress-plugin-deploy@stable
@@ -67,3 +63,16 @@ jobs:
     #     SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
     #     SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
     #     SLUG: force-refresh
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        file: ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
+        asset_name: Force_Refresh_v${{ steps.package-version.outputs.current-version}}.zip
+        tag_name: ${{ github.ref }}
+        release_name: Force Refresh ${{ github.ref }}
+        draft: false
+        prerelease: false
