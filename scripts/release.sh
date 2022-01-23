@@ -32,11 +32,11 @@ RELEASE_TYPE=$(getReleaseType $1)
 SPECIFIED_RELEASE_TYPE_ARG=$([ $RELEASE_TYPE ] && echo "--releaseAs ${RELEASE_TYPE}")
 NEXT_VERSION=$(npx standard-version --dry-run --skip.changelog --skip.commit --skip.tag ${SPECIFIED_RELEASE_TYPE_ARG})
 
-if [[ $CURRENT_BRANCH != $PRODUCTION_BRANCH ]]
-  then
-  echo "\033[1;31mCannot release while on branch ${CURRENT_BRANCH}\033[0m"
-  exit 1
-fi
+# if [[ $CURRENT_BRANCH != $PRODUCTION_BRANCH ]]
+#   then
+#   echo "\033[1;31mCannot release while on branch ${CURRENT_BRANCH}\033[0m"
+#   exit 1
+# fi
 
 echo "\033[37m=====================\033[0m\n"
 echo "\033[37m${NEXT_VERSION}\033[0m\n"
