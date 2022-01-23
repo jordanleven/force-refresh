@@ -70,6 +70,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
         asset_name: Force_Refresh_v${{ steps.package-version.outputs.current-version}}.zip
         tag_name: ${{ github.ref }}
