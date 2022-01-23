@@ -1,15 +1,13 @@
-name: Release Beta Build
+name: Release Production Build
 on:
-  pull_request:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "!v[0-9]+.[0-9]+.[0-9]+-"
 
 jobs:
-  build:
-    name: Release Beta Build
+  deploy:
+    name: Release Production Build
     runs-on: ubuntu-latest
 
     strategy:
@@ -20,6 +18,8 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -50,16 +50,36 @@ jobs:
     - name: Test JavaScript source code
       run: npm test
 
-    - name: Create release notes
-      run: npm run createWpReadme
-
     - name: Build JavaScript artifact
       run: npm run build:beta
 
     - name: Build PHP artifact
       run: composer build ./ ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
 
-    - name: Create GitHub release
+    - name: Create release notes
+      run: npm run createWpReadme
+
+    - name: Prune JavaScript dependencies
+      run: npm prune --production
+
+    - name: Prune PHP dependencies
+      run: composer install --no-dev --no-scripts
+
+    - name: Deploy plugin to WordPress.org
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      env:
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SLUG: force-refresh
+
+    - name: Get Changelog Entry
+      id: changelog_reader
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        version: ${{ steps.package-version.outputs.current-version }}
+        path: ./CHANGELOG.md
+
+    - name: Create Release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -67,6 +87,5 @@ jobs:
         asset_name: Force_Refresh_v${{ steps.package-version.outputs.current-version}}.zip
         tag: ${{ github.ref }}
         release_name: Force Refresh ${{ steps.package-version.outputs.current-version }}
-        overwrite: true
-        prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and **should not** be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh/. \n\nPlease note that beta releases will, on average, be larger in size due to the inclusion of dependencies not usually included in production builds and omission of minification."
+        prerelease: false
+        body: "This is a production release of Force Refresh (v${{ steps.package-version.outputs.current-version }}). This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh/. \n\n**Release Notes**\n${{ steps.changelog_reader.outputs.changes }}"

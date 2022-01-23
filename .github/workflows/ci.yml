@@ -1,0 +1,172 @@
+name: CI
+on:
+  push:
+    branches: [ master, release--* ]
+  pull_request:
+    branches: [ master,  release--* ]
+
+jobs:
+  check-commit-message:
+    name: Check Commit Message
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Proofread commit types
+        uses: gsactions/commit-message-checker@v1
+        with:
+          pattern: '^(feat|fix|docs|style|refactor|test|chore).+'
+          error: 'Commit messages must begin with a valid commit type.'
+          excludeDescription: 'true'
+          excludeTitle: 'true'
+          checkAllCommitMessages: 'true'
+          accessToken: ${{ secrets.GITHUB_TOKEN }}
+
+  install-dependencies:
+    name: Cache Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 7.4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Composer dependencies
+        run: composer install
+
+      - name: Save to Cache
+        uses: actions/cache@v2
+        with:
+          path: '**/'
+          key: ${{ runner.os }}-${{github.run_id}}
+
+  analyze:
+    name: Static Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: ['javascript']
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v1
+      with:
+        languages: ${{ matrix.language }}
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v1
+
+  linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Pull from Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/
+          key: ${{ runner.os }}-${{github.run_id}}
+
+      - name: Lint JavaScript source code
+        run: npm run lint
+
+      - name: Lint PHP source code
+        run: composer lint
+
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Pull from Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/
+          key: ${{ runner.os }}-${{github.run_id}}
+
+      - name: Test JavaScript source code
+        run: npm test
+
+  building:
+    name: Building
+    runs-on: ubuntu-latest
+    needs: install-dependencies
+    timeout-minutes: 20
+
+    strategy:
+      matrix:
+        node-version: [14.x]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Pull from Cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            **/
+          key: ${{ runner.os }}-${{github.run_id}}
+
+      - name: Build JavaScript artifact
+        run: npm run build

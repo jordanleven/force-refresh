@@ -8,7 +8,7 @@ const {
 } = require('ramda');
 const dedent = require('dedent');
 const md2json = require('md-2-json');
-const pluginVersion = require('../package.json').version;
+const pluginVersion = require('../../package.json').version;
 
 /**
  * In some changes, release notes for a specific release are unavailable for specific
