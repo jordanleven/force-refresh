@@ -44,10 +44,10 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: Install node dependencies
+      - name: Install Node dependencies
         run: npm ci
 
-      - name: Install composer dependencies
+      - name: Install Composer dependencies
         run: composer install
 
       - name: Save to Cache
