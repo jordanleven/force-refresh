@@ -1,5 +1,4 @@
 PRODUCTION_BRANCH="master"
-MAIN_FILE="filter-force-refresh.php"
 
 function getCurrentBranchName {
   echo $(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
@@ -48,31 +47,13 @@ function getNextVersion {
   fi
 }
 
-function getReleaseType {
-  RELEASE_OPTION=$1
-  case $RELEASE_OPTION in
-    --major)
-      RELEASE_TYPE='major'
-      ;;
-    --minor)
-      RELEASE_TYPE='minor'
-      ;;
-    --patch)
-      RELEASE_TYPE='patch'
-      ;;
-  esac
-  echo $RELEASE_TYPE;
-}
-
 function bumpVersionPackage {
-  RELEASE_TYPE=$1
-  PRERELEASE_NAME=$2
+  PRERELEASE_NAME=$1
   SPECIFIED_RELEASE_TYPE_ARG=$([ ${RELEASE_TYPE} ] && echo "--releaseAs ${RELEASE_TYPE}")
   npx standard-version -a --prerelease ${PRERELEASE_NAME} --skip.changelog ${SPECIFIED_RELEASE_TYPE_ARG}
 }
 
 CURRENT_BRANCH=$(getCurrentBranchName)
-RELEASE_TYPE=$(getReleaseType $1)
 # If we've specified a type of release, we need to include the `releaseAs` argument
 SPECIFIED_RELEASE_TYPE_ARG=$([ ${RELEASE_TYPE} ] && echo "--releaseAs ${RELEASE_TYPE}")
 PRERELEASE_NAME=$(getPrereleaseName)
@@ -91,7 +72,7 @@ echo "\033[33mPress \"y\" to proceed with this beta release or press any other k
 read -p "" -n 1 -s
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
-  bumpVersionPackage $RELEASE_TYPE $PRERELEASE_NAME
+  bumpVersionPackage $PRERELEASE_NAME
   git push --follow-tags
   echo "\033[1;32mPackage succesfully updated and pushed to the remote.\033[0m\n"
 else
