@@ -29,11 +29,15 @@
     "TROUBLESHOOTING_LABEL_PHP": "PHP",
     "TROUBLESHOOTING_LABEL_SITE_NAME": "Site Name",
     "TROUBLESHOOTING_LABEL_MULTISITE_INSTALLATION": "Multisite Installation",
-    "TROUBLESHOOTING_LABEL_CURRENT_SITE_ID": "Current Site ID"
+    "TROUBLESHOOTING_LABEL_CURRENT_SITE_ID": "Current Site ID",
+    "TROUBLESHOOTING_VERSION_IS_UP_TO_DATE": "Your version of %{label} is up-to-date.",
+    "TROUBLESHOOTING_VERSION_IS_OUTDATED": "Your version of %{label} is outdated. Please update to version %{versionRequired}.",
+    "TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION": "Your version of %{label} is an unsupported development version."
   },
   "ADMIN_REFRESH_MAIN": {
     "REFRESH_DIRECTIONS": "Here, you can force all currently-connected users to manually reload the site \"%{siteName}\".",
-    "PLUGIN_WARNING_OUTDATED": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is outdated. Visit the Plugins page to update to version %{currentVersion}."
+    "PLUGIN_WARNING_OUTDATED": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is outdated. Visit the Plugins page to update to version %{currentVersion}.",
+    "PLUGIN_WARNING_DEVELOPMENT_BUILD": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is a development build intended only to be used for debugging purposes. Once debugging is complete, please visit the Plugins page to update to most recent supported version (%{currentVersion})."
   },
   "FORM_BUTTONS_GENERIC": {
     "FORCE_REFRESH_SITE": "Force Refresh Site",

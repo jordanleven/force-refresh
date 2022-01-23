@@ -23,12 +23,12 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheckCircle, faTimesCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
-import { versionSatisfies } from '@/js/admin/compare-versions.js';
+import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
-library.add([faCheckCircle, faTimesCircle]);
+library.add([faCheckCircle, faTimesCircle, faQuestionCircle]);
 
 export default {
   name: 'TroubleshootingVersions',
@@ -46,16 +46,49 @@ export default {
         this.versionIsOutdated && 'plugin-info--is-outdated',
       ];
     },
+    versionIsDevelopmentVersion() {
+      return isDevelopmentVersion(this.version);
+    },
     versionIsOutdated() {
-      return !versionSatisfies(this.versionRequired, this.version);
+      // In case the version is actually a development build
+      const versionSanitized = getSanitizedVersion(this.version);
+      return !versionSatisfies(this.versionRequired, versionSanitized);
     },
     versionStatus() {
-      return this.versionIsOutdated ? faTimesCircle : faCheckCircle;
+      switch (true) {
+        case this.versionIsDevelopmentVersion:
+          return faQuestionCircle;
+        case this.versionIsOutdated:
+          return faTimesCircle;
+        default:
+          return faCheckCircle;
+      }
     },
     versionStatusMessage() {
-      return this.versionIsOutdated
-        ? `Your version of ${this.label} is outdated. Please update to version ${this.versionRequired}.`
-        : `Your version of ${this.label} is up-to-date.`;
+      switch (true) {
+        case this.versionIsDevelopmentVersion:
+          return this.$t(
+            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION',
+            {
+              label: this.label,
+            },
+          );
+        case this.versionIsOutdated:
+          return this.$t(
+            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED',
+            {
+              label: this.label,
+              versionRequired: this.versionRequired,
+            },
+          );
+        default:
+          return this.$t(
+            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE',
+            {
+              label: this.label,
+            },
+          );
+      }
     },
   },
   methods: {
@@ -104,6 +137,10 @@ $icon-size: 1.125rem;
   position: absolute;
   z-index: 2;
   cursor: help;
+
+  &.fa-question-circle {
+    color: var.$status-warning;
+  }
 
   &.fa-times-circle {
     color: var.$status-error;

@@ -3,15 +3,9 @@
     <h1 class="header" @click="headerClicked">
       {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
     </h1>
-    <template v-if="isPluginOutdated">
+    <template v-if="getPluginWarningText">
       <p class="admin-section__warning">
-        {{
-          $t(
-            'ADMIN_REFRESH_MAIN.PLUGIN_WARNING_OUTDATED', {
-              installedVersion: troubleshootingInformation.versions.forceRefresh.version,
-              currentVersion: troubleshootingInformation.versions.forceRefresh.required
-            })
-        }}
+        {{ getPluginWarningText }}
       </p>
     </template>
     <div class="admin-section__notifications">
@@ -54,7 +48,7 @@ import { mapActions, mapGetters } from 'vuex';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
-import { versionSatisfies } from '@/js/admin/compare-versions.js';
+import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
 
 /**
  * The number of clicks required before the troubleshooting page show up.
@@ -84,14 +78,29 @@ export default {
     };
   },
   computed: {
+    getPluginWarningText() {
+      const { required, version } = this.troubleshootingInformation.versions.forceRefresh;
+      const versionSanitized = getSanitizedVersion(version);
+
+      switch (true) {
+        case !versionSatisfies(required, versionSanitized):
+          return this.$t('ADMIN_REFRESH_MAIN.PLUGIN_WARNING_OUTDATED', {
+            currentVersion: this.troubleshootingInformation.versions.forceRefresh.required,
+            installedVersion: this.troubleshootingInformation.versions.forceRefresh.version,
+          });
+        case isDevelopmentVersion(version):
+          return this.$t('ADMIN_REFRESH_MAIN.PLUGIN_WARNING_DEVELOPMENT_BUILD', {
+            currentVersion: this.troubleshootingInformation.versions.forceRefresh.required,
+            installedVersion: this.troubleshootingInformation.versions.forceRefresh.version,
+          });
+        default:
+          return null;
+      }
+    },
     headerClass() {
       return [
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
       ];
-    },
-    isPluginOutdated() {
-      const { required, version } = this.troubleshootingInformation.versions.forceRefresh;
-      return !versionSatisfies(required, version);
     },
     refreshOptions() {
       return {
