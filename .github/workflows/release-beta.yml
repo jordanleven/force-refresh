@@ -61,13 +61,12 @@ jobs:
 
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
         asset_name: Force_Refresh_v${{ steps.package-version.outputs.current-version}}.zip
         tag: ${{ github.ref }}
+        release_name: Force Refresh ${{ github.ref }}
         overwrite: true
         prerelease: true
         body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and should not be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh/. \n\nPlease note that beta releases will, on average, be larger in size due to the inclusion of dependencies not usually included in production builds and omission of minification."
