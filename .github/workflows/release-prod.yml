@@ -53,7 +53,6 @@ jobs:
     - name: Prune JavaScript dependencies
       run: npm prune --production
 
-
     - name: Prune PHP dependencies
       run: composer install --no-dev --no-scripts
 
@@ -63,6 +62,14 @@ jobs:
     #     SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
     #     SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
     #     SLUG: force-refresh
+
+    - name: Get Changelog Entry
+      id: changelog_reader
+      uses: mindsers/changelog-reader-action@v2
+      with:
+        validation_depth: 10
+        version: 2.5.0
+        path: ./CHANGELOG.md
 
     - name: Create Release
       id: create_release
@@ -77,3 +84,4 @@ jobs:
         release_name: Force Refresh ${{ github.ref }}
         draft: false
         prerelease: false
+        body: "This is a production release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh/. \n\n*Release Notes*\n${{ steps.changelog_reader.outputs.changes }}"

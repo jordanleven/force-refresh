@@ -49,15 +49,12 @@ function getNextVersion {
 
 function bumpVersionPackage {
   PRERELEASE_NAME=$1
-  SPECIFIED_RELEASE_TYPE_ARG=$([ ${RELEASE_TYPE} ] && echo "--releaseAs ${RELEASE_TYPE}")
-  npx standard-version -a --prerelease ${PRERELEASE_NAME} --skip.changelog ${SPECIFIED_RELEASE_TYPE_ARG}
+  npx standard-version -a --prerelease ${PRERELEASE_NAME} --skip.changelog
 }
 
 CURRENT_BRANCH=$(getCurrentBranchName)
-# If we've specified a type of release, we need to include the `releaseAs` argument
-SPECIFIED_RELEASE_TYPE_ARG=$([ ${RELEASE_TYPE} ] && echo "--releaseAs ${RELEASE_TYPE}")
 PRERELEASE_NAME=$(getPrereleaseName)
-NEXT_VERSION=$(npx standard-version --prerelease ${PRERELEASE_NAME} --dry-run --skip.changelog --skip.commit --skip.tag ${SPECIFIED_RELEASE_TYPE_ARG})
+NEXT_VERSION=$(npx standard-version --prerelease ${PRERELEASE_NAME} --dry-run --skip.changelog --skip.commit --skip.tag)
 
 if [[ $CURRENT_BRANCH == $PRODUCTION_BRANCH ]]
   then
