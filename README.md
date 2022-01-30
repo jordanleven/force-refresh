@@ -3,9 +3,9 @@
 ![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** refresh, reload, single page application\
-**Requires PHP:** 7.2\
+**Requires PHP:** 7.4\
 **Requires at least:** 5.2\
-**Tested up to:** 5.8.2\
+**Tested up to:** 5.9\
 **License:** GPLv2 or later
 
 Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site. Additionally, you may force refreshes on a per-page or post basis.
