@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <h1 class="header" @click="headerClicked">
+    <h1 class="header">
       {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
     </h1>
     <template v-if="getPluginWarningText">
@@ -37,6 +37,7 @@
           :site-name="siteName"
           @refresh-requested="refreshSite"
           @options-were-updated="updateOptions"
+          @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
     </div>
@@ -50,19 +51,6 @@ import AdminNotification from '@/components/AdminNotification/AdminNotification.
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
 
-/**
- * The number of clicks required before the troubleshooting page show up.
- * @var {Number}
- */
-const TROUBLESHOOTING_NUMBER_OF_CLICKS_REQUIRED_TO_VIEW = 3;
-
-/**
- * The number of milliseconds before a single click expires (to ensure clicks are deliberate to enter
- * the troubleshooting page).
- * @var {Number}
- */
-const TROUBLESHOOTING_TIMEOUT_IN_MS = 1000;
-
 export default {
   name: 'LayoutAdminMain',
   components: {
@@ -73,7 +61,6 @@ export default {
   data() {
     return {
       notificationMessage: null,
-      troubleshootingNumberOfClicks: 0,
       troubleshootingPageIsActive: false,
     };
   },
@@ -117,6 +104,9 @@ export default {
     this.checkForOptionsUpdated();
   },
   methods: {
+    activateTroubleshootingPage() {
+      this.troubleshootingPageIsActive = true;
+    },
     checkForOptionsUpdated() {
       if (window.location.href.indexOf('optionsUpdated') > -1) {
         this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS');
@@ -124,22 +114,6 @@ export default {
     },
     exitTroubleshooting() {
       this.troubleshootingPageIsActive = false;
-    },
-    /**
-     * Method used to handle when users are trying to invoke the troubleshooting page. If the header is clicked
-     * a certain number of times within a set interval, we'll reveal the troubleshooting page.
-     * @return  {void}
-     */
-    headerClicked() {
-      this.troubleshootingNumberOfClicks += 1;
-
-      if (this.troubleshootingNumberOfClicks >= TROUBLESHOOTING_NUMBER_OF_CLICKS_REQUIRED_TO_VIEW) {
-        this.troubleshootingPageIsActive = true;
-      }
-
-      setTimeout(() => {
-        this.troubleshootingNumberOfClicks -= 1;
-      }, TROUBLESHOOTING_TIMEOUT_IN_MS);
     },
     notificationWasClosed() {
       this.notificationMessage = null;

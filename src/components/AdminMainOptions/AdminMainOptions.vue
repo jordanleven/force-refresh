@@ -45,6 +45,14 @@
         </button>
       </div>
     </div>
+    <div class="force-refresh-admin__options-troubleshooting">
+      <button
+        class="button button-secondary"
+        @click="troubleshootPageClicked"
+      >
+        Visit troubleshooting page
+      </button>
+    </div>
   </div>
 </template>
 
@@ -107,6 +115,9 @@ export default {
     this.optionSelectedRefreshInterval = this.refreshOptions?.refreshInterval;
   },
   methods: {
+    troubleshootPageClicked() {
+      this.$emit('troubleshooting-page-clicked');
+    },
     updateOptionsWasClicked() {
       this.$emit('options-were-updated', {
         refreshInterval: this.optionSelectedRefreshInterval,
@@ -137,6 +148,14 @@ export default {
 
   .option-group {
     margin-bottom: 10px;
+  }
+}
+
+.force-refresh-admin__options-troubleshooting {
+  text-align: right;
+
+  @include utils.small {
+    margin: 50px 20px 0;
   }
 }
 
