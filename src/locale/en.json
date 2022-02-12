@@ -36,6 +36,7 @@
   },
   "ADMIN_REFRESH_MAIN": {
     "REFRESH_DIRECTIONS": "Here, you can force all currently-connected users to manually reload the site \"%{siteName}\".",
+    "REFRESH_DIRECTIONS_NO_SITE_NAME": "Here, you can force all currently-connected users to manually reload this site.",
     "PLUGIN_WARNING_OUTDATED": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is outdated. Visit the Plugins page to update to version %{currentVersion}.",
     "PLUGIN_WARNING_DEVELOPMENT_BUILD": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is a development build intended only to be used for debugging purposes. Once debugging is complete, please visit the Plugins page to update to most recent supported version (%{currentVersion})."
   },

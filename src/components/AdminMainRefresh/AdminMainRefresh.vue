@@ -5,7 +5,7 @@
       :class="refreshLogoClass"
       :icon="refreshLogo"
     />
-    <p>{{ $t('ADMIN_REFRESH_MAIN.REFRESH_DIRECTIONS', { siteName }) }}</p>
+    <p>{{ forceRefreshDirections }}</p>
     <button
       type="submit"
       class="button button-primary admin__refresh-button"
@@ -38,6 +38,12 @@ export default {
     };
   },
   computed: {
+    forceRefreshDirections() {
+      const { siteName } = this;
+      return siteName
+        ? this.$t('ADMIN_REFRESH_MAIN.REFRESH_DIRECTIONS', { siteName })
+        : this.$t('ADMIN_REFRESH_MAIN.REFRESH_DIRECTIONS_NO_SITE_NAME');
+    },
     refreshLogoClass() {
       return {
         'admin__refresh-logo--active': this.refreshTriggered,
