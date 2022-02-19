@@ -1,53 +1,55 @@
-PRODUCTION_BRANCH="master"
+#!/bin/sh
 
-function getCurrentBranchName {
-  echo $(git branch | sed -n -e 's/^\* \(.*\)/\1/p')
+production_branch="master"
+
+getCurrentBranchName() {
+  git branch | sed -n -e 's/^\* \(.*\)/\1/p'
 }
 
-function getReleaseType {
-  RELEASE_OPTION=$1
-  case $RELEASE_OPTION in
+getReleaseType() {
+  release_option=$1
+  case $release_option in
     --major)
-      RELEASE_TYPE='major'
+      release_type='major'
       ;;
     --minor)
-      RELEASE_TYPE='minor'
+      release_type='minor'
       ;;
     --patch)
-      RELEASE_TYPE='patch'
+      release_type='patch'
       ;;
   esac
-  echo $RELEASE_TYPE
+  echo $release_type
 }
 
-function bumpVersionPackage {
-  RELEASE_TYPE=$1
-  SPECIFIED_RELEASE_TYPE_ARG=$([ ${RELEASE_TYPE} ] && echo "--releaseAs ${RELEASE_TYPE}")
-  npx standard-version -a ${SPECIFIED_RELEASE_TYPE_ARG}
+bumpVersionPackage() {
+  release_type=$1
+  specified_release_type_arg=$([ "$release_type" ] && echo "--releaseAs $release_type")
+  npx standard-version -a "$specified_release_type_arg"
 }
 
-CURRENT_BRANCH=$(getCurrentBranchName)
-RELEASE_TYPE=$(getReleaseType $1)
+current_branch=$(getCurrentBranchName)
+release_type=$(getReleaseType "$1")
 # If we've specified a type of release, we need to include the `releaseAs` argument
-SPECIFIED_RELEASE_TYPE_ARG=$([ $RELEASE_TYPE ] && echo "--releaseAs ${RELEASE_TYPE}")
-NEXT_VERSION=$(npx standard-version --dry-run --skip.changelog --skip.commit --skip.tag ${SPECIFIED_RELEASE_TYPE_ARG})
+specified_release_type_arg=$([ "$release_type" ] && echo "--releaseAs $release_type")
+next_version=$(npx standard-version --dry-run --skip.changelog --skip.commit --skip.tag "$specified_release_type_arg")
 
-if [[ $CURRENT_BRANCH != $PRODUCTION_BRANCH ]]
+if [ "$current_branch" != "$production_branch" ]
   then
-  echo "\033[1;31mCannot release while on branch ${CURRENT_BRANCH}\033[0m"
+  echo "\033[1;31mCannot release while on branch $current_branch\033[0m"
   exit 1
 fi
 
-echo "\033[37m=====================\033[0m\n"
-echo "\033[37m${NEXT_VERSION}\033[0m\n"
-echo "\033[33mPress \"y\" to proceed with this release or press any other key to abort.\033[0m\n"
+printf "\033[37m=====================\033[0m\n"
+printf "\033[37m%s\033[0m\n""$next_version"
+printf "\033[33mPress \"y\" to proceed with this release or press any other key to abort.\033[0m\n"
 
-read -p "" -n 1 -s
-if [[ $REPLY =~ ^[Yy]$ ]]
+read -r "" -n 1 -s
+if echo "$REPLY" | grep -q "^[Yy]$"
 then
-  bumpVersionPackage $RELEASE_TYPE
+  bumpVersionPackage "$release_type"
   git push --follow-tags
-  echo "\033[1;32mPackage succesfully updated and pushed to the remote.\033[0m\n"
+  printf "\033[1;32mPackage succesfully updated and pushed to the remote.\033[0m\n"
 else
-  echo "\033[1;31mRelease was aborted.\033[0m\n"
+  printf "\033[1;31mRelease was aborted.\033[0m\n"
 fi
