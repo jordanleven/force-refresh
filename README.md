@@ -24,7 +24,8 @@ Force Refresh is the best plugin for requesting browsers to refresh their page. 
 
 ## Feature Requests and Bug Reports
 
-Please report any feature requests you have or bugs you encounter [under the Support tab](https://wordpress.org/support/plugin/force-refresh).
+- Please report any bugs you encounter [under the Support tab](https://wordpress.org/support/plugin/force-refresh).
+- Feature requests can be made [on GitHub](https://github.com/jordanleven/force-refresh/issues). Force Refresh is an open-source plugin, and PRs are welcomed!
 
 ## Installation
 
