@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "@babel/cli": "^7.17.6",
-    "@babel/core": "^7.17.5",
+    "@babel/core": "^7.18.0",
     "@babel/preset-env": "^7.16.11",
     "babel-loader": "^8.2.2",
     "check-node-version": "^4.2.1",
