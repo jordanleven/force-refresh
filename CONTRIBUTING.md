@@ -16,6 +16,6 @@ To log into the WordPress admin, visit [localhost/wp-admin](http://localhost/wp-
 
 **Username**: `force-refresh-dev`
 
-**Password**: `5cWco)Fs4eE3yiYBd2`
+**Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
 
 [Docker]: www.docker.com
