@@ -42,9 +42,9 @@ fi
 
 printf "\033[37m=====================\033[0m\n"
 printf "\033[37m%s\033[0m\n""$next_version"
-printf "\033[33mPress \"y\" to proceed with this release or press any other key to abort.\033[0m\n"
+printf "\033[33m\n\nPress \"y\" to proceed with this release or press any other key to abort.\033[0m\n"
 
-read -r "" -n 1 -s
+read -r
 if echo "$REPLY" | grep -q "^[Yy]$"
 then
   bumpVersionPackage "$release_type"
