@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.6.0](https://github.com/jordanleven/force-refresh/compare/v2.5.2...v2.6.0) (2022-06-11)
+
+
+### Features
+
+* Add troubleshooting page link to admin page ([6543e75](https://github.com/jordanleven/force-refresh/commit/6543e75f526c0502e54be37504df4d3d1611eea9))
+
+
+### Bug Fixes
+
+* Update directions for sites with no name ([986a950](https://github.com/jordanleven/force-refresh/commit/986a9506104a8b84206976af1d9f58b5a091bbef))
+
 ### [2.5.2](https://github.com/jordanleven/force-refresh/compare/v2.5.1...v2.5.2) (2022-01-23)
 
 
