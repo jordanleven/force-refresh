@@ -2,7 +2,7 @@ version: '3.4'
 services:
   db:
     container_name: 'force-refresh-db-dev-container'
-    image: 'mysql:5.7'
+    image: mariadb:10.3
     volumes:
       - './.docker-build/data/mysql:/var/lib/mysql'
       - ./db:/docker-entrypoint-initdb.d
