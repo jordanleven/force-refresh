@@ -57,7 +57,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-vue": "^8.5.0",
     "jest": "^28.1.1",
-    "jest-environment-jsdom": "^28.1.1",
+    "jest-environment-jsdom": "^29.4.3",
     "md-2-json": "^2.0.0",
     "moment": "^2.29.3",
     "postcss": "^8.4.21",
