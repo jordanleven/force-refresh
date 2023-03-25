@@ -195,7 +195,7 @@ export default {
 }
 
 @keyframes fade-and-scale-main {
-  from {
+  0% {
     opacity: 0;
     transform: scale(2) translateY(-100px);
   }
@@ -207,7 +207,7 @@ export default {
 }
 
 @keyframes fade-and-scale-troubleshooting {
-  from {
+  0% {
     opacity: 0;
     transform: scale(0.5);
   }
