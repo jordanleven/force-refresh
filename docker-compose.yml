@@ -19,7 +19,7 @@ services:
       - db
     image: 'wordpress:beta-5.9-php7.4-apache'
     ports:
-      - '80:80'
+      - '8080:80'
     environment:
       WORDPRESS_DB_HOST: 'db:3306'
       WORDPRESS_DB_NAME: force-refresh-dev-db
