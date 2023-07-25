@@ -17,7 +17,7 @@ services:
     container_name: 'force-refresh-dev-container'
     depends_on:
       - db
-    image: 'wordpress:beta-5.9-php7.4-apache'
+    image: 'wordpress:beta-6.3-php8.0'
     ports:
       - '8080:80'
     environment:
