@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.7.0](https://github.com/jordanleven/force-refresh/compare/v2.6.1...v2.7.0) (2023-07-26)
+
+
+### Features
+
+* Add support for WordPress 6.3 ([6bd2682](https://github.com/jordanleven/force-refresh/commit/6bd268288704e9cefa064632a261866a80db738b))
+
 ### [2.6.1](https://github.com/jordanleven/force-refresh/compare/v2.6.0...v2.6.1) (2023-03-04)
 
 ## [2.6.0](https://github.com/jordanleven/force-refresh/compare/v2.5.2...v2.6.0) (2022-06-11)
