@@ -3,7 +3,7 @@
 ![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** refresh, reload, single page application\
-**Requires PHP:** 8.0\
+**Requires PHP:** 7.4\
 **Requires at least:** 5.2\
 **Tested up to:** 6.3\
 **License:** GPLv2 or later
