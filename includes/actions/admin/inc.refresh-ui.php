@@ -35,14 +35,28 @@ function get_localized_data_versions(): array {
 }
 
 /**
+ * Function to get the refresh options.
+ *
+ * @return  array  An array of refresh options.
+ */
+function get_refresh_options(): array {
+    $interval_minimum_minutes = REFRESH_INTERVAL_CUSTOM_MINIMUM_IN_SECONDS / 60;
+    $interval_maximum_minutes = REFRESH_INTERVAL_CUSTOM_MAXIMUM_IN_SECONDS / 60;
+
+    return array(
+        'customRefreshIntervalMaximumInMinutes' => (float) $interval_maximum_minutes,
+        'customRefreshIntervalMinimumInMinutes' => (float) $interval_minimum_minutes,
+        'refreshInterval'                       => get_force_refresh_option_refresh_interval(),
+        'showRefreshInMenuBar'                  => get_force_refresh_option_show_in_admin_bar(),
+    );
+}
+
+/**
  * Function to retrieve the localized data used in the admin script.
  *
  * @return  array   The data to localize to the script
  */
 function get_localized_data(): array {
-    // Get the current screen.
-    $current_screen = get_current_screen();
-
     return array(
         // Wrap in inner array to preserve primitive types.
         'localData' => array(
@@ -55,13 +69,9 @@ function get_localized_data(): array {
             'targetAdminMetaBox'          => '#' . HTML_ID_META_BOX,
             'targetNotificationContainer' => '#' . HTML_ID_REFRESH_NOTIFICATION_CONTAINER,
             'isDebugActive'               => get_option_debug_mode(),
-            'refreshOptions'              => array(
-                // Add the refresh interval.
-                'refreshInterval'      => (int) get_force_refresh_option_refresh_interval(),
-                'showRefreshInMenuBar' => get_force_refresh_option_show_in_admin_bar(),
-            ),
+            'refreshOptions'              => get_refresh_options(),
             'postId'                      => get_the_ID(),
-            'postType'                    => $current_screen->post_type,
+            'postType'                    => get_current_screen()->post_type,
             'postName'                    => get_the_title(),
             'isMultiSite'                 => (bool) is_multisite(),
             'currentSiteId'               => (int) get_current_blog_id(),

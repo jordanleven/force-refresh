@@ -1,6 +1,8 @@
 export default (localizedData) => ({
   nonce: localizedData.nonce,
   settings: {
+    customRefreshIntervalMaximumInMinutes: localizedData.refreshOptions.customRefreshIntervalMaximumInMinutes,
+    customRefreshIntervalMinimumInMinutes: localizedData.refreshOptions.customRefreshIntervalMinimumInMinutes,
     isDebugActive: localizedData.isDebugActive,
     refreshFromAdminBar: localizedData.refreshOptions.showRefreshInMenuBar,
     refreshInterval: localizedData.refreshOptions.refreshInterval,

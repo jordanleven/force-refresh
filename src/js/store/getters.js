@@ -2,6 +2,12 @@ export default {
   isDebugActive: ({ settings }) => settings.isDebugActive,
   refreshFromAdminBar: ({ settings }) => settings.refreshFromAdminBar,
   refreshInterval: ({ settings }) => settings.refreshInterval,
+  refreshOptions: ({ settings }, getters) => ({
+    customRefreshIntervalMaximumInMinutes: settings.customRefreshIntervalMaximumInMinutes,
+    customRefreshIntervalMinimumInMinutes: settings.customRefreshIntervalMinimumInMinutes,
+    refreshInterval: getters.refreshInterval,
+    showRefreshInMenuBar: getters.refreshFromAdminBar,
+  }),
   siteName: ({ site }) => site.siteName,
   troubleshootingInformation: (_, getters) => ({
     ...getters.troubleshootingInformationSettings,

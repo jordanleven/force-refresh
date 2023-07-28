@@ -3,6 +3,7 @@
   "ADMIN_NOTIFICATIONS": {
     "DISMISS_NOTIFICATION": "Dismiss this notice.",
     "DEBUG_MODE_ACTIVE": "Force Refresh is currently in Debug Mode.",
+    "CUSTOM_INTERVAL_SET_FAILURE": "Oops, your custom interval of %{refreshInterval} minutes must be between %{refreshIntervalMinimum} and %{refreshIntervalMaximum} minutes. Please try again.",
     "SITE_DEBUG_MODE_FAILURE": "There was an issue updating settings for debug mode. Please try again.",
     "SITE_REFRESHED_FAILURE": "There was an issue refreshing your site. Please try again.",
     "SITE_REFRESHED_SUCCESS": "You've successfully refreshed your site. All connected browsers will refresh within %{refreshInterval} seconds.",
@@ -14,7 +15,11 @@
   "ADMIN_SETTINGS": {
     "OPTIONS_HEADER": "Options",
     "OPTION_REFRESH_FROM_ADMIN_BAR": "Refresh from Admin Bar",
-    "OPTION_REFRESH_INTERVAL": "Refresh interval"
+    "OPTION_REFRESH_INTERVAL": "Refresh interval",
+    "OPTION_REFRESH_INTERVAL_CUSTOM": "Custom interval (minutes)",
+    "OPTION_REFRESH_INTERVAL_UNIT_SECOND_SINGULAR": "second",
+    "OPTION_REFRESH_INTERVAL_UNIT_MINUTE_SINGULAR": "minute",
+    "OPTION_REFRESH_INTERVAL_UNIT_MODIFIER_PLURAL": "s"
   },
   "ADMIN_TROUBLESHOOTING": {
     "DEBUG_MODE_DESCRIPTION_ACTIVE": "Debugging mode is currently turned on. This means that Force Refresh will log additional output to the browser console and will not refresh connected browsers.",

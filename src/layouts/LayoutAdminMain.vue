@@ -16,7 +16,12 @@
         type="warning"
         size="large"
       />
-      <AdminNotification v-if="notificationMessage" :message="notificationMessage" @notification-closed="notificationWasClosed" />
+      <AdminNotification
+        v-if="notificationMessage.message"
+        :message="notificationMessage.message"
+        :type="notificationMessage.type"
+        @notification-closed="notificationMessageClear"
+      />
     </div>
     <div class="admin-section">
       <transition name="fade-and-scale__troubleshooting">
@@ -37,6 +42,7 @@
           :site-name="siteName"
           @refresh-requested="refreshSite"
           @options-were-updated="updateOptions"
+          @notify-user-of-error="notifyUserOfError"
           @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
@@ -60,7 +66,7 @@ export default {
   },
   data() {
     return {
-      notificationMessage: null,
+      notificationMessage: {},
       troubleshootingPageIsActive: false,
     };
   },
@@ -89,16 +95,18 @@ export default {
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
       ];
     },
-    refreshOptions() {
-      return {
-        refreshInterval: this.refreshInterval,
-        showRefreshInMenuBar: this.refreshFromAdminBar,
-      };
-    },
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
     },
-    ...mapGetters(['isDebugActive', 'refreshFromAdminBar', 'refreshInterval', 'siteName', 'troubleshootingInformation', 'wordPressNonce']),
+    ...mapGetters([
+      'isDebugActive',
+      'refreshFromAdminBar',
+      'refreshInterval',
+      'refreshOptions',
+      'siteName',
+      'troubleshootingInformation',
+      'wordPressNonce',
+    ]),
   },
   mounted() {
     this.checkForOptionsUpdated();
@@ -109,31 +117,47 @@ export default {
     },
     checkForOptionsUpdated() {
       if (window.location.href.indexOf('optionsUpdated') > -1) {
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS');
+        this.notificationMessageSet(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS'));
       }
     },
     exitTroubleshooting() {
       this.troubleshootingPageIsActive = false;
     },
-    notificationWasClosed() {
+    notificationMessageClear() {
       this.notificationMessage = null;
+    },
+    notificationMessageSet(message, type) {
+      this.notificationMessage = {
+        message,
+        type,
+      };
+    },
+    notificationMessageSetError(message) {
+      this.notificationMessageSet(message, 'error');
+    },
+    notificationMessageSetSuccess(message) {
+      this.notificationMessageSet(message, 'success');
+    },
+    notifyUserOfError(message) {
+      this.notificationMessageSetError(message);
     },
     async refreshSite() {
       const success = await this.requestRefreshSite();
 
       if (success) {
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval });
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval }));
       } else {
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE');
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE'));
       }
     },
+
     async updateDebugMode(newValue) {
       const success = await this.updateForceRefreshDebugMode(newValue);
 
       if (success) {
         this.notificationMessage = '';
       } else {
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_DEBUG_MODE_FAILURE');
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_DEBUG_MODE_FAILURE'));
       }
     },
     async updateOptions(updatedOptions) {
@@ -146,9 +170,9 @@ export default {
           window.location.search += '&optionsUpdated';
           return;
         }
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS');
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS'));
       } else {
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_FAILURE');
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_FAILURE'));
       }
     },
     ...mapActions(['requestRefreshSite', 'updateForceRefreshSettings', 'updateForceRefreshDebugMode']),

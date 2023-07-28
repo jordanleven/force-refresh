@@ -6,6 +6,16 @@
  * @subpackage ApiCalls
  */
 
+ /**
+  * Custom intervals must be at least 30 seconds.
+  */
+ define( 'REFRESH_INTERVAL_CUSTOM_MINIMUM_IN_SECONDS', 30 );
+
+ /**
+  * Custom intervals must be, at max, four hours.
+  */
+ define( 'REFRESH_INTERVAL_CUSTOM_MAXIMUM_IN_SECONDS', 4 * 3600 );
+
 /**
  * Function to reply to the client with a response.
  *

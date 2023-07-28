@@ -127,12 +127,52 @@ const setCountdownInterval = (refreshInterval) => {
   }, COUNTDOWN_INTERVAL_IN_SECONDS * 1000);
 };
 
+const getRoundedRefreshInterval = (value, divisor) => {
+  const precision = 100;
+  return Math.floor((value * precision) / divisor) / precision;
+};
+
+const getRefreshIntervalUnitAndValue = (refreshInterval) => {
+  const divisors = {
+    hour: 3600,
+    minute: 60,
+    second: 1,
+  };
+
+  let unit;
+  let divisor;
+  switch (true) {
+    case refreshInterval >= divisors.hour:
+      unit = 'hour';
+      divisor = divisors.hour;
+      break;
+    case refreshInterval >= divisors.minute:
+      unit = 'minute';
+      divisor = divisors.minute;
+      break;
+    default:
+      unit = 'second';
+      divisor = divisors.second;
+      break;
+  }
+
+  const roundedInterval = getRoundedRefreshInterval(refreshInterval, divisor);
+  return [roundedInterval, unit];
+};
+
+const getRefreshIntervalMessage = (refreshInterval) => {
+  const [refreshMessageValue, refreshUnit] = getRefreshIntervalUnitAndValue(refreshInterval);
+  const refreshUnitPlural = refreshMessageValue === 1 ? '' : 's';
+  return `${refreshMessageValue} ${refreshUnit}${refreshUnitPlural}`;
+};
+
 // eslint-disable-next-line no-undef
 const { isDebugActive, refreshInterval } = forceRefreshLocalizedData;
+const refreshIntervalMessage = getRefreshIntervalMessage(refreshInterval);
 
 setDebugMode(!!isDebugActive);
 debug(`Debug mode is ${isDebugActive ? 'active' : 'inactive'}.`);
-debug(`Refreshing every ${refreshInterval} seconds.`);
+debug(`Refreshing every ${refreshIntervalMessage}.`);
 
 if (isDebugActive) {
   setCountdownInterval(refreshInterval);

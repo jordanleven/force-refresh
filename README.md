@@ -17,10 +17,10 @@ Force Refresh is the best plugin for requesting browsers to refresh their page. 
 ## Features
 
 - Support for both parent and child themes.
-- Allows an admin to simply click a button to request browsers to refresh their page. This is done within between 30 seconds and two minutes after making the request.
+- Allows an admin to simply click a button to request browsers to refresh their page. This is done within your selected customized client-side refresh interval.
 - Ability to add refreshing capabilities to any role using the "Invoke Force Refresh" capability.
 - Ability to refresh on a per-page or post basis.
-- Customizable client-side refresh intervals.
+- Customizable client-side refresh intervals, including the ability to customize any refresh interval between 30 seconds and four hours.
 
 ## Feature Requests and Bug Reports
 
