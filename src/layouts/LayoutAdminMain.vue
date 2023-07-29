@@ -43,17 +43,33 @@
           @refresh-requested="refreshSite"
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
+          @release-notes-page-clicked="activateReleaseNotesPage"
           @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
+      <div class="admin-release-notes" :class="classAdminReleaseNotes">
+        <transition name="fade-and-move">
+          <div
+            v-if="!troubleshootingActive && releaseNotesPageActive"
+            class="admin-release-notes__inner"
+            @click="exitReleaseNotes"
+          >
+            <AdminReleaseNotes
+              :release-notes="releaseNotes"
+            />
+          </div>
+        </transition>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
+import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
 import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
@@ -63,15 +79,25 @@ export default {
   components: {
     AdminMain,
     AdminNotification,
+    AdminReleaseNotes,
     AdminTroubleshooting,
+  },
+  props: {
+    releaseNotes: VueTypes.object,
   },
   data() {
     return {
       notificationMessage: {},
+      releaseNotesPageActive: false,
       troubleshootingPageIsActive: false,
     };
   },
   computed: {
+    classAdminReleaseNotes() {
+      return [
+        this.releaseNotesPageActive && 'admin-release-notes--active',
+      ];
+    },
     getPluginWarningText() {
       const { required, version } = this.troubleshootingInformation.versions.forceRefresh;
       const versionSanitized = getSanitizedVersion(version);
@@ -113,6 +139,9 @@ export default {
     this.checkForOptionsUpdated();
   },
   methods: {
+    activateReleaseNotesPage() {
+      this.releaseNotesPageActive = true;
+    },
     activateTroubleshootingPage() {
       this.troubleshootingPageIsActive = true;
     },
@@ -120,6 +149,9 @@ export default {
       if (window.location.href.indexOf('optionsUpdated') > -1) {
         this.notificationMessageSet(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS'));
       }
+    },
+    exitReleaseNotes() {
+      this.releaseNotesPageActive = false;
     },
     exitTroubleshooting() {
       this.troubleshootingPageIsActive = false;
@@ -244,6 +276,55 @@ export default {
   100% {
     opacity: 1;
   }
+}
+
+@keyframes fade-and-move {
+  0% {
+    opacity: 0;
+    transform: translateY(100px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-release-notes {
+  transition: backdrop-filter var.$transition-medium, background-color var.$transition-medium;
+
+  &.admin-release-notes--active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(var.$black, 0.4);
+    backdrop-filter: blur(0.125rem);
+  }
+
+  .admin-release-notes__inner {
+    height: 100%;
+    width: 100vw;
+    height: 100vh;
+    margin-top: 10rem;
+  }
+}
+
+.fade-and-move-enter-active,
+.fade-and-move-leave-active {
+  animation-fill-mode: both;
+  position: absolute;
+  animation-name: fade-and-move;
+}
+
+.fade-and-move-enter-active {
+  animation-delay: var.$transition-medium;
+  animation-duration: var.$transition-medium;
+}
+
+.fade-and-move-leave-active {
+  animation-duration: 0;
 }
 
 .fade-and-scale__main-enter-active,

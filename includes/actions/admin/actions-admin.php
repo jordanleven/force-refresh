@@ -11,4 +11,5 @@ require __DIR__ . '/inc.refresh-ui.php';
 require __DIR__ . '/inc.refresh-ui-settings.php';
 require __DIR__ . '/inc.refresh-ui-meta-box.php';
 require __DIR__ . '/inc.refresh-ui-admin-bar.php';
+require __DIR__ . '/inc.release-notes.php';
 require __DIR__ . '/inc.roles.php';

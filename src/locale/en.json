@@ -14,6 +14,7 @@
   },
   "ADMIN_SETTINGS": {
     "OPTIONS_HEADER": "Options",
+    "OPTIONS_UTILITY_VIEW_RELEASE_NOTES": "View release notes",
     "OPTION_REFRESH_FROM_ADMIN_BAR": "Refresh from Admin Bar",
     "OPTION_REFRESH_INTERVAL": "Refresh interval",
     "OPTION_REFRESH_INTERVAL_CUSTOM": "Custom interval (minutes)",
@@ -28,6 +29,7 @@
     "TROUBLESHOOTING_HEADER_HEALTH": "Health",
     "TROUBLESHOOTING_HEADER_SITE_SETTINGS": "Site Settings",
     "TROUBLESHOOTING_DEBUG_MODE": "Debug Mode",
+    "BUTTON_ENTER_TROUBLESHOOTING_MODE": "Troubleshooting",
     "BUTTON_EXIT_TROUBLESHOOTING_MODE": "Exit troubleshooting",
     "TROUBLESHOOTING_LABEL_VERSION": "Version",
     "TROUBLESHOOTING_LABEL_WORDPRESS": "WordPress",
@@ -49,5 +51,10 @@
     "FORCE_REFRESH_SITE": "Force Refresh Site",
     "UPDATE": "Update",
     "TOGGLE": "Toggle"
+  },
+  "RELEASE_NOTES": {
+    "HEADER": "Force Refresh Release Notes",
+    "RELEASE_NOTES_UNAVAILABLE": "I'm sorry, but release notes are currently unavailable. Please visit Force Refresh's plugin page to view the full changelog.",
+    "RELEASE_NOTES_PLUGIN_LINK_TITLE": "Force Refresh on WordPress.org"
   }
 }

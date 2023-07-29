@@ -36,7 +36,8 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-$main-window-width: 65%;
+$main-window-width: 50%;
+$options-max-width: 30rem;
 
 .force-refresh__container {
   @include utils.small {
@@ -48,15 +49,25 @@ $main-window-width: 65%;
 .force-refresh__main,
 .force-refresh-admin__options {
   width: 100%;
+  margin-bottom: 1rem;
 }
 
 @include utils.small {
   .force-refresh__main {
     width: $main-window-width;
+
+    @include utils.large {
+      width: calc(100% - $options-max-width);
+    }
   }
 
   .force-refresh-admin__options {
     width: 100% - $main-window-width;
+
+    @include utils.large {
+      width: 100%;
+      max-width: $options-max-width;
+    }
   }
 }
 </style>

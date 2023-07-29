@@ -19,6 +19,7 @@ const {
   postId,
   postName,
   postType,
+  releaseNotes,
 } = localizedData;
 
 Vue.component('FontAwesomeIcon', FontAwesomeIcon);
@@ -48,7 +49,9 @@ const maybeRenderVueInstance = ({ target, layout, props }) => {
 
 maybeRenderVueInstance({
   layout: LayoutAdminMain,
-  props: {},
+  props: {
+    releaseNotes,
+  },
   target: targetMain,
 });
 

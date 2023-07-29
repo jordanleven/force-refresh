@@ -70,6 +70,7 @@ function get_localized_data(): array {
             'targetNotificationContainer' => '#' . HTML_ID_REFRESH_NOTIFICATION_CONTAINER,
             'isDebugActive'               => get_option_debug_mode(),
             'refreshOptions'              => get_refresh_options(),
+            'releaseNotes'                => get_release_notes(),
             'postId'                      => get_the_ID(),
             'postType'                    => get_current_screen()->post_type,
             'postName'                    => get_the_title(),

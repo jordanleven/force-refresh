@@ -59,13 +59,23 @@
         </div>
       </form>
     </div>
-    <div class="force-refresh-admin__options-troubleshooting">
-      <button
-        class="button button-secondary"
-        @click="troubleshootPageClicked"
-      >
-        Visit troubleshooting page
-      </button>
+    <div class="force-refresh-admin__options-utilities">
+      <div class="force-refresh-admin__options-utility">
+        <button
+          class="button button-secondary"
+          @click="pageClickedTroubleshooting"
+        >
+          {{ $t("ADMIN_TROUBLESHOOTING.BUTTON_ENTER_TROUBLESHOOTING_MODE") }}
+        </button>
+      </div>
+      <div class="force-refresh-admin__options-utility">
+        <button
+          class="button button-secondary"
+          @click="pageClickedReleaseNotes"
+        >
+          {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_RELEASE_NOTES") }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -104,7 +114,7 @@ export default {
       showRefreshInMenuBar: VueTypes.bool.isRequired,
     }),
   },
-  emits: ['options-were-updated'],
+  emits: ['options-were-updated', 'troubleshooting-page-clicked', 'release-notes-page-clicked'],
   data() {
     return {
       isCustomIntervalWithinBounds: true,
@@ -177,7 +187,10 @@ export default {
       const isCustomRefreshIntervalBelowMaximum = customRefreshInterval <= customRefreshIntervalMaximumInMinutes;
       return isCustomRefreshIntervalAboveMinimum && isCustomRefreshIntervalBelowMaximum;
     },
-    troubleshootPageClicked() {
+    pageClickedReleaseNotes() {
+      this.$emit('release-notes-page-clicked');
+    },
+    pageClickedTroubleshooting() {
       this.$emit('troubleshooting-page-clicked');
     },
     updateOptionsWasClicked() {
@@ -256,11 +269,15 @@ export default {
   }
 }
 
-.force-refresh-admin__options-troubleshooting {
+.force-refresh-admin__options-utilities {
   text-align: right;
 
   @include utils.small {
     margin: 50px 20px 0;
+  }
+
+  .force-refresh-admin__options-utility {
+    margin-bottom: 0.5rem;
   }
 }
 
