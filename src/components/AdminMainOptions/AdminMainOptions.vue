@@ -76,12 +76,25 @@
           {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_RELEASE_NOTES") }}
         </button>
       </div>
+      <div class="force-refresh-admin__options-utility force-refresh-admin__options-utility-leave-review">
+        <a href="https://wordpress.org/plugins/force-refresh/#reviews" target="_blank">
+          <font-awesome-icon
+            class="leave-review-icon"
+            :icon="leaveReviewLogo"
+          />
+          {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_LEAVE_REVIEW") }}
+        </a>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+
+library.add([faHeart]);
 
 const OPTIONS_REFRESH_FROM_ADMIN_BAR = [
   {
@@ -118,6 +131,7 @@ export default {
   data() {
     return {
       isCustomIntervalWithinBounds: true,
+      leaveReviewLogo: faHeart,
       optionSelectedRefreshInterval: null,
       optionSelectedRefreshIntervalCustom: null,
       optionSelectedShowRefreshInMenuBar: null,
@@ -230,6 +244,25 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
+@include utils.generate-animation("logo-excited") {
+  0% { transform: translateY(0) }
+  25% { transform: translateY(2px) }
+  50% { transform: translateY(-2px) }
+  75% { transform: translateY(2px) }
+  100% { transform: translateY(0) }
+}
+
+@include utils.generate-animation('line-grow-and-face') {
+  0% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 1;
+    width: 100%;
+  }
+}
+
 .force-refresh-admin__options-inner {
   padding: 0 20px 10px;
   background-color: white;
@@ -278,6 +311,46 @@ export default {
 
   .force-refresh-admin__options-utility {
     margin-bottom: 0.5rem;
+
+    &.force-refresh-admin__options-utility-leave-review {
+      margin-top: 2rem;
+
+      a {
+        color: var.$blue;
+        text-decoration: none;
+        display: inline-block;
+        position: relative;
+
+        &::after {
+          display: block;
+          right: left;
+          left: 0;
+          position: absolute;
+          content: '';
+          height: 1px;
+          width: 0;
+          background-color: var.$blue;
+        }
+
+        .leave-review-icon {
+          transition: color var.$transition-short;
+        }
+
+        &:hover {
+          .leave-review-icon {
+            color: var.$red;
+
+            @include utils.animation("logo-excited", var.$transition-medium, ease);
+          }
+
+          &::after {
+            @include utils.animation('line-grow-and-face', var.$transition-medium, ease);
+
+            animation-fill-mode: forwards;
+          }
+        }
+      }
+    }
   }
 }
 

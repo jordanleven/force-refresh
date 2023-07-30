@@ -15,6 +15,7 @@
   "ADMIN_SETTINGS": {
     "OPTIONS_HEADER": "Options",
     "OPTIONS_UTILITY_VIEW_RELEASE_NOTES": "View release notes",
+    "OPTIONS_UTILITY_LEAVE_REVIEW": "Leave review",
     "OPTION_REFRESH_FROM_ADMIN_BAR": "Refresh from Admin Bar",
     "OPTION_REFRESH_INTERVAL": "Refresh interval",
     "OPTION_REFRESH_INTERVAL_CUSTOM": "Custom interval (minutes)",
