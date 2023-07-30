@@ -1,3 +1,5 @@
+@use "sass:string";
+
 /**
  * Mixin used to generate an animation. The content will be repeated for all of the vendor prefixes.
  * @param {string} $animation-name The name of the animation
@@ -18,5 +20,5 @@
  * @param {string} $delay : 0s                      Any delay applied to the animation
  */
 @mixin animation($animation-name, $speed: 2s , $timing-function: infinite, $delay : null) {
-  animation: $animation-name $speed $timing-function $delay;
+  animation: string.unquote($animation-name) $speed $timing-function $delay;
 }
