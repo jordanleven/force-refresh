@@ -304,7 +304,6 @@ export default {
   }
 
   .admin-release-notes__inner {
-    height: 100%;
     width: 100vw;
     height: 100vh;
     margin-top: 10rem;

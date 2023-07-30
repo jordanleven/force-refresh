@@ -58,8 +58,6 @@ export default {
   align-items: center;
   justify-content: center;
   user-select: none;
-  user-select: none;
-  user-select: none;
 }
 
 .release-notes__unavailable {
