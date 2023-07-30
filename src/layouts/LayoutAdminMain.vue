@@ -56,6 +56,7 @@ import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
+import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
 
 export default {
   name: 'LayoutAdminMain',
@@ -145,7 +146,11 @@ export default {
       const success = await this.requestRefreshSite();
 
       if (success) {
-        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval }));
+        const [refreshIntervalValue, refreshIntervalUnit] = getRefreshIntervalUnitAndValue(this.refreshInterval);
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', {
+          refreshIntervalUnit,
+          refreshIntervalValue,
+        }));
       } else {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE'));
       }

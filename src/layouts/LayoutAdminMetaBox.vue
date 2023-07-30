@@ -24,6 +24,7 @@ import { decode } from 'html-entities';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
+import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
 
 export default {
   name: 'LayoutAdminMetaBox',
@@ -43,8 +44,12 @@ export default {
   },
   computed: {
     notificationMessage() {
+      const [refreshIntervalValue, refreshIntervalUnit] = getRefreshIntervalUnitAndValue(this.refreshInterval);
       return this.refreshStatus
-        ? this.$t('ADMIN_NOTIFICATIONS.PAGE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval })
+        ? this.$t('ADMIN_NOTIFICATIONS.PAGE_REFRESHED_SUCCESS', {
+          refreshIntervalUnit,
+          refreshIntervalValue,
+        })
         : this.$t('ADMIN_NOTIFICATIONS.PAGE_REFRESHED_FAILURE');
     },
     postNameDecoded() {
