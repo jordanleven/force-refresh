@@ -17,7 +17,7 @@
         size="large"
       />
       <AdminNotification
-        v-if="notificationMessage.message"
+        v-if="isAdminNotificationSet"
         :message="notificationMessage.message"
         :type="notificationMessage.type"
         @notification-closed="notificationMessageClear"
@@ -121,6 +121,9 @@ export default {
       return [
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
       ];
+    },
+    isAdminNotificationSet() {
+      return !!this.notificationMessage?.message;
     },
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
