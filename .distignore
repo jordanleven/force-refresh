@@ -1,11 +1,4 @@
-.distignore
-.docker-build
-.eslintrc.js
-.git
-.github
-.gitignore
-.stylelintrc
-.wordpress-org
+.*
 CHANGELOG.md
 CONTRIBUTING.md
 Force-Refresh-*.zip
