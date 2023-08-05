@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.8.0](https://github.com/jordanleven/force-refresh/compare/v2.7.0...v2.8.0) (2023-08-05)
+
+
+### Features
+
+* Add link for leaving reviews ([0fa8c54](https://github.com/jordanleven/force-refresh/commit/0fa8c546fd51dc66f16616bd321830c24be08925))
+* Add support for custom refresh intervals ([082169a](https://github.com/jordanleven/force-refresh/commit/082169a00e364c14b7472c043345ec3e729eed4c))
+* Add support for viewing plugin release notes ([b5ac691](https://github.com/jordanleven/force-refresh/commit/b5ac6914c99aaac984cf40448d6c5975378d7084))
+
+
+### Bug Fixes
+
+* Issue dismissing admin notifications ([35ff43b](https://github.com/jordanleven/force-refresh/commit/35ff43bab3ceaee9e0c31275ff7b63c9c3583cf7))
+* Issue with logo animations ([e439d91](https://github.com/jordanleven/force-refresh/commit/e439d91e990f99071ed4251c220c5a20ba9e1028))
+
 ## [2.7.0](https://github.com/jordanleven/force-refresh/compare/v2.6.1...v2.7.0) (2023-07-26)
 
 
