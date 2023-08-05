@@ -55,7 +55,7 @@ printf "\033[37m=====================\033[0m\n"
 printf "\033[37m%s\033[0m\n\n" "$next_version"
 printf "\033[33mPress \"y\" to proceed with this beta release or press any other key to abort.\033[0m "
 
-read -r "" -n 1 -s
+read -r
 if echo "$REPLY" | grep -q "^[Yy]$"
 then
   bumpVersionPackage "$prerelease_name"
