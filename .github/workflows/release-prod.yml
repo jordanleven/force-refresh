@@ -78,7 +78,6 @@ jobs:
       with:
         version: ${{ github.ref }}
 
-
     - name: Create Release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -88,4 +87,4 @@ jobs:
         tag: ${{ github.ref }}
         release_name: Force Refresh ${{ steps.package-version.outputs.current-version }}
         prerelease: false
-        body: "This is a production release of Force Refresh (v${{ steps.package-version.outputs.current-version }}). This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh/. \n\n**Release Notes**\n${{ steps.get_changelog_entry.outputs.release_notes }}"
+        body: "This is a production release of Force Refresh (v${{ steps.package-version.outputs.current-version }}). This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh/. \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
