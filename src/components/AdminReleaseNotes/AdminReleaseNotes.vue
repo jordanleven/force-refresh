@@ -27,7 +27,7 @@
                 v-for="note, noteIndex in value.notes"
                 :key="noteIndex"
               >
-                {{ note }}.
+                {{ note }}
               </li>
             </ul>
           </div>
