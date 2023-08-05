@@ -34,7 +34,7 @@
     "compare-versions": "^6.0.0",
     "html-entities": "^2.3.2",
     "qs": "^6.10.3",
-    "ramda": "^0.28.0",
+    "ramda": "^0.29.0",
     "regenerator-runtime": "^0.13.11",
     "sprintf-js": "^1.1.2",
     "uniqid": "^5.4.0",
