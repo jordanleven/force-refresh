@@ -15,7 +15,7 @@ const pluginVersion = require('../../package.json').version;
  * types of commits. In these cases, this message will be used in lieu of the contents
  * of the change.
  */
-const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Performance enhancements and bug fixes';
+const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Performance enhancements and bug fixes.';
 
 /**
  * Function to remove the bold formatting in Markdown.
@@ -105,13 +105,41 @@ const getFormattedSectionContent = (sections) => pipe(
 )(sections);
 
 /**
+ * Function to get the formatted bug fix release notes.
+ *
+ * @param   {array}  releaseNoteSplit  An array note section.
+ *
+ * @return  {array}                    The formatted release notes array.
+ */
+const getFormattedBugFixes = (releaseNoteSplit) => {
+  return releaseNoteSplit.map((v) => {
+    const releaseNoteUpdated = v.replace('\* Issue', '* Fix issue');
+    return releaseNoteUpdated;
+  })
+}
+
+/**
  * Function to get the release details of a specific release in the changelog.
  * @param   {object}  content     The section content object
  * @param   {string}  content.raw  The raw section content
  * @param   {string}  releaseCategory  The release category parsed out from the changelog, like "feature" or "chore"
  * @return  {string}                   The formatted release content
  */
-const getReleaseDetails = ({ raw }, releaseCategory) => `${raw}\n`;
+const getReleaseDetails = ({ raw }, releaseCategory) => {
+  const releaseNoteSplit =  raw.split('\n').filter((v) => !!v).map((v) => `${v.trim()}.\n`)
+  let releaseNote;
+  switch(releaseCategory) {
+    case 'Bug Fixes':
+    case 'Fix':
+      releaseNote = getFormattedBugFixes(releaseNoteSplit)
+      break
+    default:
+      releaseNote = releaseNoteSplit
+      break
+  }
+
+  return `${releaseNote.join('')}\n`
+}
 
 /**
  * Function to get a formatted release note for a specific release.
