@@ -20,6 +20,8 @@ jobs:
 
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
@@ -59,6 +61,10 @@ jobs:
     - name: Build PHP artifact
       run: composer build ./ ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
 
+    - name: Get Commits since last release
+      id: changes
+      uses: simbo/changes-since-last-release-action@v1
+
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
@@ -69,4 +75,4 @@ jobs:
         release_name: Force Refresh ${{ steps.package-version.outputs.current-version }}
         overwrite: true
         prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and **should not** be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh/. \n\nPlease note that beta releases will, on average, be larger in size due to the inclusion of dependencies not usually included in production builds and omission of minification."
+        body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and **should not** be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\nPlease note that beta releases will, on average, be larger in size due to the inclusion of dependencies not usually included in production builds and omission of minification. \n\n## Changelog\n\n${{ steps.changes.outputs.log || 'Performance enhancements and bug fixes' }}"
