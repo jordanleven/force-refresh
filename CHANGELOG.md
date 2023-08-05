@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.8.2-9983AF.7](https://github.com/jordanleven/force-refresh/compare/v2.8.2-9983AF.6...v2.8.2-9983AF.7) (2023-08-05)
+
 ### [2.8.1](https://github.com/jordanleven/force-refresh/compare/v2.8.0...v2.8.1) (2023-08-05)
 
 ## [2.8.0](https://github.com/jordanleven/force-refresh/compare/v2.7.0...v2.8.0) (2023-08-05)
