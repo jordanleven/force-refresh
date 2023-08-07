@@ -4,7 +4,7 @@ services:
     container_name: 'force-refresh-db-dev-container-wp-6'
     image: mariadb:10.3
     volumes:
-      - './.docker-build/data/mysql:/var/lib/mysql'
+      - './.docker-build/data/mysql_6:/var/lib/mysql'
       - ./db/wp-6:/docker-entrypoint-initdb.d
     ports:
       - 18766:3306
