@@ -1,11 +1,11 @@
 version: '3.4'
 services:
-  db:
-    container_name: 'force-refresh-db-dev-container'
+  db-6:
+    container_name: 'force-refresh-db-dev-container-wp-6'
     image: mariadb:10.3
     volumes:
       - './.docker-build/data/mysql:/var/lib/mysql'
-      - ./db:/docker-entrypoint-initdb.d
+      - ./db/wp-6:/docker-entrypoint-initdb.d
     ports:
       - 18766:3306
     environment:
@@ -13,15 +13,15 @@ services:
       MYSQL_DATABASE: force-refresh-dev-db
       MYSQL_USER: force-refresh-dev-user
       MYSQL_PASSWORD: force-refresh-dev-password
-  wordpress:
-    container_name: 'force-refresh-dev-container'
+  wordpress-6:
+    container_name: 'force-refresh-dev-container-wp-6'
     depends_on:
-      - db
+      - db-6
     image: 'wordpress:beta-6.3-php8.0'
     ports:
       - '8080:80'
     environment:
-      WORDPRESS_DB_HOST: 'db:3306'
+      WORDPRESS_DB_HOST: 'db-6:3306'
       WORDPRESS_DB_NAME: force-refresh-dev-db
       WORDPRESS_DB_USER: force-refresh-dev-user
       WORDPRESS_DB_PASSWORD: force-refresh-dev-password
