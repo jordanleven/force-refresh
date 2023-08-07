@@ -5,7 +5,7 @@ services:
     image: mariadb:10.3
     volumes:
       - './.docker-build/data/mysql:/var/lib/mysql'
-      - ./db:/docker-entrypoint-initdb.d
+      - ./db/wp-6:/docker-entrypoint-initdb.d
     ports:
       - 18766:3306
     environment:
