@@ -29,5 +29,36 @@ services:
       WP_DEBUG_DISPLAY: 1
       WP_DEBUG_LOG: 1
     volumes:
-      - "./.docker-build/wordpress:/var/www/html"
+      - "./.docker-build/wordpress_6:/var/www/html"
+      - "./:/var/www/html/wp-content/plugins/force-refresh"
+  db-5:
+    container_name: 'force-refresh-db-dev-container-wp-5'
+    image: mariadb:10.3
+    volumes:
+      - './.docker-build/data/mysql_5:/var/lib/mysql'
+      - ./db/wp-5:/docker-entrypoint-initdb.d
+    ports:
+      - 18767:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: force-refresh_root_password
+      MYSQL_DATABASE: force-refresh-dev-db
+      MYSQL_USER: force-refresh-dev-user
+      MYSQL_PASSWORD: force-refresh-dev-password
+  wordpress-5:
+    container_name: 'force-refresh-dev-container-wp-5'
+    depends_on:
+      - db-5
+    image: 'wordpress:beta-5.9-php7.4-apache'
+    ports:
+      - '8081:80'
+    environment:
+      WORDPRESS_DB_HOST: 'db-5:3306'
+      WORDPRESS_DB_NAME: force-refresh-dev-db
+      WORDPRESS_DB_USER: force-refresh-dev-user
+      WORDPRESS_DB_PASSWORD: force-refresh-dev-password
+      WORDPRESS_DEBUG: 1
+      WP_DEBUG_DISPLAY: 1
+      WP_DEBUG_LOG: 1
+    volumes:
+      - "./.docker-build/wordpress_5:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
