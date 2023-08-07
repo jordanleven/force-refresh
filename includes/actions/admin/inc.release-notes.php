@@ -15,7 +15,7 @@ require_once ABSPATH . 'wp-admin/includes/class-wp-filesystem-direct.php';
  *
  * @return  mixed   String if file is located.
  */
-function get_plugin_readme(): mixed {
+function get_plugin_readme() {
     $readme_file_location = dirname( get_main_plugin_file() ) . '/README.txt';
 
     if ( ! file_exists( $readme_file_location ) ) {
@@ -87,7 +87,7 @@ function assign_release_note_based_on_role( &$current_version_i, &$notes_formatt
  *
  * @return  array  An array of release notes.
  */
-function get_release_notes_json(): mixed {
+function get_release_notes_json() {
     $readme_contents = get_plugin_readme();
     if ( ! $readme_contents ) {
         return null;
@@ -110,6 +110,6 @@ function get_release_notes_json(): mixed {
  *
  * @return  array  Array of release notes.
  */
-function get_release_notes(): mixed {
+function get_release_notes() {
     return get_release_notes_json();
 }
