@@ -33,32 +33,59 @@ getNextBuildNumber() {
     then
       echo 0
     else
-      "$($existing_build_number + 1)"
+      echo $((existing_build_number+1))
   fi
 }
 
 bumpVersionPackage() {
-  prerelease_name=$1
-  npx standard-version -a --prerelease "$prerelease_name" --skip.changelog
+  release_version=$1
+  npm version "$release_version" --no-git-tag-version >/dev/null
+  git add package*
+  ./.github/scripts/bumpWordPressPluginVersion.sh
+  git commit -m "chore(release): ${release_version}"
+  git tag -a "v$release_version" -m "v$release_version"
+}
+
+getNextBetaReleaseVersion() {
+  current_release_version=$1
+  next_build_number=$(getNextBuildNumber)
+  release_without_build=$(echo "$current_release_version" | sed 's![^.]*$!!')
+  echo "${release_without_build}${next_build_number}"
+}
+
+getBetaReleaseVersion() {
+  current_version=$(getCurrentPackageVersion)
+  prerelease_name=$(getPrereleaseName)
+
+  case $current_version in
+    *"-"*)
+      beta_release_version="$(getNextBetaReleaseVersion "$current_version")"
+      ;;
+    *)
+      beta_release_version="${current_version}-${prerelease_name}.0"
+      ;;
+  esac
+
+  echo "$beta_release_version"
 }
 
 current_branch=$(getCurrentBranchName)
-prerelease_name=$(getPrereleaseName)
-next_version=$(npx standard-version --prerelease "$prerelease_name" --dry-run --skip.changelog --skip.commit --skip.tag)
+next_version=$(getBetaReleaseVersion)
+
 if [ "$current_branch" = "$production_branch" ]
   then
-  echo "\033[1;31mCannot release betas while on branch ${production_branch}\033[0m"
+  printf "\033[1;31mCannot release betas while on branch %s\n\033[0m" "$production_branch"
   exit 1
 fi
 
 printf "\033[37m=====================\033[0m\n"
-printf "\033[37m%s\033[0m\n\n" "$next_version"
+printf "\033[37mPreparing to release beta version %s.\033[0m\n\n" "$next_version"
 printf "\033[33mPress \"y\" to proceed with this beta release or press any other key to abort.\033[0m "
 
 read -r
 if echo "$REPLY" | grep -q "^[Yy]$"
 then
-  bumpVersionPackage "$prerelease_name"
+  bumpVersionPackage "$next_version"
   git push --follow-tags
   printf "\033[1;32m\n\nPackage succesfully updated and pushed to the remote.\033[0m\n\n"
 else

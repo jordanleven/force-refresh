@@ -19,7 +19,7 @@ getReleaseType() {
       release_type='patch'
       ;;
   esac
-  echo $release_type
+  echo "$release_type"
 }
 
 bumpVersionPackage() {
@@ -36,7 +36,7 @@ next_version=$(npx standard-version --dry-run --skip.changelog --skip.commit --s
 
 if [ "$current_branch" != "$production_branch" ]
   then
-  echo "\033[1;31mCannot release while on branch $current_branch\033[0m"
+  printf "\033[1;31mCannot release while on branch %s\n\033[0m" $current_branch
   exit 1
 fi
 
