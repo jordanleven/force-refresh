@@ -17,6 +17,11 @@ const pluginVersion = require('../../package.json').version;
  */
 const MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE = 'Performance enhancements and bug fixes.';
 
+const MESSAGE_NOTES_HEADERS = {
+  BUG: '##### **Bug Fixes**\n',
+  FEATURE: '##### **New Features**\n',
+}
+
 /**
  * Function to remove the bold formatting in Markdown.
  */
@@ -105,20 +110,6 @@ const getFormattedSectionContent = (sections) => pipe(
 )(sections);
 
 /**
- * Function to get the formatted bug fix release notes.
- *
- * @param   {array}  releaseNoteSplit  An array note section.
- *
- * @return  {array}                    The formatted release notes array.
- */
-const getFormattedBugFixes = (releaseNoteSplit) => {
-  return releaseNoteSplit.map((v) => {
-    const releaseNoteUpdated = v.replace('\* Issue', '* Fix issue');
-    return releaseNoteUpdated;
-  })
-}
-
-/**
  * Function to get the release details of a specific release in the changelog.
  * @param   {object}  content     The section content object
  * @param   {string}  content.raw  The raw section content
@@ -131,10 +122,10 @@ const getReleaseDetails = ({ raw }, releaseCategory) => {
   switch(releaseCategory) {
     case 'Bug Fixes':
     case 'Fix':
-      releaseNote = getFormattedBugFixes(releaseNoteSplit)
+      releaseNote = [MESSAGE_NOTES_HEADERS.BUG, ...releaseNoteSplit]
       break
     default:
-      releaseNote = releaseNoteSplit
+      releaseNote = [MESSAGE_NOTES_HEADERS.FEATURE, ...releaseNoteSplit]
       break
   }
 
@@ -164,14 +155,14 @@ const getFormattedReleaseNote = async (release, releaseVersion) => {
   // If the release details are null, then it means the content for this release is
   // unavailable and we should instead use the `MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE`
   // message
-  || `* ${MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE}`;
+  || `${MESSAGE_NOTES_HEADERS.BUG} * ${MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE}`;
 
   const releaseDate = await git.log([ `v${releaseVersion}`])
   const formattedReleaseDate = moment(releaseDate.latest.date).format('MMMM D, YYYY');
 
   return `
-    = ${releaseVersion} =
-    *Released on ${formattedReleaseDate}*
+    ####${releaseVersion}
+    _Released on ${formattedReleaseDate}_
 
     ${releaseDetails}\n
   `;
