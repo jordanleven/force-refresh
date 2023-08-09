@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.8.2](https://github.com/jordanleven/force-refresh/compare/v2.8.1...v2.8.2) (2023-08-09)
+
+
+### Bug Fixes
+
+* Displaying multiple periods in release notes ([a657e68](https://github.com/jordanleven/force-refresh/commit/a657e687126aa0ad55251bafe55a0314451d95a8))
+* Issue with typed returns in PHP 7.4 ([1b6e44f](https://github.com/jordanleven/force-refresh/commit/1b6e44f822e9dce118efa8e354c130f6ae0b4f22))
+
 ### [2.8.1](https://github.com/jordanleven/force-refresh/compare/v2.8.0...v2.8.1) (2023-08-05)
 
 ## [2.8.0](https://github.com/jordanleven/force-refresh/compare/v2.7.0...v2.8.0) (2023-08-05)
