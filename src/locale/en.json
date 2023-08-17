@@ -49,7 +49,8 @@
     "PLUGIN_WARNING_DEVELOPMENT_BUILD": "Psst, just a heads up that your installed version of Force Refresh (%{installedVersion}) is a development build intended only to be used for debugging purposes. Once debugging is complete, please visit the Plugins page to update to most recent supported version (%{currentVersion})."
   },
   "FORM_BUTTONS_GENERIC": {
-    "FORCE_REFRESH_SITE": "Force Refresh Site",
+    "FORCE_REFRESH_SITE_NOW": "Force Refresh Site Now",
+    "FORCE_REFRESH_SITE_SCHEDULE": "Schedule Force Refresh",
     "UPDATE": "Update",
     "TOGGLE": "Toggle"
   },

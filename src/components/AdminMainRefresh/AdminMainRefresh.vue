@@ -6,13 +6,21 @@
       :icon="refreshLogo"
     />
     <p>{{ forceRefreshDirections }}</p>
-    <button
-      type="submit"
-      class="button button-primary admin__refresh-button"
-      @click="refreshButtonClicked"
-    >
-      {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE', { siteName }) }}
-    </button>
+    <div class="admin__refresh-buttons">
+      <button
+        type="submit"
+        class="button button-primary admin__refresh-button"
+        @click="refreshButtonClicked"
+      >
+        {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_NOW') }}
+      </button>
+      <button
+        type="submit"
+        class="button admin__refresh-button"
+      >
+        {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_SCHEDULE') }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -107,9 +115,16 @@ export default {
   }
 }
 
+.admin__refresh-buttons {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
 .admin__refresh-button {
   font-size: 1rem;
-  display: inline;
+  margin: 0.5rem;
+  position: relative;
   cursor: pointer;
 }
 </style>
