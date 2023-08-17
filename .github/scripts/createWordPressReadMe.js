@@ -161,7 +161,7 @@ const getFormattedReleaseNote = async (release, releaseVersion) => {
   const formattedReleaseDate = moment(releaseDate.latest.date).format('MMMM D, YYYY');
 
   return `
-    ####${releaseVersion}
+    #### ${releaseVersion}
     _Released on ${formattedReleaseDate}_
 
     ${releaseDetails}\n

@@ -13,21 +13,27 @@
       </div>
       <ul v-else>
         <li
-          v-for="value, key in releaseNotes"
-          :key="key"
+          v-for="release, versionNumber in releaseNotes"
+          :key="versionNumber"
           class="release-note"
         >
           <div class="release-notes-header">
-            <span class="release-notes-header__version">{{ key }}</span>
-            <span class="release-notes-header__date">{{ value.date }}</span>
+            <span class="release-notes-header__version">{{ versionNumber }}</span>
+            <span class="release-notes-header__date">{{ release.date }}</span>
           </div>
-          <div>
+          <div
+            v-for="releaseNote, noteIndex in release.notes"
+            :key="noteIndex"
+          >
+            <p class="release-notes-section-header">
+              {{ releaseNote.sectionHeader }}
+            </p>
             <ul class="release-notes-note">
               <li
-                v-for="note, noteIndex in value.notes"
-                :key="noteIndex"
+                v-for="sectionNote, sectionNoteIndex in releaseNote.sectionNotes"
+                :key="sectionNoteIndex"
               >
-                {{ note }}
+                {{ sectionNote }}
               </li>
             </ul>
           </div>
@@ -81,7 +87,25 @@ export default {
 }
 
 .release-note {
-  margin-bottom: 1.5rem;
+  margin: 0;
+  position: relative;
+
+  &:nth-child(n+2) {
+    margin: 2rem 0;
+
+    &::before{
+      height: 1px;
+      background-color: var.$light-grey;
+      width: 90%;
+      left: 0;
+      right: 0;
+      margin: auto;
+      content: '';
+      display: block;
+      position: absolute;
+      top: calc(-2rem / 2);
+    }
+  }
 }
 
 .release-notes-header {
@@ -96,10 +120,19 @@ export default {
 
 .release-notes-header__version {
   font-weight: bold;
+  font-size: 1rem;
 }
 
 .release-notes-header__date {
   color: var.$dark-grey;
+}
+
+.release-notes-section-header {
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  margin-bottom: 0.125rem;
+  opacity: 0.9;
 }
 
 .release-notes-note {

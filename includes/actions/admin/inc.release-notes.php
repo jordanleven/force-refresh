@@ -54,8 +54,8 @@ function get_release_notes_from_plugin_readme( string $readme ): array {
 function assign_release_note_based_on_role( &$current_version_i, &$notes_formatted, $note ): void {
     switch ( true ) {
         // If the line is a version number.
-        case preg_match( ' /= .* /', $note ):
-            $version_number                     = str_replace( array( '=', ' ' ), '', $note );
+        case preg_match( '/#### [0-9].*/', $note ):
+            $version_number                     = str_replace( array( '#', ' ' ), '', $note );
             $notes_formatted[ $version_number ] = array(
                 'date'  => null,
                 'notes' => array(),
@@ -64,20 +64,36 @@ function assign_release_note_based_on_role( &$current_version_i, &$notes_formatt
             $current_version_i = $version_number;
             break;
 
-        // If the line is a release note.
-        case preg_match( '/^\* /', $note ):
-            $release_note = str_replace( '*', '', $note );
+        // Release dates.
+        case preg_match( '/^\_/', $note ):
+            $release_date_formatted = str_replace( array( '_', '' ), '', $note );
+
+            $notes_formatted[ $current_version_i ]['date'] = $release_date_formatted;
+            break;
+
+        // Release headers.
+        case preg_match( '/^##### .*/', $note ):
+            $release_header = str_replace( array( '#', '*' ), '', $note );
+
             array_push(
                 $notes_formatted[ $current_version_i ]['notes'],
-                trim( $release_note ),
+                array(
+                    'sectionHeader' => $release_header,
+                    'sectionNotes'  => array(),
+                ),
             );
             break;
 
-        // Release dates.
-        case preg_match( '/^\*/', $note ):
-            $release_date_formatted = str_replace( array( '*', 'Released on ' ), '', $note );
+        // If the line is a release note.
+        default:
+            $release_note         = str_replace( array( '#', '*' ), '', $note );
+            $all_notes            = &$notes_formatted[ $current_version_i ]['notes'];
+            $release_notes_length = count( $all_notes );
 
-            $notes_formatted[ $current_version_i ]['date'] = $release_date_formatted;
+            array_push(
+                $all_notes[ $release_notes_length - 1 ]['sectionNotes'],
+                trim( $release_note ),
+            );
             break;
     }
 }

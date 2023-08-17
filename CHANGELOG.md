@@ -140,34 +140,22 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## 2.1.0
 
-### Feat
+### Features
 
 * Add support to request refreshes on custom post types
 
 ## 2.0.0
 
-### Feat
+### Features
 
 * Move from Xamin to LightnCandy for HTML templates
 
-### Chore
-
-* Performance enhancements and bug fixes
-
 ## 1.1.2
-
-### Chore
-
-* Update dependencies
 
 ## 1.1.1
 
-### Fix
-
-* Bug fixes
-
 ## 1.0.0
 
-### Feat
+### Features
 
 * Initial release
