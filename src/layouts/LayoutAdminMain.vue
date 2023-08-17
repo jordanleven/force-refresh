@@ -39,23 +39,39 @@
           v-if="!troubleshootingActive"
           class="admin-section__main"
           :refresh-options="refreshOptions"
+          :scheduled-refreshes="scheduledRefreshes"
           :site-name="siteName"
           @refresh-requested="refreshSite"
+          @schedule-refresh-requested="scheduleRefresh"
+          @delete-scheduled-refresh="deleteScheduledRefresh"
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
           @release-notes-page-clicked="activateReleaseNotesPage"
           @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
-      <div class="admin-release-notes" :class="classAdminReleaseNotes">
+      <div class="admin-window" :class="classAdminReleaseNotes">
         <transition name="fade-and-move">
           <div
             v-if="!troubleshootingActive && releaseNotesPageActive"
-            class="admin-release-notes__inner"
-            @click="exitReleaseNotes"
+            class="admin-window__inner"
           >
             <AdminReleaseNotes
               :release-notes="releaseNotes"
+              @modal-was-closed="exitAdminWindow"
+            />
+          </div>
+        </transition>
+      </div>
+      <div class="admin-window" :class="classAdminScheduleRefresh">
+        <transition name="fade-and-move">
+          <div
+            v-if="!troubleshootingActive && scheduleRefreshPageActive"
+            class="admin-window__inner"
+          >
+            <AdminScheduleRefresh
+              @modal-was-closed="exitAdminWindow"
+              @schedule-refresh="refreshWasScheduled"
             />
           </div>
         </transition>
@@ -70,6 +86,7 @@ import { mapActions, mapGetters } from 'vuex';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
+import AdminScheduleRefresh from '@/components/AdminScheduleRefresh/AdminScheduleRefresh.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
 import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
@@ -80,6 +97,7 @@ export default {
     AdminMain,
     AdminNotification,
     AdminReleaseNotes,
+    AdminScheduleRefresh,
     AdminTroubleshooting,
   },
   props: {
@@ -89,13 +107,19 @@ export default {
     return {
       notificationMessage: {},
       releaseNotesPageActive: false,
+      scheduleRefreshPageActive: false,
       troubleshootingPageIsActive: false,
     };
   },
   computed: {
     classAdminReleaseNotes() {
       return [
-        this.releaseNotesPageActive && 'admin-release-notes--active',
+        this.releaseNotesPageActive && 'admin-window--active',
+      ];
+    },
+    classAdminScheduleRefresh() {
+      return [
+        this.scheduleRefreshPageActive && 'admin-window--active',
       ];
     },
     getPluginWarningText() {
@@ -133,6 +157,7 @@ export default {
       'refreshFromAdminBar',
       'refreshInterval',
       'refreshOptions',
+      'scheduledRefreshes',
       'siteName',
       'troubleshootingInformation',
       'wordPressNonce',
@@ -153,8 +178,17 @@ export default {
         this.notificationMessageSet(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS'));
       }
     },
-    exitReleaseNotes() {
+    async deleteScheduledRefresh(timestamp) {
+      const success = await this.requestDeleteScheduledRefresh(timestamp);
+      if (success) {
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_DELETE_SUCCESS'));
+      } else {
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_DELETE_FAILURE'));
+      }
+    },
+    exitAdminWindow() {
       this.releaseNotesPageActive = false;
+      this.scheduleRefreshPageActive = false;
     },
     exitTroubleshooting() {
       this.troubleshootingPageIsActive = false;
@@ -190,6 +224,18 @@ export default {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE'));
       }
     },
+    async refreshWasScheduled(scheduledRefresh) {
+      const success = await this.requestScheduledRefresh(scheduledRefresh);
+      this.scheduleRefreshPageActive = false;
+      if (success) {
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_SUCCESS'));
+      } else {
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE'));
+      }
+    },
+    scheduleRefresh() {
+      this.scheduleRefreshPageActive = true;
+    },
     async updateDebugMode(newValue) {
       const success = await this.updateForceRefreshDebugMode(newValue);
 
@@ -215,7 +261,13 @@ export default {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_FAILURE'));
       }
     },
-    ...mapActions(['requestRefreshSite', 'updateForceRefreshSettings', 'updateForceRefreshDebugMode']),
+    ...mapActions([
+      'requestDeleteScheduledRefresh',
+      'requestRefreshSite',
+      'requestScheduledRefresh',
+      'updateForceRefreshSettings',
+      'updateForceRefreshDebugMode',
+    ]),
   },
 };
 </script>
@@ -293,10 +345,10 @@ export default {
   }
 }
 
-.admin-release-notes {
+.admin-window {
   transition: backdrop-filter var.$transition-medium, background-color var.$transition-medium;
 
-  &.admin-release-notes--active {
+  &.admin-window--active {
     position: fixed;
     top: 0;
     left: 0;
@@ -306,7 +358,7 @@ export default {
     backdrop-filter: blur(0.125rem);
   }
 
-  .admin-release-notes__inner {
+  .admin-window__inner {
     width: 100vw;
     height: 100vh;
     margin-top: 10rem;

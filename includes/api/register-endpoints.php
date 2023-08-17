@@ -13,7 +13,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
  *
  * @return  void
  */
-function register_admin_endpoints() {
+function register_admin_endpoints(): void {
     $controller = new Api_Handler_Admin_Refresh_Site();
     $controller->register_routes();
 
@@ -28,6 +28,11 @@ function register_admin_endpoints() {
 
     $controller = new Api_Handler_Client();
     $controller->register_routes();
+
+    $controller = new Api_Handler_Admin_Schedule_Refresh_Site();
+    $controller->register_routes();
 }
 
 add_action( 'rest_api_init', __NAMESPACE__ . '\\register_admin_endpoints' );
+$controller = new Api_Handler_Admin_Schedule_Refresh_Site();
+$controller->register_actions();

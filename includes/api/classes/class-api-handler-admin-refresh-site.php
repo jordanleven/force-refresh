@@ -12,7 +12,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
- * Main class controller for the client API handler.
+ * Main class controller.
  */
 class Api_Handler_Admin_Refresh_Site extends Api_Handler_Admin implements Api_Handler_Admin_Interface {
 

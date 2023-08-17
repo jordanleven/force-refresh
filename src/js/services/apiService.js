@@ -1,4 +1,4 @@
-import axios, { AxiosHeaders } from 'axios';
+import axios from 'axios';
 import { error } from './loggingService.js';
 
 const axiosConfig = {
@@ -22,7 +22,8 @@ export default (args) => {
   }
 
   return {
-    get: async (url, payload) => handleAxiosRequest(axios.get(url, { AxiosHeaders, params: payload })),
+    delete: async (url, payload) => handleAxiosRequest(axios.delete(url, { ...axiosConfig, params: payload })),
+    get: async (url, payload) => handleAxiosRequest(axios.get(url, { ...axiosConfig, params: payload })),
     post: async (url, payload) => handleAxiosRequest(axios.post(url, payload, axiosConfig)),
     put: async (url, payload) => handleAxiosRequest(axios.put(url, payload, axiosConfig)),
   };

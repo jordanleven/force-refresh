@@ -10,7 +10,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler;
 
 /**
- * Main class controller for the client API handler.
+ * Main class controller.
  */
 class Api_Handler_Client extends Api_Handler {
 

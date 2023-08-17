@@ -3,6 +3,7 @@
     <AdminMainRefresh
       class="force-refresh__main"
       :site-name="siteName"
+      :scheduled-refreshes="scheduledRefreshes"
       v-on="$listeners"
     />
     <AdminMainOptions
@@ -27,6 +28,7 @@ export default {
   },
   props: {
     refreshOptions: VueTypes.object.isRequired,
+    scheduledRefreshes: VueTypes.array,
     siteName: VueTypes.string.isRequired,
   },
 };
@@ -50,6 +52,10 @@ $options-max-width: 30rem;
 .force-refresh-admin__options {
   width: 100%;
   margin-bottom: 1rem;
+}
+
+.force-refresh__main {
+  padding: var.$side-padding;
 }
 
 @include utils.small {

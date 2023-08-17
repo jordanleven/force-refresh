@@ -8,6 +8,7 @@ export default (localizedData) => ({
   },
   site: {
     isMultiSite: localizedData.isMultiSite,
+    scheduledRefreshes: localizedData.scheduledRefreshes,
     siteId: localizedData.siteId,
     siteName: localizedData.siteName,
     versionForceRefreshInstalled: localizedData.versions.forceRefresh.version,
