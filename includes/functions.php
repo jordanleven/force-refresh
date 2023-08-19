@@ -106,3 +106,19 @@ function get_force_refresh_plugin_url( $file = null ) {
     $plugin_url = plugins_url( $file, get_main_plugin_file() );
     return $plugin_url;
 }
+
+/**
+ * Function to conditionally log data based if WP_DEBUG is set.
+ *
+ * @param mixed $log The data to log.
+ *
+ * @return void
+ */
+function logger( $log ): void {
+    if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
+        // phpcs:disable WordPress.PHP.DevelopmentFunctions
+        $log_formatted = sprintf( 'Force Refresh - %s', print_r( $log, true ) );
+        error_log( $log_formatted );
+        // phpcs:enable
+    }
+}
