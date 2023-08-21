@@ -52,6 +52,10 @@ $options-max-width: 30rem;
   margin-bottom: 1rem;
 }
 
+.force-refresh__main {
+  padding: var.$side-padding;
+}
+
 @include utils.small {
   .force-refresh__main {
     width: $main-window-width;
