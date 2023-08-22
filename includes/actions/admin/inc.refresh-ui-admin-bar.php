@@ -7,6 +7,8 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
+use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+
 define( 'FILE_NAME_ADMIN_BAR', 'force-refresh-menu-bar' );
 define( 'HTML_ID_REFRESH_FROM_MENUBAR', 'force-refresh__menu-bar' );
 define( 'HTML_ID_REFRESH_NOTIFICATION_CONTAINER', 'force-refresh-notification-container' );
@@ -17,7 +19,7 @@ define( 'HTML_ID_REFRESH_NOTIFICATION_CONTAINER', 'force-refresh-notification-co
  * @return  bool    True if the admin bar HTML should be rendered.
  */
 function render_admin_bar_html(): bool {
-    return user_can_request_force_refresh() && get_force_refresh_option_show_in_admin_bar();
+    return user_can_request_force_refresh() && Options_Storage_Service::get_show_in_admin_bar();
 }
 
 /**
