@@ -64,10 +64,10 @@ export default {
     async refreshPage() {
       const { postId } = this;
 
-      const { success } = await this.requestRefreshPost(postId);
+      const response = await this.requestRefreshPost(postId);
 
       this.notificationVisible = true;
-      this.refreshStatus = success;
+      this.refreshStatus = response?.code === 201;
     },
     ...mapActions(['requestRefreshPost']),
   },
