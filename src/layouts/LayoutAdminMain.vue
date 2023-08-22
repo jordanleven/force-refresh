@@ -190,7 +190,6 @@ export default {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE'));
       }
     },
-
     async updateDebugMode(newValue) {
       const success = await this.updateForceRefreshDebugMode(newValue);
 
@@ -203,6 +202,7 @@ export default {
     async updateOptions(updatedOptions) {
       const previousRefreshFromAdminBar = this.refreshFromAdminBar;
       const success = await this.updateForceRefreshSettings(updatedOptions);
+
       if (success) {
         // If we've updated the menu bar option, we need to manually reload the page in order
         // to have the menu item rerendered server side

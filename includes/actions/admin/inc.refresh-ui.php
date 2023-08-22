@@ -7,6 +7,13 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Options;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debugging;
+use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+
 // The name of the main admin JS file.
 define( 'FILE_NAME_ADMIN_MAIN', 'force-refresh-admin' );
 
@@ -46,8 +53,22 @@ function get_refresh_options(): array {
     return array(
         'customRefreshIntervalMaximumInMinutes' => (float) $interval_maximum_minutes,
         'customRefreshIntervalMinimumInMinutes' => (float) $interval_minimum_minutes,
-        'refreshInterval'                       => get_force_refresh_option_refresh_interval(),
-        'showRefreshInMenuBar'                  => get_force_refresh_option_show_in_admin_bar(),
+        'refreshInterval'                       => Options_Storage_Service::get_refresh_interval(),
+        'showRefreshInMenuBar'                  => Options_Storage_Service::get_show_in_admin_bar(),
+    );
+}
+
+/**
+ * Function to get all of the localized API endpoints.
+ *
+ * @return array An array of admin endpoints.
+ */
+function get_admin_api_endpoints(): array {
+    return array(
+        'refreshSite' => Api_Handler_Admin_Refresh_Site::get_rest_endpoint(),
+        'refreshPage' => Api_Handler_Admin_Refresh_Page::get_rest_endpoint(),
+        'options'     => Api_Handler_Admin_Options::get_rest_endpoint(),
+        'debugging'   => Api_Handler_Admin_Debugging::get_rest_endpoint(),
     );
 }
 
@@ -62,13 +83,14 @@ function get_localized_data(): array {
         'localData' => array(
             'siteId'                      => get_current_blog_id(),
             // Create a nonce for the user.
-            'nonce'                       => wp_create_nonce( WP_FORCE_REFRESH_ACTION ),
+            'nonce'                       => wp_create_nonce( 'wp_rest' ),
+            'adminEndpoints'              => get_admin_api_endpoints(),
             'siteName'                    => get_bloginfo(),
             'targetMain'                  => '#' . HTML_ID_MAIN,
             'targetAdminBar'              => '#' . HTML_ID_REFRESH_FROM_MENUBAR,
             'targetAdminMetaBox'          => '#' . HTML_ID_META_BOX,
             'targetNotificationContainer' => '#' . HTML_ID_REFRESH_NOTIFICATION_CONTAINER,
-            'isDebugActive'               => get_option_debug_mode(),
+            'isDebugActive'               => Debug_Storage_Service::debug_mode_is_active(),
             'refreshOptions'              => get_refresh_options(),
             'releaseNotes'                => get_release_notes(),
             'postId'                      => get_the_ID(),

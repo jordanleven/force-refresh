@@ -1,15 +1,16 @@
-import ApiService from '@/js/services/apiService.js';
+import apiService from '@/js/services/apiService.js';
 import { debug } from '@/js/services/loggingService.js';
+
+const apiClient = apiService();
 
 export const getCurrentVersion = async () => {
   // eslint-disable-next-line no-undef
-  const { apiUrl, postId } = forceRefreshLocalizedData;
+  const { apiEndpoint, postId } = forceRefreshLocalizedData;
 
   debug(`Requesting refresh data for site and post ${postId}.`);
   const payload = {
-    action: 'force_refresh_get_version',
     postId,
   };
 
-  return ApiService.get(apiUrl, payload);
+  return apiClient.get(apiEndpoint, payload);
 };

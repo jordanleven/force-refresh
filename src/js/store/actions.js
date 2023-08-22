@@ -5,22 +5,24 @@ import {
   updateForceRefreshDebugMode,
 } from '@/js/services/admin/refreshService.js';
 
-export default {
-  requestRefreshPost: ({ getters }, postId) => {
-    const { wordPressNonce } = getters;
-    return requestPostRefreshByPostID(postId, { nonce: wordPressNonce });
-  },
-  requestRefreshSite: ({ getters }) => {
-    const { wordPressNonce } = getters;
-    return requestSiteRefresh({ nonce: wordPressNonce });
-  },
-  updateForceRefreshDebugMode: async ({ commit, getters }, updatedDebugMode) => {
-    const { wordPressNonce } = getters;
+/**
+ * Function to check if the returned response code is a success.
+ *
+ * @var {int} The response.
+ *
+ * @return {bool} True if the returned response is a success.
+ */
+const isSuccess = (response) => response?.code && [200, 201].includes(response.code);
 
-    const { success } = await updateForceRefreshDebugMode({
+export default {
+  requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
+  requestRefreshSite: requestSiteRefresh,
+  updateForceRefreshDebugMode: async ({ commit }, updatedDebugMode) => {
+    const response = await updateForceRefreshDebugMode({
       isDebugActive: updatedDebugMode,
-      nonce: wordPressNonce,
     });
+
+    const success = isSuccess(response);
 
     if (success) {
       commit('SET_DEBUG_MODE', updatedDebugMode);
@@ -28,14 +30,13 @@ export default {
 
     return success;
   },
-  updateForceRefreshSettings: async ({ commit, getters }, updatedOptions) => {
-    const { wordPressNonce } = getters;
-
-    const { success } = await updateForceRefreshOptions({
-      nonce: wordPressNonce,
+  updateForceRefreshSettings: async ({ commit }, updatedOptions) => {
+    const response = await updateForceRefreshOptions({
       refreshInterval: updatedOptions?.refreshInterval,
       showRefreshInMenuBar: updatedOptions?.showRefreshInMenuBar,
     });
+
+    const success = isSuccess(response);
 
     if (success) {
       commit('SET_REFRESH_INTERVAL', updatedOptions?.refreshInterval);

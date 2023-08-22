@@ -109,8 +109,8 @@ const exitForceRefresh = () => {
 };
 
 const checkForRefresh = async () => {
-  const { success, data } = await getCurrentVersion().catch(exitForceRefresh);
-  if (!success) {
+  const { code, data } = await getCurrentVersion().catch(exitForceRefresh);
+  if (code !== 200) {
     exitForceRefresh();
     return;
   }
