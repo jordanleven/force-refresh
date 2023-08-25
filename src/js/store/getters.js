@@ -8,6 +8,7 @@ export default {
     refreshInterval: getters.refreshInterval,
     showRefreshInMenuBar: getters.refreshFromAdminBar,
   }),
+  scheduledRefreshes: ({ site }) => site.scheduledRefreshes,
   siteName: ({ site }) => site.siteName,
   troubleshootingInformation: (_, getters) => ({
     ...getters.troubleshootingInformationSettings,

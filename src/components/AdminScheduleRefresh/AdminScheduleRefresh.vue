@@ -58,7 +58,7 @@ export default {
         month: 'short',
         year: 'numeric',
       });
-      const time = scheduledDateTime.toLocaleTimeString();
+      const time = scheduledDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
       return `${date} at ${time}`;
     },
   },

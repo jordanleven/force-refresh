@@ -22,6 +22,21 @@
         {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_SCHEDULE') }}
       </button>
     </div>
+    <div v-if="scheduledRefreshes" class="scheduled-refreshes">
+      <hr>
+      <h3>{{ $t("SCHEDULE_REFRESH.HEADER_SCHEDULED_REFRESHES") }}</h3>
+      <ul class="scheduled-refreshes__list">
+        <li v-for="data, index in scheduledRefreshesSorted" :key="index">
+          {{  data  }}
+          <button
+            class="button-link button-link-delete"
+            @click="deleteButtonWasClicked"
+          >
+            {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE")}}
+          </button>
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -35,6 +50,7 @@ library.add([faSyncAlt]);
 export default {
   name: 'AdminMainRefresh',
   props: {
+    scheduledRefreshes: VueTypes.array,
     siteName: VueTypes.string.isRequired,
   },
   emits: [
@@ -59,6 +75,40 @@ export default {
         'admin__refresh-logo--active': this.refreshTriggered,
       };
     },
+    scheduledRefreshDate() {
+      if (!this.scheduledRefreshes) return '';
+
+      const timestamp = new Date(0);
+      timestamp.setUTCSeconds(this.scheduledRefreshes.timestamp);
+
+      const date = timestamp.toLocaleDateString('en-us', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      });
+
+      const time = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      return `${date} at ${time}`;
+    },
+    scheduledRefreshesSorted() {
+      const sortedRefreshes = this.scheduledRefreshes.map(({ timestamp }) => {
+        const timestampDate = new Date(0);
+        timestampDate.setUTCSeconds(timestamp);
+
+        const date = timestampDate.toLocaleDateString('en-us', {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        });
+
+        const time = timestampDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        return `${date} at ${time}`;
+      });
+
+      return sortedRefreshes;
+    },
   },
   methods: {
     animateLogo() {
@@ -66,6 +116,9 @@ export default {
       setTimeout(() => {
         this.refreshTriggered = false;
       }, 2000);
+    },
+    deleteButtonWasClicked() {
+      this.$emit('delete-scheduled-refresh', this.scheduledRefreshes.timestamp);
     },
     emitEventButtonClicked() {
       this.$emit('refresh-requested');
@@ -107,6 +160,23 @@ export default {
   border: 2px solid var.$light_grey;
   border-radius: 10px;
   background-color: white;
+}
+
+.scheduled-refreshes {
+  text-align: left;
+
+  hr {
+    margin: var.$space-large 0;
+  }
+
+  .scheduled-refreshes__list {
+    list-style: disc;
+    padding-left: var.$space-medium;
+  }
+
+  .button-link {
+    margin-left: var.$space-small;
+  }
 }
 
 .admin__refresh-logo {

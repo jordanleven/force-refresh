@@ -23,9 +23,19 @@ export const updateForceRefreshDebugMode = async (data) => {
   return apiClient.put(adminEndpoints.debugging, { debug: data.isDebugActive });
 };
 
+export const deleteScheduledRefresh = async (date) => {
+  debug('Requesting delete scheduled refresh');
+  return apiClient.delete(adminEndpoints.scheduleRefreshSite, { schedule_refresh_timestamp: date });
+};
+
 export const requestSiteRefresh = async () => {
   debug('Requesting refresh for site');
   return apiClient.post(adminEndpoints.refreshSite);
+};
+
+export const scheduleRequestSiteRefresh = async (date) => {
+  debug(`Requesting scheduled refresh for site for ${date}`);
+  return apiClient.post(adminEndpoints.scheduleRefreshSite, { schedule_refresh_timestamp: date });
 };
 
 export const requestPostRefreshByPostID = async (postId) => {

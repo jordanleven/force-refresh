@@ -1,8 +1,10 @@
 import {
-  requestSiteRefresh,
+  deleteScheduledRefresh,
   requestPostRefreshByPostID,
-  updateForceRefreshOptions,
+  requestSiteRefresh,
+  scheduleRequestSiteRefresh,
   updateForceRefreshDebugMode,
+  updateForceRefreshOptions,
 } from '@/js/services/admin/refreshService.js';
 
 /**
@@ -15,11 +17,10 @@ import {
 const isSuccess = (response) => response?.code && [200, 201].includes(response.code);
 
 export default {
+  requestDeleteScheduledRefresh: (_, timestamp) => deleteScheduledRefresh(timestamp),
   requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
   requestRefreshSite: requestSiteRefresh,
-  requestScheduledRefresh: async (_, scheduledRefresh) => {
-    console.log(scheduledRefresh);
-  },
+  requestScheduledRefresh: (_, scheduledRefresh) => scheduleRequestSiteRefresh(scheduledRefresh),
   updateForceRefreshDebugMode: async ({ commit }, updatedDebugMode) => {
     const response = await updateForceRefreshDebugMode({
       isDebugActive: updatedDebugMode,
