@@ -17,6 +17,7 @@
       <button
         type="submit"
         class="button admin__refresh-button"
+        @click="scheduleRefreshButtonClicked"
       >
         {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_SCHEDULE') }}
       </button>
@@ -38,6 +39,7 @@ export default {
   },
   emits: [
     'refresh-requested',
+    'schedule-refresh-requested',
   ],
   data() {
     return {
@@ -71,6 +73,9 @@ export default {
     refreshButtonClicked() {
       this.animateLogo();
       this.emitEventButtonClicked();
+    },
+    scheduleRefreshButtonClicked() {
+      this.$emit('schedule-refresh-requested');
     },
   },
 };

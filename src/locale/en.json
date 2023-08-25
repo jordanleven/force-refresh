@@ -58,5 +58,14 @@
     "HEADER": "Force Refresh Release Notes",
     "RELEASE_NOTES_UNAVAILABLE": "I'm sorry, but release notes are currently unavailable. Please visit Force Refresh's plugin page to view the full changelog.",
     "RELEASE_NOTES_PLUGIN_LINK_TITLE": "Force Refresh on WordPress.org"
+  },
+  "SCHEDULE_REFRESH": {
+    "HEADER": "Schedule Refresh",
+    "DESCRIPTION": "Please select the date and time you'd like to schedule a refresh.",
+    "SUBMIT_BUTTON_WITH_DATE": "Schedule refresh for %{scheduledDate}",
+    "SUBMIT_BUTTON": "Schedule refresh"
+  },
+  "MODAL": {
+    "CLOSE": "Close"
   }
 }
