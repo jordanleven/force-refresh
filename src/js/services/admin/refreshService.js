@@ -28,6 +28,11 @@ export const requestSiteRefresh = async () => {
   return apiClient.post(adminEndpoints.refreshSite);
 };
 
+export const scheduleRequestSiteRefresh = async (date) => {
+  debug(`Requesting scheduled refresh for site for ${date}`);
+  return apiClient.post(adminEndpoints.scheduleRefreshSite, { schedule_refresh_timestamp: date });
+};
+
 export const requestPostRefreshByPostID = async (postId) => {
   debug(`Requesting refresh for post ${postId}`);
   return apiClient.post(adminEndpoints.refreshPage, { postId });

@@ -7,6 +7,8 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
+use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
+
 /**
  * Function for adding scripts for this plugin.
  *

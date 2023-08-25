@@ -1,8 +1,9 @@
 import {
-  requestSiteRefresh,
   requestPostRefreshByPostID,
-  updateForceRefreshOptions,
+  requestSiteRefresh,
+  scheduleRequestSiteRefresh,
   updateForceRefreshDebugMode,
+  updateForceRefreshOptions,
 } from '@/js/services/admin/refreshService.js';
 
 /**
@@ -17,9 +18,7 @@ const isSuccess = (response) => response?.code && [200, 201].includes(response.c
 export default {
   requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
   requestRefreshSite: requestSiteRefresh,
-  requestScheduledRefresh: async (_, scheduledRefresh) => {
-    console.log(scheduledRefresh);
-  },
+  requestScheduledRefresh: (_, scheduledRefresh) => scheduleRequestSiteRefresh(scheduledRefresh),
   updateForceRefreshDebugMode: async ({ commit }, updatedDebugMode) => {
     const response = await updateForceRefreshDebugMode({
       isDebugActive: updatedDebugMode,

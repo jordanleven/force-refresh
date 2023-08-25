@@ -39,6 +39,7 @@
           v-if="!troubleshootingActive"
           class="admin-section__main"
           :refresh-options="refreshOptions"
+          :scheduled-refreshes="scheduledRefreshes"
           :site-name="siteName"
           @refresh-requested="refreshSite"
           @schedule-refresh-requested="scheduleRefresh"
@@ -155,6 +156,7 @@ export default {
       'refreshFromAdminBar',
       'refreshInterval',
       'refreshOptions',
+      'scheduledRefreshes',
       'siteName',
       'troubleshootingInformation',
       'wordPressNonce',

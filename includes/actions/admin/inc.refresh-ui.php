@@ -7,10 +7,11 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
-use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
-use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
-use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Options;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debugging;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Options;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 
@@ -65,10 +66,11 @@ function get_refresh_options(): array {
  */
 function get_admin_api_endpoints(): array {
     return array(
-        'refreshSite' => Api_Handler_Admin_Refresh_Site::get_rest_endpoint(),
-        'refreshPage' => Api_Handler_Admin_Refresh_Page::get_rest_endpoint(),
-        'options'     => Api_Handler_Admin_Options::get_rest_endpoint(),
-        'debugging'   => Api_Handler_Admin_Debugging::get_rest_endpoint(),
+        'refreshSite'         => Api_Handler_Admin_Refresh_Site::get_rest_endpoint(),
+        'refreshPage'         => Api_Handler_Admin_Refresh_Page::get_rest_endpoint(),
+        'options'             => Api_Handler_Admin_Options::get_rest_endpoint(),
+        'debugging'           => Api_Handler_Admin_Debugging::get_rest_endpoint(),
+        'scheduleRefreshSite' => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint(),
     );
 }
 
@@ -82,6 +84,7 @@ function get_localized_data(): array {
         // Wrap in inner array to preserve primitive types.
         'localData' => array(
             'siteId'                      => get_current_blog_id(),
+            'scheduledRefreshes'          => Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes(),
             // Create a nonce for the user.
             'nonce'                       => wp_create_nonce( 'wp_rest' ),
             'adminEndpoints'              => get_admin_api_endpoints(),
