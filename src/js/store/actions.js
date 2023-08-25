@@ -17,6 +17,9 @@ const isSuccess = (response) => response?.code && [200, 201].includes(response.c
 export default {
   requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
   requestRefreshSite: requestSiteRefresh,
+  requestScheduledRefresh: async (_, scheduledRefresh) => {
+    console.log(scheduledRefresh);
+  },
   updateForceRefreshDebugMode: async ({ commit }, updatedDebugMode) => {
     const response = await updateForceRefreshDebugMode({
       isDebugActive: updatedDebugMode,

@@ -1,8 +1,9 @@
 <template>
-  <div class="release-notes-window">
-    <div class="release-notes">
-      <h2>{{ $t("RELEASE_NOTES.HEADER") }}</h2>
-      <hr>
+  <BaseModal
+    :header="$t('RELEASE_NOTES.HEADER')"
+    v-on="$listeners"
+  >
+    <div>
       <div v-if="!releaseNotes">
         {{ $t("RELEASE_NOTES.RELEASE_NOTES_UNAVAILABLE") }}
         <div class="release-notes__unavailable">
@@ -40,14 +41,18 @@
         </li>
       </ul>
     </div>
-  </div>
+  </BaseModal>
 </template>
 
 <script>
 import VueTypes from 'vue-types';
+import BaseModal from '@/components/BaseModal/BaseModal.vue';
 
 export default {
   name: 'AdminReleaseNotes',
+  components: {
+    BaseModal,
+  },
   props: {
     releaseNotes: VueTypes.object,
   },
@@ -58,14 +63,6 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-.release-notes-window {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  user-select: none;
-}
-
 .release-notes__unavailable {
   text-align: center;
 }
@@ -73,17 +70,6 @@ export default {
 .release-notes__unavailable-link {
   margin-top: 2rem;
   display: inline-block;
-}
-
-.release-notes {
-  background-color: var.$white;
-  width: 100%;
-  max-width: 30rem + 1rem;
-  max-height: 50vh;
-  padding: 1rem;
-  margin: 1rem;
-  border-radius: var.$border-radius;
-  overflow: scroll;
 }
 
 .release-note {
