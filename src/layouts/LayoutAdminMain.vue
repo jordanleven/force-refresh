@@ -43,6 +43,7 @@
           :site-name="siteName"
           @refresh-requested="refreshSite"
           @schedule-refresh-requested="scheduleRefresh"
+          @delete-scheduled-refresh="deleteScheduledRefresh"
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
           @release-notes-page-clicked="activateReleaseNotesPage"
@@ -177,6 +178,10 @@ export default {
         this.notificationMessageSet(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS'));
       }
     },
+    async deleteScheduledRefresh(timestamp) {
+      const response = await this.requestDeleteScheduledRefresh(timestamp);
+      console.log(response);
+    },
     exitAdminWindow() {
       this.releaseNotesPageActive = false;
       this.scheduleRefreshPageActive = false;
@@ -246,7 +251,13 @@ export default {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_FAILURE'));
       }
     },
-    ...mapActions(['requestRefreshSite', 'requestScheduledRefresh', 'updateForceRefreshSettings', 'updateForceRefreshDebugMode']),
+    ...mapActions([
+      'requestDeleteScheduledRefresh',
+      'requestRefreshSite',
+      'requestScheduledRefresh',
+      'updateForceRefreshSettings',
+      'updateForceRefreshDebugMode',
+    ]),
   },
 };
 </script>

@@ -63,7 +63,9 @@
     "HEADER": "Schedule Refresh",
     "DESCRIPTION": "Please select the date and time you'd like to schedule a refresh.",
     "SUBMIT_BUTTON_WITH_DATE": "Schedule refresh for %{scheduledDate}",
-    "SUBMIT_BUTTON": "Schedule refresh"
+    "SUBMIT_BUTTON": "Schedule refresh",
+    "HEADER_SCHEDULED_REFRESHES": "Scheduled Refresh",
+    "BUTTON_DELETE": "Delete"
   },
   "MODAL": {
     "CLOSE": "Close"

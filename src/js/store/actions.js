@@ -1,4 +1,5 @@
 import {
+  deleteScheduledRefresh,
   requestPostRefreshByPostID,
   requestSiteRefresh,
   scheduleRequestSiteRefresh,
@@ -16,6 +17,7 @@ import {
 const isSuccess = (response) => response?.code && [200, 201].includes(response.code);
 
 export default {
+  requestDeleteScheduledRefresh: (_, timestamp) => deleteScheduledRefresh(timestamp),
   requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
   requestRefreshSite: requestSiteRefresh,
   requestScheduledRefresh: (_, scheduledRefresh) => scheduleRequestSiteRefresh(scheduledRefresh),

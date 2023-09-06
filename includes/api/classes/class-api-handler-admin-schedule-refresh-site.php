@@ -52,7 +52,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
-                'methods'             => \WP_REST_Server::DELETABLE,
+                'methods'             => \WP_REST_Server::ALLMETHODS,
                 'callback'            => array( $this, 'delete_schedule_refresh_site' ),
                 'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
             ),
@@ -84,7 +84,31 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return mixed The scheduled events.
      */
     public static function get_scheduled_refreshes() {
-        return wp_get_scheduled_event( self::ACTION_NAME_SCHEDULE_REFRESH_SITE );
+        $scheduled_refreshes = array();
+        $cron                = get_option( 'cron' );
+
+        if ( ! is_array( $cron ) ) {
+            return $scheduled_refreshes;
+        }
+
+        foreach ( $cron as $timestamp => $cron_event ) {
+            if ( ! is_array( $cron_event ) ) {
+                continue;
+            }
+
+            foreach ( $cron_event as $event_name => $event_data ) {
+                if ( self::ACTION_NAME_SCHEDULE_REFRESH_SITE === $event_name ) {
+                    array_push(
+                        $scheduled_refreshes,
+                        array(
+                            'timestamp' => $timestamp,
+                        )
+                    );
+                }
+            }
+        }
+
+        return $scheduled_refreshes;
     }
 
     /**
@@ -95,16 +119,15 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return void
      */
     public function delete_schedule_refresh_site( \WP_REST_Request $request ): void {
-        $scheduled_refresh      = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
-        $scheduled_refresh_time = strtotime( $scheduled_refresh );
+        $scheduled_refresh = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
 
-        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( 'time' => $scheduled_refresh_time ) );
+        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( 'time' => $scheduled_refresh ) );
 
         $this->return_api_response(
             202,
             'You\'ve successfully deleted a site refresh.',
             array(
-                'scheduled_refresh_time' => $scheduled_refresh_time,
+                'scheduled_refresh_time' => $scheduled_refresh,
             )
         );
     }
