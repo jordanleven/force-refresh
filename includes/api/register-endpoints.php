@@ -31,18 +31,8 @@ function register_admin_endpoints(): void {
 
     $controller = new Api_Handler_Admin_Schedule_Refresh_Site();
     $controller->register_routes();
-    $controller->register_actions();
-}
-
-/**
- * Function for registering admin actions.
- *
- * @return  void
- */
-function register_admin_actions(): void {
-    $controller = new Api_Handler_Admin_Schedule_Refresh_Site();
-    $controller->register_actions();
 }
 
 add_action( 'rest_api_init', __NAMESPACE__ . '\\register_admin_endpoints' );
-add_action( 'init', __NAMESPACE__ . '\\register_admin_actions' );
+$controller = new Api_Handler_Admin_Schedule_Refresh_Site();
+$controller->register_actions();

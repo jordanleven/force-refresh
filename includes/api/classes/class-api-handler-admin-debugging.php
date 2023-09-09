@@ -55,13 +55,13 @@ class Api_Handler_Admin_Debugging extends Api_Handler_Admin implements Api_Handl
      * @return void
      */
     public function save_options( \WP_REST_Request $request ): void {
-        $debug_mode = $request->get_param( 'debug' ) === 'true' ?? null;
+        $debug_mode = $request->get_param( 'debug' ) === true ?? null;
 
         Debug_Storage_Service::set_debug_mode( $debug_mode );
 
         $this->return_api_response(
             201,
-            'You\'ve successfully updated debug mode.',
+            'You\'ve successfully updated debug mode.'
         );
     }
 

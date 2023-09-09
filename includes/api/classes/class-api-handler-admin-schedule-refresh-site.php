@@ -71,9 +71,11 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     /**
      * Method for executing a scheduled site refresh.
      *
+     * @param string $time The scheduled time.
+     *
      * @return  void
      */
-    public function executeSiteRefresh(): void {
+    public function executeSiteRefresh( $time ): void {
         $site_version = Versions_Storage_Service::get_new_version();
         Versions_Storage_Service::set_site_version( $site_version );
     }
@@ -121,7 +123,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     public function delete_schedule_refresh_site( \WP_REST_Request $request ): void {
         $scheduled_refresh = (int) $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
 
-        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( 'time' => $scheduled_refresh ) );
+        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $scheduled_refresh ) );
 
         $this->return_api_response(
             202,
@@ -143,7 +145,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
         $scheduled_refresh      = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
         $scheduled_refresh_time = strtotime( $scheduled_refresh );
 
-        wp_schedule_single_event( $scheduled_refresh_time, self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( 'time' => $scheduled_refresh_time ) );
+        wp_schedule_single_event( $scheduled_refresh_time, self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $scheduled_refresh_time ) );
 
         $this->return_api_response(
             201,
