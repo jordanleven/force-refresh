@@ -179,8 +179,12 @@ export default {
       }
     },
     async deleteScheduledRefresh(timestamp) {
-      const response = await this.requestDeleteScheduledRefresh(timestamp);
-      console.log(response);
+      const success = await this.requestDeleteScheduledRefresh(timestamp);
+      if (success) {
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_DELETE_SUCCESS'));
+      } else {
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_DELETE_FAILURE'));
+      }
     },
     exitAdminWindow() {
       this.releaseNotesPageActive = false;
@@ -221,7 +225,13 @@ export default {
       }
     },
     async refreshWasScheduled(scheduledRefresh) {
-      this.requestScheduledRefresh(scheduledRefresh);
+      const success = await this.requestScheduledRefresh(scheduledRefresh);
+      this.scheduleRefreshPageActive = false;
+      if (success) {
+        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_SUCCESS'));
+      } else {
+        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE'));
+      }
     },
     scheduleRefresh() {
       this.scheduleRefreshPageActive = true;
