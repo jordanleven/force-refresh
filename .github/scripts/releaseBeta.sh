@@ -21,8 +21,7 @@ getExistingBuildNumber() {
   current_package_version=$(getCurrentPackageVersion)
   if echo "$current_package_version" | grep -q "-"
   then
-      prerelease_name=$(getPrereleaseName)
-      build_version=$(echo "$current_package_version" | sed 's/.*-'"$prerelease_name"'.//')
+      build_version=$(echo "$current_package_version" | sed 's/.*\.//')
       echo "$build_version"
   fi
 }
