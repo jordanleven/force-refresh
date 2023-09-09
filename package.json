@@ -14,7 +14,7 @@
     "build": "npx webpack --mode=production",
     "build:dev": "npx webpack --mode=development",
     "predev": "npm run checkNodeVersion",
-    "dev": "npm run build:beta -- --watch",
+    "dev": "npm run build:dev -- --watch",
     "test": "jest",
     "lint": "npm run lint:css && npm run lint:js",
     "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose",
