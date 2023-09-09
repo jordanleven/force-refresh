@@ -22,15 +22,15 @@
         {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_SCHEDULE') }}
       </button>
     </div>
-    <div v-if="scheduledRefreshes" class="scheduled-refreshes">
+    <div v-if="scheduledRefreshes.length > 0" class="scheduled-refreshes">
       <hr>
       <h3>{{ $t("SCHEDULE_REFRESH.HEADER_SCHEDULED_REFRESHES") }}</h3>
       <ul class="scheduled-refreshes__list">
         <li v-for="data, index in scheduledRefreshesSorted" :key="index">
-          {{  data  }}
+          {{ data }}
           <button
             class="button-link button-link-delete"
-            @click="deleteButtonWasClicked"
+            @click="deleteButtonWasClicked(index)"
           >
             {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE")}}
           </button>
@@ -117,8 +117,8 @@ export default {
         this.refreshTriggered = false;
       }, 2000);
     },
-    deleteButtonWasClicked() {
-      this.$emit('delete-scheduled-refresh', this.scheduledRefreshes.timestamp);
+    deleteButtonWasClicked(index) {
+      this.$emit('delete-scheduled-refresh', this.scheduledRefreshes[index].timestamp);
     },
     emitEventButtonClicked() {
       this.$emit('refresh-requested');

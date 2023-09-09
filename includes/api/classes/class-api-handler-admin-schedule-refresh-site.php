@@ -119,7 +119,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return void
      */
     public function delete_schedule_refresh_site( \WP_REST_Request $request ): void {
-        $scheduled_refresh = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
+        $scheduled_refresh = (int) $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
 
         wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( 'time' => $scheduled_refresh ) );
 
