@@ -5,11 +5,7 @@ export default {
   },
   DELETE_SCHEDULED_REFRESH: (state, timestampToDelete) => {
     const { scheduledRefreshes } = state.site;
-    state.site.scheduledRefreshes = scheduledRefreshes.filter(({ timestamp }) => {
-      console.log(timestamp);
-      console.log(timestampToDelete);
-      return timestamp !== timestampToDelete;
-    });
+    state.site.scheduledRefreshes = scheduledRefreshes.filter(({ timestamp }) => timestamp !== timestampToDelete);
   },
   SET_DEBUG_MODE: (state, updatedDebugMode) => {
     state.settings.isDebugActive = updatedDebugMode;

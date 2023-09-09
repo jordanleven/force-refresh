@@ -83,7 +83,7 @@ export default {
 <style lang="scss">
   @use "@/scss/variables" as var;
   @use "@/scss/utilities" as utils;
-  @import 'vue2-datepicker/scss/index.scss';
+  @import 'vue2-datepicker/scss/index';
 
   .admin-scheduled-refresh__inner {
     text-align: center;

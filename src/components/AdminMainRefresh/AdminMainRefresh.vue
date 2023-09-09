@@ -32,7 +32,7 @@
             class="button-link button-link-delete"
             @click="deleteButtonWasClicked(index)"
           >
-            {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE")}}
+            {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE") }}
           </button>
         </li>
       </ul>
