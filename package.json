@@ -35,7 +35,7 @@
     "html-entities": "^2.4.0",
     "qs": "^6.11.2",
     "ramda": "^0.29.0",
-    "regenerator-runtime": "^0.13.11",
+    "regenerator-runtime": "^0.14.0",
     "sprintf-js": "^1.1.2",
     "uniqid": "^5.4.0",
     "vue": "^2.7.14",
