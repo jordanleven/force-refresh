@@ -87,7 +87,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      *
      * @return array The scheduled refreshes
      */
-    public function get_scheduled_refreshes_from_cron_event( array $cron_event ) {
+    public static function get_scheduled_refreshes_from_cron_event( array $cron_event ) {
         $scheduled_refreshes = array();
         foreach ( $cron_event as $event_name => $event_data ) {
             if ( self::ACTION_NAME_SCHEDULE_REFRESH_SITE === $event_name ) {
@@ -123,7 +123,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
             $scheduled_refreshes = array_merge(
                 $scheduled_refreshes,
-                get_scheduled_refreshes_from_cron_event( $cron_event ),
+                self::get_scheduled_refreshes_from_cron_event( $cron_event ),
             );
         }
 
