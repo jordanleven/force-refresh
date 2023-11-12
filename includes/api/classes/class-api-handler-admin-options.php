@@ -68,7 +68,7 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
 
         $this->return_api_response(
             201,
-            'You\'ve successfully updated options.'
+            'You\'ve successfully updated options.',
         );
     }
 

@@ -58,7 +58,12 @@ class Options_Storage_Service {
             'false'
         );
 
-        return 'true' === $show_in_admin_bar;
+        // For previous versions of Force Refresh where options were stored as strings.
+        if ( in_array( $show_in_admin_bar, array( 'true', 'false' ), true ) ) {
+            return 'true' === $show_in_admin_bar;
+        }
+
+        return $show_in_admin_bar;
     }
 
     /**
