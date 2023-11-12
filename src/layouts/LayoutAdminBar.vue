@@ -10,7 +10,7 @@
         :class="logoClass"
         :icon="forceRefreshIcon"
       />
-      {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE') }}
+      {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_NOW') }}
     </span>
   </span>
 </template>

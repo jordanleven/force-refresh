@@ -53,7 +53,7 @@
     "REFRESH_DIRECTIONS_NO_SITE_NAME": "Here, you can force all currently-connected users to manually reload this site."
   },
   "FORM_BUTTONS_GENERIC": {
-    "FORCE_REFRESH_SITE_NOW": "Force Refresh Site Now",
+    "FORCE_REFRESH_SITE_NOW": "Force Refresh Site",
     "FORCE_REFRESH_SITE_SCHEDULE": "Schedule Force Refresh",
     "TOGGLE": "Toggle",
     "UPDATE": "Update"
