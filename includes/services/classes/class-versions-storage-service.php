@@ -14,7 +14,7 @@ class Versions_Storage_Service {
 
     const OPTION_SITE_VERSION = 'force_refresh_current_site_version';
 
-    const OPTION_PAGE_VERSION = 'force_refresh_current_site_version';
+    const OPTION_PAGE_VERSION = 'force_refresh_current_page_version';
 
     /**
      * Method for setting a site version.
@@ -34,11 +34,11 @@ class Versions_Storage_Service {
      * Method for setting a page version.
      *
      * @param int    $page_id The post ID to update.
-     * @param string $new_version The new site version.
+     * @param string $page_version The new site version.
      *
      * @return void
      */
-    public static function set_page_version( int $page_id, string $new_version ): void {
+    public static function set_page_version( int $page_id, string $page_version ): void {
         // Remove the old.
         delete_post_meta( $page_id, self::OPTION_PAGE_VERSION );
 

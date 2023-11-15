@@ -59,13 +59,14 @@ class Api_Handler_Admin_Refresh_Page extends Api_Handler_Admin implements Api_Ha
         $page_id      = $request->get_param( 'postId' ) ?? null;
         $page_version = Versions_Storage_Service::get_new_version();
 
-        Versions_Storage_Service::set_page_version( $page_id, $site_version );
+        Versions_Storage_Service::set_page_version( $page_id, $page_version );
 
         $this->return_api_response(
             201,
             'You\'ve successfully requested all browsers to refresh this page.',
             array(
                 'new_page_version' => $page_version,
+                'page_id'          => $page_id,
                 'refresh_interval' => Options_Storage_Service::get_refresh_interval(),
             )
         );
