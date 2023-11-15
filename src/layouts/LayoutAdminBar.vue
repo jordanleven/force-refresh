@@ -22,6 +22,7 @@ import Vue from 'vue';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminFooterNotification from '@/components/AdminFooterNotification/AdminFooterNotification.vue';
+import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
 
 library.add([faSyncAlt]);
 
@@ -81,7 +82,11 @@ export default {
       const success = await this.requestRefreshSite();
 
       if (success) {
-        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', { refreshInterval: this.refreshInterval });
+        const [refreshIntervalValue, refreshIntervalUnit] = getRefreshIntervalUnitAndValue(this.refreshInterval);
+        this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', {
+          refreshIntervalUnit,
+          refreshIntervalValue,
+        });
       } else {
         this.notificationMessage = this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE');
       }
