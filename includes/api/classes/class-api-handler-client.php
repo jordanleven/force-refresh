@@ -55,13 +55,18 @@ class Api_Handler_Client extends Api_Handler {
     public function get_version( \WP_REST_Request $request ): void {
         $post_id = $request->get_param( 'postId' ) ?? null;
 
+        $response = array(
+            'currentVersionSite' => $this->get_current_version_site(),
+        );
+
+        if ( $post_id ) {
+            $response['currentVersionPage'] = $this->get_current_version_post( $post_id );
+        }
+
         $this->return_api_response(
             200,
             'The current site version has been successfully retrieved.',
-            array(
-                'currentVersionSite' => $this->get_current_version_site(),
-                'currentVersionPage' => $post_id ? $this->get_current_version_post( $post_id ) : 0,
-            )
+            $response,
         );
     }
 

@@ -1,6 +1,7 @@
 import 'regenerator-runtime/runtime';
 import {
   __,
+  always,
   anyPass,
   curry,
   identity,
@@ -36,12 +37,16 @@ const isSiteVersionOutdated = ({ currentVersionSite }) => pipe(
   )('Site', __, currentVersionSite),
 )();
 
-const isPageVersionOutdated = ({ currentVersionPage }) => pipe(
-  getStoredVersionPage,
-  curry(
-    isVersionOutdated,
-  )('Page', __, currentVersionPage),
-)();
+const isPageVersionOutdated = ({ currentVersionPage }) => ifElse(
+  (v) => v !== undefined,
+  (v) => pipe(
+    getStoredVersionPage,
+    curry(
+      isVersionOutdated,
+    )('Page', __, v),
+  )(),
+  always(false),
+)(currentVersionPage);
 
 const storeVersionSite = (version) => pipe(
   tap(
@@ -76,7 +81,10 @@ const pageRequiresRefresh = (versions) => anyPass([
 
 const maybeStoreVersions = ({ currentVersionSite, currentVersionPage }) => {
   maybeStoreVersionSite(currentVersionSite);
-  maybeStoreVersionPage(currentVersionPage);
+
+  if (currentVersionPage !== undefined) {
+    maybeStoreVersionPage(currentVersionPage);
+  }
 };
 
 const refreshPage = ({ currentVersionSite, currentVersionPage }) => {
@@ -114,6 +122,7 @@ const checkForRefresh = async () => {
     exitForceRefresh();
     return;
   }
+
   compareRetrievedVersions(data);
 };
 
