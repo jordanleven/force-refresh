@@ -35,7 +35,7 @@ function get_plugin_readme() {
  */
 function get_release_notes_from_plugin_readme( string $readme ): array {
     // Remove the "== Changelog ==" string and everything before.
-    $release_notes                = preg_replace( "/(.|\n)* Changelog \=\=/", '', $readme );
+    $release_notes                = preg_replace( '/.* Changelog \=\=/s', '', $readme );
     $release_notes_split          = explode( "\n", $release_notes );
     $release_notes_split_filtered = array_filter( $release_notes_split );
 
@@ -45,20 +45,22 @@ function get_release_notes_from_plugin_readme( string $readme ): array {
 /**
  * Function to modify the current version index and notes based on a specific release note.
  *
- * @param int    $current_version_i  The index of the current release version.
+ * @param string $current_plugin_version The currently-loaded version of Force Refresh.
+ * @param int    $current_version_i      The index of the current release version.
  * @param array  $notes_formatted        The key/value pairs of release notes.
  * @param string $note                   The note to parse.
  *
  * @return  void
  */
-function assign_release_note_based_on_role( &$current_version_i, &$notes_formatted, $note ): void {
+function assign_release_note_based_on_role( string $current_plugin_version, &$current_version_i, &$notes_formatted, $note ): void {
     switch ( true ) {
         // If the line is a version number.
         case preg_match( '/#### [0-9].*/', $note ):
             $version_number                     = str_replace( array( '#', ' ' ), '', $note );
             $notes_formatted[ $version_number ] = array(
-                'date'  => null,
-                'notes' => array(),
+                'date'             => null,
+                'isCurrentVersion' => $current_plugin_version === $version_number,
+                'notes'            => array(),
             );
 
             $current_version_i = $version_number;
@@ -101,9 +103,11 @@ function assign_release_note_based_on_role( &$current_version_i, &$notes_formatt
 /**
  * Function to get release notes as formatted JSON.
  *
+ * @param string $current_plugin_version The currently-loaded version of Force Refresh.
+ *
  * @return  array  An array of release notes.
  */
-function get_release_notes_json() {
+function get_release_notes_json( string $current_plugin_version ) {
     $readme_contents = get_plugin_readme();
     if ( ! $readme_contents ) {
         return null;
@@ -115,7 +119,7 @@ function get_release_notes_json() {
     $current_version_index = null;
 
     foreach ( $release_notes as $k => $v ) {
-        assign_release_note_based_on_role( $current_version_index, $notes_formatted, $v );
+        assign_release_note_based_on_role( $current_plugin_version, $current_version_index, $notes_formatted, $v );
     }
 
     return $notes_formatted;
@@ -124,8 +128,10 @@ function get_release_notes_json() {
 /**
  * Function to get the release notes.
  *
- * @return  array  Array of release notes.
+ * @param string $current_plugin_version The currently-loaded version of Force Refresh.
+ *
+ * @return array Array of release notes.
  */
-function get_release_notes() {
-    return get_release_notes_json();
+function get_release_notes( string $current_plugin_version ) {
+    return get_release_notes_json( $current_plugin_version );
 }

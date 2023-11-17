@@ -5,7 +5,7 @@
   >
     <div>
       <div v-if="!releaseNotes">
-        {{ $t("RELEASE_NOTES.RELEASE_NOTES_UNAVAILABLE") }}
+        <p>{{ $t("RELEASE_NOTES.RELEASE_NOTES_UNAVAILABLE") }}</p>
         <div class="release-notes__unavailable">
           <a class="release-notes__unavailable-link button button-primary" href="https://wordpress.org/plugins/force-refresh/#developers" target="_blank">
             {{ $t("RELEASE_NOTES.RELEASE_NOTES_PLUGIN_LINK_TITLE") }}
@@ -17,6 +17,7 @@
           v-for="release, versionNumber in releaseNotes"
           :key="versionNumber"
           class="release-note"
+          :class="getReleaseNotesClass(release)"
         >
           <div class="release-notes-header">
             <span class="release-notes-header__version">{{ versionNumber }}</span>
@@ -56,6 +57,13 @@ export default {
   props: {
     releaseNotes: VueTypes.object,
   },
+  methods: {
+    getReleaseNotesClass(release) {
+      return [
+        release?.isCurrentVersion && 'release-note--current-version',
+      ];
+    },
+  },
 };
 </script>
 
@@ -75,6 +83,7 @@ export default {
 .release-note {
   margin: 0;
   position: relative;
+  opacity: 0.65;
 
   &:nth-child(n+2) {
     margin: 2rem 0;
@@ -92,6 +101,10 @@ export default {
       top: calc(-2rem / 2);
     }
   }
+
+  &.release-note--current-version {
+    opacity: 1;
+  }
 }
 
 .release-notes-header {
@@ -107,10 +120,8 @@ export default {
 .release-notes-header__version {
   font-weight: bold;
   font-size: 1rem;
-}
-
-.release-notes-header__date {
-  color: var.$dark-grey;
+  display: flex;
+  justify-content: space-between;
 }
 
 .release-notes-section-header {

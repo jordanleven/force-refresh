@@ -26,6 +26,12 @@ Vue.component('FontAwesomeIcon', FontAwesomeIcon);
 Vue.use(VueI18n);
 Vue.use(Vuex);
 
+const releaseNotesAreValid = (a) => {
+  const isObject = typeof a === 'object';
+  const isNotArray = !Array.isArray(a);
+  return isObject && isNotArray;
+};
+
 const storeInitialized = Store(localizedData);
 const i18nInitialized = i18n();
 
@@ -50,7 +56,7 @@ const maybeRenderVueInstance = ({ target, layout, props }) => {
 maybeRenderVueInstance({
   layout: LayoutAdminMain,
   props: {
-    releaseNotes,
+    releaseNotes: releaseNotesAreValid(releaseNotes) ? releaseNotes : null,
   },
   target: targetMain,
 });

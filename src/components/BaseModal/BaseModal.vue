@@ -4,7 +4,7 @@
       <h2 v-if="header">
         {{ header }}
       </h2>
-      <hr v-if="header">
+      <hr v-if="header" class="modal__divider">
       <div class="modal__inner">
         <slot />
       </div>
@@ -50,16 +50,21 @@ export default {
   background-color: var.$white;
   width: 100%;
   max-width: 30rem + 1rem;
-  max-height: 50vh;
   overflow: scroll;
   padding: 1rem;
   margin: 1rem;
   border-radius: var.$border-radius;
 }
 
+.modal__divider {
+  margin: 0;
+  border-bottom: 0;
+}
+
 .modal__inner {
   overflow: scroll;
-  max-height: 30vh;
+  max-height: 50vh;
+  padding-right: 10px;
   -webkit-overflow-scrolling: touch;
   background:
     linear-gradient(
@@ -89,11 +94,10 @@ export default {
 }
 
 .modal__footer {
-  margin-top: var.$side-padding;
   text-align: right;
 
   .button {
-    margin-top: var.$side-padding;
+    margin-top: 1rem;
   }
 }
 </style>

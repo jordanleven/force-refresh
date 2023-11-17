@@ -80,6 +80,7 @@ function get_admin_api_endpoints(): array {
  * @return  array   The data to localize to the script
  */
 function get_localized_data(): array {
+    $versions = get_localized_data_versions();
     return array(
         // Wrap in inner array to preserve primitive types.
         'localData' => array(
@@ -95,13 +96,13 @@ function get_localized_data(): array {
             'targetNotificationContainer' => '#' . HTML_ID_REFRESH_NOTIFICATION_CONTAINER,
             'isDebugActive'               => Debug_Storage_Service::debug_mode_is_active(),
             'refreshOptions'              => get_refresh_options(),
-            'releaseNotes'                => get_release_notes(),
+            'releaseNotes'                => get_release_notes( $versions['forceRefresh']['version'] ),
             'postId'                      => get_the_ID(),
             'postType'                    => get_current_screen()->post_type,
             'postName'                    => get_the_title(),
             'isMultiSite'                 => (bool) is_multisite(),
             'currentSiteId'               => (int) get_current_blog_id(),
-            'versions'                    => get_localized_data_versions(),
+            'versions'                    => $versions,
         ),
     );
 }
