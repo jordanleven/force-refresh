@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.9.2](https://github.com/jordanleven/force-refresh/compare/v2.9.1...v2.9.2) (2023-11-17)
+
+
+### Bug Fixes
+
+* Add missing refresh interval in admin message ([6f39068](https://github.com/jordanleven/force-refresh/commit/6f390685820c6932076c4e4e1f6ecbf05aa14362))
+* Fix button text in Refresh from Admin Bar ([20b4796](https://github.com/jordanleven/force-refresh/commit/20b47963031341f9fd5dd6643cb470fb30aae621))
+* Resolve infinite refreshing on search pages ([87f3b11](https://github.com/jordanleven/force-refresh/commit/87f3b1107a6bdd50cd59b9b45ee02bed9d38cfd4))
+* Resolve issue requesting page refreshes ([eb9c211](https://github.com/jordanleven/force-refresh/commit/eb9c2117190364ccaaf9223c0e31189a7571477e))
+* Resolve saving Refresh from Admin Bar options ([432edf2](https://github.com/jordanleven/force-refresh/commit/432edf2e780b31b258ddaf806089e5549c7ec674))
+
 ### [2.9.1](https://github.com/jordanleven/force-refresh/compare/v2.9.0...v2.9.1) (2023-11-10)
 
 
