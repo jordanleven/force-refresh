@@ -39,7 +39,7 @@ services:
     depends_on:
       - db-6
       - traefik
-    image: 'wordpress:6.4-php8.0'
+    image: 'wordpress:6.4.1-php8.0'
     ports:
       - '8082:80'
     environment:
