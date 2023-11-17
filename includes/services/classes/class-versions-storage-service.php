@@ -33,8 +33,8 @@ class Versions_Storage_Service {
     /**
      * Method for setting a page version.
      *
-     * @param int    $page_id The post ID to update.
-     * @param string $page_version The new site version.
+     * @param int    $page_id      The post ID to update.
+     * @param string $page_version The new page version.
      *
      * @return void
      */
