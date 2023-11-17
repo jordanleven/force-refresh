@@ -13,6 +13,7 @@
     "prebuild": "npm run checkNodeVersion",
     "build": "npx webpack --mode=production",
     "build:dev": "npx webpack --mode=development",
+    "build:beta": "npm run createWpReadme && npm run build",
     "predev": "npm run checkNodeVersion",
     "dev": "npm run build:dev -- --watch",
     "test": "jest",
