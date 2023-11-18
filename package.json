@@ -30,7 +30,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
-    "@fortawesome/vue-fontawesome": "^2.0.6",
+    "@fortawesome/vue-fontawesome": "^3.0.5",
     "axios": "^1.6.1",
     "compare-versions": "^6.1.0",
     "html-entities": "^2.4.0",
