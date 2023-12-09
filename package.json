@@ -26,7 +26,7 @@
     "checkNodeVersion": "check-node-version --package"
   },
   "dependencies": {
-    "@fontsource/fira-code": "^5.0.15",
+    "@fontsource/fira-code": "^5.0.16",
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-brands-svg-icons": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
