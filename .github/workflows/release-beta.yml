@@ -63,7 +63,11 @@ jobs:
 
     - name: Get commits since last release
       id: changes
-      uses: simbo/changes-since-last-release-action@v1
+      uses: simbo/changes-between-tags-action@v1
+      with:
+        validate-tag: false
+        tag-pattern: '^v[0-9]+\.[0-9]+\.[0-9]+-.*\.[0-9]+$'
+        include-tag-commit: false
 
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
@@ -75,4 +79,4 @@ jobs:
         release_name: Force Refresh ${{ steps.package-version.outputs.current-version }}
         overwrite: true
         prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and **should not** be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n## Changelog Since Last Release\n\n${{ steps.changes.outputs.log || 'Performance enhancements and bug fixes' }}"
+        body: "This is a beta release of Force Refresh (v${{ steps.package-version.outputs.current-version}}). This release is intended to be used for debugging and **should not** be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n## Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
