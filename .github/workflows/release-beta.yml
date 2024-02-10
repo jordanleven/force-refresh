@@ -63,7 +63,7 @@ jobs:
 
     - name: Get commits since last release
       id: changes
-      uses: simbo/changes-since-last-release-action@v1
+      uses: simbo/changes-between-tags-action@v1
 
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
