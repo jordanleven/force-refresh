@@ -64,6 +64,8 @@ jobs:
     - name: Get commits since last release
       id: changes
       uses: simbo/changes-between-tags-action@v1
+      with:
+        validate-tag: false
 
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
