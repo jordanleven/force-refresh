@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.9.4](https://github.com/jordanleven/force-refresh/compare/v2.9.3...v2.9.4) (2024-02-10)
+
+
+### Bug Fixes
+
+* Resolve issue loading icons ([d2e3c02](https://github.com/jordanleven/force-refresh/commit/d2e3c027ebbfd01afe485d550cd215cde2a4bf40))
+
 ### [2.9.3](https://github.com/jordanleven/force-refresh/compare/v2.9.2...v2.9.3) (2023-12-09)
 
 
