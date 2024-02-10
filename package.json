@@ -66,7 +66,7 @@
     "postcss-html": "^1.5.0",
     "sass": "^1.69.5",
     "sass-loader": "^13.3.2",
-    "simple-git": "^3.21.0",
+    "simple-git": "^3.22.0",
     "standard-version": "^9.3.2",
     "style-loader": "^3.3.3",
     "stylelint": "^15.11.0",
