@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set Node Version
         uses: actions/setup-node@v4
@@ -51,7 +51,7 @@ jobs:
         run: composer install
 
       - name: Save to Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             vendor
@@ -68,7 +68,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set Node Version
         uses: actions/setup-node@v4
@@ -76,7 +76,7 @@ jobs:
           node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
       - name: Pull from Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             vendor
@@ -99,7 +99,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Set Node Version
         uses: actions/setup-node@v4
@@ -107,7 +107,7 @@ jobs:
           node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
       - name: Pull from Cache
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             vendor
@@ -126,12 +126,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
     - name: Pull from Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           vendor
@@ -144,7 +144,7 @@ jobs:
         node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
     - name: Pull from Cache
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           vendor
