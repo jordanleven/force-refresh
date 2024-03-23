@@ -34,7 +34,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set Node Version
+      - name: Set node version
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.set-meta-data.outputs.node-version }}
@@ -70,12 +70,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set Node Version
+      - name: Set node version
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-      - name: Pull from Cache
+      - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
           path: |
@@ -101,12 +101,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set Node Version
+      - name: Set node version
         uses: actions/setup-node@v4
         with:
           node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-      - name: Pull from Cache
+      - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
           path: |
@@ -130,7 +130,7 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Pull from Cache
+    - name: Pull dependencies from cache
       uses: actions/cache@v4
       with:
         path: |
@@ -138,18 +138,10 @@ jobs:
           node_modules
         key: dependencies-${{ runner.os }}-${{ github.sha }}
 
-    - name: Set Node Version
+    - name: Set node version
       uses: actions/setup-node@v4
       with:
         node-version: ${{ needs.set-meta-data.outputs.node-version }}
-
-    - name: Pull from Cache
-      uses: actions/cache@v4
-      with:
-        path: |
-          vendor
-          node_modules
-        key: dependencies-${{ runner.os }}-${{ github.sha }}
 
     - name: Create release notes
       run: npm run createWpReadme
@@ -160,7 +152,7 @@ jobs:
     - name: Build PHP artifact
       run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
 
-    - name: Save Build to Cache
+    - name: Save build to cache
       uses: actions/cache@v4
       with:
         save-always: true
@@ -179,6 +171,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+
+    - name: Pull build from cache
+      uses: actions/cache@v4
+      with:
+        path: '**/'
+        key: build-${{ runner.os }}-${{ github.sha }}
 
     - name: Get commits since last release
       id: changes
