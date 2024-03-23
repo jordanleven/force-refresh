@@ -63,8 +63,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs:
-        - install-dependencies
-        - set-meta-data
+      - install-dependencies
+      - set-meta-data
 
     steps:
       - name: Checkout repository
@@ -121,8 +121,8 @@ jobs:
     name: Build Artifact
     runs-on: ubuntu-latest
     needs:
-      - set-meta-data
       - install-dependencies
+      - set-meta-data
 
     steps:
     - name: Checkout repository
@@ -178,6 +178,8 @@ jobs:
       - build
 
     steps:
+    - uses: actions/checkout@v4
+
     - name: Get commits since last release
       id: changes
       uses: simbo/changes-between-tags-action@v1
