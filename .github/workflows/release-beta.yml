@@ -171,6 +171,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
 
     - name: Pull build from cache
       uses: actions/cache@v4
@@ -196,4 +198,8 @@ jobs:
         release_name: Force Refresh ${{ needs.set-meta-data.outputs.release-version  }}
         overwrite: true
         prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ needs.set-meta-data.outputs.release-version }}). This release is intended to be used for debugging and **should not** be used on production sites unless directed. Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n## Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
+        body:
+          This is a beta release of Force Refresh (v${{ needs.set-meta-data.outputs.release-version }}).
+          This release is intended to be used for debugging and **should not** be used on production sites unless directed.
+          Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n##
+          Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
