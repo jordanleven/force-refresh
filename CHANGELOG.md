@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.10.1](https://github.com/jordanleven/force-refresh/compare/v2.10.0...v2.10.1) (2024-03-24)
+
 ## [2.10.0](https://github.com/jordanleven/force-refresh/compare/v2.9.4...v2.10.0) (2024-03-24)
 
 
