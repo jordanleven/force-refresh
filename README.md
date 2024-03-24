@@ -8,7 +8,7 @@
 **Tested up to:** 6.5\
 **License:** GPLv2 or later
 
-Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site. Additionally, you may force refreshes on a per-page or post basis.
+Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site on a per-page or post basis.
 
 ## Description
 
