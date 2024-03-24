@@ -200,19 +200,17 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Pull dependencies from cache
+    - name: Pull build from cache
       uses: actions/cache@v4
       with:
         fail-on-cache-miss: true
-        path: |
-          vendor
-          node_modules
-        key: dependencies-${{ runner.os }}-${{ github.sha }}
+        path: '**/'
+        key: build-${{ runner.os }}-${{ github.sha }}
 
-    - name: Set node version
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ needs.set-meta-data.outputs.node-version }}
+    # - name: Set node version
+    #   uses: actions/setup-node@v4
+    #   with:
+    #     node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
     # - name: Setup PHP
     #   uses: shivammathur/setup-php@v2
@@ -227,20 +225,20 @@ jobs:
         tag-pattern: '^v[0-9]+\.[0-9]+\.[0-9]+-.*\.[0-9]+$'
         include-tag-commit: false
 
-    - name: Build JavaScript artifact
-      run: npm run build
+    # - name: Build JavaScript artifact
+    #   run: npm run build
 
-    - name: Build PHP artifact
-      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version}}.zip
+    # - name: Build PHP artifact
+    #   run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version}}.zip
 
-    - name: Create release notes
-      run: npm run createWpReadme
+    # - name: Create release notes
+    #   run: npm run createWpReadme
 
-    - name: Prune JavaScript dependencies
-      run: npm prune --production
+    # - name: Prune JavaScript dependencies
+    #   run: npm prune --production
 
-    - name: Prune PHP dependencies
-      run: composer install --no-dev --no-scripts
+    # - name: Prune PHP dependencies
+    #   run: composer install --no-dev --no-scripts
 
     # - name: Get Changelog Entry
     #   id: get_changelog_entry
