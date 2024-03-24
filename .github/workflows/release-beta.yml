@@ -192,6 +192,14 @@ jobs:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
+    - name: Create release notes
+      run: npm run createWpReadme
+
+    - name: 'Check File Existence'
+      uses: andstor/file-existence-action@v3
+      with:
+        files: 'filter-force-refresh.php, README.txt, vendor/*, includes/*, dist/*'
+
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
