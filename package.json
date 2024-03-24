@@ -1,6 +1,6 @@
 {
   "name": "force-refresh",
-  "version": "2.10.1-690EA6.14",
+  "version": "2.10.1-690EA6.15",
   "description": "Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.",
   "url": "https://github.com/jordanleven/force-refresh",
   "repository": {
