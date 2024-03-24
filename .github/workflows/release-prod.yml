@@ -146,6 +146,7 @@ jobs:
     - name: Pull dependencies from cache
       uses: actions/cache@v4
       with:
+        fail-on-cache-miss: true
         path: |
           vendor
           node_modules
@@ -202,6 +203,7 @@ jobs:
     - name: Pull dependencies from cache
       uses: actions/cache@v4
       with:
+        fail-on-cache-miss: true
         path: |
           vendor
           node_modules
@@ -228,6 +230,7 @@ jobs:
     - name: Pull build from cache
       uses: actions/cache@v4
       with:
+        fail-on-cache-miss: true
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
