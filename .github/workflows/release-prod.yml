@@ -177,7 +177,7 @@ jobs:
       run: composer install
 
     - name: Build PHP artifact
-      run: composer build ./* ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
+      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
 
     - name: Prune JavaScript dependencies
       run: npm prune --production
