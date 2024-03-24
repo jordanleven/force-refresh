@@ -58,7 +58,7 @@ jobs:
         with:
           node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-      - name: Setup PHP
+      - name: Set PHP version
         uses: shivammathur/setup-php@v2
         with:
           php-version: 7.4
