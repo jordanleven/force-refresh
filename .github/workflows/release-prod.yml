@@ -164,7 +164,6 @@ jobs:
       with:
         php-version: 7.4
 
-
     - name: Build JavaScript artifact
       run: npm run build
 
@@ -177,14 +176,14 @@ jobs:
     - name: Install Composer dependencies
       run: composer install
 
+    - name: Build PHP artifact
+      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
+
     - name: Prune JavaScript dependencies
       run: npm prune --production
 
     - name: Prune PHP dependencies
       run: composer install --no-dev --no-scripts
-
-    - name: Build PHP artifact
-      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
 
     - name: Save build to cache
       uses: actions/cache@v4
