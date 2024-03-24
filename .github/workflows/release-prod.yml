@@ -2,8 +2,7 @@ name: Release Production Build
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      - "!v[0-9]+.[0-9]+.[0-9]+-"
+      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
 
 jobs:
   set-meta-data:
@@ -199,12 +198,12 @@ jobs:
       with:
         version: ${{ github.ref }}
 
-    - name: Deploy plugin to WordPress.org
-      uses: 10up/action-wordpress-plugin-deploy@stable
-      env:
-        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: force-refresh
+    # - name: Deploy plugin to WordPress.org
+    #   uses: 10up/action-wordpress-plugin-deploy@stable
+    #   env:
+    #     SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+    #     SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+    #     SLUG: force-refresh
 
     - name: Create Release
       uses: svenstaro/upload-release-action@v2
