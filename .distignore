@@ -1,0 +1,16 @@
+.*
+CHANGELOG.md
+CONTRIBUTING.md
+Force-Refresh-*.zip
+README.md
+composer.json
+composer.lock
+db
+docker-compose.yml
+<!-- node_modules -->
+package*.json
+phpcs.xml
+scripts
+src
+webpack.config.js
+jest.config.js
