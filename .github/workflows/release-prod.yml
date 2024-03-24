@@ -207,10 +207,19 @@ jobs:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
-    # - name: Set node version
-    #   uses: actions/setup-node@v4
-    #   with:
-    #     node-version: ${{ needs.set-meta-data.outputs.node-version }}
+    - name: Pull dependencies from cache
+      uses: actions/cache@v4
+      with:
+        fail-on-cache-miss: true
+        path: |
+          vendor
+          node_modules
+        key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+    - name: Set node version
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
     # - name: Setup PHP
     #   uses: shivammathur/setup-php@v2
@@ -231,8 +240,8 @@ jobs:
     # - name: Build PHP artifact
     #   run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version}}.zip
 
-    # - name: Create release notes
-    #   run: npm run createWpReadme
+    - name: Create release notes
+      run: npm run createWpReadme
 
     # - name: Prune JavaScript dependencies
     #   run: npm prune --production
