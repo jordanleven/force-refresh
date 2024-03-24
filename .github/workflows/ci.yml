@@ -1,12 +1,16 @@
 name: CI
 on:
   push:
-    branches: [ master, release--* ]
+    branches:
+      - master
+      - release--*
     tags:
       - "!v[0-9]+.[0-9]+.[0-9]+"
       - "!v[0-9]+.[0-9]+.[0-9]+-"
   pull_request:
-    branches: [ master,  release--* ]
+    branches:
+      - master
+      - release--*
 
 jobs:
   check-commit-message:
@@ -24,12 +28,13 @@ jobs:
           checkAllCommitMessages: 'true'
           accessToken: ${{ secrets.GITHUB_TOKEN }}
 
-  set-meta-data:
-    name: Set Meta Data
+  set-variables:
+    name: Set Variables
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
       node-version: ${{ steps.nvm.outputs.NVMRC }}
+      php-version: ${{ steps.php.outputs.PHP_VERSION }}
       release-version: ${{ steps.release-version.outputs.RELEASE_VERSION }}
 
     steps:
@@ -39,6 +44,10 @@ jobs:
         run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
         id: nvm
 
+      - name: Get PHP cersion
+        run: echo "PHP_VERSION=7.4" >> $GITHUB_OUTPUT
+        id: php
+
       - name: Set release version
         run: echo "RELEASE_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
         id: release-version
@@ -47,7 +56,7 @@ jobs:
     name: Cache Dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: set-meta-data
+    needs: set-variables
 
     steps:
       - name: Checkout repository
@@ -56,12 +65,12 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-meta-data.outputs.node-version }}
+          node-version: ${{ needs.set-variables.outputs.node-version }}
 
-      - name: Setup PHP
+      - name: Set PHP version
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 7.4
+          php-version: ${{ needs.set-variables.outputs.php-version }}
 
       - name: Install Node dependencies
         run: npm ci
@@ -108,7 +117,7 @@ jobs:
     timeout-minutes: 20
     needs:
         - install-dependencies
-        - set-meta-data
+        - set-variables
 
     steps:
       - name: Checkout repository
@@ -117,9 +126,9 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-meta-data.outputs.node-version }}
+          node-version: ${{ needs.set-variables.outputs.node-version }}
 
-      - name: Pull from cache
+      - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
           path: |
@@ -139,7 +148,7 @@ jobs:
     timeout-minutes: 20
     needs:
       - install-dependencies
-      - set-meta-data
+      - set-variables
 
     steps:
       - name: Checkout repository
@@ -148,9 +157,9 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-meta-data.outputs.node-version }}
+          node-version: ${{ needs.set-variables.outputs.node-version }}
 
-      - name: Pull from cache
+      - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
           path: |
@@ -167,11 +176,7 @@ jobs:
     timeout-minutes: 20
     needs:
       - install-dependencies
-      - set-meta-data
-
-    strategy:
-      matrix:
-        node-version: [14.x]
+      - set-variables
 
     steps:
       - name: Checkout repository
@@ -180,9 +185,9 @@ jobs:
       - name: Set Node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-meta-data.outputs.node-version }}
+          node-version: ${{ needs.set-variables.outputs.node-version }}
 
-      - name: Pull from cache
+      - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
           path: |

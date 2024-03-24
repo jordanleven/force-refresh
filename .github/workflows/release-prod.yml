@@ -6,71 +6,222 @@ on:
       - "!v[0-9]+.[0-9]+.[0-9]+-"
 
 jobs:
-  deploy:
-    name: Release Production Build
+  check-commit-message:
+    name: Check Commit Message
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [14.x]
+    steps:
+      - name: Proofread commit types
+        uses: gsactions/commit-message-checker@v1
+        with:
+          pattern: '^(feat|fix|docs|style|refactor|test|chore).+'
+          error: 'Commit messages must begin with a valid commit type.'
+          excludeDescription: 'true'
+          excludeTitle: 'true'
+          checkAllCommitMessages: 'true'
+          accessToken: ${{ secrets.GITHUB_TOKEN }}
+
+  set-variables:
+    name: Set Variables
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      node-version: ${{ steps.nvm.outputs.NVMRC }}
+      php-version: ${{ steps.php.outputs.PHP_VERSION }}
+      release-version: ${{ steps.release-version.outputs.RELEASE_VERSION }}
 
     steps:
+      - uses: actions/checkout@v4
 
+      - name: Get node version .nvmrc
+        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+        id: nvm
+
+      - name: Get PHP cersion
+        run: echo "PHP_VERSION=7.4" >> $GITHUB_OUTPUT
+        id: php
+
+      - name: Get release version
+        run: echo "RELEASE_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+        id: release-version
+
+  install-dependencies:
+    name: Cache Dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: set-variables
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.set-variables.outputs.node-version }}
+
+      - name: Set PHP version
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ needs.set-variables.outputs.php-version }}
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Install Composer dependencies
+        run: composer install
+
+      - name: Save to Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            node_modules
+          key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+  linting:
+    name: Linting
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - install-dependencies
+      - set-variables
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.set-variables.outputs.node-version }}
+
+      - name: Pull dependencies from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            node_modules
+          key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+      - name: Lint JavaScript source code
+        run: npm run lint
+
+      - name: Lint PHP source code
+        run: composer lint
+
+  testing:
+    name: Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - install-dependencies
+      - set-variables
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.set-variables.outputs.node-version }}
+
+      - name: Pull dependencies from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            node_modules
+          key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+      - name: Test JavaScript source code
+        run: npm test
+
+  build:
+    name: Build Artifact
+    runs-on: ubuntu-latest
+    needs:
+      - install-dependencies
+      - set-variables
+
+    steps:
     - name: Checkout repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
 
-    - name: Setup PHP
+    - name: Pull dependencies from cache
+      uses: actions/cache@v4
+      with:
+        fail-on-cache-miss: true
+        path: |
+          vendor
+          node_modules
+        key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+    - name: Set node version
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ needs.set-variables.outputs.node-version }}
+
+    - name: Set PHP version
       uses: shivammathur/setup-php@v2
       with:
-        php-version: 7.4
-
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
-      with:
-        node-version: ${{ matrix.node-version }}
-
-    - name: Get Release Number
-      id: package-version
-      uses: martinbeentjes/npm-get-version-action@master
-
-    - name: Install node dependencies
-      run: npm ci
-
-    - name: Install composer dependencies
-      run: composer install
-
-    - name: Lint JavaScript source code
-      run: npm run lint
-
-    - name: Lint PHP source code
-      run: composer lint
-
-    - name: Test JavaScript source code
-      run: npm test
+        php-version: ${{ needs.set-variables.outputs.php-version }}
 
     - name: Build JavaScript artifact
       run: npm run build
 
-    - name: Build PHP artifact
-      run: composer build ./ ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
-
     - name: Create release notes
       run: npm run createWpReadme
+
+    - name: Prune Composer dependencies
+      run: composer install --no-dev --no-scripts
 
     - name: Prune JavaScript dependencies
       run: npm prune --production
 
-    - name: Prune PHP dependencies
-      run: composer install --no-dev --no-scripts
+    - name: Find files not included in distignore
+      id: dist-files
+      run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
-    - name: Deploy plugin to WordPress.org
-      uses: 10up/action-wordpress-plugin-deploy@stable
-      env:
-        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: force-refresh
+    - name: Build plugin artifact
+      uses: vimtor/action-zip@v1.2
+      with:
+        files: ${{ steps.dist-files.outputs.DIST_FILES }}
+        recursive: false
+        dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
+
+    - name: Save build to cache
+      uses: actions/cache@v4
+      with:
+        save-always: true
+        path: '**/'
+        key: build-${{ runner.os }}-${{ github.sha }}
+
+  release:
+    name: Release Production Build
+    runs-on: ubuntu-latest
+    needs:
+      - set-variables
+      - install-dependencies
+      - linting
+      - testing
+      - build
+      - check-commit-message
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Pull build from cache
+      uses: actions/cache@v4
+      with:
+        fail-on-cache-miss: true
+        path: '**/'
+        key: build-${{ runner.os }}-${{ github.sha }}
 
     - name: Get Changelog Entry
       id: get_changelog_entry
@@ -78,13 +229,25 @@ jobs:
       with:
         version: ${{ github.ref }}
 
+    - name: Deploy plugin to WordPress.org
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        dry-run: false
+      env:
+        ASSETS_DIR: .wordpress-org
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SLUG: force-refresh
+
     - name: Create Release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./Force-Refresh-${{ steps.package-version.outputs.current-version}}.zip
-        asset_name: Force_Refresh_v${{ steps.package-version.outputs.current-version}}.zip
+        file: ./Force-Refresh-${{ needs.set-variables.outputs.release-version}}.zip
+        asset_name: Force_Refresh_v${{ needs.set-variables.outputs.release-version}}.zip
         tag: ${{ github.ref }}
-        release_name: Force Refresh ${{ steps.package-version.outputs.current-version }}
+        release_name: Force Refresh ${{ needs.set-variables.outputs.release-version }}
         prerelease: false
-        body: "This is a production release of Force Refresh (v${{ steps.package-version.outputs.current-version }}). This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh. \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
+        body: "This is a production release of Force Refresh (v${{ needs.set-variables.outputs.release-version }}).
+          This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh.
+          \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
