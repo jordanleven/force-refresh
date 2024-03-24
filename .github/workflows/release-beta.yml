@@ -127,8 +127,6 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Pull dependencies from cache
       uses: actions/cache@v4
@@ -173,12 +171,6 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-
-    - name: Pull build from cache
-      uses: actions/cache@v4
-      with:
-        path: '**/'
-        key: build-${{ runner.os }}-${{ github.sha }}
 
     - name: Get commits since last release
       id: changes
