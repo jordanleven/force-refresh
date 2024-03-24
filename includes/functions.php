@@ -10,6 +10,17 @@ namespace JordanLeven\Plugins\ForceRefresh;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
+ * Function to print out an error message to the user
+ *
+ * @param string $message The message to display.
+ *
+ * @return  void
+ */
+function print_error( string $message ): void {
+    echo sprintf( '<div class="notice notice-error">%s</div>', esc_html( $message ) );
+}
+
+/**
  * Function for adding scripts for this plugin.
  *
  * @param string  $handle The script handle.
@@ -23,32 +34,33 @@ function add_script( $handle, $path, $register = false ) {
     $file_path = get_force_refresh_plugin_directory() . $path;
     // If the file doesn't exist, throw an error.
     if ( ! file_exists( $file_path ) ) {
-        echo '<div class="notice notice-error">';
-        echo esc_html( "<p>${path} is missing.</p>" );
-        echo '</div>';
-    } else {
-        // Get the file version.
-        $file_version = filemtime( $file_path );
-        // If we want to only register the script.
-        if ( $register ) {
-            wp_register_script(
-                $handle,
-                get_force_refresh_plugin_url( $path ),
-                array(),
-                $file_version,
-                true
-            );
-        } else {
-            // Enqueue the style.
-            wp_enqueue_script(
-                $handle,
-                get_force_refresh_plugin_url( $path ),
-                array(),
-                $file_version,
-                true
-            );
-        }
+        print_error( "${path} is missing." );
+        return;
     }
+
+    // Get the file version.
+    $file_version = filemtime( $file_path );
+    // If we want to only register the script.
+    if ( $register ) {
+        wp_register_script(
+            $handle,
+            get_force_refresh_plugin_url( $path ),
+            array(),
+            $file_version,
+            true
+        );
+
+        return;
+    }
+
+    // Enqueue the style.
+    wp_enqueue_script(
+        $handle,
+        get_force_refresh_plugin_url( $path ),
+        array(),
+        $file_version,
+        true
+    );
 }
 
 /**
@@ -64,15 +76,14 @@ function add_style( $handle, $path ) {
     $file_path = get_force_refresh_plugin_directory() . $path;
     // If the file doesn't exist, throw an error.
     if ( ! file_exists( $file_path ) ) {
-        echo '<div class="notice notice-error">';
-        echo esc_html( "<p>${path} is missing.</p>" );
-        echo '</div>';
-    } else {
-        // Get the file version.
-        $file_version = filemtime( $file_path );
-        // Enqueue the style.
-        wp_enqueue_style( $handle, get_force_refresh_plugin_url( $path ), array(), $file_version );
+        print_error( "${path} is missing." );
+        return;
     }
+
+    // Get the file version.
+    $file_version = filemtime( $file_path );
+    // Enqueue the style.
+    wp_enqueue_style( $handle, get_force_refresh_plugin_url( $path ), array(), $file_version );
 }
 
 /**
