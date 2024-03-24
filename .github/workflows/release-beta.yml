@@ -150,6 +150,12 @@ jobs:
     - name: Build PHP artifact
       run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
 
+    - name: Prune JavaScript dependencies
+      run: npm prune --production
+
+    - name: Prune PHP dependencies
+      run: composer install --no-dev --no-scripts
+
     - name: Save build to cache
       uses: actions/cache@v4
       with:
