@@ -156,6 +156,11 @@ jobs:
       with:
         node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+
     - name: Create release notes
       run: npm run createWpReadme
 
@@ -194,6 +199,24 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Pull dependencies from cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          vendor
+          node_modules
+        key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+    - name: Set node version
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ needs.set-meta-data.outputs.node-version }}
+
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: 7.4
+
     - name: Get commits since last release
       id: changes
       uses: simbo/changes-between-tags-action@v1
@@ -207,6 +230,30 @@ jobs:
       with:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
+
+    - name: Lint JavaScript source code
+      run: npm run lint
+
+    - name: Lint PHP source code
+      run: composer lint
+
+    - name: Test JavaScript source code
+      run: npm test
+
+    - name: Build JavaScript artifact
+      run: npm run build
+
+    - name: Build PHP artifact
+      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version}}.zip
+
+    - name: Create release notes
+      run: npm run createWpReadme
+
+    - name: Prune JavaScript dependencies
+      run: npm prune --production
+
+    - name: Prune PHP dependencies
+      run: composer install --no-dev --no-scripts
 
     # - name: Get Changelog Entry
     #   id: get_changelog_entry
