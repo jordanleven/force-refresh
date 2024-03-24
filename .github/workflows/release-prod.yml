@@ -162,20 +162,27 @@ jobs:
       with:
         php-version: 7.4
 
-    - name: Create release notes
-      run: npm run createWpReadme
 
     - name: Build JavaScript artifact
       run: npm run build
 
-    - name: Build PHP artifact
-      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
+    - name: Create release notes
+      run: npm run createWpReadme
+
+    - name: Copy notes
+      run: mkdir test && cp README.txt test
+
+    - name: Install Composer dependencies
+      run: composer install
 
     - name: Prune JavaScript dependencies
       run: npm prune --production
 
     - name: Prune PHP dependencies
       run: composer install --no-dev --no-scripts
+
+    - name: Build PHP artifact
+      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
 
     - name: Save build to cache
       uses: actions/cache@v4
@@ -239,9 +246,6 @@ jobs:
 
     # - name: Build PHP artifact
     #   run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version}}.zip
-
-    - name: Create release notes
-      run: npm run createWpReadme
 
     # - name: Prune JavaScript dependencies
     #   run: npm prune --production
