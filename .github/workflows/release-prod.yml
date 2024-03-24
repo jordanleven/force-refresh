@@ -157,14 +157,15 @@ jobs:
       with:
         node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-    - name: Create release notes
-      run: npm run createWpReadme
 
     - name: Build JavaScript artifact
       run: npm run build
 
     - name: Build PHP artifact
       run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
+
+    - name: Create release notes
+      run: npm run createWpReadme
 
     - name: Prune JavaScript dependencies
       run: npm prune --production
