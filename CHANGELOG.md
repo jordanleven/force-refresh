@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.10.0](https://github.com/jordanleven/force-refresh/compare/v2.9.4...v2.10.0) (2024-03-24)
+
+
+### Features
+
+* Add support for WordPress 6.5 ([b2ae45b](https://github.com/jordanleven/force-refresh/commit/b2ae45bb786a7333091eb6aa2f8edc642244cafb))
+
+
+### Bug Fixes
+
+* Update error message when missing build files ([75910ba](https://github.com/jordanleven/force-refresh/commit/75910bae49ed717f795facff750e2d5c826d8b7a))
+
 ### [2.9.4](https://github.com/jordanleven/force-refresh/compare/v2.9.3...v2.9.4) (2024-02-10)
 
 
