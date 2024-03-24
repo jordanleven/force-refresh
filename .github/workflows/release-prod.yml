@@ -264,6 +264,6 @@ jobs:
         tag: ${{ github.ref }}
         release_name: Force Refresh ${{ needs.set-meta-data.outputs.release-version }}
         prerelease: true
-        body: "This is a production release of Force Refresh (v${{ needs.set-meta-data.outputs.release-version }}).
-          This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh.
-          \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
+        # body: "This is a production release of Force Refresh (v${{ needs.set-meta-data.outputs.release-version }}).
+        #   This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh.
+        #   \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
