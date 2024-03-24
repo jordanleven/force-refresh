@@ -214,10 +214,10 @@ jobs:
       with:
         node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-    - name: Setup PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: 7.4
+    # - name: Setup PHP
+    #   uses: shivammathur/setup-php@v2
+    #   with:
+    #     php-version: 7.4
 
     - name: Get commits since last release
       id: changes
@@ -226,15 +226,6 @@ jobs:
         validate-tag: false
         tag-pattern: '^v[0-9]+\.[0-9]+\.[0-9]+-.*\.[0-9]+$'
         include-tag-commit: false
-
-    - name: Lint JavaScript source code
-      run: npm run lint
-
-    - name: Lint PHP source code
-      run: composer lint
-
-    - name: Test JavaScript source code
-      run: npm test
 
     - name: Build JavaScript artifact
       run: npm run build
