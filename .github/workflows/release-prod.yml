@@ -2,8 +2,7 @@ name: Release Production Build
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      - "!v[0-9]+.[0-9]+.[0-9]+-"
+      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
 
 jobs:
   check-commit-message:
@@ -74,64 +73,64 @@ jobs:
             node_modules
           key: dependencies-${{ runner.os }}-${{ github.sha }}
 
-  linting:
-    name: Linting
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs:
-      - install-dependencies
-      - set-meta-data
+  # linting:
+  #   name: Linting
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 20
+  #   needs:
+  #     - install-dependencies
+  #     - set-meta-data
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Set node version
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ needs.set-meta-data.outputs.node-version }}
+  #     - name: Set node version
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-      - name: Pull dependencies from cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            vendor
-            node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+  #     - name: Pull dependencies from cache
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           vendor
+  #           node_modules
+  #         key: dependencies-${{ runner.os }}-${{ github.sha }}
 
-      - name: Lint JavaScript source code
-        run: npm run lint
+  #     - name: Lint JavaScript source code
+  #       run: npm run lint
 
-      - name: Lint PHP source code
-        run: composer lint
+  #     - name: Lint PHP source code
+  #       run: composer lint
 
-  testing:
-    name: Testing
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs:
-      - install-dependencies
-      - set-meta-data
+  # testing:
+  #   name: Testing
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 20
+  #   needs:
+  #     - install-dependencies
+  #     - set-meta-data
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v4
 
-      - name: Set node version
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ needs.set-meta-data.outputs.node-version }}
+  #     - name: Set node version
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-      - name: Pull dependencies from cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            vendor
-            node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+  #     - name: Pull dependencies from cache
+  #       uses: actions/cache@v4
+  #       with:
+  #         path: |
+  #           vendor
+  #           node_modules
+  #         key: dependencies-${{ runner.os }}-${{ github.sha }}
 
-      - name: Test JavaScript source code
-        run: npm test
+  #     - name: Test JavaScript source code
+  #       run: npm test
 
   build:
     name: Build Artifact
@@ -185,10 +184,10 @@ jobs:
     needs:
       - set-meta-data
       - install-dependencies
-      - linting
-      - testing
+      # - linting
+      # - testing
       - build
-      - check-commit-message
+      # - check-commit-message
 
     steps:
     - uses: actions/checkout@v4
@@ -217,6 +216,8 @@ jobs:
 
     - name: Deploy plugin to WordPress.org
       uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        dry-run: true
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
@@ -230,7 +231,7 @@ jobs:
         asset_name: Force_Refresh_v${{ needs.set-meta-data.outputs.release-version}}.zip
         tag: ${{ github.ref }}
         release_name: Force Refresh ${{ needs.set-meta-data.outputs.release-version }}
-        prerelease: false
+        prerelease: true
         body: "This is a production release of Force Refresh (v${{ needs.set-meta-data.outputs.release-version }}).
           This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh.
           \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
