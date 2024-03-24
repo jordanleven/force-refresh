@@ -2,7 +2,7 @@ name: Release Beta Build
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
+      - "test"
 
 jobs:
   set-meta-data:
