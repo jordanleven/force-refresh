@@ -177,16 +177,13 @@ jobs:
       run: npm run createWpReadme
 
     - name: Install Composer dependencies
-      run: composer install
-
-    - name: Build PHP artifact
-      run: composer build ./ ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
+      run: composer install --no-dev --no-scripts
 
     - name: Prune JavaScript dependencies
       run: npm prune --production
 
-    - name: Prune PHP dependencies
-      run: composer install --no-dev --no-scripts
+    - name: Build plugin artifact
+      run: composer build ./ ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
       uses: actions/cache@v4
