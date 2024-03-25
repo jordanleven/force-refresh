@@ -2,8 +2,7 @@ name: Release Production Build
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
-      - "!v[0-9]+.[0-9]+.[0-9]+-"
+      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
 
 jobs:
   check-commit-message:
@@ -232,16 +231,16 @@ jobs:
       with:
         node-version: ${{ needs.set-variables.outputs.node-version }}
 
-    - name: Get Changelog Entry
-      id: get_changelog_entry
-      uses: yashanand1910/standard-release-notes@v1.2.1
-      with:
-        version: ${{ github.ref }}
+    # - name: Get Changelog Entry
+    #   id: get_changelog_entry
+    #   uses: yashanand1910/standard-release-notes@v1.2.1
+    #   with:
+    #     version: ${{ github.ref }}
 
     - name: Deploy plugin to WordPress.org
       uses: 10up/action-wordpress-plugin-deploy@stable
       with:
-        dry-run: false
+        dry-run: true
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
@@ -255,7 +254,10 @@ jobs:
         asset_name: Force_Refresh_v${{ needs.set-variables.outputs.release-version}}.zip
         tag: ${{ github.ref }}
         release_name: Force Refresh ${{ needs.set-variables.outputs.release-version }}
-        prerelease: false
+        prerelease: true
         body: "This is a production release of Force Refresh (v${{ needs.set-variables.outputs.release-version }}).
           This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh.
-          \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
+          \n\n## Release Notes"
+        # body: "This is a production release of Force Refresh (v${{ needs.set-variables.outputs.release-version }}).
+        #   This version, and all production-stable versions, are available at https://wordpress.org/plugins/force-refresh.
+        #   \n\n## Release Notes\n${{ steps.get_changelog_entry.outputs.release_notes || 'Performance enhancements and bug fixes' }}"
