@@ -183,7 +183,9 @@ jobs:
       run: npm prune --production
 
     - name: Build plugin artifact
-      run: composer build ./ ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
+      uses: php-actions/composer@v6
+      with:
+        command: build ./ ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
       uses: actions/cache@v4
