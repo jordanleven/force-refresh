@@ -33,7 +33,7 @@
     "@fortawesome/vue-fontawesome": "^2.0.6",
     "axios": "^1.6.8",
     "compare-versions": "^6.1.0",
-    "html-entities": "^2.4.0",
+    "html-entities": "^2.5.2",
     "qs": "^6.11.2",
     "ramda": "^0.29.1",
     "regenerator-runtime": "^0.14.1",
