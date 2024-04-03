@@ -1,4 +1,9 @@
-.*
+.git
+.github
+.db
+.babelrc
+.codeclimate.yml
+.distignore
 CHANGELOG.md
 CONTRIBUTING.md
 Force-Refresh-*.zip
