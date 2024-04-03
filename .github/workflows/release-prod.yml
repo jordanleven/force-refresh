@@ -184,7 +184,7 @@ jobs:
 
     - name: Find files not included in distignore
       id: dist-files
-      run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' 'gc -p)" >> $GITHUB_OUTPUT
+      run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
     - name: Build plugin artifact
       uses: vimtor/action-zip@v1.2
