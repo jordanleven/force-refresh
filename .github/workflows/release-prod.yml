@@ -182,9 +182,10 @@ jobs:
       run: npm prune --production
 
     - name: Build plugin artifact
-      uses: php-actions/composer@v6
+      uses: vimtor/action-zip@v1.2
       with:
-        command: build ./ ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
+        files: ./*
+        dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
       uses: actions/cache@v4
