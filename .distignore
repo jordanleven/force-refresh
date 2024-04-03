@@ -1,17 +1,9 @@
-.babelrc
-.codeclimate.yml
-.distignore
-.git
-.github
-CHANGELOG.md
+/\..*
 CHANGELOG.md
 CONTRIBUTING.md
 Force-Refresh-*.zip
 README.md
 composer.*
-composer.json
-composer.lock
-db
 db
 docker-compose.yml
 docker-compose.yml
@@ -22,8 +14,6 @@ node_modules
 package*.json
 package.*
 phpcs.xml
-phpcs.xml
 scripts
-src
 src
 webpack.config.js
