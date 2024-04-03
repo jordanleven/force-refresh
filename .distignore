@@ -1,4 +1,13 @@
-\..*
+.babelrc
+.codeclimate.yml
+.distignore
+.eslintrc.js
+.git
+.github
+.nvmrc
+.stylelintrc.json
+.wordpress
+CHANGELOG.md
 CHANGELOG.md
 CONTRIBUTING.md
 Force-Refresh-*.zip
