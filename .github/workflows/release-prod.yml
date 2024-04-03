@@ -223,20 +223,6 @@ jobs:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
-    - name: Pull dependencies from cache
-      uses: actions/cache@v4
-      with:
-        fail-on-cache-miss: true
-        path: |
-          vendor
-          node_modules
-        key: dependencies-${{ runner.os }}-${{ github.sha }}
-
-    - name: Set node version
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ needs.set-variables.outputs.node-version }}
-
     - name: Get Changelog Entry
       id: get_changelog_entry
       uses: yashanand1910/standard-release-notes@v1.2.1
