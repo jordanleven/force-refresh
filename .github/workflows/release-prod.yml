@@ -184,7 +184,7 @@ jobs:
     - name: Build plugin artifact
       uses: vimtor/action-zip@v1.2
       with:
-        files: ./*
+        files: '**/'
         dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
