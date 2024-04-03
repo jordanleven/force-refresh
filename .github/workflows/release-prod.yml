@@ -189,6 +189,7 @@ jobs:
       uses: vimtor/action-zip@v1.2
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
+        recursive: false
         dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
