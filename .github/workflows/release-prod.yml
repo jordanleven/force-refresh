@@ -233,6 +233,7 @@ jobs:
       with:
         dry-run: true
       env:
+        ASSETS_DIR: .wordpress-org
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SLUG: force-refresh
