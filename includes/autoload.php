@@ -10,15 +10,15 @@ namespace JordanLeven\Plugins\ForceRefresh;
 /**
  * Function to handle the autoloading of our classes and interfaces.
  *
- * @param string $class The class attempting to load.
+ * @param string $class_name The class attempting to load.
  *
  * @return  void
  * @throws \Exception If the file isn't found.
  */
-function autoload_classes_and_interfaces( string $class ) {
+function autoload_classes_and_interfaces( string $class_name ) {
 
     // If the autoloaded class is not of our namespace, do an early exit.
-    if ( strpos( $class, __NAMESPACE__ ) === false ) {
+    if ( strpos( $class_name, __NAMESPACE__ ) === false ) {
         return;
     }
 
@@ -26,7 +26,7 @@ function autoload_classes_and_interfaces( string $class ) {
     $file_path = str_replace(
         array( __NAMESPACE__, '\\', '_' ),
         array( '', '/', '-' ),
-        $class
+        $class_name
     );
 
     $file_path_absolute = strtolower( sprintf( '%s%s.php', __DIR__, $file_path ) );
@@ -43,7 +43,7 @@ function autoload_classes_and_interfaces( string $class ) {
     $file_path_absolute_adjusted = str_replace( $file_name, $file_name_adjusted, $file_path_absolute );
 
     if ( ! file_exists( $file_path_absolute_adjusted ) ) {
-        throw new \Exception( sprintf( 'Unable to locate file %s', $file_path_absolute_adjusted ) );
+        throw new \Exception( sprintf( 'Unable to locate file %s', esc_html( $file_path_absolute_adjusted ) ) );
     }
 
     require_once $file_path_absolute_adjusted;

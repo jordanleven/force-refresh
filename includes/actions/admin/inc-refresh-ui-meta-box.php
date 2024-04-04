@@ -21,7 +21,7 @@ function force_refresh_specific_page_refresh_html() {
 // Add meta boxes for specific pages that we want to refresh.
 add_action(
     'add_meta_boxes',
-    function() {
+    function () {
         // All post types.
         $all_post_types = get_post_types();
         // Loop through all the post types.

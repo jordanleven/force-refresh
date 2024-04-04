@@ -15,7 +15,7 @@ use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 // Add the script for normal front-facing pages (non-admin).
 add_action(
     'wp_enqueue_scripts',
-    function() {
+    function () {
         // Include the normal JS.
         add_script( 'force-refresh-js', '/dist/js/force-refresh.js', true );
         // Localize the admin ajax URL. This doesn't sound like the best idea but WP is into

@@ -17,7 +17,7 @@ use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
  * @return  void
  */
 function print_error( string $message ): void {
-    echo sprintf( '<div class="notice notice-error">%s</div>', esc_html( $message ) );
+    printf( '<div class="notice notice-error">%s</div>', esc_html( $message ) );
 }
 
 /**

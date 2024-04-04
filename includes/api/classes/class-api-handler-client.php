@@ -77,7 +77,7 @@ class Api_Handler_Client extends Api_Handler {
      */
     private function get_current_version_site(): string {
         $current_site_version = get_option( 'force_refresh_current_site_version' );
-        return ! ! $current_site_version ? $current_site_version : '0';
+        return (bool) $current_site_version ? $current_site_version : '0';
     }
 
     /**
@@ -93,7 +93,7 @@ class Api_Handler_Client extends Api_Handler {
             'force_refresh_current_page_version',
             true
         );
-        return ! ! $current_page_version ? $current_page_version : '0';
+        return (bool) $current_page_version ? $current_page_version : '0';
     }
 
     /**

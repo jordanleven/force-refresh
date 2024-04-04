@@ -7,7 +7,7 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
-require __DIR__ . '/inc.troubleshooting.php';
+require __DIR__ . '/inc-troubleshooting.php';
 
 // The ID of the container we'll append our force refresh component to.
 define( 'HTML_ID_MAIN', 'force-refresh-main' );
@@ -24,7 +24,7 @@ function force_refresh_main_settings() {
 // Add the menu where we'll configure the settings.
 add_action(
     'admin_menu',
-    function() {
+    function () {
         add_submenu_page(
             'tools.php',
             'Force Refresh',

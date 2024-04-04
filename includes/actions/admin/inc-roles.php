@@ -12,7 +12,7 @@ namespace JordanLeven\Plugins\ForceRefresh;
 // and roles can init a Force Refresh.
 add_action(
     'admin_init',
-    function() {
+    function () {
         $role = get_role( 'administrator' );
         $role->add_cap( WP_FORCE_REFRESH_CAPABILITY );
     }
