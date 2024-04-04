@@ -18,7 +18,7 @@ To get started, follow the steps below:
 
 ## Admin
 
-To log into the WordPress admin, visit the admin page of the  and log in with the following development credentials:
+To log into the WordPress admin, visit the admin page of the and log in with the following development credentials:
 
 **Username**: `force-refresh-dev`
 
