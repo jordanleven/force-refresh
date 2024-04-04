@@ -43,6 +43,48 @@ function get_release_notes_from_plugin_readme( string $readme ): array {
 }
 
 /**
+ * Function to get the release note node.
+ *
+ * @param string $current_plugin_version The currently-loaded version of Force Refresh.
+ * @param string $version_number The version number of this node.
+ *
+ * @return array The release note node.
+ */
+function get_release_note_node( string $current_plugin_version, string $version_number ): array {
+    return array(
+        'date'             => null,
+        'isCurrentVersion' => $current_plugin_version === $version_number,
+        'notes'            => array(),
+    );
+}
+
+/**
+ * Function to get the release note date from a note.
+ *
+ * @param string $note The note to parse.
+ *
+ * @return string The note release date.
+ */
+function get_release_note_date( string $note ): string {
+    return str_replace( array( '_', '' ), '', $note );
+}
+
+/**
+ * Function to get a release header node from a note.
+ *
+ * @param string $note The note.
+ *
+ * @return array The release note header node.
+ */
+function get_release_note_header_node( string $note ): array {
+    $release_header = str_replace( array( '#', '*' ), '', $note );
+    return array(
+        'sectionHeader' => $release_header,
+        'sectionNotes'  => array(),
+    );
+}
+
+/**
  * Function to modify the current version index and notes based on a specific release note.
  *
  * @param string $current_plugin_version The currently-loaded version of Force Refresh.
@@ -57,32 +99,21 @@ function assign_release_note_based_on_role( string $current_plugin_version, &$cu
         // If the line is a version number.
         case preg_match( '/#### [0-9].*/', $note ):
             $version_number                     = str_replace( array( '#', ' ' ), '', $note );
-            $notes_formatted[ $version_number ] = array(
-                'date'             => null,
-                'isCurrentVersion' => $current_plugin_version === $version_number,
-                'notes'            => array(),
-            );
+            $notes_formatted[ $version_number ] = get_release_note_node( $current_plugin_version, $version_number );
 
             $current_version_i = $version_number;
             break;
 
         // Release dates.
         case preg_match( '/^\_/', $note ):
-            $release_date_formatted = str_replace( array( '_', '' ), '', $note );
-
-            $notes_formatted[ $current_version_i ]['date'] = $release_date_formatted;
+            $notes_formatted[ $current_version_i ]['date'] = get_release_note_date( $note );
             break;
 
         // Release headers.
         case preg_match( '/^##### .*/', $note ):
-            $release_header = str_replace( array( '#', '*' ), '', $note );
-
             array_push(
                 $notes_formatted[ $current_version_i ]['notes'],
-                array(
-                    'sectionHeader' => $release_header,
-                    'sectionNotes'  => array(),
-                ),
+                get_release_note_header_node( $note )
             );
             break;
 
