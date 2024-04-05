@@ -31,6 +31,16 @@ class Versions_Storage_Service {
     }
 
     /**
+     * Method to get the current version of the site.
+     *
+     * @return  string The version of the site
+     */
+    public static function get_site_version(): string {
+        $current_site_version = get_option( self::OPTION_SITE_VERSION );
+        return (bool) $current_site_version ? $current_site_version : '0';
+    }
+
+    /**
      * Method for setting a page version.
      *
      * @param int    $page_id      The post ID to update.

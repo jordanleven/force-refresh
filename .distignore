@@ -25,3 +25,7 @@ scripts
 src
 webpack.config.js
 qa
+*-test.php
+phpunit.xml
+phpunit-bootstrap.php
+test/php-mocks/*
