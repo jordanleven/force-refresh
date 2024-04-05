@@ -34,5 +34,3 @@ function register_admin_endpoints(): void {
 }
 
 add_action( 'rest_api_init', __NAMESPACE__ . '\\register_admin_endpoints' );
-$controller = new Api_Handler_Admin_Schedule_Refresh_Site();
-$controller->register_actions();
