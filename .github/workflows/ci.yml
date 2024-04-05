@@ -142,8 +142,8 @@ jobs:
       - name: Lint PHP source code
         run: composer lint
 
-  testing:
-    name: Testing
+  testing-javascript:
+    name: Testing - JavaScript
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs:
@@ -169,6 +169,34 @@ jobs:
 
       - name: Test JavaScript source code
         run: npm test
+
+  testing-php:
+    name: Testing - PHP
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs:
+      - install-dependencies
+      - set-variables
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set PHP version
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ needs.set-variables.outputs.php-version }}
+
+      - name: Pull dependencies from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            node_modules
+          key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+      - name: Test PHP source code
+        run: composer test
 
   building:
     name: Building
