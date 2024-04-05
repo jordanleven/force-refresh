@@ -1,5 +1,17 @@
-<testsuites>
-  <testsuite name="unit">
-    <directory suffix="test.php">./includes/**/*</directory>
-  </testsuite>
-</testsuites>
+<phpunit bootstrap="test/phpunit-bootstrap.php" colors="true">
+  <testsuites>
+    <testsuite name="unit">
+      <directory suffix="test.php">./includes/**/*</directory>
+    </testsuite>
+  </testsuites>
+
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">src</directory>
+        </include>
+        <exclude>
+            <directory>tests</directory>
+            <directory>vendor</directory>
+        </exclude>
+    </coverage>
+</phpunit>
