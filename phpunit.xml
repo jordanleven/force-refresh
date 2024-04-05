@@ -1,0 +1,5 @@
+<testsuites>
+  <testsuite name="unit">
+    <directory suffix="test.php">./includes/**/*</directory>
+  </testsuite>
+</testsuites>
