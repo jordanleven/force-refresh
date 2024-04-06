@@ -29,7 +29,7 @@
     "@fontsource/fira-code": "^5.0.17",
     "@fortawesome/fontawesome-svg-core": "^6.5.1",
     "@fortawesome/free-brands-svg-icons": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^2.0.6",
     "axios": "^1.6.8",
     "compare-versions": "^6.1.0",
