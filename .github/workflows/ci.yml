@@ -198,6 +198,12 @@ jobs:
       - name: Test PHP source code
         run: composer test
 
+      - name: Upload coverage reports to Codecov
+        uses: codecov/codecov-action@v4.0.1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          slug: jordanleven/force-refresh
+
   building:
     name: Building
     runs-on: ubuntu-latest
