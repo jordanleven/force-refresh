@@ -203,6 +203,8 @@ jobs:
           configuration: phpunit.xml
           php_extensions: xdebug
           args: --coverage-clover ./coverage.xml
+          test_suffix: test.php
+          bootstrap: test/phpunit-bootstrap.php
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
