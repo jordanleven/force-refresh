@@ -18,6 +18,11 @@ use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 // The name of the main admin JS file.
 define( 'FILE_NAME_ADMIN_MAIN', 'force-refresh-admin' );
 
+// Check if WordPress is loaded.
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 /**
  * Function to return the localized data used for the troubleshooting page.
  *
