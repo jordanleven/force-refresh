@@ -10,3 +10,4 @@ node_modules
 /qa/*
 !qa/.gitkeep
 .phpunit.result.cache
+coverage

@@ -204,7 +204,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: jordanleven/force-refresh
-          file: ./coverage.xml
+          file: ./coverage/coverage.xml
 
   building:
     name: Building
