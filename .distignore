@@ -25,3 +25,4 @@ scripts
 src
 webpack.config.js
 qa
+*-test.php
