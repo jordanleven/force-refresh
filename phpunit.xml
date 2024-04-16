@@ -5,9 +5,9 @@
     </testsuite>
   </testsuites>
 
-    <coverage processUncoveredFiles="true" cacheDirectory=".phpunit.cache/code-coverage">
+    <coverage>
         <include>
-            <directory suffix=".php">./includes</directory>
+            <directory suffix=".php">includes</directory>
         </include>
         <exclude>
             <directory>tests</directory>
