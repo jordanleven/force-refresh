@@ -10,8 +10,8 @@
             <directory suffix=".php">includes</directory>
         </include>
         <exclude>
-            <directory>tests</directory>
             <directory>vendor</directory>
+            <directory suffix="-test.php">includes</directory>
         </exclude>
     </coverage>
 </phpunit>
