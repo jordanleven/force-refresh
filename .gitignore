@@ -8,3 +8,4 @@ Force-Refresh-*.zip
 README.txt
 node_modules
 .phpunit.result.cache
+coverage
