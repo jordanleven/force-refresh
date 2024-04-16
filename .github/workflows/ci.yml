@@ -195,18 +195,8 @@ jobs:
             node_modules
           key: dependencies-${{ runner.os }}-${{ github.sha }}
 
-      - name: PHPUnit Tests
-        uses: php-actions/phpunit@v3
-        env:
-          XDEBUG_MODE: coverage
-        with:
-          version: 9.6
-          php_version: ${{ needs.set-variables.outputs.php-version }}
-          configuration: phpunit.xml
-          php_extensions: xdebug
-          args: --coverage-clover ./coverage.xml
-          test_suffix: test.php
-          bootstrap: test/phpunit-bootstrap.php
+      - name: Test PHP source code
+        run: composer test
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v4.0.1
