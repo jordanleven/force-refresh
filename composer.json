@@ -4,7 +4,7 @@
   "scripts": {
     "lint": "phpcs filter-force-refresh.php ./includes",
     "test": "phpunit",
-    "test:coverage": "phpunit --coverage-clover ./coverage.xml"
+    "test:coverage": "phpunit --coverage-clover=coverage.xml"
   },
   "require": {
     "php": ">=7.4"
