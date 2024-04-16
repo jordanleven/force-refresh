@@ -201,6 +201,7 @@ jobs:
           XDEBUG_MODE: coverage
         with:
           version: 9.6
+          php_version: ${{ needs.set-variables.outputs.php-version }}
           configuration: phpunit.xml
           php_extensions: xdebug
           args: --coverage-clover ./coverage.xml
