@@ -3,7 +3,8 @@
   "description" : "Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.",
   "scripts": {
     "lint": "phpcs filter-force-refresh.php ./includes",
-    "test": "phpunit"
+    "test": "phpunit",
+    "test:coverage": "phpunit --coverage-clover ./coverage.xml"
   },
   "require": {
     "php": ">=7.4"
