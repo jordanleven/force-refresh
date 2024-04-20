@@ -26,3 +26,7 @@ src
 webpack.config.js
 qa
 *-test.php
+phpunit.xml
+phpunit-bootstrap.php
+interface-mock-function.php
+class-mock-*.php
