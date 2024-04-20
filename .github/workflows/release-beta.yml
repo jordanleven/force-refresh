@@ -236,5 +236,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        message: Build ${{ needs.set-variables.outputs.build-version }} is available at https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}.
-        allow-repeats: false
+        message: Build ${{ needs.set-variables.outputs.build-version }} is available for download at [Releases - ${{ needs.set-variables.outputs.build-number }}](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
+        allow-repeats: true
