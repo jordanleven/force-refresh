@@ -5,25 +5,20 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
 
 jobs:
-  set-variables:
-    name: Set Variables
+  set-meta-data:
+    name: Set Meta Data
     runs-on: ubuntu-latest
     timeout-minutes: 2
     outputs:
       node-version: ${{ steps.nvm.outputs.NVMRC }}
-      php-version: ${{ steps.php.outputs.PHP_VERSION }}
       release-version: ${{ steps.release-version.outputs.RELEASE_VERSION }}
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Get node version
+      - name: Read .nvmrc
         run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
         id: nvm
-
-      - name: Get PHP cersion
-        run: echo "PHP_VERSION=7.4" >> $GITHUB_OUTPUT
-        id: php
 
       - name: Set Release Version
         run: echo "RELEASE_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
@@ -33,7 +28,7 @@ jobs:
     name: Cache Dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    needs: set-variables
+    needs: set-meta-data
 
     steps:
       - name: Checkout repository
@@ -42,12 +37,12 @@ jobs:
       - name: Set node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-variables.outputs.node-version }}
+          node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
-      - name: Set PHP version
+      - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ needs.set-variables.outputs.php-version }}
+          php-version: 7.4
 
       - name: Install Node dependencies
         run: npm ci
@@ -69,7 +64,7 @@ jobs:
     timeout-minutes: 20
     needs:
       - install-dependencies
-      - set-variables
+      - set-meta-data
 
     steps:
       - name: Checkout repository
@@ -78,7 +73,7 @@ jobs:
       - name: Set node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-variables.outputs.node-version }}
+          node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
       - name: Pull dependencies from cache
         uses: actions/cache@v4
@@ -100,7 +95,7 @@ jobs:
     timeout-minutes: 20
     needs:
       - install-dependencies
-      - set-variables
+      - set-meta-data
 
     steps:
       - name: Checkout repository
@@ -109,7 +104,7 @@ jobs:
       - name: Set node version
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ needs.set-variables.outputs.node-version }}
+          node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
       - name: Pull dependencies from cache
         uses: actions/cache@v4
@@ -127,13 +122,11 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - install-dependencies
-      - set-variables
+      - set-meta-data
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
 
     - name: Pull dependencies from cache
       uses: actions/cache@v4
@@ -146,30 +139,22 @@ jobs:
     - name: Set node version
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ needs.set-variables.outputs.node-version }}
-
-    - name: Build JavaScript artifact
-      run: npm run build
+        node-version: ${{ needs.set-meta-data.outputs.node-version }}
 
     - name: Create release notes
       run: npm run createWpReadme
 
-    - name: Prune Composer dependencies
-      run: composer install --no-dev --no-scripts
+    - name: Build JavaScript artifact
+      run: npm run build
+
+    - name: Build PHP artifact
+      run: composer build ./ ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
 
     - name: Prune JavaScript dependencies
       run: npm prune --production
 
-    - name: Find files not included in distignore
-      id: dist-files
-      run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
-
-    - name: Build plugin artifact
-      uses: vimtor/action-zip@v1.2
-      with:
-        files: ${{ steps.dist-files.outputs.DIST_FILES }}
-        recursive: false
-        dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
+    - name: Prune PHP dependencies
+      run: composer install --no-dev --no-scripts
 
     - name: Save build to cache
       uses: actions/cache@v4
@@ -182,7 +167,7 @@ jobs:
     name: Release Beta
     runs-on: ubuntu-latest
     needs:
-      - set-variables
+      - set-meta-data
       - install-dependencies
       - linting
       - testing
@@ -211,13 +196,13 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
-        asset_name: Force_Refresh_v${{ needs.set-variables.outputs.release-version }}.zip
+        file: ./Force-Refresh-${{ needs.set-meta-data.outputs.release-version }}.zip
+        asset_name: Force_Refresh_v${{ needs.set-meta-data.outputs.release-version }}.zip
         tag: ${{ github.ref }}
-        release_name: Force Refresh ${{ needs.set-variables.outputs.release-version  }}
+        release_name: Force Refresh ${{ needs.set-meta-data.outputs.release-version  }}
         overwrite: true
         prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.release-version }}).
+        body: "This is a beta release of Force Refresh (v${{ needs.set-meta-data.outputs.release-version }}).
           This release is intended to be used for debugging and **should not** be used on production sites unless directed.
           Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n##
           Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
