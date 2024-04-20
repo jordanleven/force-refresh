@@ -23,14 +23,21 @@ class Mock_Function implements Mock_Function_Interface {
     protected $mock_return_value;
 
     /**
+     * The mock instance of the built spy.
+     *
+     * @var Mock
+     */
+    protected $mock_instance;
+
+    /**
      * Class constructor.
      *
      * @param string $mock_namespace The namespace for the mock function.
      * @param string $mock_function_name The name of the function to mock.
      */
     public function __construct( string $mock_namespace, string $mock_function_name ) {
-        $builder_get_option = new Spy( $mock_namespace, $mock_function_name, fn () => $this->mock_return_value );
-        $this->mock_instance = $builder_get_option;
+        $spy                 = new Spy( $mock_namespace, $mock_function_name, fn () => $this->mock_return_value );
+        $this->mock_instance = $spy;
         $this->mock_instance->enable();
     }
 
