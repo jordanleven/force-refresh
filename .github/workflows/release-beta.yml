@@ -31,7 +31,7 @@ jobs:
         id: build-number
 
       - name: Set Build Version
-        run: echo "BUILD_VERSION=$(${{ steps.build-number.outputs.BUILD_NUMBER }}}} | sed 's/.*\.//')" >> $GITHUB_OUTPUT
+        run: echo "BUILD_VERSION=$(${{ steps.build-number.outputs.BUILD_NUMBER }} | sed 's/.*\.//')" >> $GITHUB_OUTPUT
         id: build-version
 
   install-dependencies:
