@@ -58,6 +58,7 @@ jobs:
       - name: Save to Cache
         uses: actions/cache@v4
         with:
+          save-always: true
           path: |
             vendor
             node_modules
@@ -83,6 +84,7 @@ jobs:
       - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
+          fail-on-cache-miss: true
           path: |
             vendor
             node_modules
@@ -114,6 +116,7 @@ jobs:
       - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
+          fail-on-cache-miss: true
           path: |
             vendor
             node_modules
@@ -138,6 +141,7 @@ jobs:
     - name: Pull dependencies from cache
       uses: actions/cache@v4
       with:
+        fail-on-cache-miss: true
         path: |
           vendor
           node_modules
