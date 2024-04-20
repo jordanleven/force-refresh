@@ -24,4 +24,4 @@ phpcs.xml
 scripts
 src
 webpack.config.js
-./qa
+qa
