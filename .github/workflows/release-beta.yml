@@ -151,6 +151,9 @@ jobs:
     - name: Build JavaScript artifact
       run: npm run build
 
+    - name: Install node dependencies
+      run: npm ci
+
     - name: Create release notes
       run: npm run createWpReadme
 
