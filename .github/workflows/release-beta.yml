@@ -233,3 +233,13 @@ jobs:
       with:
         message: Build ${{ needs.set-variables.outputs.build-number }} is available for download at [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
         allow-repeats: true
+
+    - name: Simulate deploy to WordPress.org
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        dry-run: true
+      env:
+        ASSETS_DIR: .wordpress-org
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SLUG: force-refresh
