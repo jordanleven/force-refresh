@@ -61,6 +61,18 @@ final class Debug_Storage_Service_Test extends TestCase {
     }
 
     /**
+     * Test teardown.
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void {
+        self::$mock_get_option->disable();
+        self::$mock_current_time->disable();
+        self::$mock_update_option->disable();
+        self::$mock_delete_option->disable();
+    }
+
+    /**
      * When the debug option is not set.
      */
     public function testDebugModeIsOffWhenOptionIsNotSet() {

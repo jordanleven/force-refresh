@@ -42,6 +42,15 @@ class Mock_Function implements Mock_Function_Interface {
     }
 
     /**
+     * Method for disabling the mock.
+     *
+     * @return void
+     */
+    public function disable() {
+        $this->mock_instance->disable();
+    }
+
+    /**
      * Method to set the return value for the function.
      *
      * @param mixed $return_value The mock return value.
