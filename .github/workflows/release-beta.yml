@@ -13,7 +13,6 @@ jobs:
       node-version: ${{ steps.nvm.outputs.NVMRC }}
       php-version: ${{ steps.php.outputs.PHP_VERSION }}
       build-number: ${{ steps.build-number.outputs.BUILD_NUMBER }}
-      build-version: ${{ steps.build-number.outputs.BUILD_VERSION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -29,10 +28,6 @@ jobs:
       - name: Set Build Number
         run: echo "BUILD_NUMBER=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
         id: build-number
-
-      - name: Set Build Version
-        run: echo "BUILD_VERSION=$(${{ steps.build-number.outputs.BUILD_NUMBER }} | sed 's/.*\.//')" >> $GITHUB_OUTPUT
-        id: build-version
 
   install-dependencies:
     name: Cache Dependencies
@@ -236,5 +231,5 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        message: Build ${{ needs.set-variables.outputs.build-version }} is available for download at [Releases - ${{ needs.set-variables.outputs.build-number }}](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
+        message: Build ${{ needs.set-variables.outputs.build-number }} is available for download at [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
         allow-repeats: true
