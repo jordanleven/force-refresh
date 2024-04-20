@@ -19,6 +19,44 @@ services:
       timeout: 10s
       retries: 10
 
+  db-qa:
+    container_name: 'force-refresh-db-dev-container-wp-qa'
+    image: mariadb:10.3
+    volumes:
+      - './.docker-build/data/mysql_qa:/var/lib/mysql'
+      - ./db/wp-qa:/docker-entrypoint-initdb.d
+    ports:
+      - 18768:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: force-refresh_root_password
+      MYSQL_DATABASE: force-refresh-dev-db
+      MYSQL_USER: force-refresh-dev-user
+      MYSQL_PASSWORD: force-refresh-dev-password
+
+  wordpress-qa:
+    hostname: qa.force-refresh.localhost
+    container_name: 'force-refresh-dev-container-wp-qa'
+    depends_on:
+      - db-qa
+      - traefik
+    image: 'wordpress:beta-6.5-RC3-php8.1-apache'
+    ports:
+      - '8084:80'
+    environment:
+      WORDPRESS_DB_HOST: 'db-qa:3306'
+      WORDPRESS_DB_NAME: force-refresh-dev-db
+      WORDPRESS_DB_USER: force-refresh-dev-user
+      WORDPRESS_DB_PASSWORD: force-refresh-dev-password
+      WORDPRESS_DEBUG: 1
+      WP_DEBUG_DISPLAY: 1
+      WP_DEBUG_LOG: 1
+    volumes:
+      - "./.docker-build/wordpress_qa:/var/www/html"
+      - "./qa:/var/www/html/wp-content/plugins/force-refresh"
+    labels:
+      - "traefik.http.routers.qa.rule=host(`qa.force-refresh.localhost`)"
+      - "traefik.http.services.qa.loadbalancer.server.port=80"
+
   db-6:
     container_name: 'force-refresh-db-dev-container-wp-6'
     image: mariadb:10.3

@@ -7,3 +7,5 @@
 Force-Refresh-*.zip
 README.txt
 node_modules
+/qa/*
+!qa/.gitkeep
