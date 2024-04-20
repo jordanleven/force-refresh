@@ -12,7 +12,8 @@ jobs:
     outputs:
       node-version: ${{ steps.nvm.outputs.NVMRC }}
       php-version: ${{ steps.php.outputs.PHP_VERSION }}
-      release-version: ${{ steps.release-version.outputs.RELEASE_VERSION }}
+      build-number: ${{ steps.build-number.outputs.BUILD_NUMBER }}
+      build-version: ${{ steps.build-number.outputs.BUILD_VERSION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -25,9 +26,13 @@ jobs:
         run: echo "PHP_VERSION=7.4" >> $GITHUB_OUTPUT
         id: php
 
-      - name: Set Release Version
-        run: echo "RELEASE_VERSION=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
-        id: release-version
+      - name: Set Build Number
+        run: echo "BUILD_NUMBER=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
+        id: build-number
+
+      - name: Set Build Version
+        run: echo "BUILD_VERSION=$(${{ steps.build-number.outputs.BUILD_NUMBER }}}} | sed 's/.*\.//')" >> $GITHUB_OUTPUT
+        id: build-version
 
   install-dependencies:
     name: Cache Dependencies
@@ -173,7 +178,7 @@ jobs:
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
         recursive: false
-        dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
+        dest: ./Force-Refresh-${{ needs.set-variables.outputs.build-number }}.zip
 
     - name: Save build to cache
       uses: actions/cache@v4
@@ -215,13 +220,21 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
-        asset_name: Force_Refresh_v${{ needs.set-variables.outputs.release-version }}.zip
+        file: ./Force-Refresh-${{ needs.set-variables.outputs.build-number }}.zip
+        asset_name: Force_Refresh_v${{ needs.set-variables.outputs.build-number }}.zip
         tag: ${{ github.ref }}
-        release_name: Force Refresh ${{ needs.set-variables.outputs.release-version  }}
+        release_name: Force Refresh ${{ needs.set-variables.outputs.build-number  }}
         overwrite: true
         prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.release-version }}).
+        body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.build-number }}).
           This release is intended to be used for debugging and **should not** be used on production sites unless directed.
           Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n##
           Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
+
+    - name: Comment on PR
+      uses: mshick/add-pr-comment@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        message: Build ${{ needs.set-variables.outputs.build-version }} is available at https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}.
+        allow-repeats: false
