@@ -260,7 +260,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        message: Build ${{ needs.set-variables.outputs.build-number }} is available for download at [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
+        message: Build ${{ needs.set-variables.outputs.build-number }} is [available for download](https://github.com/jordanleven/force-refresh/releases/download/v${{ needs.set-variables.outputs.build-number }}/Force_Refresh_v${{ needs.set-variables.outputs.build-number }}.zip) under [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
         allow-repeats: true
 
     - name: Simulate deploy to WordPress.org
