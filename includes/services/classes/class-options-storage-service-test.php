@@ -18,7 +18,7 @@ require_once __DIR__ . '/class-options-storage-service.php';
 /**
  * Test for Debug Storage Service
  */
-final class Options_Storage_Service_Tets extends TestCase {
+final class Options_Storage_Service_Test extends TestCase {
 
     /**
      * Our store for the mock of `get_option`.
