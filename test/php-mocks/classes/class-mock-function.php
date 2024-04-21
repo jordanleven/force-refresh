@@ -30,6 +30,13 @@ class Mock_Function implements Mock_Function_Interface {
     protected $mock_instance;
 
     /**
+     * Invocation index used to reset mock invocations.
+     *
+     * @var int
+     */
+    protected $invocation_index = 0;
+
+    /**
      * Class constructor.
      *
      * @param string   $mock_namespace The namespace for the mock function.
@@ -70,12 +77,20 @@ class Mock_Function implements Mock_Function_Interface {
      */
     public function get_invocation_arguments( int $invocation_index = 0 ) {
         $invocations = $this->mock_instance->getInvocations();
+        $index       = $this->invocation_index - $invocation_index;
 
-        if ( ! array_key_exists( $invocation_index, $invocations ) ) {
+        if ( ! array_key_exists( $index, $invocations ) ) {
             return null;
         }
 
-        return $invocations[ $invocation_index ]->getArguments();
+        return $invocations[ $index ]->getArguments();
+    }
+
+    /**
+     * Method to reset the invocation index.
+     */
+    public function resetInvocationIndex(): void {
+        $this->invocation_index = $this->get_invocation_count();
     }
 
     /**
