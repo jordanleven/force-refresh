@@ -32,11 +32,13 @@ class Mock_Function implements Mock_Function_Interface {
     /**
      * Class constructor.
      *
-     * @param string $mock_namespace The namespace for the mock function.
-     * @param string $mock_function_name The name of the function to mock.
+     * @param string   $mock_namespace The namespace for the mock function.
+     * @param string   $mock_function_name The name of the function to mock.
+     * @param callable $mock_implementation  The mock implementation.
      */
-    public function __construct( string $mock_namespace, string $mock_function_name ) {
-        $spy                 = new Spy( $mock_namespace, $mock_function_name, fn () => $this->mock_return_value );
+    public function __construct( string $mock_namespace, string $mock_function_name, callable $mock_implementation = null ) {
+        $implementation      = (bool) $mock_implementation ? $mock_implementation : fn () => $this->mock_return_value;
+        $spy                 = new Spy( $mock_namespace, $mock_function_name, $implementation );
         $this->mock_instance = $spy;
         $this->mock_instance->enable();
     }

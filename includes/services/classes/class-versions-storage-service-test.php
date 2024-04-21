@@ -56,6 +56,20 @@ final class Versions_Storage_Service_Test extends TestCase {
     private static $mock_delete_post_meta;
 
     /**
+     * Our store for the mock of `current_time`.
+     *
+     * @var Mock
+     */
+    private static $mock_current_time;
+
+    /**
+     * Our store for the mock of `wp_hash`.
+     *
+     * @var Mock
+     */
+    private static $mock_wp_hash;
+
+    /**
      * Initial test setup.
      *
      * @return  void
@@ -66,6 +80,23 @@ final class Versions_Storage_Service_Test extends TestCase {
         self::$mock_delete_option    = new Mocks\Mock_Delete_Option( __NAMESPACE__ );
         self::$mock_update_post_meta = new Mocks\Mock_Update_Post_Meta( __NAMESPACE__ );
         self::$mock_delete_post_meta = new Mocks\Mock_Delete_Post_Meta( __NAMESPACE__ );
+        self::$mock_current_time     = new Mocks\Mock_Current_Time( __NAMESPACE__ );
+        self::$mock_wp_hash          = new Mocks\Mock_WP_Hash( __NAMESPACE__ );
+    }
+
+    /**
+     * Test teardown.
+     *
+     * @return void
+     */
+    public static function tearDownAfterClass(): void {
+        self::$mock_get_option->disable();
+        self::$mock_add_option->disable();
+        self::$mock_delete_option->disable();
+        self::$mock_update_post_meta->disable();
+        self::$mock_delete_post_meta->disable();
+        self::$mock_current_time->disable();
+        self::$mock_wp_hash->disable();
     }
 
     /**
@@ -128,5 +159,16 @@ final class Versions_Storage_Service_Test extends TestCase {
                 $page_version_new,
             )
         );
+    }
+
+    /**
+     * Returns a truncated and hashed version of the time.
+     */
+    public function testGetNewVersion() {
+        self::$mock_current_time->set_return_value( '1984' );
+
+        $new_version = Versions_Storage_Service::get_new_version();
+
+        $this->assertEquals( 'hash-198', $new_version );
     }
 }

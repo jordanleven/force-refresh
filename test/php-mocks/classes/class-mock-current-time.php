@@ -19,6 +19,8 @@ final class Mock_Current_Time extends Mock_Function implements Mock_Function_Int
      */
     const MOCK_FUNCTION_NAME = 'current_time';
 
+    const MOCK_TIME = '06-29-2007 18:00:00';
+
     /**
      * Class constructor.
      *
@@ -26,5 +28,6 @@ final class Mock_Current_Time extends Mock_Function implements Mock_Function_Int
      */
     public function __construct( string $mock_namespace ) {
         parent::__construct( $mock_namespace, self::MOCK_FUNCTION_NAME );
+        $this->set_return_value( self::MOCK_TIME );
     }
 }
