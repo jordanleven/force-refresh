@@ -28,5 +28,4 @@ qa
 *-test.php
 phpunit.xml
 phpunit-bootstrap.php
-interface-mock-function.php
-class-mock-*.php
+test/php-mocks/*
