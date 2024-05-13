@@ -2,7 +2,9 @@ import axios from 'axios';
 import { error } from './loggingService.js';
 
 const axiosConfig = {
-  headers: {},
+  headers: {
+    'Cache-Control': 'no-cache',
+  },
 };
 
 const handleAxiosRequest = async (method) => {
