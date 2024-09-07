@@ -31,7 +31,7 @@
     "@fortawesome/free-brands-svg-icons": "^6.6.0",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/vue-fontawesome": "^2.0.10",
-    "axios": "^1.7.2",
+    "axios": "^1.7.7",
     "compare-versions": "^6.1.1",
     "html-entities": "^2.5.2",
     "qs": "^6.13.0",
