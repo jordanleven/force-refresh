@@ -5,7 +5,7 @@
 **Tags:** refresh, reload, single page application\
 **Requires PHP:** 7.4\
 **Requires at least:** 5.2\
-**Tested up to:** 6.6\
+**Tested up to:** 6.7\
 **License:** GPLv2 or later
 
 Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site on a per-page or post basis.
