@@ -323,7 +323,7 @@ export default {
 
         &::after {
           display: block;
-          right: left;
+          right: auto;
           left: 0;
           position: absolute;
           content: '';
