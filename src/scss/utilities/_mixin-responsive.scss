@@ -1,7 +1,7 @@
 @use "../variables/index.scss" as viewport;
 
 @function strip-unit($number) {
-  @if type-of($number) == "number" and not unitless($number) {
+  @if meta.type-of($number) == "number" and not math.is-unitless($number) {
     @return $number / ($number * 0 + 1);
   }
 

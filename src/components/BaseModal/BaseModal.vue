@@ -49,7 +49,7 @@ export default {
 .modal {
   background-color: var.$white;
   width: 100%;
-  max-width: 30rem + 1rem;
+  max-width: calc(30rem + 1rem);
   overflow: scroll;
   padding: 1rem;
   margin: 1rem;
