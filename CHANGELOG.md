@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.13.0](https://github.com/jordanleven/force-refresh/compare/v2.12.1...v2.13.0) (2025-04-21)
+
+
+### Features
+
+* Add support for WordPress 6.8 ([89f779e](https://github.com/jordanleven/force-refresh/commit/89f779ef0d9f0e8a6911b9f40513a5e87e818595))
+
 ### [2.12.1](https://github.com/jordanleven/force-refresh/compare/v2.12.0...v2.12.1) (2025-01-12)
 
 ## [2.12.0](https://github.com/jordanleven/force-refresh/compare/v2.11.1...v2.12.0) (2024-10-28)
