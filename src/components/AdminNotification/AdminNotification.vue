@@ -138,7 +138,7 @@ export default {
 
     p {
       background-color: #000;
-      background-color: rgba(#000, 0.8);
+      background-color: rgba(0, 0, 0, 80%);
       width: 100%;
       backdrop-filter: blur(5px);
     }

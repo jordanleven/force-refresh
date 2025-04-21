@@ -22,7 +22,7 @@
   // Loop through each default. If one is overridden, then use the overridden value instead
   @each $key, $value in $font-awesome-defaults {
     // If the value is in the overrides, use that value instead
-    @if map-has-key($overrides, $key) {
+    @if map.has-key($overrides, $key) {
       #{$key}: map.get($overrides, $key);
     }
 

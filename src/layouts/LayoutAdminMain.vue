@@ -378,7 +378,7 @@ export default {
 }
 
 .fade-and-move-leave-active {
-  animation-duration: 0;
+  animation-duration: 0s;
 }
 
 .fade-and-scale__main-enter-active,
