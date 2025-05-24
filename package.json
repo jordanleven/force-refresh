@@ -78,7 +78,7 @@
     "vue-eslint-parser": "^9.4.3",
     "vue-loader": "^15.11.1",
     "vue-template-compiler": "^2.7.16",
-    "webpack": "^5.99.5",
+    "webpack": "^5.99.9",
     "webpack-cli": "^6.0.1",
     "webpack-livereload-plugin": "^3.0.2"
   },
