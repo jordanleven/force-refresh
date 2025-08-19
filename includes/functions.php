@@ -34,7 +34,7 @@ function add_script( $handle, $path, $register = false ) {
     $file_path = get_force_refresh_plugin_directory() . $path;
     // If the file doesn't exist, throw an error.
     if ( ! file_exists( $file_path ) ) {
-        print_error( "${path} is missing." );
+        print_error( "{$path} is missing." );
         return;
     }
 
@@ -76,7 +76,7 @@ function add_style( $handle, $path ) {
     $file_path = get_force_refresh_plugin_directory() . $path;
     // If the file doesn't exist, throw an error.
     if ( ! file_exists( $file_path ) ) {
-        print_error( "${path} is missing." );
+        print_error( "{$path} is missing." );
         return;
     }
 
