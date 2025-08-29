@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [2.13.2](https://github.com/jordanleven/force-refresh/compare/v2.13.1...v2.13.2) (2025-08-29)
+
+
+### Bug Fixes
+
+* Resolve issue activating plugin on PHP 8.2 ([f3efc66](https://github.com/jordanleven/force-refresh/commit/f3efc66df52b993d13d3871490c9ef0e922f492f))
+
 ### [2.13.1](https://github.com/jordanleven/force-refresh/compare/v2.13.0...v2.13.1) (2025-08-09)
 
 ## [2.13.0](https://github.com/jordanleven/force-refresh/compare/v2.12.1...v2.13.0) (2025-04-21)
