@@ -13,12 +13,12 @@ use phpmock\MockBuilder;
 use phpmock\Mock;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
-require_once __DIR__ . '/class-debug-storage-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-debug-storage-service.php';
 
 /**
  * Test for Debug Storage Service
  */
-final class Debug_Storage_Service_Test extends TestCase {
+final class DebugStorageServiceTest extends TestCase {
 
     /**
      * Our store for the mock of `get_option`.
