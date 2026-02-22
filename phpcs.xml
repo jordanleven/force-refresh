@@ -3,8 +3,10 @@
 	<file>.</file>
 	<!-- Exclude Composer vendor directory. -->
 	<exclude-pattern>*/vendor/*</exclude-pattern>
-	<!-- Exclude PHPUnit tests from WordPress class filename rules. -->
-	<exclude-pattern>*/test/*</exclude-pattern>
+	<!-- Keep test files linted, but skip WordPress class filename conventions there. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>*/test/*</exclude-pattern>
+	</rule>
   <rule ref="WordPress">
       <exclude name="Generic.WhiteSpace.DisallowSpaceIndent" />
       <exclude name="WordPress.WhiteSpace.PrecisionAlignment.Found" />

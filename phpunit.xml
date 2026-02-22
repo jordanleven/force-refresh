@@ -11,7 +11,6 @@
     </include>
     <exclude>
       <directory>vendor</directory>
-      <directory suffix="_Test.php">includes</directory>
     </exclude>
   </source>
 </phpunit>
