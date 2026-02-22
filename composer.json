@@ -7,7 +7,7 @@
     "test:coverage": "phpunit --coverage-clover coverage/coverage.xml --coverage-html coverage/html"
   },
   "require": {
-    "php": ">=7.4"
+    "php": ">=8.2"
   },
   "require-dev": {
     "wp-coding-standards/wpcs": "^3.3",

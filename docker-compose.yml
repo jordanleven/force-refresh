@@ -115,7 +115,7 @@ services:
     depends_on:
       - db-5
       - traefik
-    image: 'wordpress:beta-5.9-php7.4-apache'
+    image: 'wordpress:5.9-php8.2-apache'
     ports:
       - '8083:80'
     environment:

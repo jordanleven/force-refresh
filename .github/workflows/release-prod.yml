@@ -38,7 +38,7 @@ jobs:
         id: nvm
 
       - name: Get PHP version
-        run: echo "PHP_VERSION=7.4" >> $GITHUB_OUTPUT
+        run: echo "PHP_VERSION=8.2" >> $GITHUB_OUTPUT
         id: php
 
       - name: Get release version
