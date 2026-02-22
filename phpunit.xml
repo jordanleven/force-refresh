@@ -1,17 +1,17 @@
+<?xml version="1.0"?>
 <phpunit bootstrap="test/phpunit-bootstrap.php" colors="true">
   <testsuites>
     <testsuite name="unit">
       <directory suffix="test.php">./includes/**/*</directory>
     </testsuite>
   </testsuites>
-
-    <coverage>
-        <include>
-            <directory suffix=".php">includes</directory>
-        </include>
-        <exclude>
-            <directory>vendor</directory>
-            <directory suffix="-test.php">includes</directory>
-        </exclude>
-    </coverage>
+  <source>
+    <include>
+      <directory suffix=".php">includes</directory>
+    </include>
+    <exclude>
+      <directory>vendor</directory>
+      <directory suffix="_Test.php">includes</directory>
+    </exclude>
+  </source>
 </phpunit>
