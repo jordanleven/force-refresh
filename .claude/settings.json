@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(composer outdated:*)",
+      "Bash(node:*)",
+      "Bash(npm --version:*)",
+      "Bash(npm show:*)",
+      "Bash(composer show:*)",
+      "Bash(npm install:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
