@@ -63,7 +63,7 @@
     "moment": "^2.30.1",
     "postcss": "^8.5.1",
     "postcss-html": "^1.8.1",
-    "sass": "^1.90.0",
+    "sass": "^1.97.3",
     "sass-loader": "^16.0.4",
     "simple-git": "^3.27.0",
     "standard-version": "^9.3.2",
