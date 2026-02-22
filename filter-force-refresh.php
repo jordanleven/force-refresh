@@ -49,8 +49,6 @@ function get_main_plugin_file() {
     return __FILE__;
 }
 
-// Include the composer autoload file.
-require_once __DIR__ . '/vendor/autoload.php';
 // Include the plugin autoload file.
 require_once __DIR__ . '/includes/autoload.php';
 // Include the functions file.
