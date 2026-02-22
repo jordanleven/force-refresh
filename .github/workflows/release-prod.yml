@@ -37,7 +37,7 @@ jobs:
         run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
         id: nvm
 
-      - name: Get PHP cersion
+      - name: Get PHP version
         run: echo "PHP_VERSION=7.4" >> $GITHUB_OUTPUT
         id: php
 
