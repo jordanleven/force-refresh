@@ -4,7 +4,7 @@
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** refresh, reload, single page application\
 **Requires PHP:** 8.2\
-**Requires at least:** 5.2\
+**Requires at least:** 6.3\
 **Tested up to:** 6.9\
 **License:** GPLv2 or later
 
