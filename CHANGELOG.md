@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.16.0](https://github.com/jordanleven/force-refresh/compare/v2.15.0...v2.16.0) (2026-02-24)
+
+
+### Features
+
+* Update minimum PHP version to 8.2 ([bf34412](https://github.com/jordanleven/force-refresh/commit/bf3441222e607225008e5d3123522f4c39fe528e))
+
 ## [2.15.0](https://github.com/jordanleven/force-refresh/compare/v2.14.0...v2.15.0) (2026-02-24)
 
 
