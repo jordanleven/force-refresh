@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.15.0](https://github.com/jordanleven/force-refresh/compare/v2.14.0...v2.15.0) (2026-02-24)
+
+
+### Features
+
+* Update minimum WordPress version to 6.3 ([47f9113](https://github.com/jordanleven/force-refresh/commit/47f911391deac8166031dbc1da3b25a8241f97b2))
+
 ## [2.14.0](https://github.com/jordanleven/force-refresh/compare/v2.13.2...v2.14.0) (2025-11-29)
 
 
