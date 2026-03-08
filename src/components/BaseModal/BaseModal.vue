@@ -69,24 +69,24 @@ export default {
   background:
     linear-gradient(
       white 30%,
-      rgba(255, 255, 255, 0%)
+      rgb(255, 255, 255, 0%)
     ) center top,
 
     linear-gradient(
-      rgba(255, 255, 255, 0%),
+      rgb(255, 255, 255, 0%),
       white 70%
     ) center bottom,
 
     radial-gradient(
       farthest-side at 50% 0,
-      rgba(0, 0, 0, 20%),
-      rgba(0, 0, 0, 0%)
+      rgb(0, 0, 0, 20%),
+      rgb(0, 0, 0, 0%)
     ) center top,
 
     radial-gradient(
       farthest-side at 50% 100%,
-      rgba(0, 0, 0, 20%),
-      rgba(0, 0, 0, 0%)
+      rgb(0, 0, 0, 20%),
+      rgb(0, 0, 0, 0%)
     ) center bottom;
   background-repeat: no-repeat;
   background-size: 100% 40px, 100% 40px, 100% 14px, 100% 14px;
