@@ -1,10 +1,10 @@
-import Vuex from 'vuex';
+import { createStore } from 'vuex';
 import actions from './actions.js';
 import getters from './getters.js';
 import mutations from './mutations.js';
 import state from './state.js';
 
-export default (localizedData) => new Vuex.Store({
+export default (localizedData) => createStore({
   actions,
   getters,
   mutations,

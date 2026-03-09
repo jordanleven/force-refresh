@@ -127,7 +127,7 @@ export default {
       showRefreshInMenuBar: VueTypes.bool.isRequired,
     }),
   },
-  emits: ['options-were-updated', 'troubleshooting-page-clicked', 'release-notes-page-clicked'],
+  emits: ['notify-user-of-error', 'options-were-updated', 'release-notes-page-clicked', 'troubleshooting-page-clicked'],
   data() {
     return {
       isCustomIntervalWithinBounds: true,

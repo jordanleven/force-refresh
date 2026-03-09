@@ -80,7 +80,7 @@ export default {
   transition: opacity 0.5s;
 }
 
-.notification-fade-enter,
+.notification-fade-enter-from,
 .notification-fade-leave-to {
   opacity: 0;
 }

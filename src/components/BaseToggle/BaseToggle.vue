@@ -19,6 +19,7 @@ export default {
   props: {
     isChecked: VueTypes.bool.def(true),
   },
+  emits: ['toggled'],
   data() {
     return {
       id: Uniqid(),

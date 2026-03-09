@@ -1,7 +1,6 @@
+import { library } from '@fortawesome/fontawesome-svg-core';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import Vue from 'vue';
-import VueI18n from 'vue-i18n';
-import Vuex from 'vuex';
+import { createApp } from 'vue';
 import i18n from '@/js/i18n/index.js';
 import Store from '@/js/store/index.js';
 import LayoutAdminBar from '@/layouts/LayoutAdminBar.vue';
@@ -22,10 +21,6 @@ const {
   releaseNotes,
 } = localizedData;
 
-Vue.component('FontAwesomeIcon', FontAwesomeIcon);
-Vue.use(VueI18n);
-Vue.use(Vuex);
-
 const releaseNotesAreValid = (a) => {
   const isObject = typeof a === 'object';
   const isNotArray = !Array.isArray(a);
@@ -39,18 +34,12 @@ const maybeRenderVueInstance = ({ target, layout, props }) => {
   const isTargetOnPage = !!document.querySelector(target);
   if (!isTargetOnPage) return;
 
-  // eslint-disable-next-line no-new
-  new Vue({
-    el: target,
-    store: storeInitialized,
-    i18n: i18nInitialized,
-    render: (createElement) => createElement(
-      layout,
-      {
-        props,
-      },
-    ),
-  });
+  const app = createApp(layout, props);
+  app.use(storeInitialized);
+  app.use(i18nInitialized);
+  app.component('FontAwesomeIcon', FontAwesomeIcon);
+  app.provide('fontAwesomeLibrary', library);
+  app.mount(target);
 };
 
 maybeRenderVueInstance({

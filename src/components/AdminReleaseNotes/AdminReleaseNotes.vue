@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :header="$t('RELEASE_NOTES.HEADER')"
-    v-on="$listeners"
+    v-bind="$attrs"
   >
     <div>
       <div v-if="!releaseNotes">
@@ -54,6 +54,7 @@ export default {
   components: {
     BaseModal,
   },
+  inheritAttrs: false,
   props: {
     releaseNotes: VueTypes.object,
   },
