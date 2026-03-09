@@ -194,7 +194,7 @@ export default {
     overflow: hidden;
   }
 
-  &-enter,
+  &-enter-from,
   &-leave-to {
     height: 0;
     opacity: 0;

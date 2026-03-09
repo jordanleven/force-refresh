@@ -1,4 +1,4 @@
-<template functional>
+<template>
   <dl class="descriptive-list">
     <dt>
       <slot name="term" />

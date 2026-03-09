@@ -13,12 +13,18 @@
       {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_NOW') }}
     </span>
   </span>
+  <Teleport :to="targetNotificationContainer">
+    <AdminFooterNotification
+      v-if="isNotificationActive"
+      :message="notificationMessage"
+      @notification-closed="closeNotification"
+    />
+  </Teleport>
 </template>
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
-import Vue from 'vue';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminFooterNotification from '@/components/AdminFooterNotification/AdminFooterNotification.vue';
@@ -28,6 +34,9 @@ library.add([faSyncAlt]);
 
 export default {
   name: 'LayoutAdminBar',
+  components: {
+    AdminFooterNotification,
+  },
   props: {
     targetNotificationContainer: VueTypes.string.isRequired,
   },
@@ -46,26 +55,6 @@ export default {
       };
     },
     ...mapGetters(['refreshInterval', 'refreshFromAdminBar']),
-  },
-  created() {
-    // eslint-disable-next-line no-new
-    new Vue({
-      el: this.targetNotificationContainer,
-      render: (h) => {
-        if (!this.isNotificationActive) return null;
-        return h(
-          AdminFooterNotification,
-          {
-            on: {
-              'notification-closed': this.closeNotification,
-            },
-            props: {
-              message: this.notificationMessage,
-            },
-          },
-        );
-      },
-    });
   },
   methods: {
     animateLogo() {

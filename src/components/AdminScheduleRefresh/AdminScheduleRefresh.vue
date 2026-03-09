@@ -1,7 +1,7 @@
 <template>
   <BaseModal
     :header="$t('SCHEDULE_REFRESH.HEADER')"
-    v-on="$listeners"
+    v-bind="$attrs"
   >
     <div class="admin-scheduled-refresh__inner">
       <div>
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import DatePicker from 'vue2-datepicker';
+import DatePicker from 'vue-datepicker-next';
 import BaseModal from '@/components/BaseModal/BaseModal.vue';
 
 export default {
@@ -36,6 +36,7 @@ export default {
     BaseModal,
     DatePicker,
   },
+  inheritAttrs: false,
   emits: ['schedule-refresh'],
   data() {
     return {
@@ -83,7 +84,7 @@ export default {
 <style lang="scss">
   @use "@/scss/variables" as var;
   @use "@/scss/utilities" as utils;
-  @use 'vue2-datepicker/scss/index';
+  @use 'vue-datepicker-next/scss/index';
 
   .admin-scheduled-refresh__inner {
     text-align: center;
