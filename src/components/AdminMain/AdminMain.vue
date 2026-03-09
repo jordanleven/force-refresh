@@ -4,13 +4,13 @@
       class="force-refresh__main"
       :site-name="siteName"
       :scheduled-refreshes="scheduledRefreshes"
-      v-on="$listeners"
+      v-bind="$attrs"
     />
     <AdminMainOptions
       v-if="refreshOptions"
       class="force-refresh__options"
       :refresh-options="refreshOptions"
-      v-on="$listeners"
+      v-bind="$attrs"
     />
   </div>
 </template>
@@ -26,6 +26,7 @@ export default {
     AdminMainOptions,
     AdminMainRefresh,
   },
+  inheritAttrs: false,
   props: {
     refreshOptions: VueTypes.object.isRequired,
     scheduledRefreshes: VueTypes.array,

@@ -56,6 +56,7 @@ export default {
     siteName: VueTypes.string.isRequired,
   },
   emits: [
+    'delete-scheduled-refresh',
     'refresh-requested',
     'schedule-refresh-requested',
   ],

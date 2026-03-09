@@ -69,6 +69,7 @@ export default {
       }),
     }),
   },
+  emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
   computed: {
     debugCopy() {
       return this.isDebugActive

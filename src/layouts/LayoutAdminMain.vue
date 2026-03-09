@@ -387,6 +387,7 @@ export default {
 .fade-and-scale__troubleshooting-leave-active {
   animation-fill-mode: both;
   position: absolute;
+  width: 100%;
 }
 
 .fade-and-scale__main-enter-active,

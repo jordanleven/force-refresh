@@ -38,7 +38,7 @@ export default [
     ],
   },
   ...airbnbConfig,
-  ...pluginVue.configs['flat/vue2-recommended'],
+  ...pluginVue.configs['flat/recommended'],
   {
     files: ['**/*.js', '**/*.vue'],
     languageOptions: {
