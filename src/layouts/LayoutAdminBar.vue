@@ -132,8 +132,8 @@ export default {
   }
 
   .force-refresh-logo {
-    display: inline;
-    height: 40%;
+    display: inline-block;
+    height: 1em;
     margin-right: var.$space-small;
 
     &.force-refresh-logo--active {
