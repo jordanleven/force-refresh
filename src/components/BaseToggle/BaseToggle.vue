@@ -17,7 +17,7 @@ import VueTypes from 'vue-types';
 export default {
   component: 'BaseToggle',
   props: {
-    isChecked: VueTypes.bool.def(true),
+    isChecked: VueTypes.bool.def(false),
   },
   emits: ['toggled'],
   data() {
@@ -27,7 +27,7 @@ export default {
   },
   computed: {
     checked() {
-      return this.isChecked ? 'checked' : '';
+      return this.isChecked;
     },
   },
   methods: {
