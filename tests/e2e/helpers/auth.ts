@@ -14,5 +14,12 @@ export async function loginAsAdmin(page: Page): Promise<void> {
 
 export async function goToPluginPage(page: Page): Promise<void> {
   await page.goto('/wp-admin/tools.php?page=force_refresh');
-  await page.waitForSelector('select[name="refresh-interval"]');
+  await page.locator('select[name="refresh-interval"]')
+    .waitFor({ timeout: 15_000 })
+    .catch(async () => {
+      // Retry once — in CI, WordPress admin may not be fully ready
+      // immediately after the healthcheck passes
+      await page.goto('/wp-admin/tools.php?page=force_refresh');
+      await page.locator('select[name="refresh-interval"]').waitFor();
+    });
 }
