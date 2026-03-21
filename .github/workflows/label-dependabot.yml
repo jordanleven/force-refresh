@@ -1,0 +1,29 @@
+name: Label Dependabot PRs
+
+on:
+  pull_request:
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    if: github.actor == 'dependabot[bot]'
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Fetch Dependabot metadata
+        id: metadata
+        uses: dependabot/fetch-metadata@v2
+
+      - name: Apply major label
+        if: steps.metadata.outputs.update-type == 'version-update:semver-major'
+        run: gh pr edit "$PR_URL" --add-label "update-major" --remove-label "update-minor" 2>/dev/null || gh pr edit "$PR_URL" --add-label "update-major"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+
+      - name: Apply minor or patch label
+        if: steps.metadata.outputs.update-type != 'version-update:semver-major'
+        run: gh pr edit "$PR_URL" --add-label "update-minor" --remove-label "update-major" 2>/dev/null || gh pr edit "$PR_URL" --add-label "update-minor"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
