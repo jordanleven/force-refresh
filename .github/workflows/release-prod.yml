@@ -1,6 +1,4 @@
 name: Release Production Build
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 on:
   push:
     tags:
@@ -14,14 +12,17 @@ jobs:
 
     steps:
       - name: Proofread commit types
-        uses: gsactions/commit-message-checker@v1
-        with:
-          pattern: '^(feat|fix|docs|style|refactor|test|chore).+'
-          error: 'Commit messages must begin with a valid commit type.'
-          excludeDescription: 'true'
-          excludeTitle: 'true'
-          checkAllCommitMessages: 'true'
-          accessToken: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits \
+            --jq '.[].commit.message | split("\n")[0]' | while IFS= read -r subject; do
+            if ! echo "$subject" | grep -qE '^(feat|fix|docs|style|refactor|test|chore).+'; then
+              echo "Invalid commit message: $subject"
+              echo "Commit messages must begin with a valid commit type."
+              exit 1
+            fi
+          done
 
   set-variables:
     name: Set Variables
