@@ -222,14 +222,13 @@ jobs:
         dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
-      uses: actions/cache@v4
+      uses: actions/cache/save@v4
       with:
-        save-always: true
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
   testing-e2e:
-    name: Testing - E2E
+    name: Testing – E2E
     runs-on: ubuntu-latest
     timeout-minutes: 15
     needs:
@@ -256,6 +255,9 @@ jobs:
             vendor
             node_modules
           key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+      - name: Build JavaScript artifact
+        run: npm run build
 
       - name: Add WordPress hostnames
         run: echo "127.0.0.1 wp5.force-refresh.localhost wp6.force-refresh.localhost" | sudo tee -a /etc/hosts
