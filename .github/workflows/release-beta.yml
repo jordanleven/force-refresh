@@ -58,9 +58,8 @@ jobs:
         run: composer install
 
       - name: Save to Cache
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
-          save-always: true
           path: |
             vendor
             node_modules
