@@ -5,12 +5,14 @@ test.describe('Admin', () => {
   test.describe('Force Refresh button', () => {
     test('Clicking Force Refresh updates the site version', async ({ page }) => {
       await page.goto('/');
+      await page.locator('html[force-refresh-version-site]').waitFor();
       const beforeVersion = await page.locator('html').getAttribute('force-refresh-version-site');
 
       await goToPluginPage(page);
       await page.locator('[data-test="btn-force-refresh"]').click();
 
       await page.goto('/');
+      await page.locator('html[force-refresh-version-site]').waitFor();
       const afterVersion = await page.locator('html').getAttribute('force-refresh-version-site');
 
       expect(afterVersion).not.toBe(beforeVersion);
