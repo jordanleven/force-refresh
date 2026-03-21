@@ -235,6 +235,12 @@ jobs:
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
+      - name: Pull build artifact from cache
+        uses: actions/cache@v4
+        with:
+          path: '**/'
+          key: build-${{ runner.os }}-${{ github.sha }}
+
       - name: Pull dependencies from cache
         uses: actions/cache@v4
         with:
@@ -242,9 +248,6 @@ jobs:
             vendor
             node_modules
           key: dependencies-${{ runner.os }}-${{ github.sha }}
-
-      - name: Build JavaScript artifact
-        run: npm run build
 
       - name: Add WordPress hostnames
         run: echo "127.0.0.1 wp5.force-refresh.localhost wp6.force-refresh.localhost" | sudo tee -a /etc/hosts
