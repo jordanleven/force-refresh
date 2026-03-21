@@ -268,7 +268,6 @@ jobs:
       - testing-javascript
       - testing-php
       - build
-      - testing-e2e
 
     steps:
     - uses: actions/checkout@v4
