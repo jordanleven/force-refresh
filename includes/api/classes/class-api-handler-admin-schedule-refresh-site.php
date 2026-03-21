@@ -84,10 +84,11 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * Method to get all scheduled refreshes from a cron event.
      *
      * @param array $cron_event The cron event.
+     * @param int   $timestamp  The Unix timestamp for this cron event.
      *
      * @return array The scheduled refreshes
      */
-    public static function get_scheduled_refreshes_from_cron_event( array $cron_event ) {
+    public static function get_scheduled_refreshes_from_cron_event( array $cron_event, int $timestamp ) {
         $scheduled_refreshes = array();
         foreach ( $cron_event as $event_name => $event_data ) {
             if ( self::ACTION_NAME_SCHEDULE_REFRESH_SITE === $event_name ) {
@@ -123,7 +124,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
             $scheduled_refreshes = array_merge(
                 $scheduled_refreshes,
-                self::get_scheduled_refreshes_from_cron_event( $cron_event ),
+                self::get_scheduled_refreshes_from_cron_event( $cron_event, $timestamp ),
             );
         }
 
