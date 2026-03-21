@@ -15,7 +15,7 @@ jobs:
       build-number: ${{ steps.build-number.outputs.BUILD_NUMBER }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Get node version
         run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
@@ -37,10 +37,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
@@ -56,9 +56,8 @@ jobs:
         run: composer install
 
       - name: Save to Cache
-        uses: actions/cache@v4
+        uses: actions/cache/save@v5
         with:
-          save-always: true
           path: |
             vendor
             node_modules
@@ -74,15 +73,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           fail-on-cache-miss: true
           path: |
@@ -106,15 +105,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           fail-on-cache-miss: true
           path: |
@@ -135,7 +134,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set PHP version
         uses: shivammathur/setup-php@v2
@@ -143,7 +142,7 @@ jobs:
           php-version: ${{ needs.set-variables.outputs.php-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -162,12 +161,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     - name: Pull dependencies from cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         fail-on-cache-miss: true
         path: |
@@ -176,7 +175,7 @@ jobs:
         key: dependencies-${{ runner.os }}-${{ github.sha }}
 
     - name: Set node version
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ needs.set-variables.outputs.node-version }}
 
@@ -200,14 +199,14 @@ jobs:
       run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
     - name: Build plugin artifact
-      uses: vimtor/action-zip@v1.2
+      uses: vimtor/action-zip@v1.3
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
         recursive: false
         dest: ./Force-Refresh-${{ needs.set-variables.outputs.build-number }}.zip
 
     - name: Save build to cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
@@ -226,21 +225,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull build artifact from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: '**/'
           key: build-${{ runner.os }}-${{ github.sha }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -271,7 +270,7 @@ jobs:
       - build
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
@@ -284,7 +283,7 @@ jobs:
         include-tag-commit: false
 
     - name: Pull build from cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
@@ -305,7 +304,7 @@ jobs:
           Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
 
     - name: Comment on PR
-      uses: mshick/add-pr-comment@v2
+      uses: mshick/add-pr-comment@v3.9.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
