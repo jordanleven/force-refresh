@@ -8,7 +8,7 @@ export default defineConfig({
   use: {
     trace: 'on-first-retry',
     launchOptions: {
-      slowMo: 800,
+      slowMo: process.env.PLAYWRIGHT_SLOW_MO ? 800 : 0,
     },
   },
   projects: [

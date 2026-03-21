@@ -213,6 +213,47 @@ jobs:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
+  testing-e2e:
+    name: Testing - E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs:
+      - install-dependencies
+      - set-variables
+      - linting
+      - testing-javascript
+      - testing-php
+      - build
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set node version
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ needs.set-variables.outputs.node-version }}
+
+      - name: Pull dependencies from cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            vendor
+            node_modules
+          key: dependencies-${{ runner.os }}-${{ github.sha }}
+
+      - name: Add WordPress hostnames
+        run: echo "127.0.0.1 wp5.force-refresh.localhost wp6.force-refresh.localhost" | sudo tee -a /etc/hosts
+
+      - name: Start WordPress instances
+        run: docker compose up -d --wait
+
+      - name: Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: Run e2e tests
+        run: npm run test:e2e
+
   release:
     name: Release Beta
     runs-on: ubuntu-latest
@@ -223,6 +264,7 @@ jobs:
       - testing-javascript
       - testing-php
       - build
+      - testing-e2e
 
     steps:
     - uses: actions/checkout@v4
