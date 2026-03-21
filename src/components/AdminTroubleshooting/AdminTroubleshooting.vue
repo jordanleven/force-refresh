@@ -26,7 +26,7 @@
       {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_DEBUG_MODE') }}
     </h2>
     <p>{{ debugCopy }}</p>
-    <BaseToggle :is-checked="isDebugActive" @toggled="toggleDebugMode" />
+    <BaseToggle data-test="toggle-debug-mode" :is-checked="isDebugActive" @toggled="toggleDebugMode" />
     <hr>
     <template v-if="false">
       <h4>
@@ -35,7 +35,7 @@
       <TroubleshootingConsole />
       <hr>
     </template>
-    <button class="button-primary" @click="exitTroubleshooting">
+    <button class="button-primary" data-test="btn-exit-troubleshooting" @click="exitTroubleshooting">
       {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_EXIT_TROUBLESHOOTING_MODE') }}
     </button>
   </div>

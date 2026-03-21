@@ -10,6 +10,7 @@
       <button
         type="submit"
         class="button button-primary admin__refresh-button"
+        data-test="btn-force-refresh"
         @click="refreshButtonClicked"
       >
         {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_NOW') }}

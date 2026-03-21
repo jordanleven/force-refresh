@@ -2,6 +2,7 @@
   <span
     v-if="refreshFromAdminBar"
     class="force-refresh__admin-bar"
+    data-test="btn-admin-bar-refresh"
     @click="refreshSite"
   >
     <span class="force-refresh__admin-bar-inner">

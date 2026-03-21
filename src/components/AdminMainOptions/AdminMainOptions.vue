@@ -50,6 +50,7 @@
           <button
             type="submit"
             class="button button-primary"
+            data-test="btn-update-options"
             @click="updateOptionsWasClicked"
           >
             {{ $t('FORM_BUTTONS_GENERIC.UPDATE') }}
@@ -61,6 +62,7 @@
       <div class="force-refresh-admin__options-utility">
         <button
           class="button button-secondary"
+          data-test="btn-troubleshooting"
           @click="pageClickedTroubleshooting"
         >
           {{ $t("ADMIN_TROUBLESHOOTING.BUTTON_ENTER_TROUBLESHOOTING_MODE") }}
@@ -69,6 +71,7 @@
       <div class="force-refresh-admin__options-utility">
         <button
           class="button button-secondary"
+          data-test="btn-release-notes"
           @click="pageClickedReleaseNotes"
         >
           {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_RELEASE_NOTES") }}
