@@ -19,14 +19,17 @@ jobs:
 
     steps:
       - name: Proofread commit types
-        uses: gsactions/commit-message-checker@v1
-        with:
-          pattern: '^(feat|fix|docs|style|refactor|test|chore).+'
-          error: 'Commit messages must begin with a valid commit type.'
-          excludeDescription: 'true'
-          excludeTitle: 'true'
-          checkAllCommitMessages: 'true'
-          accessToken: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/commits \
+            --jq '.[].commit.message | split("\n")[0]' | while IFS= read -r subject; do
+            if ! echo "$subject" | grep -qE '^(feat|fix|docs|style|refactor|test|chore).+'; then
+              echo "Invalid commit message: $subject"
+              echo "Commit messages must begin with a valid commit type."
+              exit 1
+            fi
+          done
 
   set-variables:
     name: Set Variables
@@ -38,7 +41,7 @@ jobs:
       release-version: ${{ steps.release-version.outputs.RELEASE_VERSION }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Read .nvmrc
         run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
@@ -74,10 +77,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
@@ -93,7 +96,7 @@ jobs:
         run: composer install
 
       - name: Save to cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -110,7 +113,7 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
 
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v4
@@ -119,6 +122,8 @@ jobs:
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
+      env:
+        CODEQL_ACTION_FILE_COVERAGE_ON_PRS: true
 
   linting:
     name: Linting
@@ -130,15 +135,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -161,15 +166,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -189,7 +194,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set PHP version
         uses: shivammathur/setup-php@v2
@@ -198,7 +203,7 @@ jobs:
           coverage: xdebug
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -209,11 +214,11 @@ jobs:
         run: composer test:coverage
 
       - name: Upload coverage reports to Codecov
-        uses: codecov/codecov-action@v4.0.1
+        uses: codecov/codecov-action@v5.5.3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           slug: jordanleven/force-refresh
-          file: ./coverage/coverage.xml
+          files: ./coverage/coverage.xml
 
   building:
     name: Building
@@ -225,15 +230,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set Node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
