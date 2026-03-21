@@ -6,3 +6,4 @@
  */
 
 require_once __DIR__ . '/php-mocks/mocks-autoload.php';
+require_once __DIR__ . '/php-mocks/wp-stubs.php';
