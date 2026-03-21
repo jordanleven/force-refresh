@@ -11,15 +11,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Proofread commit types
-        uses: gsactions/commit-message-checker@v1
+      - uses: actions/checkout@v6
         with:
-          pattern: '^(feat|fix|docs|style|refactor|test|chore).+'
-          error: 'Commit messages must begin with a valid commit type.'
-          excludeDescription: 'true'
-          excludeTitle: 'true'
-          checkAllCommitMessages: 'true'
-          accessToken: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Proofread commit types since last release
+        run: |
+          PREV_TAG=$(git describe --abbrev=0 --tags HEAD^ 2>/dev/null || echo "")
+          if [ -z "$PREV_TAG" ]; then
+            SUBJECTS=$(git log --format='%s')
+          else
+            SUBJECTS=$(git log ${PREV_TAG}..HEAD --format='%s')
+          fi
+          echo "$SUBJECTS" | while IFS= read -r subject; do
+            if ! echo "$subject" | grep -qE '^(feat|fix|docs|style|refactor|test|chore).+'; then
+              echo "Invalid commit message: $subject"
+              echo "Commit messages must begin with a valid commit type."
+              exit 1
+            fi
+          done
 
   set-variables:
     name: Set Variables
@@ -31,7 +41,7 @@ jobs:
       release-version: ${{ steps.release-version.outputs.RELEASE_VERSION }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Get node version .nvmrc
         run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
@@ -53,10 +63,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
@@ -72,7 +82,7 @@ jobs:
         run: composer install
 
       - name: Save to Cache
-        uses: actions/cache@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             vendor
@@ -89,15 +99,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -120,15 +130,15 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -148,7 +158,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set PHP version
         uses: shivammathur/setup-php@v2
@@ -156,7 +166,7 @@ jobs:
           php-version: ${{ needs.set-variables.outputs.php-version }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -175,12 +185,12 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     - name: Pull dependencies from cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         fail-on-cache-miss: true
         path: |
@@ -189,7 +199,7 @@ jobs:
         key: dependencies-${{ runner.os }}-${{ github.sha }}
 
     - name: Set node version
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: ${{ needs.set-variables.outputs.node-version }}
 
@@ -215,14 +225,14 @@ jobs:
       run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
     - name: Build plugin artifact
-      uses: vimtor/action-zip@v1.2
+      uses: vimtor/action-zip@v1.3
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
         recursive: false
         dest: ./Force-Refresh-${{ needs.set-variables.outputs.release-version }}.zip
 
     - name: Save build to cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       with:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
@@ -241,21 +251,21 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set node version
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ needs.set-variables.outputs.node-version }}
 
       - name: Pull build artifact from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: '**/'
           key: build-${{ runner.os }}-${{ github.sha }}
 
       - name: Pull dependencies from cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             vendor
@@ -288,12 +298,12 @@ jobs:
       - testing-e2e
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         fetch-depth: 0
 
     - name: Pull build from cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         fail-on-cache-miss: true
         path: '**/'
