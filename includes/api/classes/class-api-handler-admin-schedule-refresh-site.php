@@ -91,12 +91,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
         $scheduled_refreshes = array();
         foreach ( $cron_event as $event_name => $event_data ) {
             if ( self::ACTION_NAME_SCHEDULE_REFRESH_SITE === $event_name ) {
-                array_push(
-                    $scheduled_refreshes,
-                    array(
-                        'timestamp' => $timestamp,
-                    )
-                );
+                array_push( $scheduled_refreshes, array() );
             }
         }
 

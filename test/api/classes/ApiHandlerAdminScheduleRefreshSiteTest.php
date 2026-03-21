@@ -229,20 +229,18 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     }
 
     /**
-     * Test that get_scheduled_refreshes returns matching events with their timestamps.
+     * Test that get_scheduled_refreshes returns matching events.
      */
-    public function testGetScheduledRefreshesReturnsMatchingEventsWithTimestamps() {
-        $timestamp = 1234567890;
+    public function testGetScheduledRefreshesReturnsMatchingEvents() {
         self::$mock_get_option->set_return_value(
             array(
-                $timestamp => array(
+                1234567890 => array(
                     'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
                 ),
             )
         );
         $result = Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes();
         $this->assertCount( 1, $result );
-        $this->assertEquals( $timestamp, $result[0]['timestamp'] );
     }
 
     /**
