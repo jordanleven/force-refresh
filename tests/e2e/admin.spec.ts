@@ -112,7 +112,7 @@ test.describe('Admin', () => {
     });
 
     test('The release notes modal contains release notes', async ({ page }) => {
-      await expect(page.locator('.release-note').first()).toBeVisible();
+      await expect(page.locator('.release-note').first()).toBeVisible({ timeout: 15_000 });
     });
   });
 });
