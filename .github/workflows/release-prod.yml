@@ -218,7 +218,7 @@ jobs:
       run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
     - name: Build plugin artifact
-      uses: vimtor/action-zip@v1.2
+      uses: vimtor/action-zip@v1.3
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
         recursive: false

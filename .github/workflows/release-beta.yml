@@ -199,7 +199,7 @@ jobs:
       run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
 
     - name: Build plugin artifact
-      uses: vimtor/action-zip@v1.2
+      uses: vimtor/action-zip@v1.3
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
         recursive: false
@@ -304,7 +304,7 @@ jobs:
           Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
 
     - name: Comment on PR
-      uses: mshick/add-pr-comment@v2
+      uses: mshick/add-pr-comment@v3.9.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
