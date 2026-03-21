@@ -102,6 +102,7 @@ test.describe('Admin', () => {
     test.beforeEach(async ({ page }) => {
       await goToPluginPage(page);
       await page.locator('[data-test="btn-release-notes"]').click();
+      await page.waitForLoadState('networkidle');
     });
 
     test('Clicking View Release Notes shows the release notes modal', async ({ page }) => {

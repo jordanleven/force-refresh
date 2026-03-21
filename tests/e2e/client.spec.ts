@@ -42,7 +42,10 @@ test.describe('Client', () => {
       // Enable debug mode and check if it actually took effect
       await adminPage.locator('[data-test="btn-troubleshooting"]').click();
       await adminPage.locator('[data-test="toggle-debug-mode"] label').click();
-      debugModeEnabled = await adminPage.locator('.notice-force-refresh.notice-warning').isVisible();
+      debugModeEnabled = await adminPage.locator('.notice-force-refresh.notice-warning')
+        .waitFor({ state: 'visible', timeout: 5_000 })
+        .then(() => true)
+        .catch(() => false);
 
       if (!debugModeEnabled) {
         await adminContext.close();
