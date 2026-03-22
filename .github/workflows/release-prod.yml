@@ -19,9 +19,9 @@ jobs:
         run: |
           PREV_TAG=$(git describe --abbrev=0 --tags HEAD^ 2>/dev/null || echo "")
           if [ -z "$PREV_TAG" ]; then
-            SUBJECTS=$(git log --format='%s')
+            SUBJECTS=$(git log --no-merges --format='%s')
           else
-            SUBJECTS=$(git log ${PREV_TAG}..HEAD --format='%s')
+            SUBJECTS=$(git log ${PREV_TAG}..HEAD --no-merges --format='%s')
           fi
           echo "$SUBJECTS" | while IFS= read -r subject; do
             if ! echo "$subject" | grep -qE '^(feat|fix|docs|style|refactor|test|chore).+'; then

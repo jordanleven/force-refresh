@@ -26,7 +26,7 @@ jobs:
         env:
           BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
         run: |
-          git log ${BASE_SHA}..HEAD --format='%s' | while IFS= read -r subject; do
+          git log ${BASE_SHA}..HEAD --no-merges --format='%s' | while IFS= read -r subject; do
             if ! echo "$subject" | grep -qE '^(feat|fix|docs|style|refactor|test|chore).+'; then
               echo "Invalid commit message: $subject"
               echo "Commit messages must begin with a valid commit type."
