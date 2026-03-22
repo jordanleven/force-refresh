@@ -75,7 +75,7 @@
     "simple-git": "^3.33.0",
     "standard-version": "^9.5.0",
     "style-loader": "^4.0.0",
-    "stylelint": "^17.4.0",
+    "stylelint": "^17.5.0",
     "stylelint-config-recommended-scss": "^17.0.0",
     "stylelint-config-recommended-vue": "^1.6.1",
     "stylelint-config-standard": "^40.0.0",
