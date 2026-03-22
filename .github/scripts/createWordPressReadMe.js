@@ -218,6 +218,7 @@ const getFileContents = (fileLocation) => fs.readFileSync(fileLocation, 'utf8');
  */
 const getParsedReadMe = () => pipe(
   getFileContents,
+  (content) => content.replace(/^!\[.*?\]\(.*?\)\n\n?/gm, ''),
   md2json.parse,
 )('./README.md');
 

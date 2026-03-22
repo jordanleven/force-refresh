@@ -1,3 +1,5 @@
+![banner](/assets/banner.png)
+
 # Force Refresh
 
 ![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
