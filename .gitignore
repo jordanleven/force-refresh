@@ -11,6 +11,6 @@ node_modules
 !qa/.gitkeep
 .phpunit.result.cache
 coverage
-tests/e2e/.auth/
+test/e2e/.auth/
 /playwright-last-run/
 /test-results/*
