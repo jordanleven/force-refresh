@@ -1,10 +1,10 @@
 import { defineConfig, devices } from '@playwright/test';
-import { getAuthFile } from './tests/e2e/helpers/constants';
+import { getAuthFile } from './test/e2e/helpers/constants';
 
 const QA_INSTANCE = { name: 'QA', baseURL: 'http://qa.force-refresh.localhost' };
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: './test/e2e',
   timeout: 120_000,
   reporter: 'list',
   workers: 1,
