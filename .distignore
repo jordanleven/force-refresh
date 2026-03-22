@@ -10,8 +10,7 @@
 .wordpress
 assets
 CHANGELOG.md
-composer.json
-composer.lock
+composer.*
 CONTRIBUTING.md
 db
 docker-compose.yml
