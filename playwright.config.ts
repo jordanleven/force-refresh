@@ -1,8 +1,8 @@
 import { defineConfig, devices } from '@playwright/test';
-import { WP_INSTANCES, getAuthFile } from './tests/e2e/helpers/constants';
+import { WP_INSTANCES, getAuthFile } from './test/e2e/helpers/constants';
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: './test/e2e',
   timeout: 120_000,
   reporter: 'list',
   use: {

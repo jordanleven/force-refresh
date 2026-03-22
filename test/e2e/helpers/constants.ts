@@ -6,5 +6,5 @@ export const WP_INSTANCES = [
 export function getAuthFile(baseURL: string): string {
   const { hostname } = new URL(baseURL);
   const instance = hostname.split('.')[0];
-  return `tests/e2e/.auth/${instance}.json`;
+  return `test/e2e/.auth/${instance}.json`;
 }

@@ -27,7 +27,6 @@ phpunit.xml
 playwright.config.ts
 qa
 README.md
-scripts
 src
-test/php-mocks/*
+test/*
 webpack.config.js
