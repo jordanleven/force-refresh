@@ -149,7 +149,7 @@ VALUES
 	(25,'links_updated_date_format','F j, Y g:i a','yes'),
 	(26,'comment_moderation','0','yes'),
 	(27,'moderation_notify','1','yes'),
-	(28,'permalink_structure','','yes'),
+	(28,'permalink_structure','/%year%/%monthnum%/%day%/%postname%/','yes'),
 	(29,'rewrite_rules','','yes'),
 	(30,'hack_file','0','yes'),
 	(31,'blog_charset','UTF-8','yes'),
