@@ -81,7 +81,7 @@ services:
     ports:
       - '8082:80'
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost/wp-json/force-refresh/v1/site-version"]
+      test: ["CMD", "curl", "-sf", "http://localhost/wp-json/"]
       interval: 10s
       timeout: 5s
       retries: 20
@@ -125,7 +125,7 @@ services:
     ports:
       - '8083:80'
     healthcheck:
-      test: ["CMD", "curl", "-sf", "http://localhost/wp-json/force-refresh/v1/site-version"]
+      test: ["CMD", "curl", "-sf", "http://localhost/wp-json/"]
       interval: 10s
       timeout: 5s
       retries: 20
