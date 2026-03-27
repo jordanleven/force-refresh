@@ -23,6 +23,8 @@ Contributors:
 
 // phpcs:enable Generic.Files.LineLength
 
+// The absolute path to the plugin's root directory.
+define( 'WP_FORCE_REFRESH_PLUGIN_DIR', __DIR__ );
 // Define the name of the action for the refresh. This is used with the nonce to create a unique
 // action when admins request a refresh.
 define( 'WP_FORCE_REFRESH_ACTION', 'wp_force_refresh' );

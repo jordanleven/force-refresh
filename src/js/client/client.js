@@ -144,6 +144,7 @@ const getRefreshIntervalMessage = (refreshInterval) => {
 
 // eslint-disable-next-line no-undef
 const { isDebugActive, refreshInterval } = forceRefreshLocalizedData;
+
 const refreshIntervalMessage = getRefreshIntervalMessage(refreshInterval);
 
 setDebugMode(!!isDebugActive);

@@ -126,6 +126,13 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     private static $mock_current_user_can;
 
     /**
+     * Mock for `wp_generate_uuid4`.
+     *
+     * @var Mocks\Mock_Wp_Generate_Uuid4
+     */
+    private static $mock_wp_generate_uuid4;
+
+    /**
      * Initial test setup.
      *
      * @return void
@@ -145,6 +152,7 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_current_blog_id       = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
         self::$mock_get_rest_url              = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
         self::$mock_current_user_can          = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
+        self::$mock_wp_generate_uuid4         = new Mocks\Mock_Wp_Generate_Uuid4( __NAMESPACE__ );
     }
 
     /**
@@ -167,6 +175,7 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_current_blog_id->disable();
         self::$mock_get_rest_url->disable();
         self::$mock_current_user_can->disable();
+        self::$mock_wp_generate_uuid4->disable();
     }
 
     /**
@@ -235,12 +244,55 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_option->set_return_value(
             array(
                 1234567890 => array(
-                    'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
                 ),
             )
         );
         $result = Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes();
         $this->assertCount( 1, $result );
+    }
+
+    /**
+     * Test that get_scheduled_refreshes includes the timestamp in each returned event.
+     */
+    public function testGetScheduledRefreshesIncludesTimestamp() {
+        $timestamp = 1234567890;
+        self::$mock_get_option->set_return_value(
+            array(
+                $timestamp => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
+                ),
+            )
+        );
+        $result = Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes();
+        $this->assertEquals( $timestamp, $result[0]['timestamp'] );
+    }
+
+    /**
+     * Test that get_scheduled_refreshes returns events sorted by latest first.
+     */
+    public function testGetScheduledRefreshesReturnsSortedBySoonestFirst() {
+        self::$mock_get_option->set_return_value(
+            array(
+                9999999999 => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'uuid-far' ) ),
+                    ),
+                ),
+                1000000000 => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'def' => array( 'schedule' => false, 'args' => array( 'uuid-soon' ) ),
+                    ),
+                ),
+            )
+        );
+        $result = Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes();
+        $this->assertEquals( 9999999999, $result[0]['timestamp'] );
+        $this->assertEquals( 1000000000, $result[1]['timestamp'] );
     }
 
     /**
@@ -251,7 +303,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
             array(
                 'version'  => 2,
                 123456789  => array(
-                    'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
                 ),
             )
         );
@@ -260,10 +314,34 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     }
 
     /**
+     * Test that get_scheduled_refreshes_site returns a 200 response with scheduled refreshes.
+     */
+    public function testGetScheduledRefreshSiteReturns200Response() {
+        self::$mock_status_header->resetInvocationIndex();
+        $timestamp = 1234567890;
+        self::$mock_get_option->set_return_value(
+            array(
+                $timestamp => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
+                ),
+            )
+        );
+
+        ob_start();
+        ( new Api_Handler_Admin_Schedule_Refresh_Site() )->get_scheduled_refreshes_site();
+        ob_get_clean();
+
+        $this->assertEquals( 200, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+    }
+
+    /**
      * Test that schedule_refresh_site schedules a WordPress cron event.
      */
     public function testScheduleRefreshSiteSchedulesEvent() {
         self::$mock_wp_schedule_single_event->resetInvocationIndex();
+        self::$mock_wp_generate_uuid4->set_return_value( 'test-uuid-5678' );
 
         $timestamp          = '2026-12-31 12:00:00';
         $expected_unix_time = strtotime( $timestamp );
@@ -278,6 +356,7 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         $args = self::$mock_wp_schedule_single_event->get_invocation_arguments( 0 );
         $this->assertEquals( $expected_unix_time, $args[0] );
         $this->assertEquals( 'force_refresh_scheduled_site_refresh', $args[1] );
+        $this->assertEquals( array( 'test-uuid-5678' ), $args[2] );
     }
 
     /**
@@ -302,9 +381,20 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     public function testDeleteScheduleRefreshSiteClearsScheduledHook() {
         self::$mock_wp_clear_scheduled_hook->resetInvocationIndex();
 
-        $timestamp = 1234567890;
-        $request   = new \WP_REST_Request();
-        $request->set_param( 'schedule_refresh_timestamp', $timestamp );
+        $uuid = 'test-uuid-1234';
+        self::$mock_get_option->set_return_value(
+            array(
+                9999999999 => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( $uuid ) ),
+                    ),
+                ),
+            )
+        );
+        self::$mock_wp_clear_scheduled_hook->set_return_value( 1 );
+
+        $request = new \WP_REST_Request();
+        $request->set_param( 'id', $uuid );
 
         ob_start();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );
@@ -312,7 +402,7 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
 
         $args = self::$mock_wp_clear_scheduled_hook->get_invocation_arguments( 0 );
         $this->assertEquals( 'force_refresh_scheduled_site_refresh', $args[0] );
-        $this->assertEquals( array( $timestamp ), $args[1] );
+        $this->assertEquals( array( $uuid ), $args[1] );
     }
 
     /**
@@ -321,8 +411,20 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     public function testDeleteScheduleRefreshSiteReturns202Response() {
         self::$mock_status_header->resetInvocationIndex();
 
+        $uuid = 'test-uuid-1234';
+        self::$mock_get_option->set_return_value(
+            array(
+                9999999999 => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( $uuid ) ),
+                    ),
+                ),
+            )
+        );
+        self::$mock_wp_clear_scheduled_hook->set_return_value( 1 );
+
         $request = new \WP_REST_Request();
-        $request->set_param( 'schedule_refresh_timestamp', 1234567890 );
+        $request->set_param( 'id', $uuid );
 
         ob_start();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );

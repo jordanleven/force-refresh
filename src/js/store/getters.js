@@ -1,5 +1,7 @@
 export default {
+  featureFlags: ({ featureFlags }) => featureFlags,
   isDebugActive: ({ settings }) => settings.isDebugActive,
+  isFeatureEnabled: ({ featureFlags }) => (flag) => Boolean(featureFlags?.[flag]),
   refreshFromAdminBar: ({ settings }) => settings.refreshFromAdminBar,
   refreshInterval: ({ settings }) => settings.refreshInterval,
   refreshOptions: ({ settings }, getters) => ({

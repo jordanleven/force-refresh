@@ -8,8 +8,12 @@
         <p>{{ $t("SCHEDULE_REFRESH.DESCRIPTION") }}</p>
       </div>
       <div class="admin-scheduled-refresh__date-picker">
+        <label for="schedule-datetime-picker" class="admin-scheduled-refresh__label">
+          {{ $t('SCHEDULE_REFRESH.DATE_TIME_LABEL') }}
+        </label>
         <DatePicker
-          v-model="scheduleDateTime"
+          v-model:value="scheduleDateTime"
+          :input-attr="{ id: 'schedule-datetime-picker' }"
           type="datetime"
           :use12h="true"
           :show-second="false"
@@ -18,7 +22,12 @@
         />
       </div>
       <div>
-        <button class="button button-primary button-schedule-refresh" :disabled="buttonDisabled" @click="scheduleRefresh">
+        <button
+          class="button button-primary button-schedule-refresh"
+          data-test="btn-submit-schedule-refresh"
+          :disabled="buttonDisabled"
+          @click="scheduleRefresh"
+        >
           {{ scheduleButtonTest }}
         </button>
       </div>
@@ -29,6 +38,7 @@
 <script>
 import DatePicker from 'vue-datepicker-next';
 import BaseModal from '@/components/BaseModal/BaseModal.vue';
+import { filterAvailableDates, filterAvailableTimes, formatScheduledTime } from './AdminScheduleRefreshUtils.js';
 
 export default {
   name: 'AdminScheduleRefresh',
@@ -53,27 +63,12 @@ export default {
         : this.$t('SCHEDULE_REFRESH.SUBMIT_BUTTON');
     },
     scheduledTimeFormatted() {
-      const scheduledDateTime = new Date(this.scheduleDateTime);
-      const date = scheduledDateTime.toLocaleDateString('en-us', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      });
-      const time = scheduledDateTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      return `${date} at ${time}`;
+      return formatScheduledTime(this.scheduleDateTime);
     },
   },
   methods: {
-    filterAvailableDates(date) {
-      const currentDate = new Date().setHours(0, 0, 0, 0);
-      const optionDate = new Date(date);
-      return currentDate > optionDate;
-    },
-    filterAvailableTimes(date) {
-      const currentDate = new Date();
-      const optionDate = new Date(date);
-      return currentDate > optionDate;
-    },
+    filterAvailableDates,
+    filterAvailableTimes,
     scheduleRefresh() {
       this.$emit('schedule-refresh', this.scheduleDateTime);
     },
@@ -96,6 +91,14 @@ export default {
 
   .admin-scheduled-refresh__date-picker {
     margin-top: var.$space-large;
+  }
+
+  .admin-scheduled-refresh__label {
+    display: block;
+    margin-bottom: var.$space-small;
+    font-weight: 600;
+    color: var.$dark-grey;
+    font-size: 0.9rem;
   }
 
   .button-primary.button-schedule-refresh {
