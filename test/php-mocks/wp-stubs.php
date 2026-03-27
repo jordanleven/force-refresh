@@ -10,8 +10,10 @@ if ( ! class_exists( 'WP_REST_Server' ) ) {
      * Stub for WP_REST_Server.
      */
     class WP_REST_Server {
+        const CREATABLE  = 'POST';
         const EDITABLE   = 'POST, PUT, PATCH';
         const READABLE   = 'GET';
+        const DELETABLE  = 'DELETE';
         const ALLMETHODS = 'GET, POST, PUT, PATCH, DELETE';
     }
 }
