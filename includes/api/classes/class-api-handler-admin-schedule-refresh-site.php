@@ -42,19 +42,21 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
-                'methods'             => \WP_REST_Server::EDITABLE,
-                'callback'            => array( $this, 'schedule_refresh_site' ),
-                'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
-            ),
-        );
-
-        self::register_rest_endpoint(
-            self::ENDPOINT_PATH,
-            self::ENDPOINT_VERSION,
-            array(
-                'methods'             => \WP_REST_Server::ALLMETHODS,
-                'callback'            => array( $this, 'delete_schedule_refresh_site' ),
-                'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                array(
+                    'methods'             => \WP_REST_Server::READABLE,
+                    'callback'            => array( $this, 'get_scheduled_refreshes_site' ),
+                    'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                ),
+                array(
+                    'methods'             => \WP_REST_Server::EDITABLE,
+                    'callback'            => array( $this, 'schedule_refresh_site' ),
+                    'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                ),
+                array(
+                    'methods'             => \WP_REST_Server::DELETABLE,
+                    'callback'            => array( $this, 'delete_schedule_refresh_site' ),
+                    'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                ),
             ),
         );
     }
@@ -71,11 +73,11 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     /**
      * Method for executing a scheduled site refresh.
      *
-     * @param string $time The scheduled time.
+     * @param string $uuid The UUID for the scheduled refresh.
      *
      * @return  void
      */
-    public function executeSiteRefresh( $time ): void {
+    public function executeSiteRefresh( string $uuid ): void {
         $site_version = Versions_Storage_Service::get_new_version();
         Versions_Storage_Service::set_site_version( $site_version );
     }
@@ -84,14 +86,23 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * Method to get all scheduled refreshes from a cron event.
      *
      * @param array $cron_event The cron event.
+     * @param int   $timestamp  The Unix timestamp for the event.
      *
      * @return array The scheduled refreshes
      */
-    public static function get_scheduled_refreshes_from_cron_event( array $cron_event ) {
+    public static function get_scheduled_refreshes_from_cron_event( array $cron_event, int $timestamp ) {
         $scheduled_refreshes = array();
         foreach ( $cron_event as $event_name => $event_data ) {
             if ( self::ACTION_NAME_SCHEDULE_REFRESH_SITE === $event_name ) {
-                array_push( $scheduled_refreshes, array() );
+                foreach ( $event_data as $event ) {
+                    array_push(
+                        $scheduled_refreshes,
+                        array(
+                            'timestamp' => $timestamp,
+                            'uuid'      => $event['args'][0],
+                        )
+                    );
+                }
             }
         }
 
@@ -118,11 +129,33 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
             $scheduled_refreshes = array_merge(
                 $scheduled_refreshes,
-                self::get_scheduled_refreshes_from_cron_event( $cron_event ),
+                self::get_scheduled_refreshes_from_cron_event( $cron_event, (int) $timestamp ),
             );
         }
 
+        usort(
+            $scheduled_refreshes,
+            function ( $a, $b ) {
+                return $b['timestamp'] - $a['timestamp'];
+            }
+        );
+
         return $scheduled_refreshes;
+    }
+
+    /**
+     * Method for getting all scheduled refreshes.
+     *
+     * @return void
+     */
+    public function get_scheduled_refreshes_site(): void {
+        $this->return_api_response(
+            200,
+            'Successfully retrieved scheduled refreshes.',
+            array(
+                'scheduled_refreshes' => self::get_scheduled_refreshes(),
+            )
+        );
     }
 
     /**
@@ -133,21 +166,21 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return void
      */
     public function delete_schedule_refresh_site( \WP_REST_Request $request ): void {
-        $scheduled_refresh = (int) $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
+        $uuid = $request->get_param( 'uuid' ) ?? null;
 
-        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $scheduled_refresh ) );
+        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $uuid ) );
 
         $this->return_api_response(
             202,
             'You\'ve successfully deleted a site refresh.',
             array(
-                'scheduled_refresh_time' => $scheduled_refresh,
+                'uuid' => $uuid,
             )
         );
     }
 
     /**
-     * Method for refreshing the site version.
+     * Method for scheduling a site refresh.
      *
      * @param \WP_REST_Request $request The request object.
      *
@@ -156,14 +189,16 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     public function schedule_refresh_site( \WP_REST_Request $request ): void {
         $scheduled_refresh      = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
         $scheduled_refresh_time = strtotime( $scheduled_refresh );
+        $uuid                   = wp_generate_uuid4();
 
-        wp_schedule_single_event( $scheduled_refresh_time, self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $scheduled_refresh_time ) );
+        wp_schedule_single_event( $scheduled_refresh_time, self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $uuid ) );
 
         $this->return_api_response(
             201,
             'You\'ve successfully scheduled a site refresh.',
             array(
                 'scheduled_refresh_time' => $scheduled_refresh_time,
+                'uuid'                   => $uuid,
             )
         );
     }
