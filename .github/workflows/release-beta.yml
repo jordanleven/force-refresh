@@ -125,7 +125,7 @@ jobs:
         run: npm test
 
   testing-php:
-    name: Testing — PHP
+    name: Testing – PHP
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs:
