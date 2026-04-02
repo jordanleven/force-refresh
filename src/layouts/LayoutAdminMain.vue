@@ -38,6 +38,7 @@
         <AdminMain
           v-if="!troubleshootingActive"
           class="admin-section__main"
+          :is-scheduled-refresh-enabled="isScheduledRefreshEnabled"
           :refresh-options="refreshOptions"
           :scheduled-refreshes="scheduledRefreshes"
           :site-name="siteName"
@@ -66,7 +67,7 @@
       <div class="admin-window" :class="classAdminScheduleRefresh">
         <transition name="fade-and-move">
           <div
-            v-if="!troubleshootingActive && scheduleRefreshPageActive"
+            v-if="isScheduledRefreshEnabled && !troubleshootingActive && scheduleRefreshPageActive"
             class="admin-window__inner"
           >
             <AdminScheduleRefresh
@@ -152,8 +153,12 @@ export default {
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
     },
+    isScheduledRefreshEnabled() {
+      return this.isFeatureEnabled('scheduledRefresh');
+    },
     ...mapGetters([
       'isDebugActive',
+      'isFeatureEnabled',
       'refreshFromAdminBar',
       'refreshInterval',
       'refreshOptions',

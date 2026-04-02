@@ -13,6 +13,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 
 // The name of the main admin JS file.
@@ -108,6 +109,7 @@ function get_localized_data(): array {
             'isMultiSite'                 => (bool) is_multisite(),
             'currentSiteId'               => (int) get_current_blog_id(),
             'versions'                    => $versions,
+            'featureFlags'                => Feature_Flag_Service::get_all(),
         ),
     );
 }
