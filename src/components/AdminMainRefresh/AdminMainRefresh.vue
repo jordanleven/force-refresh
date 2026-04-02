@@ -15,9 +15,8 @@
       >
         {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_NOW') }}
       </button>
-      <!-- Future location for scheduled refreshes -->
       <button
-        v-if="false"
+        v-if="isScheduledRefreshEnabled"
         type="submit"
         class="button admin__refresh-button"
         @click="scheduleRefreshButtonClicked"
@@ -53,6 +52,7 @@ library.add([faSyncAlt]);
 export default {
   name: 'AdminMainRefresh',
   props: {
+    isScheduledRefreshEnabled: VueTypes.bool.def(false),
     scheduledRefreshes: VueTypes.array,
     siteName: VueTypes.string.isRequired,
   },
