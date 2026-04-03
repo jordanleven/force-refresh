@@ -13,6 +13,9 @@ export default {
   SET_REFRESH_INTERVAL: (state, updatedRefreshInterval) => {
     state.settings.refreshInterval = updatedRefreshInterval;
   },
+  SET_SCHEDULED_REFRESHES: (state, scheduledRefreshes) => {
+    state.site.scheduledRefreshes = scheduledRefreshes;
+  },
   SET_SHOW_REFRESH_IN_MENU_BAR: (state, updatedShowRefreshInMenuBar) => {
     state.settings.refreshFromAdminBar = updatedShowRefreshInMenuBar;
   },
