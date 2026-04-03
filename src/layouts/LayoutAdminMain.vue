@@ -44,6 +44,7 @@
           :site-name="siteName"
           @refresh-requested="refreshSite"
           @schedule-refresh-requested="scheduleRefresh"
+          @scheduled-refreshes-sync-requested="syncScheduledRefreshes"
           @delete-scheduled-refresh="deleteScheduledRefresh"
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
@@ -150,11 +151,11 @@ export default {
     isAdminNotificationSet() {
       return !!this.notificationMessage?.message;
     },
-    troubleshootingActive() {
-      return this.troubleshootingPageIsActive;
-    },
     isScheduledRefreshEnabled() {
       return this.isFeatureEnabled('scheduledRefresh');
+    },
+    troubleshootingActive() {
+      return this.troubleshootingPageIsActive;
     },
     ...mapGetters([
       'isDebugActive',
@@ -233,6 +234,7 @@ export default {
       const success = await this.requestScheduledRefresh(scheduledRefresh);
       this.scheduleRefreshPageActive = false;
       if (success) {
+        await this.requestScheduledRefreshes();
         this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_SUCCESS'));
       } else {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE'));
@@ -240,6 +242,9 @@ export default {
     },
     scheduleRefresh() {
       this.scheduleRefreshPageActive = true;
+    },
+    async syncScheduledRefreshes() {
+      await this.requestScheduledRefreshes();
     },
     async updateDebugMode(newValue) {
       const success = await this.updateForceRefreshDebugMode(newValue);
@@ -270,6 +275,7 @@ export default {
       'requestDeleteScheduledRefresh',
       'requestRefreshSite',
       'requestScheduledRefresh',
+      'requestScheduledRefreshes',
       'updateForceRefreshSettings',
       'updateForceRefreshDebugMode',
     ]),

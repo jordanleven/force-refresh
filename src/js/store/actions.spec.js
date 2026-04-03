@@ -1,20 +1,20 @@
+import {
+  deleteScheduledRefresh,
+  getScheduledRefreshes,
+  scheduleRequestSiteRefresh,
+} from '../services/admin/refreshService.js';
 import actions from './actions.js';
 
 // Mock the service module
 jest.mock('../services/admin/refreshService.js', () => ({
   deleteScheduledRefresh: jest.fn(),
-  scheduleRequestSiteRefresh: jest.fn(),
+  getScheduledRefreshes: jest.fn(),
   requestPostRefreshByPostID: jest.fn(),
   requestSiteRefresh: jest.fn(),
+  scheduleRequestSiteRefresh: jest.fn(),
   updateForceRefreshDebugMode: jest.fn(),
   updateForceRefreshOptions: jest.fn(),
 }));
-
-// Import mocked functions after mocking the module
-import {
-  deleteScheduledRefresh,
-  scheduleRequestSiteRefresh,
-} from '../services/admin/refreshService.js';
 
 describe('Store Actions', () => {
   beforeEach(() => {
@@ -81,8 +81,8 @@ describe('Store Actions', () => {
       const response = {
         code: 201,
         data: {
-          scheduled_refresh_time: timestamp,
           id,
+          scheduled_refresh_time: timestamp,
         },
       };
 
@@ -92,8 +92,8 @@ describe('Store Actions', () => {
 
       expect(scheduleRequestSiteRefresh).toHaveBeenCalledWith(scheduledRefresh);
       expect(commit).toHaveBeenCalledWith('ADD_SCHEDULED_REFRESH', {
-        timestamp,
         id,
+        timestamp,
       });
       expect(result).toBe(true);
     });
@@ -125,6 +125,43 @@ describe('Store Actions', () => {
       scheduleRequestSiteRefresh.mockResolvedValue(response);
 
       const result = await actions.requestScheduledRefresh({ commit }, scheduledRefresh);
+
+      expect(commit).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('requestScheduledRefreshes', () => {
+    it('commits SET_SCHEDULED_REFRESHES on successful fetch', async () => {
+      const commit = jest.fn();
+      const scheduledRefreshes = [
+        { id: 'first', timestamp: 1777862400 },
+        { id: 'second', timestamp: 1777862460 },
+      ];
+      const response = {
+        code: 200,
+        data: {
+          scheduled_refreshes: scheduledRefreshes,
+        },
+      };
+
+      getScheduledRefreshes.mockResolvedValue(response);
+
+      const result = await actions.requestScheduledRefreshes({ commit });
+
+      expect(getScheduledRefreshes).toHaveBeenCalled();
+      expect(commit).toHaveBeenCalledWith('SET_SCHEDULED_REFRESHES', scheduledRefreshes);
+      expect(result).toBe(true);
+    });
+
+    it('does not commit on an unsuccessful fetch', async () => {
+      const commit = jest.fn();
+      getScheduledRefreshes.mockResolvedValue({
+        code: 500,
+        data: {},
+      });
+
+      const result = await actions.requestScheduledRefreshes({ commit });
 
       expect(commit).not.toHaveBeenCalled();
       expect(result).toBe(false);

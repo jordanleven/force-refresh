@@ -9,8 +9,8 @@ describe('Store Mutations', () => {
         },
       };
       const newRefresh = {
-        timestamp: 1719792000,
         id: '12345-67890',
+        timestamp: 1719792000,
       };
 
       mutations.ADD_SCHEDULED_REFRESH(state, newRefresh);
@@ -22,12 +22,12 @@ describe('Store Mutations', () => {
     it('adds multiple scheduled refreshes to the state', () => {
       const state = {
         site: {
-          scheduledRefreshes: [{ timestamp: 1719792000, id: 'first' }],
+          scheduledRefreshes: [{ id: 'first', timestamp: 1719792000 }],
         },
       };
       const newRefresh = {
-        timestamp: 1719878400,
         id: 'second',
+        timestamp: 1719878400,
       };
 
       mutations.ADD_SCHEDULED_REFRESH(state, newRefresh);
@@ -42,9 +42,9 @@ describe('Store Mutations', () => {
       const state = {
         site: {
           scheduledRefreshes: [
-            { timestamp: 1719792000, id: 'first' },
-            { timestamp: 1719878400, id: 'second' },
-            { timestamp: 1719964800, id: 'third' },
+            { id: 'first', timestamp: 1719792000 },
+            { id: 'second', timestamp: 1719878400 },
+            { id: 'third', timestamp: 1719964800 },
           ],
         },
       };
@@ -60,8 +60,8 @@ describe('Store Mutations', () => {
       const state = {
         site: {
           scheduledRefreshes: [
-            { timestamp: 1719792000, id: 'first' },
-            { timestamp: 1719878400, id: 'second' },
+            { id: 'first', timestamp: 1719792000 },
+            { id: 'second', timestamp: 1719878400 },
           ],
         },
       };
@@ -74,7 +74,7 @@ describe('Store Mutations', () => {
     it('removes all items when deleting from single-item array', () => {
       const state = {
         site: {
-          scheduledRefreshes: [{ timestamp: 1719792000, id: 'only' }],
+          scheduledRefreshes: [{ id: 'only', timestamp: 1719792000 }],
         },
       };
 
@@ -107,6 +107,21 @@ describe('Store Mutations', () => {
       mutations.SET_DEBUG_MODE(state, false);
 
       expect(state.settings.isDebugActive).toBe(false);
+    });
+  });
+
+  describe('SET_SCHEDULED_REFRESHES', () => {
+    it('replaces the scheduled refreshes in state', () => {
+      const state = {
+        site: {
+          scheduledRefreshes: [{ id: 'old', timestamp: 1719792000 }],
+        },
+      };
+      const scheduledRefreshes = [{ id: 'new', timestamp: 1719878400 }];
+
+      mutations.SET_SCHEDULED_REFRESHES(state, scheduledRefreshes);
+
+      expect(state.site.scheduledRefreshes).toEqual(scheduledRefreshes);
     });
   });
 });

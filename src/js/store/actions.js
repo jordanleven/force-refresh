@@ -1,5 +1,6 @@
 import {
   deleteScheduledRefresh,
+  getScheduledRefreshes,
   requestPostRefreshByPostID,
   requestSiteRefresh,
   scheduleRequestSiteRefresh,
@@ -35,9 +36,19 @@ export default {
 
     if (success) {
       commit('ADD_SCHEDULED_REFRESH', {
-        timestamp: response.data.scheduled_refresh_time,
         id: response.data.id,
+        timestamp: response.data.scheduled_refresh_time,
       });
+    }
+
+    return success;
+  },
+  requestScheduledRefreshes: async ({ commit }) => {
+    const response = await getScheduledRefreshes();
+    const success = isSuccess(response);
+
+    if (success) {
+      commit('SET_SCHEDULED_REFRESHES', response.data.scheduled_refreshes ?? []);
     }
 
     return success;

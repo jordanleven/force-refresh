@@ -28,6 +28,8 @@ export const deleteScheduledRefresh = async (uuid) => {
   return apiClient.delete(`${adminEndpoints.scheduleRefreshSite}/${uuid}`);
 };
 
+export const getScheduledRefreshes = async () => apiClient.get(adminEndpoints.scheduleRefreshSite);
+
 export const requestSiteRefresh = async () => {
   debug('Requesting refresh for site');
   return apiClient.post(adminEndpoints.refreshSite);
