@@ -12,7 +12,7 @@
           {{ $t('SCHEDULE_REFRESH.DATE_TIME_LABEL') }}
         </label>
         <DatePicker
-          id="schedule-datetime-picker"
+          :input-attr="{ id: 'schedule-datetime-picker' }"
           v-model:value="scheduleDateTime"
           type="datetime"
           :use12h="true"
