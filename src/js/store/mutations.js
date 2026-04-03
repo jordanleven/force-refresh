@@ -1,11 +1,11 @@
 /* eslint-disable no-param-reassign */
 export default {
-  ADD_SCHEDULED_REFRESH: (state, timestamp) => {
-    state.site.scheduledRefreshes.push({ timestamp });
+  ADD_SCHEDULED_REFRESH: (state, refreshData) => {
+    state.site.scheduledRefreshes.push(refreshData);
   },
-  DELETE_SCHEDULED_REFRESH: (state, timestampToDelete) => {
+  DELETE_SCHEDULED_REFRESH: (state, idToDelete) => {
     const { scheduledRefreshes } = state.site;
-    state.site.scheduledRefreshes = scheduledRefreshes.filter(({ timestamp }) => timestamp !== timestampToDelete);
+    state.site.scheduledRefreshes = scheduledRefreshes.filter(({ id }) => id !== idToDelete);
   },
   SET_DEBUG_MODE: (state, updatedDebugMode) => {
     state.settings.isDebugActive = updatedDebugMode;

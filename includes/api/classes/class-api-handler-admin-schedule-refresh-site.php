@@ -52,10 +52,25 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
                     'callback'            => array( $this, 'schedule_refresh_site' ),
                     'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
                 ),
+            ),
+        );
+
+        // Register DELETE endpoint with ID path parameter
+        self::register_rest_endpoint(
+            self::ENDPOINT_PATH . '/(?P<id>[a-f0-9\-]+)',
+            self::ENDPOINT_VERSION,
+            array(
                 array(
                     'methods'             => \WP_REST_Server::DELETABLE,
                     'callback'            => array( $this, 'delete_schedule_refresh_site' ),
                     'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                    'args'                => array(
+                        'id' => array(
+                            'description' => 'The unique identifier of the scheduled refresh.',
+                            'type'        => 'string',
+                            'required'    => true,
+                        ),
+                    ),
                 ),
             ),
         );
@@ -99,7 +114,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
                         $scheduled_refreshes,
                         array(
                             'timestamp' => $timestamp,
-                            'uuid'      => $event['args'][0],
+                            'id'        => $event['args'][0],
                         )
                     );
                 }
@@ -166,15 +181,68 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return void
      */
     public function delete_schedule_refresh_site( \WP_REST_Request $request ): void {
-        $uuid = $request->get_param( 'uuid' ) ?? null;
+        $id = $request->get_param( 'id' ) ?? null;
 
-        wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $uuid ) );
+        // Validate ID is provided
+        if ( empty( $id ) ) {
+            $this->return_api_response(
+                400,
+                'Missing schedule ID.',
+                array()
+            );
+            return;
+        }
 
+        // Check if the scheduled event exists before attempting to delete
+        $cron = get_option( 'cron' );
+        $event_exists = false;
+
+        if ( is_array( $cron ) ) {
+            foreach ( $cron as $cron_event ) {
+                if ( ! is_array( $cron_event ) ) {
+                    continue;
+                }
+
+                if ( isset( $cron_event[ self::ACTION_NAME_SCHEDULE_REFRESH_SITE ] ) ) {
+                    foreach ( $cron_event[ self::ACTION_NAME_SCHEDULE_REFRESH_SITE ] as $event ) {
+                        if ( isset( $event['args'][0] ) && $event['args'][0] === $id ) {
+                            $event_exists = true;
+                            break 2;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Return 404 if event doesn't exist
+        if ( ! $event_exists ) {
+            $this->return_api_response(
+                404,
+                'Scheduled refresh not found.',
+                array( 'id' => $id )
+            );
+            return;
+        }
+
+        // Attempt to delete the scheduled hook
+        $deleted = wp_clear_scheduled_hook( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $id ) );
+
+        // Check if deletion was successful
+        if ( ! $deleted ) {
+            $this->return_api_response(
+                500,
+                'Failed to delete scheduled refresh.',
+                array( 'id' => $id )
+            );
+            return;
+        }
+
+        // Successfully deleted
         $this->return_api_response(
             202,
             'You\'ve successfully deleted a site refresh.',
             array(
-                'uuid' => $uuid,
+                'id' => $id,
             )
         );
     }
@@ -188,17 +256,61 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      */
     public function schedule_refresh_site( \WP_REST_Request $request ): void {
         $scheduled_refresh      = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
-        $scheduled_refresh_time = strtotime( $scheduled_refresh );
-        $uuid                   = wp_generate_uuid4();
 
-        wp_schedule_single_event( $scheduled_refresh_time, self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $uuid ) );
+        // Validate timestamp is provided
+        if ( empty( $scheduled_refresh ) ) {
+            $this->return_api_response(
+                400,
+                'Missing required parameter: schedule_refresh_timestamp',
+                array()
+            );
+            return;
+        }
+
+        // Parse the timestamp
+        $scheduled_refresh_time = strtotime( $scheduled_refresh );
+
+        // Validate timestamp is valid
+        if ( false === $scheduled_refresh_time ) {
+            $this->return_api_response(
+                400,
+                'Invalid timestamp format.',
+                array()
+            );
+            return;
+        }
+
+        // Validate timestamp is in the future
+        if ( $scheduled_refresh_time <= time() ) {
+            $this->return_api_response(
+                400,
+                'Scheduled time must be in the future.',
+                array()
+            );
+            return;
+        }
+
+        $uuid = wp_generate_uuid4();
+
+        // Attempt to schedule the event
+        $scheduled = wp_schedule_single_event( $scheduled_refresh_time, self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $uuid ) );
+
+        // Check if scheduling was successful
+        if ( false === $scheduled ) {
+            $this->return_api_response(
+                500,
+                'Failed to schedule refresh.',
+                array()
+            );
+            return;
+        }
 
         $this->return_api_response(
             201,
             'You\'ve successfully scheduled a site refresh.',
             array(
                 'scheduled_refresh_time' => $scheduled_refresh_time,
-                'uuid'                   => $uuid,
+                'id'                     => $uuid,
             )
         );
     }

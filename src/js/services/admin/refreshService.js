@@ -23,9 +23,9 @@ export const updateForceRefreshDebugMode = async (data) => {
   return apiClient.put(adminEndpoints.debugging, { debug: data.isDebugActive });
 };
 
-export const deleteScheduledRefresh = async (date) => {
+export const deleteScheduledRefresh = async (uuid) => {
   debug('Requesting delete scheduled refresh');
-  return apiClient.delete(adminEndpoints.scheduleRefreshSite, { schedule_refresh_timestamp: date });
+  return apiClient.delete(`${adminEndpoints.scheduleRefreshSite}/${uuid}`);
 };
 
 export const requestSiteRefresh = async () => {
