@@ -1,15 +1,30 @@
 import {
   formatScheduledRefreshBaseLabel,
+  formatScheduledRefreshDateLabel,
+  formatScheduledRefreshTimeLabel,
   getScheduledRefreshCountdownLabel,
+  getScheduledRefreshDateKey,
   formatScheduledRefreshLabel,
   getSecondsUntilScheduledRefresh,
   isScheduledRefreshImminent,
 } from './AdminMainRefreshUtils.js';
 
 describe('AdminMainRefreshUtils', () => {
+  describe('formatScheduledRefreshDateLabel', () => {
+    it('formats only the scheduled refresh date', () => {
+      expect(formatScheduledRefreshDateLabel(1776124800)).toMatch(/\w+ \d{1,2}, \d{4}/);
+    });
+  });
+
   describe('formatScheduledRefreshBaseLabel', () => {
     it('formats a scheduled refresh as "Month Day, Year at H:MM AM/PM"', () => {
       expect(formatScheduledRefreshBaseLabel(1776124800)).toMatch(/\w+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (AM|PM)/);
+    });
+  });
+
+  describe('formatScheduledRefreshTimeLabel', () => {
+    it('formats only the scheduled refresh time', () => {
+      expect(formatScheduledRefreshTimeLabel(1776124800)).toMatch(/\d{1,2}:\d{2} (AM|PM)/);
     });
   });
 
@@ -71,6 +86,12 @@ describe('AdminMainRefreshUtils', () => {
       expect(getScheduledRefreshCountdownLabel(200, 200)).toEqual({
         type: 'imminent',
       });
+    });
+  });
+
+  describe('getScheduledRefreshDateKey', () => {
+    it('returns a stable date key for grouping scheduled refreshes', () => {
+      expect(getScheduledRefreshDateKey(1776124800)).toMatch(/\d{4}-\d{2}-\d{2}/);
     });
   });
 });

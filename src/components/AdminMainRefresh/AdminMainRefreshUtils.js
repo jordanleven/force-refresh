@@ -1,19 +1,40 @@
-export function formatScheduledRefreshBaseLabel(timestamp) {
+export function formatScheduledRefreshDateLabel(timestamp) {
   const timestampDate = new Date(0);
   timestampDate.setUTCSeconds(timestamp);
 
-  const date = timestampDate.toLocaleDateString('en-US', {
+  return timestampDate.toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
     year: 'numeric',
   });
+}
 
-  const time = timestampDate.toLocaleTimeString('en-US', {
+export function formatScheduledRefreshTimeLabel(timestamp) {
+  const timestampDate = new Date(0);
+  timestampDate.setUTCSeconds(timestamp);
+
+  return timestampDate.toLocaleTimeString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
   });
+}
+
+export function formatScheduledRefreshBaseLabel(timestamp) {
+  const date = formatScheduledRefreshDateLabel(timestamp);
+  const time = formatScheduledRefreshTimeLabel(timestamp);
 
   return `${date} at ${time}`;
+}
+
+export function getScheduledRefreshDateKey(timestamp) {
+  const timestampDate = new Date(0);
+  timestampDate.setUTCSeconds(timestamp);
+
+  const year = timestampDate.getFullYear();
+  const month = `${timestampDate.getMonth() + 1}`.padStart(2, '0');
+  const day = `${timestampDate.getDate()}`.padStart(2, '0');
+
+  return `${year}-${month}-${day}`;
 }
 
 export function getSecondsUntilScheduledRefresh(timestamp, currentTimestamp = Math.floor(Date.now() / 1000)) {
