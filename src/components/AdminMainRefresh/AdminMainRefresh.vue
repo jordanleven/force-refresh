@@ -28,7 +28,37 @@
     <div v-if="scheduledRefreshes.length > 0" class="scheduled-refreshes">
       <hr>
       <h3>{{ scheduledRefreshesHeader }}</h3>
-      <ul class="scheduled-refreshes__list">
+      <template v-if="shouldGroupScheduledRefreshes">
+        <div
+          v-for="group in groupedScheduledRefreshes"
+          :key="group.dateKey"
+          class="scheduled-refreshes__group"
+        >
+          <h4 class="scheduled-refreshes__group-header">
+            {{ group.dateLabel }}
+          </h4>
+          <ul class="scheduled-refreshes__list">
+            <li v-for="schedule in group.refreshes" :key="schedule.id">
+              {{ schedule.timeLabel }}
+              <span
+                v-if="schedule.countdownLabel"
+                class="scheduled-refreshes__countdown"
+              >
+                ({{ getCountdownLabel(schedule.countdownLabel) }})
+              </span>
+              <button
+                class="button-link button-link-delete"
+                data-test="btn-delete-scheduled-refresh"
+                :disabled="schedule.deleteDisabled"
+                @click="deleteButtonWasClicked(schedule.id)"
+              >
+                {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE") }}
+              </button>
+            </li>
+          </ul>
+        </div>
+      </template>
+      <ul v-else class="scheduled-refreshes__list">
         <li v-for="schedule in scheduledRefreshesWithLabel" :key="schedule.id">
           {{ schedule.label }}
           <span
@@ -57,10 +87,17 @@ import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import {
   formatScheduledRefreshBaseLabel,
+  formatScheduledRefreshDateLabel,
+  formatScheduledRefreshTimeLabel,
   getScheduledRefreshCountdownLabel,
+  getScheduledRefreshDateKey,
   getSecondsUntilScheduledRefresh,
   isScheduledRefreshImminent,
 } from './AdminMainRefreshUtils.js';
+
+const MINIMUM_SCHEDULED_REFRESHES_TO_GROUP = 5;
+const SCHEDULED_REFRESH_COUNTDOWN_START_IN_SECONDS = 59;
+const SCHEDULED_REFRESH_SYNC_POLL_INTERVAL_IN_MILLISECONDS = 5000;
 
 library.add([faSyncAlt]);
 
@@ -94,6 +131,30 @@ export default {
         ? this.$t('ADMIN_REFRESH_MAIN.REFRESH_DIRECTIONS', { siteName })
         : this.$t('ADMIN_REFRESH_MAIN.REFRESH_DIRECTIONS_NO_SITE_NAME');
     },
+    groupedScheduledRefreshes() {
+      if (!this.shouldGroupScheduledRefreshes) {
+        return [];
+      }
+
+      const groupedRefreshes = this.scheduledRefreshesWithLabel.reduce((groups, schedule) => {
+        const existingGroup = groups.find(({ dateKey }) => dateKey === schedule.dateKey);
+
+        if (existingGroup) {
+          existingGroup.refreshes.push(schedule);
+          return groups;
+        }
+
+        groups.push({
+          dateKey: schedule.dateKey,
+          dateLabel: schedule.dateLabel,
+          refreshes: [schedule],
+        });
+
+        return groups;
+      }, []);
+
+      return groupedRefreshes;
+    },
     hasImminentScheduledRefresh() {
       return this.scheduledRefreshes?.some(({ timestamp }) => (
         isScheduledRefreshImminent(timestamp, this.currentTimestamp)
@@ -122,13 +183,34 @@ export default {
 
           return {
             countdownLabel: getScheduledRefreshCountdownLabel(timestamp, this.currentTimestamp),
+            dateKey: getScheduledRefreshDateKey(timestamp),
+            dateLabel: formatScheduledRefreshDateLabel(timestamp),
             deleteDisabled: isScheduledRefreshImminent(timestamp, this.currentTimestamp),
             id: refreshId,
             label: formatScheduledRefreshBaseLabel(timestamp),
+            timeLabel: formatScheduledRefreshTimeLabel(timestamp),
           };
         });
 
       return sortedRefreshes;
+    },
+    shouldGroupScheduledRefreshes() {
+      if (
+        !this.scheduledRefreshes
+        || this.scheduledRefreshes.length < MINIMUM_SCHEDULED_REFRESHES_TO_GROUP
+      ) {
+        return false;
+      }
+
+      const scheduledRefreshCountsByDate = this.scheduledRefreshes.reduce((counts, { timestamp }) => {
+        const dateKey = getScheduledRefreshDateKey(timestamp);
+        return {
+          ...counts,
+          [dateKey]: (counts[dateKey] ?? 0) + 1,
+        };
+      }, {});
+
+      return Object.values(scheduledRefreshCountsByDate).some((count) => count > 1);
     },
   },
   watch: {
@@ -224,12 +306,14 @@ export default {
         getSecondsUntilScheduledRefresh(timestamp, this.currentTimestamp)
       )));
 
-      if (secondsUntilNextRefresh < 60) {
+      if (secondsUntilNextRefresh <= SCHEDULED_REFRESH_COUNTDOWN_START_IN_SECONDS) {
         this.startCountdownInterval();
         return;
       }
 
-      const millisecondsUntilCountdownStarts = (secondsUntilNextRefresh - 59) * 1000;
+      const millisecondsUntilCountdownStarts = (
+        secondsUntilNextRefresh - SCHEDULED_REFRESH_COUNTDOWN_START_IN_SECONDS
+      ) * 1000;
       this.countdownTimeoutId = window.setTimeout(() => {
         this.scheduleScheduledRefreshTimers();
       }, millisecondsUntilCountdownStarts);
@@ -251,7 +335,7 @@ export default {
       this.$emit('scheduled-refreshes-sync-requested');
       this.scheduledRefreshSyncIntervalId = window.setInterval(() => {
         this.$emit('scheduled-refreshes-sync-requested');
-      }, 5000);
+      }, SCHEDULED_REFRESH_SYNC_POLL_INTERVAL_IN_MILLISECONDS);
     },
     stopScheduledRefreshImminentPolling() {
       if (!this.scheduledRefreshSyncIntervalId) {
@@ -295,6 +379,14 @@ export default {
 
 .scheduled-refreshes {
   text-align: left;
+
+  .scheduled-refreshes__group + .scheduled-refreshes__group {
+    margin-top: var.$space-medium;
+  }
+
+  .scheduled-refreshes__group-header {
+    margin: 0 0 var.$space-small;
+  }
 
   hr {
     margin: var.$space-large 0;
