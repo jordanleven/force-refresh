@@ -19,6 +19,7 @@
         v-if="isScheduledRefreshEnabled"
         type="submit"
         class="button admin__refresh-button"
+        data-test="btn-schedule-refresh"
         @click="scheduleRefreshButtonClicked"
       >
         {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_SCHEDULE') }}
@@ -32,6 +33,7 @@
           {{ schedule.label }}
           <button
             class="button-link button-link-delete"
+            data-test="btn-delete-scheduled-refresh"
             @click="deleteButtonWasClicked(schedule.id)"
           >
             {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE") }}
