@@ -17,12 +17,12 @@ import {
 const isSuccess = (response) => response?.code && [200, 201, 202].includes(response.code);
 
 export default {
-  requestDeleteScheduledRefresh: async ({ commit }, timestamp) => {
-    const response = await deleteScheduledRefresh(timestamp);
+  requestDeleteScheduledRefresh: async ({ commit }, id) => {
+    const response = await deleteScheduledRefresh(id);
     const success = isSuccess(response);
 
     if (success) {
-      commit('DELETE_SCHEDULED_REFRESH', response.data.scheduled_refresh_time);
+      commit('DELETE_SCHEDULED_REFRESH', response.data.id);
     }
 
     return success;
@@ -34,7 +34,10 @@ export default {
     const success = isSuccess(response);
 
     if (success) {
-      commit('ADD_SCHEDULED_REFRESH', response.data.scheduled_refresh_time);
+      commit('ADD_SCHEDULED_REFRESH', {
+        timestamp: response.data.scheduled_refresh_time,
+        id: response.data.id,
+      });
     }
 
     return success;

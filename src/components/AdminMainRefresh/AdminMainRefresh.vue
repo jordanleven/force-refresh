@@ -28,11 +28,11 @@
       <hr>
       <h3>{{ $t("SCHEDULE_REFRESH.HEADER_SCHEDULED_REFRESHES") }}</h3>
       <ul class="scheduled-refreshes__list">
-        <li v-for="data, index in scheduledRefreshesSorted" :key="index">
-          {{ data }}
+        <li v-for="schedule in scheduledRefreshesWithLabel" :key="schedule.id">
+          {{ schedule.label }}
           <button
             class="button-link button-link-delete"
-            @click="deleteButtonWasClicked(index)"
+            @click="deleteButtonWasClicked(schedule.id)"
           >
             {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE") }}
           </button>
@@ -79,37 +79,32 @@ export default {
         'admin__refresh-logo--active': this.refreshTriggered,
       };
     },
-    scheduledRefreshDate() {
-      if (!this.scheduledRefreshes) return '';
+    scheduledRefreshesWithLabel() {
+      if (!this.scheduledRefreshes || !this.scheduledRefreshes.length) {
+        return [];
+      }
 
-      const timestamp = new Date(0);
-      timestamp.setUTCSeconds(this.scheduledRefreshes.timestamp);
+      const sortedRefreshes = this.scheduledRefreshes
+        .slice()
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .map(({ timestamp, id }) => {
+          const refreshId = id || `${timestamp}`;
+          const timestampDate = new Date(0);
+          timestampDate.setUTCSeconds(timestamp);
 
-      const date = timestamp.toLocaleDateString('en-us', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-      });
+          const date = timestampDate.toLocaleDateString('en-US', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          });
 
-      const time = timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          const time = timestampDate.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
-      return `${date} at ${time}`;
-    },
-    scheduledRefreshesSorted() {
-      const sortedRefreshes = this.scheduledRefreshes.map(({ timestamp }) => {
-        const timestampDate = new Date(0);
-        timestampDate.setUTCSeconds(timestamp);
-
-        const date = timestampDate.toLocaleDateString('en-us', {
-          day: 'numeric',
-          month: 'long',
-          year: 'numeric',
+          return {
+            id: refreshId,
+            label: `${date} at ${time}`,
+          };
         });
-
-        const time = timestampDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        return `${date} at ${time}`;
-      });
 
       return sortedRefreshes;
     },
@@ -121,8 +116,8 @@ export default {
         this.refreshTriggered = false;
       }, 2000);
     },
-    deleteButtonWasClicked(index) {
-      this.$emit('delete-scheduled-refresh', this.scheduledRefreshes[index].timestamp);
+    deleteButtonWasClicked(uuid) {
+      this.$emit('delete-scheduled-refresh', uuid);
     },
     emitEventButtonClicked() {
       this.$emit('refresh-requested');
