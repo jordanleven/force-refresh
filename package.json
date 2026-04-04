@@ -52,7 +52,7 @@
     "@babel/preset-env": "^7.29.2",
     "@eslint/compat": "^2.0.3",
     "@eslint/eslintrc": "^3.3.5",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@vue/compiler-sfc": "^3.5.31",
     "babel-loader": "^10.1.1",
     "check-node-version": "^4.2.1",
