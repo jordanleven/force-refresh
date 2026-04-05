@@ -57,11 +57,14 @@
 <script>
 import VueTypes from 'vue-types';
 import {
+  getSecondsUntilScheduledRefresh,
+  isScheduledRefreshImminent,
+} from '../AdminMainRefresh/AdminMainRefreshUtils.js';
+import {
   getGroupedScheduledRefreshes,
   getScheduledRefreshesWithLabel,
   shouldGroupScheduledRefreshes,
 } from './AdminScheduledRefreshListUtils.js';
-import { getSecondsUntilScheduledRefresh, isScheduledRefreshImminent } from '../AdminMainRefresh/AdminMainRefreshUtils.js';
 
 const SCHEDULED_REFRESH_COUNTDOWN_START_IN_SECONDS = 59;
 const SCHEDULED_REFRESH_SYNC_POLL_INTERVAL_IN_MILLISECONDS = 5000;
