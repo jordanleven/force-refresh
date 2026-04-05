@@ -143,7 +143,7 @@ const getRefreshIntervalMessage = (refreshInterval) => {
 };
 
 // eslint-disable-next-line no-undef
-const { featureFlags, isDebugActive, refreshInterval } = forceRefreshLocalizedData;
+const { isDebugActive, refreshInterval } = forceRefreshLocalizedData;
 
 const refreshIntervalMessage = getRefreshIntervalMessage(refreshInterval);
 
