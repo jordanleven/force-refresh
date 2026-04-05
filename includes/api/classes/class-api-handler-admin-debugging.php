@@ -60,7 +60,7 @@ class Api_Handler_Admin_Debugging extends Api_Handler_Admin implements Api_Handl
         Debug_Storage_Service::set_debug_mode( $debug_mode );
 
         $this->return_api_response(
-            201,
+            \WP_Http::CREATED,
             'You\'ve successfully updated debug mode.'
         );
     }

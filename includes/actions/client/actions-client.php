@@ -10,6 +10,7 @@ namespace JordanLeven\Plugins\ForceRefresh;
 
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Client;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 
 // Add the script for normal front-facing pages (non-admin).
@@ -31,6 +32,7 @@ add_action(
                 'isDebugActive'   => Debug_Storage_Service::debug_mode_is_active(),
                 // Get the refresh interval.
                 'refreshInterval' => Options_Storage_Service::get_refresh_interval(),
+                'featureFlags'    => Feature_Flag_Service::get_all(),
             )
         );
         // Now that it's registered, enqueue the script.

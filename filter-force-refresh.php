@@ -13,7 +13,7 @@ namespace JordanLeven\Plugins\ForceRefresh;
 Plugin Name: Force Refresh
 Plugin URI: https://github.com/jordanleven/force-refresh
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
-Version: 2.16.1
+Version: 2.16.1-6591A2.0
 Requires at least: 6.3
 Requires PHP: 8.2
 Author: Jordan Leven
@@ -23,6 +23,8 @@ Contributors:
 
 // phpcs:enable Generic.Files.LineLength
 
+// The absolute path to the plugin's root directory.
+define( 'WP_FORCE_REFRESH_PLUGIN_DIR', __DIR__ );
 // Define the name of the action for the refresh. This is used with the nonce to create a unique
 // action when admins request a refresh.
 define( 'WP_FORCE_REFRESH_ACTION', 'wp_force_refresh' );

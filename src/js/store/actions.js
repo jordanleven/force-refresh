@@ -1,5 +1,6 @@
 import {
   deleteScheduledRefresh,
+  getScheduledRefreshes,
   requestPostRefreshByPostID,
   requestSiteRefresh,
   scheduleRequestSiteRefresh,
@@ -17,12 +18,12 @@ import {
 const isSuccess = (response) => response?.code && [200, 201, 202].includes(response.code);
 
 export default {
-  requestDeleteScheduledRefresh: async ({ commit }, timestamp) => {
-    const response = await deleteScheduledRefresh(timestamp);
+  requestDeleteScheduledRefresh: async ({ commit }, id) => {
+    const response = await deleteScheduledRefresh(id);
     const success = isSuccess(response);
 
     if (success) {
-      commit('DELETE_SCHEDULED_REFRESH', response.data.scheduled_refresh_time);
+      commit('DELETE_SCHEDULED_REFRESH', response.data.id);
     }
 
     return success;
@@ -34,7 +35,20 @@ export default {
     const success = isSuccess(response);
 
     if (success) {
-      commit('ADD_SCHEDULED_REFRESH', response.data.scheduled_refresh_time);
+      commit('ADD_SCHEDULED_REFRESH', {
+        id: response.data.id,
+        timestamp: response.data.scheduled_refresh_time,
+      });
+    }
+
+    return success;
+  },
+  requestScheduledRefreshes: async ({ commit }) => {
+    const response = await getScheduledRefreshes();
+    const success = isSuccess(response);
+
+    if (success) {
+      commit('SET_SCHEDULED_REFRESHES', response.data.scheduled_refreshes ?? []);
     }
 
     return success;

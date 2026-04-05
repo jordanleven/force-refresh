@@ -65,9 +65,14 @@
   },
   "SCHEDULE_REFRESH": {
     "BUTTON_DELETE": "Delete",
+    "DATE_TIME_LABEL": "Select date and time",
     "DESCRIPTION": "Please select the date and time you'd like to schedule a refresh.",
     "HEADER": "Schedule Refresh",
     "HEADER_SCHEDULED_REFRESHES": "Scheduled Refresh",
+    "HEADER_SCHEDULED_REFRESHES_PLURAL": "Scheduled Refreshes",
+    "SCHEDULED_REFRESH_TIMING_IMMINENT": "imminent",
+    "SCHEDULED_REFRESH_TIMING_SECOND": "{count} second",
+    "SCHEDULED_REFRESH_TIMING_SECONDS": "{count} seconds",
     "SUBMIT_BUTTON": "Schedule refresh",
     "SUBMIT_BUTTON_WITH_DATE": "Schedule refresh for {scheduledDate}"
   },

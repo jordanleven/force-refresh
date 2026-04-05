@@ -1,4 +1,5 @@
 export default (localizedData) => ({
+  featureFlags: localizedData.featureFlags ?? {},
   settings: {
     customRefreshIntervalMaximumInMinutes: localizedData.refreshOptions.customRefreshIntervalMaximumInMinutes,
     customRefreshIntervalMinimumInMinutes: localizedData.refreshOptions.customRefreshIntervalMinimumInMinutes,

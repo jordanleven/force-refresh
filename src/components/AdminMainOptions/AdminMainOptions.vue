@@ -8,6 +8,7 @@
         <div class="option-group">
           <label for="show-in-wp-admin-bar">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_FROM_ADMIN_BAR') }}</label>
           <select
+            id="show-in-wp-admin-bar"
             v-model="optionSelectedShowRefreshInMenuBar"
             name="show-in-wp-admin-bar"
           >
@@ -23,6 +24,7 @@
         <div class="option-group">
           <label for="refresh-interval">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_INTERVAL') }}</label>
           <select
+            id="refresh-interval"
             v-model="optionSelectedRefreshInterval"
             name="refresh-interval"
           >

@@ -64,7 +64,7 @@ class Api_Handler_Client extends Api_Handler {
         }
 
         $this->return_api_response(
-            200,
+            \WP_Http::OK,
             'The current site version has been successfully retrieved.',
             $response,
         );

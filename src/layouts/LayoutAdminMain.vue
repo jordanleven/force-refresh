@@ -38,11 +38,13 @@
         <AdminMain
           v-if="!troubleshootingActive"
           class="admin-section__main"
+          :is-scheduled-refresh-enabled="isScheduledRefreshEnabled"
           :refresh-options="refreshOptions"
           :scheduled-refreshes="scheduledRefreshes"
           :site-name="siteName"
           @refresh-requested="refreshSite"
           @schedule-refresh-requested="scheduleRefresh"
+          @scheduled-refreshes-sync-requested="syncScheduledRefreshes"
           @delete-scheduled-refresh="deleteScheduledRefresh"
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
@@ -66,7 +68,7 @@
       <div class="admin-window" :class="classAdminScheduleRefresh">
         <transition name="fade-and-move">
           <div
-            v-if="!troubleshootingActive && scheduleRefreshPageActive"
+            v-if="isScheduledRefreshEnabled && !troubleshootingActive && scheduleRefreshPageActive"
             class="admin-window__inner"
           >
             <AdminScheduleRefresh
@@ -149,11 +151,15 @@ export default {
     isAdminNotificationSet() {
       return !!this.notificationMessage?.message;
     },
+    isScheduledRefreshEnabled() {
+      return this.isFeatureEnabled('scheduledRefresh');
+    },
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
     },
     ...mapGetters([
       'isDebugActive',
+      'isFeatureEnabled',
       'refreshFromAdminBar',
       'refreshInterval',
       'refreshOptions',
@@ -228,6 +234,7 @@ export default {
       const success = await this.requestScheduledRefresh(scheduledRefresh);
       this.scheduleRefreshPageActive = false;
       if (success) {
+        await this.requestScheduledRefreshes();
         this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_SUCCESS'));
       } else {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE'));
@@ -235,6 +242,9 @@ export default {
     },
     scheduleRefresh() {
       this.scheduleRefreshPageActive = true;
+    },
+    async syncScheduledRefreshes() {
+      await this.requestScheduledRefreshes();
     },
     async updateDebugMode(newValue) {
       const success = await this.updateForceRefreshDebugMode(newValue);
@@ -265,6 +275,7 @@ export default {
       'requestDeleteScheduledRefresh',
       'requestRefreshSite',
       'requestScheduledRefresh',
+      'requestScheduledRefreshes',
       'updateForceRefreshSettings',
       'updateForceRefreshDebugMode',
     ]),
