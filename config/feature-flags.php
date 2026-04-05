@@ -9,5 +9,5 @@
  */
 
 return array(
-    'scheduledRefresh' => true,
+    'scheduledRefresh' => false,
 );
