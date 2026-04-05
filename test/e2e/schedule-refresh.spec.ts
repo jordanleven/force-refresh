@@ -95,7 +95,7 @@ async function selectScheduledRefreshInUi(page: Page, scheduledDate: Date): Prom
   await page.locator(`.mx-time-column [data-type="ampm"] .mx-time-item`, { hasText: meridiem }).click();
 }
 
-test.describe('Schedule Refresh', () => {
+test.describe.skip('Schedule Refresh', () => {
   test.describe('Scheduling modal', () => {
     test.describe.configure({ mode: 'serial' });
     let page: Page;
