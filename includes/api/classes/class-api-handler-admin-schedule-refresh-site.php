@@ -148,6 +148,17 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
             );
         }
 
+        return self::sort_scheduled_refreshes_by_timestamp_desc( $scheduled_refreshes );
+    }
+
+    /**
+     * Sort scheduled refreshes by timestamp in descending order (newest first).
+     *
+     * @param array $scheduled_refreshes Array of scheduled refresh items.
+     *
+     * @return array Sorted scheduled refreshes.
+     */
+    public static function sort_scheduled_refreshes_by_timestamp_desc( array $scheduled_refreshes ): array {
         usort(
             $scheduled_refreshes,
             function ( $a, $b ) {
