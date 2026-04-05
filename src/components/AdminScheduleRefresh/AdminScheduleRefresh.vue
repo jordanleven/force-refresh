@@ -22,7 +22,12 @@
         />
       </div>
       <div>
-        <button class="button button-primary button-schedule-refresh" data-test="btn-submit-schedule-refresh" :disabled="buttonDisabled" @click="scheduleRefresh">
+        <button
+          class="button button-primary button-schedule-refresh"
+          data-test="btn-submit-schedule-refresh"
+          :disabled="buttonDisabled"
+          @click="scheduleRefresh"
+        >
           {{ scheduleButtonTest }}
         </button>
       </div>

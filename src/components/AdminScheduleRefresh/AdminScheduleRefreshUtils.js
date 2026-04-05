@@ -48,8 +48,8 @@ export function formatScheduledTime(date) {
   });
   const timePart = scheduledDateTime.toLocaleTimeString('en-US', {
     hour: 'numeric',
-    minute: '2-digit',
     hour12: true,
+    minute: '2-digit',
   });
   return `${datePart} at ${timePart}`;
 }

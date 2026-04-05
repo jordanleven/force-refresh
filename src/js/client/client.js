@@ -145,7 +145,6 @@ const getRefreshIntervalMessage = (refreshInterval) => {
 // eslint-disable-next-line no-undef
 const { featureFlags, isDebugActive, refreshInterval } = forceRefreshLocalizedData;
 
-const isFeatureEnabled = (flag) => Boolean(featureFlags?.[flag]);
 const refreshIntervalMessage = getRefreshIntervalMessage(refreshInterval);
 
 setDebugMode(!!isDebugActive);
