@@ -244,7 +244,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_option->set_return_value(
             array(
                 1234567890 => array(
-                    'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
                 ),
             )
         );
@@ -260,7 +262,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_option->set_return_value(
             array(
                 $timestamp => array(
-                    'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
                 ),
             )
         );
@@ -299,7 +303,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
             array(
                 'version'  => 2,
                 123456789  => array(
-                    'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
                 ),
             )
         );
@@ -316,7 +322,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_option->set_return_value(
             array(
                 $timestamp => array(
-                    'force_refresh_scheduled_site_refresh' => array( 'args' => array() ),
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( 'test-uuid' ) ),
+                    ),
                 ),
             )
         );
@@ -373,9 +381,20 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     public function testDeleteScheduleRefreshSiteClearsScheduledHook() {
         self::$mock_wp_clear_scheduled_hook->resetInvocationIndex();
 
-        $uuid    = 'test-uuid-1234';
+        $uuid = 'test-uuid-1234';
+        self::$mock_get_option->set_return_value(
+            array(
+                9999999999 => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( $uuid ) ),
+                    ),
+                ),
+            )
+        );
+        self::$mock_wp_clear_scheduled_hook->set_return_value( 1 );
+
         $request = new \WP_REST_Request();
-        $request->set_param( 'uuid', $uuid );
+        $request->set_param( 'id', $uuid );
 
         ob_start();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );
@@ -392,8 +411,20 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     public function testDeleteScheduleRefreshSiteReturns202Response() {
         self::$mock_status_header->resetInvocationIndex();
 
+        $uuid = 'test-uuid-1234';
+        self::$mock_get_option->set_return_value(
+            array(
+                9999999999 => array(
+                    'force_refresh_scheduled_site_refresh' => array(
+                        'abc' => array( 'schedule' => false, 'args' => array( $uuid ) ),
+                    ),
+                ),
+            )
+        );
+        self::$mock_wp_clear_scheduled_hook->set_return_value( 1 );
+
         $request = new \WP_REST_Request();
-        $request->set_param( 'uuid', 'test-uuid-1234' );
+        $request->set_param( 'id', $uuid );
 
         ob_start();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );
