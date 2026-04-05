@@ -62,7 +62,7 @@ class Api_Handler_Admin_Refresh_Page extends Api_Handler_Admin implements Api_Ha
         Versions_Storage_Service::set_page_version( $page_id, $page_version );
 
         $this->return_api_response(
-            201,
+            \WP_Http::CREATED,
             'You\'ve successfully requested all browsers to refresh this page.',
             array(
                 'new_page_version' => $page_version,

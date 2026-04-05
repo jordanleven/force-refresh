@@ -58,7 +58,7 @@ class Api_Handler_Admin_Refresh_Site extends Api_Handler_Admin implements Api_Ha
         Versions_Storage_Service::set_site_version( $site_version );
 
         $this->return_api_response(
-            201,
+            \WP_Http::CREATED,
             'You\'ve successfully requested all browsers to refresh',
             array(
                 'new_site_version' => $site_version,
