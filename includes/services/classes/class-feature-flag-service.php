@@ -25,7 +25,7 @@ class Feature_Flag_Service {
      * @return array The feature flags.
      */
     private static function get_flags(): array {
-        if ( self::$flags === null ) {
+        if ( null === self::$flags ) {
             $config_path = WP_FORCE_REFRESH_PLUGIN_DIR . '/config/feature-flags.php';
             self::$flags = file_exists( $config_path ) ? require $config_path : array();
         }
