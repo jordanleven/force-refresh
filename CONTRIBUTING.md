@@ -25,3 +25,48 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 **Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
 
 [Docker]: www.docker.com
+
+## Adding Release Notes
+
+This project uses [changie](https://changie.dev/) to manage release notes.
+
+**When you finish a meaningful change** (feature, fix, dependency update, etc.), create a release note fragment before or alongside your commit:
+
+```sh
+npm run changelog:note
+```
+
+changie will prompt for a kind and a human-readable description. Commit the resulting `.changes/unreleased/*.yaml` file with your code.
+
+| Kind | Semver impact |
+| --- | --- |
+| Added, Changed, Deprecated | minor bump |
+| Fixed, Security | patch bump |
+| Removed | major bump |
+
+To preview what the release notes and WordPress.org readme will look like before cutting a release, run:
+
+```sh
+npm run changelog:preview
+```
+
+This generates `README.txt` locally without committing anything. Inspect it, then discard with `git restore README.txt`.
+
+## Cutting a Release
+
+**Beta release** (from a feature branch — for testing and previewing release notes):
+
+```sh
+npm run release:beta
+```
+
+The beta GitHub Release will show upcoming release notes (from changie fragments) alongside the raw commit log since the last beta.
+
+**Production release** (from `master` only):
+
+```sh
+npm run release              # version auto-detected from fragment kinds
+npm run release -- --minor   # or override the bump level explicitly
+```
+
+The script will block if no unreleased fragments exist, show the computed next version, and ask for confirmation before committing, tagging, and pushing. CI handles the rest.

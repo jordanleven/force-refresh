@@ -1,20 +1,20 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file.
 
 ### [2.16.1](https://github.com/jordanleven/force-refresh/compare/v2.16.0...v2.16.1) (2026-03-10)
 
 ## [2.16.0](https://github.com/jordanleven/force-refresh/compare/v2.15.0...v2.16.0) (2026-02-24)
 
 
-### Features
+### Changed
 
 * Update minimum PHP version to 8.2 ([bf34412](https://github.com/jordanleven/force-refresh/commit/bf3441222e607225008e5d3123522f4c39fe528e))
 
 ## [2.15.0](https://github.com/jordanleven/force-refresh/compare/v2.14.0...v2.15.0) (2026-02-24)
 
 
-### Features
+### Changed
 
 * Update minimum WordPress version to 6.3 ([47f9113](https://github.com/jordanleven/force-refresh/commit/47f911391deac8166031dbc1da3b25a8241f97b2))
 

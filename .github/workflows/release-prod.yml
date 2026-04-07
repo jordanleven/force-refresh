@@ -212,7 +212,7 @@ jobs:
       run: npm run build
 
     - name: Create release notes
-      run: npm run createWpReadme
+      run: npm run changelog:build
 
     - name: Prune Composer dependencies
       run: composer install --no-dev --no-scripts
