@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+All notable changes to this project will be documented in this file.
 
 ### [2.16.1](https://github.com/jordanleven/force-refresh/compare/v2.16.0...v2.16.1) (2026-03-10)
 

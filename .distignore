@@ -1,5 +1,7 @@
 *-test.php
 .babelrc
+.changes
+.changie.yaml
 .codeclimate.yml
 .distignore
 .eslintrc.js
