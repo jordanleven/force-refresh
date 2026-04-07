@@ -183,7 +183,21 @@ jobs:
       run: npm run build
 
     - name: Create release notes
-      run: npm run createWpReadme
+      run: |
+        NEXT_VERSION=$(npx changie next auto 2>/dev/null || echo "unreleased")
+        cp CHANGELOG.md CHANGELOG.md.bak
+        npx changie batch "$NEXT_VERSION" 2>/dev/null || true
+        if [ -f ".changes/${NEXT_VERSION}.md" ]; then
+          {
+            head -n 4 CHANGELOG.md
+            cat ".changes/${NEXT_VERSION}.md"
+            printf "\n"
+            tail -n +5 CHANGELOG.md
+          } > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+        fi
+        npm run createWpReadme
+        mv CHANGELOG.md.bak CHANGELOG.md
+        rm -f ".changes/${NEXT_VERSION}.md"
 
     - name: Prune Composer dependencies
       run: composer install --no-dev --no-scripts
@@ -274,6 +288,18 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Get upcoming release notes from changie fragments
+      id: fragment_notes
+      run: |
+        NOTES=""
+        for f in .changes/unreleased/*.yaml; do
+          [ -f "$f" ] || continue
+          KIND=$(grep '^kind:' "$f" | sed 's/kind: //')
+          BODY=$(grep '^body:' "$f" | sed 's/body: //')
+          NOTES="${NOTES}- **${KIND}:** ${BODY}\n"
+        done
+        printf "FRAGMENT_NOTES=%b" "$NOTES" >> $GITHUB_OUTPUT
+
     - name: Get commits since last release
       id: changes
       uses: simbo/changes-between-tags-action@v1
@@ -300,8 +326,9 @@ jobs:
         prerelease: true
         body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.build-number }}).
           This release is intended to be used for debugging and **should not** be used on production sites unless directed.
-          Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n##
-          Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
+          Production-stable versions are available at https://wordpress.org/plugins/force-refresh.
+          \n\n## Upcoming Release Notes\n\n${{ steps.fragment_notes.outputs.FRAGMENT_NOTES || 'No release note fragments found.' }}
+          \n\n## Commits Since Last Beta\n\n${{ steps.changes.outputs.changes || 'No changes found.' }}"
 
     - name: Comment on PR
       uses: mshick/add-pr-comment@v3.9.0
