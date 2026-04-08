@@ -107,9 +107,7 @@ jobs:
                 .join('\n');
               const body = [
                 marker,
-                'This PR modifies application code but does not include a changelog',
-                'fragment. If this change is user-facing, run `npm run changelog:note`',
-                'to add one before merging.',
+                'This PR modifies application code but does not include a changelog fragment. If this change is user-facing, run `npm run changelog:note` to add one before merging.',
                 '',
                 '**Modified application files:**',
                 files,
