@@ -20,4 +20,4 @@ kinds:
   - label: Dependencies & security
     auto: patch
     skipBody: true
-    changeFormat: "* Performance enhancements and bug fixes"
+    changeFormat: "* Performance enhancements and bug fixes."
