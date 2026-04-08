@@ -11,7 +11,7 @@ cleanup() {
 trap cleanup EXIT
 
 if ! hasUnreleasedFragments; then
-  printf "\033[1;31mNo unreleased changie fragments found. Run 'npm run release:note' to add some.\n\033[0m"
+  printf "\033[1;31mNo unreleased changie fragments found. Run 'npm run changelog:note' to add some.\n\033[0m"
   exit 1
 fi
 
@@ -26,6 +26,6 @@ npx changie batch "$NEXT_VERSION"
   printf "\n"
   tail -n +5 CHANGELOG.md
 } > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
-npm run createWpReadme
+npm run changelog:build
 
 printf "\n\033[1;32mPreview complete. Inspect README.txt, then discard with: git restore README.txt\033[0m\n"

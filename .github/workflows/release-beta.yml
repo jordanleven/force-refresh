@@ -195,7 +195,7 @@ jobs:
             tail -n +5 CHANGELOG.md
           } > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
         fi
-        npm run createWpReadme
+        npm run changelog:build
         mv CHANGELOG.md.bak CHANGELOG.md
         rm -f ".changes/${NEXT_VERSION}.md"
 

@@ -33,7 +33,7 @@ This project uses [changie](https://changie.dev/) to manage release notes.
 **When you finish a meaningful change** (feature, fix, dependency update, etc.), create a release note fragment before or alongside your commit:
 
 ```sh
-npm run release:note
+npm run changelog:note
 ```
 
 changie will prompt for a kind and a human-readable description. Commit the resulting `.changes/unreleased/*.yaml` file with your code.
@@ -47,7 +47,7 @@ changie will prompt for a kind and a human-readable description. Commit the resu
 To preview what the release notes and WordPress.org readme will look like before cutting a release, run:
 
 ```sh
-npm run release:preview
+npm run changelog:preview
 ```
 
 This generates `README.txt` locally without committing anything. Inspect it, then discard with `git restore README.txt`.

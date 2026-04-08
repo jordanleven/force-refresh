@@ -12,8 +12,8 @@
   "scripts": {
     "prebuild": "npm run checkNodeVersion",
     "build": "npx webpack --mode=production",
-    "build:dev": "npm run createWpReadme && npx webpack --mode=development",
-    "build:beta": "npm run createWpReadme && npm run build",
+    "build:dev": "npm run changelog:build && npx webpack --mode=development",
+    "build:beta": "npm run changelog:build && npm run build",
     "predev": "npm run checkNodeVersion",
     "dev": "npm run build:dev -- --watch",
     "test": "jest",
@@ -22,11 +22,11 @@
     "lint": "npm run lint:css && npm run lint:js",
     "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose",
     "lint:js": "eslint .",
-    "createWpReadme": "node ./.github/scripts/createWordPressReadMe.js",
+    "changelog:build": "node ./.github/scripts/createWordPressReadMe.js",
+    "changelog:note": "npx changie new",
+    "changelog:preview": "./.github/scripts/previewRelease.sh",
     "release": "./.github/scripts/release.sh",
     "release:beta": "./.github/scripts/releaseBeta.sh",
-    "release:note": "npx changie new",
-    "release:preview": "./.github/scripts/previewRelease.sh",
     "checkNodeVersion": "check-node-version --package"
   },
   "dependencies": {
