@@ -3,6 +3,7 @@
 .changes
 .changie.yaml
 .codeclimate.yml
+.claude
 .distignore
 .eslintrc.js
 .git
