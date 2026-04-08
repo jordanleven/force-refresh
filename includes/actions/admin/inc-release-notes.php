@@ -95,6 +95,7 @@ function get_release_note_header_node( string $note ): array {
  * @return  void
  */
 function assign_release_note_based_on_role( string $current_plugin_version, &$current_version_i, &$notes_formatted, $note ): void {
+    $note = trim( $note );
     switch ( true ) {
         // If the line is a version number.
         case preg_match( '/#### [0-9].*/', $note ):
