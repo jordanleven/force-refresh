@@ -1,10 +1,14 @@
 *-test.php
 .babelrc
+.changes
+.changie.yaml
+.claude
 .codeclimate.yml
 .distignore
 .eslintrc.js
 .git
 .github
+.npmrc
 .nvmrc
 .stylelintrc.json
 .wordpress
