@@ -117,7 +117,7 @@ const getFormattedSectionContent = (sections) => {
 const getReleaseDetails = ({ raw }, releaseCategory) => {
   const releaseNoteSplit = SINGLE_ENTRY_RELEASE_NOTES[releaseCategory]
     ? [SINGLE_ENTRY_RELEASE_NOTES[releaseCategory]]
-    : raw.split('\n').filter((v) => !!v).map((v) => `${v.trim()}.\n`);
+    : raw.split('\n').filter((v) => !!v).map((v) => `${v.trim()}\n`);
   let releaseNote;
   switch (releaseCategory) {
     case 'Feature (major)':
