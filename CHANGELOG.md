@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.16.2 - 2026-04-08
+### Dependencies & security
+* Performance enhancements and bug fixes
 ### [2.16.1](https://github.com/jordanleven/force-refresh/compare/v2.16.0...v2.16.1) (2026-03-10)
 
 ## [2.16.0](https://github.com/jordanleven/force-refresh/compare/v2.15.0...v2.16.0) (2026-02-24)
