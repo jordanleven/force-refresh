@@ -317,8 +317,8 @@ jobs:
     - name: Format asset name
       id: asset-name
       run: |
-        FORMATTED=$(echo "${{ needs.set-variables.outputs.build-number }}" | tr '.' '_' | sed 's/-/__/g')
-        echo "NAME=force-refresh__${FORMATTED}" >> $GITHUB_OUTPUT
+        FORMATTED=$(echo "${{ needs.set-variables.outputs.build-number }}" | tr '.' '-')
+        echo "NAME=force-refresh-${FORMATTED}" >> $GITHUB_OUTPUT
 
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
