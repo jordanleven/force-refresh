@@ -8,6 +8,7 @@
 .eslintrc.js
 .git
 .github
+.npmrc
 .nvmrc
 .stylelintrc.json
 .wordpress
