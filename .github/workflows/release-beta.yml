@@ -183,7 +183,22 @@ jobs:
       run: npm run build
 
     - name: Create release notes
-      run: npm run createWpReadme
+      run: |
+        NEXT_VERSION=$(npx changie next auto 2>/dev/null || echo "unreleased")
+        cp CHANGELOG.md CHANGELOG.md.bak
+        npx changie batch "$NEXT_VERSION" 2>/dev/null || true
+        if [ -f ".changes/${NEXT_VERSION}.md" ]; then
+          {
+            head -n 4 CHANGELOG.md
+            cat ".changes/${NEXT_VERSION}.md"
+            printf "\n"
+            tail -n +5 CHANGELOG.md
+          } > CHANGELOG.tmp && mv CHANGELOG.tmp CHANGELOG.md
+          cp ".changes/${NEXT_VERSION}.md" release-notes.md
+        fi
+        npm run changelog:build
+        mv CHANGELOG.md.bak CHANGELOG.md
+        rm -f ".changes/${NEXT_VERSION}.md"
 
     - name: Prune Composer dependencies
       run: composer install --no-dev --no-scripts
@@ -274,6 +289,18 @@ jobs:
       with:
         fetch-depth: 0
 
+    - name: Get release notes
+      id: release_notes
+      run: |
+        if [ -f release-notes.md ]; then
+          NOTES=$(cat release-notes.md)
+        else
+          NOTES="No release notes found."
+        fi
+        echo "NOTES<<EOF" >> $GITHUB_OUTPUT
+        echo "$NOTES" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+
     - name: Get commits since last release
       id: changes
       uses: simbo/changes-between-tags-action@v1
@@ -288,27 +315,34 @@ jobs:
         path: '**/'
         key: build-${{ runner.os }}-${{ github.sha }}
 
+    - name: Format asset name
+      id: asset-name
+      run: |
+        FORMATTED=$(echo "${{ needs.set-variables.outputs.build-number }}" | tr '.' '-')
+        echo "NAME=force-refresh-${FORMATTED}" >> $GITHUB_OUTPUT
+
     - name: Create GitHub release
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
         file: ./Force-Refresh-${{ needs.set-variables.outputs.build-number }}.zip
-        asset_name: Force_Refresh_v${{ needs.set-variables.outputs.build-number }}.zip
+        asset_name: ${{ steps.asset-name.outputs.NAME }}.zip
         tag: ${{ github.ref }}
         release_name: Force Refresh ${{ needs.set-variables.outputs.build-number  }}
         overwrite: true
         prerelease: true
         body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.build-number }}).
           This release is intended to be used for debugging and **should not** be used on production sites unless directed.
-          Production-stable versions are available at https://wordpress.org/plugins/force-refresh. \n\n##
-          Changelog Since Last Release\n\n${{ steps.changes.outputs.changes || 'Performance enhancements and bug fixes' }}"
+          Production-stable versions are available at https://wordpress.org/plugins/force-refresh.
+          \n\n## Upcoming Release Notes\n\n${{ steps.release_notes.outputs.NOTES }}
+          \n\n## Commits Since Last Beta\n\n${{ steps.changes.outputs.changes || 'No changes found.' }}"
 
     - name: Comment on PR
       uses: mshick/add-pr-comment@v3.9.0
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        message: Build ${{ needs.set-variables.outputs.build-number }} is [available for download](https://github.com/jordanleven/force-refresh/releases/download/v${{ needs.set-variables.outputs.build-number }}/Force_Refresh_v${{ needs.set-variables.outputs.build-number }}.zip) under [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
+        message: Build ${{ needs.set-variables.outputs.build-number }} is [available for download](https://github.com/jordanleven/force-refresh/releases/download/v${{ needs.set-variables.outputs.build-number }}/${{ steps.asset-name.outputs.NAME }}.zip) under [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
         allow-repeats: true
 
     - name: Simulate deploy to WordPress.org

@@ -1,0 +1,23 @@
+changesDir: .changes
+headerPath: .changes/header.md
+unreleasedDir: unreleased
+changelogPath: CHANGELOG.md
+versionExt: md
+versionFormat: "## {{.Version}} - {{.Time.Format \"2006-01-02\"}}"
+kindFormat: "### {{.Kind}}"
+changeFormat: "* {{.Body}}"
+kinds:
+  - label: Feature (major)
+    auto: major
+  - label: Feature (minor)
+    auto: minor
+  - label: Changed (major)
+    auto: major
+  - label: Changed (minor)
+    auto: minor
+  - label: Bug fix
+    auto: patch
+  - label: Dependencies & security
+    auto: patch
+    skipBody: true
+    changeFormat: "* Performance enhancements and bug fixes"
