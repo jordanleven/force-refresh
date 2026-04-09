@@ -17,6 +17,18 @@ getCurrentPackageVersion() {
   node -e "process.stdout.write(require('./package.json').version)"
 }
 
+getCurrentBaseVersion() {
+  getCurrentPackageVersion | sed 's/-.*//'
+}
+
+hasUnreleasedFragments() {
+  [ -n "$(ls .changes/unreleased/*.yaml 2>/dev/null)" ]
+}
+
+getNextBaseVersion() {
+  npx changie next auto
+}
+
 getExistingBuildNumber() {
   current_package_version=$(getCurrentPackageVersion)
   if echo "$current_package_version" | grep -q "-"
@@ -53,22 +65,26 @@ getNextBetaReleaseVersion() {
 }
 
 getBetaReleaseVersion() {
-  current_version=$(getCurrentPackageVersion)
+  next_base=$(getNextBaseVersion)
+  current_base=$(getCurrentBaseVersion)
   prerelease_name=$(getPrereleaseName)
 
-  case $current_version in
-    *"-"*)
-      beta_release_version="$(getNextBetaReleaseVersion "$current_version")"
-      ;;
-    *)
-      beta_release_version="${current_version}-${prerelease_name}.0"
-      ;;
-  esac
+  if [ "$current_base" = "$next_base" ] && getCurrentPackageVersion | grep -q "-"; then
+    beta_release_version="$(getNextBetaReleaseVersion "$(getCurrentPackageVersion)")"
+  else
+    beta_release_version="${next_base}-${prerelease_name}.0"
+  fi
 
   echo "$beta_release_version"
 }
 
 current_branch=$(getCurrentBranchName)
+
+if ! hasUnreleasedFragments; then
+  printf "\033[1;31mNo unreleased changie fragments found. Add one with 'npm run changelog:new' before releasing a beta.\n\033[0m"
+  exit 1
+fi
+
 next_version=$(getBetaReleaseVersion)
 
 if [ "$current_branch" = "$production_branch" ]
@@ -81,11 +97,11 @@ printf "\033[37m=====================\033[0m\n"
 printf "\033[37mPreparing to release beta version %s.\033[0m\n\n" "$next_version"
 printf "\033[33mPress \"y\" to proceed with this beta release or press any other key to abort.\033[0m "
 
-read -r
+read -r REPLY
 if echo "$REPLY" | grep -q "^[Yy]$"
 then
   bumpVersionPackage "$next_version"
-  git push --follow-tags
+  git push --force-with-lease --follow-tags
   printf "\033[1;32m\n\nPackage succesfully updated and pushed to the remote.\033[0m\n\n"
 else
   printf "\033[1;31mRelease was aborted.\033[0m\n\n"
