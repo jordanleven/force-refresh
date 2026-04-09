@@ -140,6 +140,8 @@ test.describe('Admin', () => {
   test.describe('Release notes', () => {
     test.describe.configure({ mode: 'serial' });
     let page: Page;
+    let firstToggle: any;
+    let secondToggle: any;
 
     test.beforeAll(async ({ browser, baseURL }) => {
       const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
@@ -147,6 +149,8 @@ test.describe('Admin', () => {
       await goToPluginPage(page);
       await page.locator('[data-test="btn-release-notes"]').click();
       await page.waitForLoadState('networkidle');
+      firstToggle = page.locator('[data-test="toggle-release-note-group-0"]');
+      secondToggle = page.locator('[data-test="toggle-release-note-group-1"]');
     });
 
     test.afterAll(async () => {
@@ -155,10 +159,57 @@ test.describe('Admin', () => {
 
     test('Clicking View Release Notes shows the release notes modal', async () => {
       await expect(page.locator('.modal-window')).toBeVisible();
+      await expect(page.locator('[data-test="release-notes-modal-content"]')).toBeVisible();
     });
 
     test('The release notes modal contains release notes', async () => {
       await expect(page.locator('.release-note').first()).toBeVisible({ timeout: 15_000 });
+    });
+
+    test('Clicking a release version opens the matching GitHub release tag', async () => {
+      const releaseLink = page.locator('[data-test^="release-note-link-"]').first();
+      const expectedUrl = await releaseLink.getAttribute('href');
+
+      await expect(releaseLink).toHaveAttribute('target', '_blank');
+      await expect(releaseLink).toHaveAttribute('rel', 'noopener noreferrer');
+
+      const [popup] = await Promise.all([
+        page.waitForEvent('popup'),
+        releaseLink.click(),
+      ]);
+
+      await expect.poll(() => popup.url()).toBe(expectedUrl);
+      await popup.close();
+    });
+
+    test('The newest minor version group is expanded by default', async () => {
+      await expect(firstToggle).toHaveAttribute('aria-expanded', 'true');
+      await expect(secondToggle).toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('[data-test="release-note-group-panel-0"]')).toHaveCount(1);
+      await expect(page.locator('[data-test="release-note-group-panel-1"]')).toHaveCount(0);
+    });
+
+    test('Only one minor version group is expanded at a time', async () => {
+      await secondToggle.click();
+
+      await expect(secondToggle).toHaveAttribute('aria-expanded', 'true');
+      await expect(firstToggle).toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('[data-test="release-note-group-panel-1"]')).toHaveCount(1);
+      await expect(page.locator('[data-test="release-note-group-panel-0"]')).toHaveCount(0);
+
+      await firstToggle.click();
+
+      await expect(firstToggle).toHaveAttribute('aria-expanded', 'true');
+      await expect(secondToggle).toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('[data-test="release-note-group-panel-0"]')).toHaveCount(1);
+      await expect(page.locator('[data-test="release-note-group-panel-1"]')).toHaveCount(0);
+    });
+
+    test('Clicking an open minor version group collapses it', async () => {
+      await firstToggle.click();
+
+      await expect(firstToggle).toHaveAttribute('aria-expanded', 'false');
+      await expect(page.locator('[data-test="release-note-group-panel-0"]')).toHaveCount(0);
     });
   });
 });

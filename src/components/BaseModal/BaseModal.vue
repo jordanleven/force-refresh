@@ -38,22 +38,36 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
+$wp-admin-header-height-desktop: 32px;
+$wp-admin-header-height-mobile: 46px;
+$modal-height-desktop: var.$viewport-height-large;
+
 .modal-window {
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   user-select: none;
+
+  @include utils.resp-height(1px, $modal-height-desktop) {
+    position: absolute;
+    top: $wp-admin-header-height-desktop;
+    bottom: 0;
+  }
 }
 
 .modal {
   background-color: var.$white;
   width: 100%;
-  max-width: calc(30rem + 1rem);
   overflow: scroll;
-  padding: 1rem;
-  margin: 1rem;
   border-radius: var.$border-radius;
+  padding: 1rem;
+  margin: 0 0.5rem;
+
+  @include utils.resp-height($modal-height-desktop) {
+    max-width: calc(50rem + 1rem);
+    margin: 1rem;
+  }
 }
 
 .modal__divider {
@@ -63,7 +77,7 @@ export default {
 
 .modal__inner {
   overflow: scroll;
-  max-height: 50vh;
+  max-height: 70vh;
   padding-right: 10px;
   -webkit-overflow-scrolling: touch;
   background:
