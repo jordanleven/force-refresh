@@ -39,7 +39,7 @@ services:
     depends_on:
       - db-qa
       - traefik
-    image: 'wordpress:beta-6.9-RC3-php8.3-apache'
+    image: 'wordpress:6.9.4-php8.3-apache'
     ports:
       - '8084:80'
     environment:

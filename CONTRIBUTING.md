@@ -9,12 +9,12 @@ To get started, follow the steps below:
 1. Download Docker for your Mac or PC.
 2. Start the environment by running `docker-compose up` in the project directory. This will launch all docker containers.
 
-| WordPress Version | 6.3 (min) | 6.9 (max) |
-| --- | --- | --- |
-| PHP Version | 8.2 | 8.3 |
-| Port | 8083 | 8082 |
-| Homepage | [wp6-3.force-refresh.localhost](http://wp6-3.force-refresh.localhost) | [wp6.force-refresh.localhost](http://wp6.force-refresh.localhost) |
-| Admin page | [wp6-3.force-refresh.localhost/wp-admin](http://wp6-3.force-refresh.localhost/wp-admin) | [wp6.force-refresh.localhost/wp-admin](http://wp6.force-refresh.localhost/wp-admin) |
+| WordPress Version | 6.3 (min) | 6.9 (max) | 6.9.4 (QA) |
+| --- | --- | --- | --- |
+| PHP Version | 8.2 | 8.3 | 8.3 |
+| Port | 8083 | 8082 | 8084 |
+| Homepage | [wp6-3.force-refresh.localhost](http://wp6-3.force-refresh.localhost) | [wp6.force-refresh.localhost](http://wp6.force-refresh.localhost) | [qa.force-refresh.localhost](http://qa.force-refresh.localhost) |
+| Admin page | [wp6-3.force-refresh.localhost/wp-admin](http://wp6-3.force-refresh.localhost/wp-admin) | [wp6.force-refresh.localhost/wp-admin](http://wp6.force-refresh.localhost/wp-admin) | [qa.force-refresh.localhost/wp-admin](http://qa.force-refresh.localhost/wp-admin) |
 
 ## Admin
 
