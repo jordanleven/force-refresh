@@ -1,3 +1,5 @@
+@use 'sass:math';
+@use 'sass:meta';
 @use "../variables/index.scss" as viewport;
 
 @function strip-unit($number) {
@@ -14,8 +16,8 @@
 
 /**
  * Mixin used to apply styles to specific viewports.
- * @param {string} $min  The min width for the query
- * @param {string} $max: false        An optional max-width for the query
+ * @param {string} $min         The min width for the query
+ * @param {string} $max: false  An optional max-width for the query
  *
  */
 @mixin resp($min, $max: false) {
@@ -29,6 +31,25 @@
     }
   }
 }
+
+/**
+ * Mixin used to apply styles to specific viewports.
+ * @param {string} $min         The min height for the query
+ * @param {string} $max: false  An optional max-height for the query
+ *
+ */
+@mixin resp-height($min, $max: false) {
+  @if $max {
+    @media (min-height: #{$min}) and (max-height: #{get-rem-from-px($max) - 1px}) {
+      @content;
+    }
+  } @else {
+    @media (min-height: #{$min}) {
+      @content;
+    }
+  }
+}
+
 
 /**
 * Mixin used to apply styles to the XXS viewport.

@@ -367,29 +367,24 @@ export default {
     width: 100%;
     background-color: rgba(var.$black, 0.4);
     backdrop-filter: blur(0.125rem);
+    z-index: 9999;
   }
 
   .admin-window__inner {
     width: 100vw;
     height: 100vh;
-    margin-top: 10rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 
-.fade-and-move-enter-active,
-.fade-and-move-leave-active {
+.fade-and-move-enter-active {
   animation-fill-mode: both;
   position: absolute;
   animation-name: fade-and-move;
-}
-
-.fade-and-move-enter-active {
   animation-delay: var.$transition-medium;
   animation-duration: var.$transition-medium;
-}
-
-.fade-and-move-leave-active {
-  animation-duration: 0s;
 }
 
 .fade-and-scale__main-enter-active,
