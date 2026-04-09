@@ -1,0 +1,43 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`generateWordPressReadMe generates correctly formatted README content from markdown inputs 1`] = `
+"=== Test Plugin ===
+Stable tag: 2.1.0
+Contributors: testauthor
+Tags: test, sample
+Requires PHP: 8.0
+Requires at least: 6.0
+Tested up to: 6.9
+License: GPLv2 or later
+A simple test plugin for unit testing purposes.
+
+
+== Description ==
+Full description of the test plugin.
+
+== Features ==
+- Feature one.
+- Feature two.
+
+== Installation ==
+Install and activate the plugin.
+
+== Changelog ==
+#### 2.1.0
+_Released on June 29, 2007_
+
+##### **New Features**
+* Add new feature.
+
+#### 2.0.0
+_Released on January 9, 2007_
+
+##### **Fixes**
+* Fix a critical bug.
+
+#### 1.0.0
+_Released on January 24, 1984_
+
+##### **Changes**
+* Performance enhancements and bug fixes."
+`;
