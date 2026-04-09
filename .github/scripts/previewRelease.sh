@@ -19,7 +19,7 @@ NEXT_VERSION=$(npx changie next auto)
 printf "\033[37mPreviewing release notes for v%s...\033[0m\n\n" "$NEXT_VERSION"
 
 cp CHANGELOG.md CHANGELOG.md.bak
-npx changie batch "$NEXT_VERSION"
+npx changie batch --keep "$NEXT_VERSION"
 {
   head -n 4 CHANGELOG.md
   cat ".changes/${NEXT_VERSION}.md"
