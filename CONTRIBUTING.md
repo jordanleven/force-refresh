@@ -9,12 +9,12 @@ To get started, follow the steps below:
 1. Download Docker for your Mac or PC.
 2. Start the environment by running `docker-compose up` in the project directory. This will launch all docker containers.
 
-| WordPress Version  | 5  | 6 |
-|---|---|---|
-| PHP Version  | 7  | 8 |
-| Port  | 8081  | 8080 |
-| Homepage  | [wp5.force-refresh.localhost](http://wp5.force-refresh.localhost)  | [wp6.force-refresh.localhost](wp6.force-refresh.localhost) |
-| Admin page  | [wp5.force-refresh.localhost/wp-admin](http://wp5.force-refresh.localhost/wp-admin)  | [wp6.force-refresh.localhost/wp-admin](http://wp6.force-refresh.localhost/wp-admin) |
+| WordPress Version | 6.3 (min) | 6.9 (max) |
+| --- | --- | --- |
+| PHP Version | 8.2 | 8.3 |
+| Port | 8083 | 8082 |
+| Homepage | [wp6-3.force-refresh.localhost](http://wp6-3.force-refresh.localhost) | [wp6.force-refresh.localhost](http://wp6.force-refresh.localhost) |
+| Admin page | [wp6-3.force-refresh.localhost/wp-admin](http://wp6-3.force-refresh.localhost/wp-admin) | [wp6.force-refresh.localhost/wp-admin](http://wp6.force-refresh.localhost/wp-admin) |
 
 ## Admin
 
@@ -23,8 +23,6 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 **Username**: `force-refresh-dev`
 
 **Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
-
-[Docker]: www.docker.com
 
 ## Adding Release Notes
 
