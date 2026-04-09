@@ -8,7 +8,7 @@ import { getAuthFile } from './helpers/constants';
  */
 async function scheduleRefreshApiRequest(page: Page, method: 'POST' | 'DELETE', path = '', data?: Record<string, unknown>) {
   return page.evaluate(async ({ methodValue, pathValue, requestData }) => {
-    const nonce = (window as any).forceRefreshMain.localData.nonce;
+    const { nonce } = (window as any).forceRefreshMain.localData;
     const response = await fetch(`/wp-json/force-refresh/v1/schedule-site-version${pathValue}`, {
       method: methodValue,
       credentials: 'same-origin',
@@ -90,9 +90,9 @@ async function selectScheduledRefreshInUi(page: Page, scheduledDate: Date): Prom
 
   await page.locator('#schedule-datetime-picker').click();
   await page.locator(`.mx-table-date td.cell[title="${dateTitle}"]`).click();
-  await page.locator(`.mx-time-column [data-type="hour"] .mx-time-item`, { hasText: hour12 }).click();
-  await page.locator(`.mx-time-column [data-type="minute"] .mx-time-item`, { hasText: minute }).click();
-  await page.locator(`.mx-time-column [data-type="ampm"] .mx-time-item`, { hasText: meridiem }).click();
+  await page.locator('.mx-time-column [data-type="hour"] .mx-time-item', { hasText: hour12 }).click();
+  await page.locator('.mx-time-column [data-type="minute"] .mx-time-item', { hasText: minute }).click();
+  await page.locator('.mx-time-column [data-type="ampm"] .mx-time-item', { hasText: meridiem }).click();
 }
 
 test.describe.skip('Schedule Refresh', () => {

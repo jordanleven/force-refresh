@@ -9,22 +9,24 @@ import {
   isScheduledRefreshImminent,
 } from './AdminMainRefreshUtils.js';
 
+const TIMESTAMP_EXPECTED = 1706107260;
+
 describe('AdminMainRefreshUtils', () => {
   describe('formatScheduledRefreshDateLabel', () => {
     it('formats only the scheduled refresh date', () => {
-      expect(formatScheduledRefreshDateLabel(1776124800)).toMatch(/\w+ \d{1,2}, \d{4}/);
+      expect(formatScheduledRefreshDateLabel(TIMESTAMP_EXPECTED)).toBe('January 24, 2024');
     });
   });
 
   describe('formatScheduledRefreshBaseLabel', () => {
     it('formats a scheduled refresh as "Month Day, Year at H:MM AM/PM"', () => {
-      expect(formatScheduledRefreshBaseLabel(1776124800)).toMatch(/\w+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (AM|PM)/);
+      expect(formatScheduledRefreshBaseLabel(TIMESTAMP_EXPECTED)).toBe('January 24, 2024 at 9:41 AM');
     });
   });
 
   describe('formatScheduledRefreshTimeLabel', () => {
     it('formats only the scheduled refresh time', () => {
-      expect(formatScheduledRefreshTimeLabel(1776124800)).toMatch(/\d{1,2}:\d{2} (AM|PM)/);
+      expect(formatScheduledRefreshTimeLabel(TIMESTAMP_EXPECTED)).toBe('9:41 AM');
     });
   });
 
@@ -91,7 +93,7 @@ describe('AdminMainRefreshUtils', () => {
 
   describe('getScheduledRefreshDateKey', () => {
     it('returns a stable date key for grouping scheduled refreshes', () => {
-      expect(getScheduledRefreshDateKey(1776124800)).toMatch(/\d{4}-\d{2}-\d{2}/);
+      expect(getScheduledRefreshDateKey(TIMESTAMP_EXPECTED)).toBe('2024-01-24');
     });
   });
 });

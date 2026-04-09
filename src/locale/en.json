@@ -59,7 +59,11 @@
     "UPDATE": "Update"
   },
   "RELEASE_NOTES": {
-    "HEADER": "Force Refresh Release Notes",
+    "CURRENT_BADGE": "Current",
+    "HEADER": "Release Notes",
+    "MINOR_VERSION_HIDE": "Hide",
+    "MINOR_VERSION_LABEL": "Version {minorVersion}",
+    "MINOR_VERSION_SHOW": "Show",
     "RELEASE_NOTES_PLUGIN_LINK_TITLE": "Force Refresh on WordPress.org",
     "RELEASE_NOTES_UNAVAILABLE": "I'm sorry, but release notes are currently unavailable. Please visit Force Refresh's plugin page to view the full changelog."
   },
