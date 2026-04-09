@@ -161,7 +161,8 @@ const getFormattedReleaseNote = async (release, releaseVersion) => {
   let formattedReleaseDate;
 
   if (changieMatch) {
-    displayVersion = changieMatch[1];
+    const baseVersion = changieMatch[1];
+    displayVersion = pluginVersion.startsWith(baseVersion) ? pluginVersion : baseVersion;
     formattedReleaseDate = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'long',
