@@ -1,6 +1,6 @@
 # Contributing to Force Refresh
 
-To streamline development, a sandbox WordPress environment is available via Docker. This will map the Force Refresh plugin directory to the plugins directory on the WordPress image and pre-populate the database with sample data.
+To streamline development, a sandbox WordPress environment is available via [Docker]. This will map the Force Refresh plugin directory to the plugins directory on the WordPress image and pre-populate the database with sample data.
 
 To get started, follow the steps below:
 
@@ -9,12 +9,12 @@ To get started, follow the steps below:
 1. Download Docker for your Mac or PC.
 2. Start the environment by running `docker-compose up` in the project directory. This will launch all docker containers.
 
-| WordPress Version  | 5  | 6 |
-|---|---|---|
-| PHP Version  | 7  | 8 |
-| Port  | 8081  | 8080 |
-| Homepage  | [wp5.force-refresh.localhost](http://wp5.force-refresh.localhost)  | [wp6.force-refresh.localhost](wp6.force-refresh.localhost) |
-| Admin page  | [wp5.force-refresh.localhost/wp-admin](http://wp5.force-refresh.localhost/wp-admin)  | [wp6.force-refresh.localhost/wp-admin](http://wp6.force-refresh.localhost/wp-admin) |
+| WordPress Version | 6.3 (min) | 6.9 (max) | 6.9.4 (QA) |
+| --- | --- | --- | --- |
+| PHP Version | 8.2 | 8.3 | 8.3 |
+| Port | 8083 | 8082 | 8084 |
+| Homepage | [wp6-3.force-refresh.localhost][wp63] | [wp6.force-refresh.localhost][wp6] | [qa.force-refresh.localhost][wpqa] |
+| Admin page | [wp6-3.force-refresh.localhost/wp-admin][wp63-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [qa.force-refresh.localhost/wp-admin][wpqa-admin] |
 
 ## Admin
 
@@ -24,11 +24,9 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 
 **Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
 
-[Docker]: www.docker.com
-
 ## Adding Release Notes
 
-This project uses [changie](https://changie.dev/) to manage release notes.
+This project uses [changie] to manage release notes.
 
 **When you finish a meaningful change** (feature, fix, dependency update, etc.), create a release note fragment before or alongside your commit:
 
@@ -70,3 +68,12 @@ npm run release -- --minor   # or override the bump level explicitly
 ```
 
 The script will block if no unreleased fragments exist, show the computed next version, and ask for confirmation before committing, tagging, and pushing. CI handles the rest.
+
+[Docker]: https://www.docker.com
+[changie]: https://changie.dev/
+[wp63]: http://wp6-3.force-refresh.localhost
+[wp63-admin]: http://wp6-3.force-refresh.localhost/wp-admin
+[wp6]: http://wp6.force-refresh.localhost
+[wp6-admin]: http://wp6.force-refresh.localhost/wp-admin
+[wpqa]: http://qa.force-refresh.localhost
+[wpqa-admin]: http://qa.force-refresh.localhost/wp-admin

@@ -39,7 +39,7 @@ services:
     depends_on:
       - db-qa
       - traefik
-    image: 'wordpress:beta-6.9-RC3-php8.3-apache'
+    image: 'wordpress:6.9.4-php8.3-apache'
     ports:
       - '8084:80'
     environment:
@@ -78,7 +78,7 @@ services:
     depends_on:
       - db-6
       - traefik
-    image: 'wordpress:beta-6.9-RC3-php8.3-apache'
+    image: 'wordpress:6.9-php8.3-apache'
     ports:
       - '8082:80'
     healthcheck:
@@ -103,13 +103,13 @@ services:
       - "traefik.http.routers.wp6.rule=host(`wp6.force-refresh.localhost`)"
       - "traefik.http.services.wp6.loadbalancer.server.port=80"
 
-  db-5:
-    hostname: wp5.force-refresh.localhost
-    container_name: 'force-refresh-db-dev-container-wp-5'
+  db-6-3:
+    hostname: wp6-3.force-refresh.localhost
+    container_name: 'force-refresh-db-dev-container-wp-6-3'
     image: mariadb:10.3
     volumes:
-      - './.docker-build/data/mysql_5:/var/lib/mysql'
-      - ./db/wp-5:/docker-entrypoint-initdb.d
+      - './.docker-build/data/mysql_6_3:/var/lib/mysql'
+      - ./db/wp-6-3:/docker-entrypoint-initdb.d
     ports:
       - 18767:3306
     environment:
@@ -118,10 +118,11 @@ services:
       MYSQL_USER: force-refresh-dev-user
       MYSQL_PASSWORD: force-refresh-dev-password
 
-  wordpress-5:
-    container_name: 'force-refresh-dev-container-wp-5'
+  wordpress-6-3:
+    hostname: wp6-3.force-refresh.localhost
+    container_name: 'force-refresh-dev-container-wp-6-3'
     depends_on:
-      - db-5
+      - db-6-3
       - traefik
     image: 'wordpress:6.3-php8.2-apache'
     ports:
@@ -133,7 +134,7 @@ services:
       retries: 20
       start_period: 60s
     environment:
-      WORDPRESS_DB_HOST: 'db-5:3306'
+      WORDPRESS_DB_HOST: 'db-6-3:3306'
       WORDPRESS_DB_NAME: force-refresh-dev-db
       WORDPRESS_DB_USER: force-refresh-dev-user
       WORDPRESS_DB_PASSWORD: force-refresh-dev-password
@@ -142,8 +143,8 @@ services:
       WP_DEBUG_LOG: 1
       WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local');"
     volumes:
-      - "./.docker-build/wordpress_5:/var/www/html"
+      - "./.docker-build/wordpress_6_3:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
     labels:
-      - "traefik.http.routers.wp5.rule=host(`wp5.force-refresh.localhost`)"
-      - "traefik.http.services.wp5.loadbalancer.server.port=80"
+      - "traefik.http.routers.wp6-3.rule=host(`wp6-3.force-refresh.localhost`)"
+      - "traefik.http.services.wp6-3.loadbalancer.server.port=80"

@@ -262,7 +262,7 @@ jobs:
           key: dependencies-${{ runner.os }}-${{ github.sha }}
 
       - name: Add WordPress hostnames
-        run: echo "127.0.0.1 wp5.force-refresh.localhost wp6.force-refresh.localhost" | sudo tee -a /etc/hosts
+        run: echo "127.0.0.1 wp6-3.force-refresh.localhost wp6.force-refresh.localhost" | sudo tee -a /etc/hosts
 
       - name: Start WordPress instances
         run: docker compose up -d --wait
