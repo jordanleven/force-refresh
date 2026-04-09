@@ -26,12 +26,18 @@ async function dismissWordPressInterstitials(page: Page): Promise<void> {
 }
 
 export async function loginAsAdmin(page: Page): Promise<void> {
-  for (let attempt = 1; attempt <= LOGIN_MAX_ATTEMPTS; attempt++) {
+  for (let attempt = 1; attempt <= LOGIN_MAX_ATTEMPTS; attempt += 1) {
+    // eslint-disable-next-line no-await-in-loop
     await page.goto('/wp-login.php');
+    // eslint-disable-next-line no-await-in-loop
     await page.fill('#user_login', ADMIN_USERNAME);
+    // eslint-disable-next-line no-await-in-loop
     await page.fill('#user_pass', ADMIN_PASSWORD);
+    // eslint-disable-next-line no-await-in-loop
     await page.click('#wp-submit');
+    // eslint-disable-next-line no-await-in-loop
     await page.waitForURL(/wp-admin|admin-email-confirm|upgrade\.php/, { timeout: LOGIN_TIMEOUT_MS }).catch(() => {});
+    // eslint-disable-next-line no-await-in-loop
     await dismissWordPressInterstitials(page);
     if (page.url().includes('wp-admin')) return;
   }
