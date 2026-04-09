@@ -123,6 +123,8 @@ jobs:
 
       - name: Test JavaScript source code
         run: npm test
+        env:
+          TZ: America/New_York
 
   testing-php:
     name: Testing – PHP
@@ -289,25 +291,11 @@ jobs:
       with:
         fetch-depth: 0
 
-    - name: Get release notes
-      id: release_notes
-      run: |
-        if [ -f release-notes.md ]; then
-          NOTES=$(cat release-notes.md)
-        else
-          NOTES="No release notes found."
-        fi
-        echo "NOTES<<EOF" >> $GITHUB_OUTPUT
-        echo "$NOTES" >> $GITHUB_OUTPUT
-        echo "EOF" >> $GITHUB_OUTPUT
-
-    - name: Get commits since last release
+    - name: Get commits since last stable release
       id: changes
-      uses: simbo/changes-between-tags-action@v1
-      with:
-        validate-tag: false
-        tag-pattern: '^v[0-9]+\.[0-9]+\.[0-9]+-.*\.[0-9]+$'
-        include-tag-commit: false
+      run: |
+        PREV_STABLE_TAG=$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
+        bash .github/scripts/getCommitsSinceRelease.sh "$PREV_STABLE_TAG"
 
     - name: Pull build from cache
       uses: actions/cache@v5
@@ -334,8 +322,7 @@ jobs:
         body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.build-number }}).
           This release is intended to be used for debugging and **should not** be used on production sites unless directed.
           Production-stable versions are available at https://wordpress.org/plugins/force-refresh.
-          \n\n## Upcoming Release Notes\n\n${{ steps.release_notes.outputs.NOTES }}
-          \n\n## Commits Since Last Beta\n\n${{ steps.changes.outputs.changes || 'No changes found.' }}"
+          \n\n## Commits Since Last Release\n\n${{ steps.changes.outputs.COMMITS }}"
 
     - name: Comment on PR
       uses: mshick/add-pr-comment@v3.9.0
