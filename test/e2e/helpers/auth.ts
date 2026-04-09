@@ -6,15 +6,34 @@ export const ADMIN_PASSWORD = 'dross_dread_motto1polopony9treacle*SERAGLIO.unctu
 const LOGIN_MAX_ATTEMPTS = 3;
 const LOGIN_TIMEOUT_MS = 30_000;
 
+async function dismissWordPressInterstitials(page: Page): Promise<void> {
+  // Admin email confirmation screen
+  if (page.url().includes('admin-email-confirm.php')) {
+    await page.locator('#submit').click();
+    await page.waitForURL(/wp-admin/, { timeout: LOGIN_TIMEOUT_MS });
+  }
+
+  // Database upgrade screen
+  if (page.url().includes('upgrade.php')) {
+    const upgradeButton = page.locator('.button.button-large');
+    if (await upgradeButton.isVisible()) {
+      await upgradeButton.click();
+      await page.waitForURL(/upgrade\.php/, { timeout: LOGIN_TIMEOUT_MS });
+    }
+    await page.goto('/wp-admin/');
+    await page.waitForURL(/wp-admin/, { timeout: LOGIN_TIMEOUT_MS });
+  }
+}
+
 export async function loginAsAdmin(page: Page): Promise<void> {
   for (let attempt = 1; attempt <= LOGIN_MAX_ATTEMPTS; attempt++) {
     await page.goto('/wp-login.php');
     await page.fill('#user_login', ADMIN_USERNAME);
     await page.fill('#user_pass', ADMIN_PASSWORD);
     await page.click('#wp-submit');
-    // WordPress may show an admin email verification screen before wp-admin
-    const reached = await page.waitForURL(/wp-admin/, { timeout: LOGIN_TIMEOUT_MS }).then(() => true).catch(() => false);
-    if (reached) return;
+    await page.waitForURL(/wp-admin|admin-email-confirm|upgrade\.php/, { timeout: LOGIN_TIMEOUT_MS }).catch(() => {});
+    await dismissWordPressInterstitials(page);
+    if (page.url().includes('wp-admin')) return;
   }
   throw new Error(`Failed to reach wp-admin after ${LOGIN_MAX_ATTEMPTS} login attempts`);
 }
