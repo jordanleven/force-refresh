@@ -122,6 +122,7 @@ const getReleaseDetails = ({ raw }, releaseCategory) => {
   switch (releaseCategory) {
     case 'Feature (major)':
     case 'Feature (minor)':
+    case 'Feature':
     case 'New Features':
       releaseNote = [MESSAGE_NOTES_HEADERS.FEATURE, ...releaseNoteSplit];
       break;
