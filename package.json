@@ -27,7 +27,8 @@
     "changelog:preview": "./.github/scripts/previewRelease.sh",
     "release": "./.github/scripts/release.sh",
     "release:beta": "./.github/scripts/releaseBeta.sh",
-    "checkNodeVersion": "check-node-version --package"
+    "checkNodeVersion": "check-node-version --package",
+    "db:update": "./db/updateDatabases.sh"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
