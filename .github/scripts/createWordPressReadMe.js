@@ -167,7 +167,8 @@ const getFormattedReleaseNote = async (release, releaseVersion) => {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
-    }).format(new Date(`${changieMatch[2]}T00:00:00`));
+      timeZone: 'America/New_York',
+    }).format(new Date(`${changieMatch[2]}T12:00:00Z`));
   } else {
     displayVersion = releaseVersion;
     const releaseDate = await git.log([`v${releaseVersion}`]);
