@@ -85,6 +85,7 @@ export default [
           ignoreUrls: true,
         },
       ],
+      'no-void': ['error', { allowAsStatement: true }],
       'vue/max-attributes-per-line': ['error', {
         multiline: {
           max: 5,
@@ -150,6 +151,12 @@ export default [
           ignoreUrls: true,
         },
       ],
+    },
+  },
+  {
+    files: ['playwright.config*.ts', 'test/**/*.ts'],
+    rules: {
+      'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     },
   },
 ];

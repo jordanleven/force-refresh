@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { goToPluginPage } from './helpers/auth';
-import { getAuthFile } from './helpers/constants';
 import { triggerRefreshAndWaitForReload } from './helpers/client';
+import { getAuthFile } from './helpers/constants';
 
 test.describe('Client', () => {
   test.beforeAll(async ({ browser, baseURL }) => {
