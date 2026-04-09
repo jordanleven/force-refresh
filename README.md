@@ -10,33 +10,34 @@
 **Tested up to:** 6.9\
 **License:** GPLv2 or later
 
-Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site on a per-page or post basis.
+Force Refresh gives you a simple way to request page refreshes for visitors currently viewing your site, whether you want to refresh the entire site or a single page.
 
 ## Description
 
-Force Refresh is the best plugin for requesting browsers to refresh their page. Perfect for single-page applications or pages that bring in feeds, this simple plugin will allow you to force a page refresh for users currently visiting any page of your site.
+Force Refresh gives you a fast, reliable way to request or schedule browser refreshes for visitors currently viewing your site. It's ideal for single-page applications, live feeds, and any experience where fresh content matters.
 
 ## Features
 
-- Support for both parent and child themes.
-- Allows an admin to simply click a button to request browsers to refresh their page. This is done within your selected customized client-side refresh interval.
-- Ability to add refreshing capabilities to any role using the "Invoke Force Refresh" capability.
-- Ability to refresh on a per-page or post basis.
-- Customizable client-side refresh intervals, including the ability to customize any refresh interval between 30 seconds and four hours.
+- Request a browser refresh with a single click, using the client-side refresh interval you've configured.
+- Schedule any number of site refreshes in advance.
+- Refresh individual pages or posts when you need a more targeted update.
+- Choose refresh intervals from 30 seconds up to four hours.
+- Extend refresh permissions to any role with the "Invoke Force Refresh" capability.
+- Works with both parent and child themes.
 
 ## Feature Requests and Bug Reports
 
-- Please report any bugs you encounter [under the Support tab](https://wordpress.org/support/plugin/force-refresh).
-- Feature requests can be made [on GitHub](https://github.com/jordanleven/force-refresh/issues). Force Refresh is an open-source plugin, and PRs are welcomed!
+- Report bugs through the [Support tab](https://wordpress.org/support/plugin/force-refresh).
+- Share feature requests on [GitHub](https://github.com/jordanleven/force-refresh/issues). Force Refresh is open source, and pull requests are welcome.
 
 ## Installation
 
-Upload the Force Refresh plugin to your site, and then simply activate it. To force a refresh, just navigate to "Tools", click on "Force Refresh" and click the button that says, "Refresh Site."
+Upload Force Refresh to your site and activate it. When you're ready to request a refresh, go to "Tools", select "Force Refresh", and click "Refresh Site."
 
 ## Screenshots
 
-1. Under Tools, you'll find all settings for Force Refresh.
-2. You can choose from popular refresh intervals or specify a custom one. After clicking, "Refresh site", you'll receive confirmation that you've requested connected browsers to refresh.
-3. To refresh a single page or post, locate the "Force Refresh" section under any page.
-4. Want to see the latest features? Clicking "View Release Notes" will display the most recent features and fixes for Force Refresh.
-5. If you're having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow you to enter Debugging Mode — an enhanced browser console logging mode that can be used to diagnose issues.
+1. Find all Force Refresh settings under Tools.
+2. Choose a common refresh interval or set your own. After clicking "Refresh Site", you'll see a confirmation that connected browsers have been asked to refresh.
+3. Refresh a single page or post from the "Force Refresh" section on the edit screen.
+4. Open "View Release Notes" to see the latest improvements in Force Refresh.
+5. Open "Troubleshooting" to review current settings and enable Debugging Mode for more detailed browser console logging.
