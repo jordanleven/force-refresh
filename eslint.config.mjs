@@ -1,5 +1,6 @@
 import { FlatCompat } from '@eslint/eslintrc';
 import { fixupPluginRules, includeIgnoreFile } from '@eslint/compat';
+import tsParser from '@typescript-eslint/parser';
 import pluginVue from 'eslint-plugin-vue';
 import globals from 'globals';
 import { fileURLToPath } from 'url';
@@ -55,7 +56,7 @@ export default [
           alias: {
             '@': path.join(__dirname, 'src'),
           },
-          extensions: ['.js'],
+          extensions: ['.js', '.ts'],
         },
       },
     },
@@ -99,6 +100,56 @@ export default [
         minKeys: 2,
         natural: false,
       }],
+    },
+  },
+  {
+    files: ['**/*.ts'],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      globals: {
+        ...globals.browser,
+        ...globals.jest,
+        ...globals.node,
+      },
+      parser: tsParser,
+      sourceType: 'module',
+    },
+    settings: {
+      'import/resolver': {
+        'eslint-import-resolver-custom-alias': {
+          alias: {
+            '@': path.join(__dirname, 'src'),
+          },
+          extensions: ['.js', '.ts'],
+        },
+      },
+    },
+    rules: {
+      'import/extensions': [
+        'error',
+        'ignorePackages', {
+          js: 'always',
+          ts: 'never',
+          vue: 'always',
+        },
+      ],
+      'import/order': ['error', {
+        alphabetize: {
+          caseInsensitive: false,
+          order: 'asc',
+        },
+        groups: ['builtin', 'external', 'index', 'parent', 'internal', 'sibling', 'object'],
+      }],
+      'import/prefer-default-export': 'off',
+      'max-len': [
+        'error', 150, 2, {
+          ignoreComments: false,
+          ignoreRegExpLiterals: true,
+          ignoreStrings: false,
+          ignoreTemplateLiterals: false,
+          ignoreUrls: true,
+        },
+      ],
     },
   },
 ];
