@@ -164,14 +164,11 @@ final class ApiHandlerAdminRefreshSiteTest extends TestCase {
      * Test that refresh_site returns a 201 response.
      */
     public function testRefreshSiteReturns201Response() {
-        self::$mock_status_header->resetInvocationIndex();
         self::$mock_current_time->set_return_value( '2007-06-29 18:00:00' );
 
-        ob_start();
-        ( new Api_Handler_Admin_Refresh_Site() )->refresh_site();
-        ob_get_clean();
+        $response = ( new Api_Handler_Admin_Refresh_Site() )->refresh_site();
 
-        $this->assertEquals( 201, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 201, $response->get_status() );
     }
 
     /**
@@ -180,13 +177,11 @@ final class ApiHandlerAdminRefreshSiteTest extends TestCase {
     public function testRefreshSiteReturnsNewVersionInResponse() {
         self::$mock_current_time->set_return_value( '1984' );
 
-        ob_start();
-        ( new Api_Handler_Admin_Refresh_Site() )->refresh_site();
-        $output = ob_get_clean();
+        $response = ( new Api_Handler_Admin_Refresh_Site() )->refresh_site();
+        $data     = $response->get_data();
 
-        $decoded = json_decode( $output, true );
-        $this->assertArrayHasKey( 'new_site_version', $decoded['data'] );
-        $this->assertEquals( 'hash-198', $decoded['data']['new_site_version'] );
+        $this->assertArrayHasKey( 'new_site_version', $data['data'] );
+        $this->assertEquals( 'hash-198', $data['data']['new_site_version'] );
     }
 
     /**

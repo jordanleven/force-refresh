@@ -28,20 +28,6 @@ final class ApiHandlerAdminDebuggingTest extends TestCase {
     const SERVICES_NAMESPACE = 'JordanLeven\\Plugins\\ForceRefresh\\Services';
 
     /**
-     * Mock for `status_header`.
-     *
-     * @var Mocks\Mock_Status_Header
-     */
-    private static $mock_status_header;
-
-    /**
-     * Mock for `wp_json_encode`.
-     *
-     * @var Mocks\Mock_Wp_Json_Encode
-     */
-    private static $mock_wp_json_encode;
-
-    /**
      * Mock for `current_time` in the services namespace.
      *
      * @var Mocks\Mock_Current_Time
@@ -96,8 +82,6 @@ final class ApiHandlerAdminDebuggingTest extends TestCase {
      * @return void
      */
     public static function setUpBeforeClass(): void {
-        self::$mock_status_header       = new Mocks\Mock_Status_Header( __NAMESPACE__ );
-        self::$mock_wp_json_encode      = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
         self::$mock_current_time        = new Mocks\Mock_Current_Time( self::SERVICES_NAMESPACE );
         self::$mock_update_option       = new Mocks\Mock_Update_Option( self::SERVICES_NAMESPACE );
         self::$mock_delete_option       = new Mocks\Mock_Delete_Option( self::SERVICES_NAMESPACE );
@@ -113,8 +97,6 @@ final class ApiHandlerAdminDebuggingTest extends TestCase {
      * @return void
      */
     public static function tearDownAfterClass(): void {
-        self::$mock_status_header->disable();
-        self::$mock_wp_json_encode->disable();
         self::$mock_current_time->disable();
         self::$mock_update_option->disable();
         self::$mock_delete_option->disable();
@@ -146,9 +128,7 @@ final class ApiHandlerAdminDebuggingTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'debug', true );
 
-        ob_start();
         ( new Api_Handler_Admin_Debugging() )->save_options( $request );
-        ob_get_clean();
 
         $this->assertEquals( 'force_refresh_debug_active_date', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
         $this->assertEquals( $test_time, self::$mock_update_option->get_invocation_arguments( 0 )[1] );
@@ -163,9 +143,7 @@ final class ApiHandlerAdminDebuggingTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'debug', false );
 
-        ob_start();
         ( new Api_Handler_Admin_Debugging() )->save_options( $request );
-        ob_get_clean();
 
         $this->assertEquals( 'force_refresh_debug_active_date', self::$mock_delete_option->get_invocation_arguments( 0 )[0] );
     }
@@ -174,17 +152,14 @@ final class ApiHandlerAdminDebuggingTest extends TestCase {
      * Test that save_options returns a 201 response.
      */
     public function testSaveOptionsReturns201Response() {
-        self::$mock_status_header->resetInvocationIndex();
         self::$mock_current_time->set_return_value( '2007-06-29 18:00:00' );
 
         $request = new \WP_REST_Request();
         $request->set_param( 'debug', true );
 
-        ob_start();
-        ( new Api_Handler_Admin_Debugging() )->save_options( $request );
-        ob_get_clean();
+        $response = ( new Api_Handler_Admin_Debugging() )->save_options( $request );
 
-        $this->assertEquals( 201, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 201, $response->get_status() );
     }
 
     /**
