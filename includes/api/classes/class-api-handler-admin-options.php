@@ -40,7 +40,7 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
-                'methods'             => \WP_REST_Server::EDITABLE,
+                'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( $this, 'save_options' ),
                 'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
             ),
@@ -52,9 +52,9 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
      *
      * @param \WP_REST_Request $request The WP ReST request.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function save_options( \WP_REST_Request $request ): void {
+    public function save_options( \WP_REST_Request $request ): \WP_REST_Response {
         $show_refresh_in_admin_bar = $request->get_param( 'show_refresh_in_admin_bar' ) ?? null;
         $refresh_interval          = $request->get_param( 'refresh_interval' ) ?? null;
 
@@ -66,7 +66,7 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
             Options_Storage_Service::set_option_refresh_interval( $refresh_interval );
         }
 
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::CREATED,
             'You\'ve successfully updated options.',
         );

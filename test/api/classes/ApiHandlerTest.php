@@ -34,20 +34,6 @@ final class ApiHandlerTest extends TestCase {
     private static $mock_get_rest_url;
 
     /**
-     * Mock for `status_header`.
-     *
-     * @var Mocks\Mock_Status_Header
-     */
-    private static $mock_status_header;
-
-    /**
-     * Mock for `wp_json_encode`.
-     *
-     * @var Mocks\Mock_Wp_Json_Encode
-     */
-    private static $mock_wp_json_encode;
-
-    /**
      * Mock for `get_option` (used by get_current_version_site).
      *
      * @var Mocks\Mock_Get_Option
@@ -69,8 +55,6 @@ final class ApiHandlerTest extends TestCase {
     public static function setUpBeforeClass(): void {
         self::$mock_get_current_blog_id = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
         self::$mock_get_rest_url        = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
-        self::$mock_status_header       = new Mocks\Mock_Status_Header( __NAMESPACE__ );
-        self::$mock_wp_json_encode      = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
         self::$mock_get_option          = new Mocks\Mock_Get_Option( __NAMESPACE__ );
         self::$mock_get_post_meta       = new Mocks\Mock_Get_Post_Meta( __NAMESPACE__ );
     }
@@ -83,8 +67,6 @@ final class ApiHandlerTest extends TestCase {
     public static function tearDownAfterClass(): void {
         self::$mock_get_current_blog_id->disable();
         self::$mock_get_rest_url->disable();
-        self::$mock_status_header->disable();
-        self::$mock_wp_json_encode->disable();
         self::$mock_get_option->disable();
         self::$mock_get_post_meta->disable();
     }
@@ -133,41 +115,33 @@ final class ApiHandlerTest extends TestCase {
     }
 
     /**
-     * Test that return_api_response calls status_header with the correct status code.
+     * Test that return_api_response returns a response with the correct status code.
      */
     public function testReturnApiResponseCallsStatusHeaderWithCorrectStatusCode() {
-        self::$mock_status_header->resetInvocationIndex();
+        $response = ( new Api_Handler_Client() )->return_api_response( 200, 'Success' );
 
-        ob_start();
-        ( new Api_Handler_Client() )->return_api_response( 200, 'Success' );
-        ob_get_clean();
-
-        $this->assertEquals( 200, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 200, $response->get_status() );
     }
 
     /**
-     * Test that return_api_response outputs JSON with the correct structure.
+     * Test that return_api_response returns a response with the correct structure.
      */
     public function testReturnApiResponseOutputsCorrectJsonStructure() {
-        ob_start();
-        ( new Api_Handler_Client() )->return_api_response( 201, 'Created', array( 'key' => 'value' ) );
-        $output = ob_get_clean();
+        $response = ( new Api_Handler_Client() )->return_api_response( 201, 'Created', array( 'key' => 'value' ) );
+        $data     = $response->get_data();
 
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( 201, $decoded['code'] );
-        $this->assertEquals( 'Created', $decoded['message'] );
-        $this->assertEquals( array( 'key' => 'value' ), $decoded['data'] );
+        $this->assertEquals( 201, $response->get_status() );
+        $this->assertEquals( 'Created', $data['message'] );
+        $this->assertEquals( array( 'key' => 'value' ), $data['data'] );
     }
 
     /**
-     * Test that return_api_response outputs JSON with an empty data array when none provided.
+     * Test that return_api_response returns a response with an empty data array when none provided.
      */
     public function testReturnApiResponseOutputsEmptyDataWhenNotProvided() {
-        ob_start();
-        ( new Api_Handler_Client() )->return_api_response( 200, 'OK' );
-        $output = ob_get_clean();
+        $response = ( new Api_Handler_Client() )->return_api_response( 200, 'OK' );
+        $data     = $response->get_data();
 
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( array(), $decoded['data'] );
+        $this->assertEquals( array(), $data['data'] );
     }
 }
