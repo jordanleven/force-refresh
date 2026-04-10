@@ -1,6 +1,7 @@
-import { debug, error, warn } from './loggingService.js';
 import { setDebugMode } from './debugService.js';
+import { debug, error, warn } from './loggingService.js';
 
+/* eslint-disable no-console */
 const PACKAGE_PREFIX = 'ForceRefresh';
 
 describe('loggingService', () => {
