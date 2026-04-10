@@ -40,7 +40,7 @@ class Api_Handler_Admin_Debugging extends Api_Handler_Admin implements Api_Handl
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
-                'methods'             => \WP_REST_Server::EDITABLE,
+                'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( $this, 'save_options' ),
                 'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
             ),
@@ -52,14 +52,14 @@ class Api_Handler_Admin_Debugging extends Api_Handler_Admin implements Api_Handl
      *
      * @param \WP_REST_Request $request The WP ReST request.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function save_options( \WP_REST_Request $request ): void {
+    public function save_options( \WP_REST_Request $request ): \WP_REST_Response {
         $debug_mode = $request->get_param( 'debug' ) === true ?? null;
 
         Debug_Storage_Service::set_debug_mode( $debug_mode );
 
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::CREATED,
             'You\'ve successfully updated debug mode.'
         );

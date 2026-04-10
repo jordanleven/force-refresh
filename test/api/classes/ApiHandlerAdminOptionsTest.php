@@ -23,20 +23,6 @@ require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-o
 final class ApiHandlerAdminOptionsTest extends TestCase {
 
     /**
-     * Mock for `status_header`.
-     *
-     * @var Mocks\Mock_Status_Header
-     */
-    private static $mock_status_header;
-
-    /**
-     * Mock for `wp_json_encode`.
-     *
-     * @var Mocks\Mock_Wp_Json_Encode
-     */
-    private static $mock_wp_json_encode;
-
-    /**
      * Mock for `update_option` in the services namespace.
      *
      * @var Mocks\Mock_Update_Option
@@ -77,8 +63,6 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
      * @return void
      */
     public static function setUpBeforeClass(): void {
-        self::$mock_status_header       = new Mocks\Mock_Status_Header( __NAMESPACE__ );
-        self::$mock_wp_json_encode      = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
         self::$mock_update_option       = new Mocks\Mock_Update_Option( 'JordanLeven\\Plugins\\ForceRefresh\\Services' );
         self::$mock_register_rest_route = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
         self::$mock_get_current_blog_id = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
@@ -92,8 +76,6 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
      * @return void
      */
     public static function tearDownAfterClass(): void {
-        self::$mock_status_header->disable();
-        self::$mock_wp_json_encode->disable();
         self::$mock_update_option->disable();
         self::$mock_register_rest_route->disable();
         self::$mock_get_current_blog_id->disable();
@@ -121,9 +103,7 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'show_refresh_in_admin_bar', 'true' );
 
-        ob_start();
         ( new Api_Handler_Admin_Options() )->save_options( $request );
-        ob_get_clean();
 
         $this->assertEquals( 'force_refresh_show_in_wp_admin_bar', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
         $this->assertEquals( 'true', self::$mock_update_option->get_invocation_arguments( 0 )[1] );
@@ -138,9 +118,7 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'refresh_interval', '60' );
 
-        ob_start();
         ( new Api_Handler_Admin_Options() )->save_options( $request );
-        ob_get_clean();
 
         $this->assertEquals( 'force_refresh_refresh_interval', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
         $this->assertEquals( '60', self::$mock_update_option->get_invocation_arguments( 0 )[1] );
@@ -156,9 +134,7 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         $request->set_param( 'show_refresh_in_admin_bar', 'false' );
         $request->set_param( 'refresh_interval', '120' );
 
-        ob_start();
         ( new Api_Handler_Admin_Options() )->save_options( $request );
-        ob_get_clean();
 
         $this->assertEquals( 2, self::$mock_update_option->get_invocation_count() - ( self::$mock_update_option->get_invocation_count() - 2 ) );
     }
@@ -173,9 +149,7 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'refresh_interval', '90' );
 
-        ob_start();
         ( new Api_Handler_Admin_Options() )->save_options( $request );
-        ob_get_clean();
 
         $invocation_count_after = self::$mock_update_option->get_invocation_count();
         $this->assertEquals( 1, $invocation_count_after - $invocation_count_before );
@@ -186,14 +160,10 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
      * Test that save_options returns a 201 response.
      */
     public function testSaveOptionsReturns201Response() {
-        self::$mock_status_header->resetInvocationIndex();
+        $request  = new \WP_REST_Request();
+        $response = ( new Api_Handler_Admin_Options() )->save_options( $request );
 
-        $request = new \WP_REST_Request();
-        ob_start();
-        ( new Api_Handler_Admin_Options() )->save_options( $request );
-        ob_get_clean();
-
-        $this->assertEquals( 201, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 201, $response->get_status() );
     }
 
     /**
