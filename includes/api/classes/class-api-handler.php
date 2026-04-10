@@ -74,16 +74,15 @@ abstract class Api_Handler implements Api_Handler_Interface {
      *                               that explains the status.
      * @param   array  $data         An array of data to sent as the response.
      *
-     * @return  void
+     * @return  \WP_REST_Response
      */
-    public function return_api_response( int $status_code, string $message, $data = array() ): void {
-        status_header( $status_code );
-        print wp_json_encode(
+    public function return_api_response( int $status_code, string $message, $data = array() ): \WP_REST_Response {
+        return new \WP_REST_Response(
             array(
-                'code'    => $status_code,
-                'message' => $message,
                 'data'    => $data,
-            )
+                'message' => $message,
+            ),
+            $status_code
         );
     }
 }

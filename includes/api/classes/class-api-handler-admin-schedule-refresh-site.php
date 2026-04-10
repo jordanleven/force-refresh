@@ -172,10 +172,10 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     /**
      * Method for getting all scheduled refreshes.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function get_scheduled_refreshes_site(): void {
-        $this->return_api_response(
+    public function get_scheduled_refreshes_site(): \WP_REST_Response {
+        return $this->return_api_response(
             \WP_Http::OK,
             'Successfully retrieved scheduled refreshes.',
             array(
@@ -189,19 +189,18 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      *
      * @param \WP_REST_Request $request The request object.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function delete_schedule_refresh_site( \WP_REST_Request $request ): void {
+    public function delete_schedule_refresh_site( \WP_REST_Request $request ): \WP_REST_Response {
         $id = $request->get_param( 'id' ) ?? null;
 
         // Validate ID is provided.
         if ( empty( $id ) ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::BAD_REQUEST,
                 'Missing schedule ID.',
                 array()
             );
-            return;
         }
 
         // Check if the scheduled event exists before attempting to delete.
@@ -227,12 +226,11 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
         // Return 404 if event doesn't exist.
         if ( ! $event_exists ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::NOT_FOUND,
                 'Scheduled refresh not found.',
                 array( 'id' => $id )
             );
-            return;
         }
 
         // Attempt to delete the scheduled hook.
@@ -240,16 +238,15 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
         // Check if deletion was successful.
         if ( ! $deleted ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::INTERNAL_SERVER_ERROR,
                 'Failed to delete scheduled refresh.',
                 array( 'id' => $id )
             );
-            return;
         }
 
         // Successfully deleted.
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::ACCEPTED,
             'You\'ve successfully deleted a site refresh.',
             array(
@@ -263,19 +260,18 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      *
      * @param \WP_REST_Request $request The request object.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function schedule_refresh_site( \WP_REST_Request $request ): void {
+    public function schedule_refresh_site( \WP_REST_Request $request ): \WP_REST_Response {
         $scheduled_refresh = $request->get_param( 'schedule_refresh_timestamp' ) ?? null;
 
         // Validate timestamp is provided.
         if ( empty( $scheduled_refresh ) ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::BAD_REQUEST,
                 'Missing required parameter: schedule_refresh_timestamp',
                 array()
             );
-            return;
         }
 
         // Parse the timestamp.
@@ -283,22 +279,20 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
         // Validate timestamp is valid.
         if ( false === $scheduled_refresh_time ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::BAD_REQUEST,
                 'Invalid timestamp format.',
                 array()
             );
-            return;
         }
 
         // Validate timestamp is in the future.
         if ( $scheduled_refresh_time <= time() ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::BAD_REQUEST,
                 'Scheduled time must be in the future.',
                 array()
             );
-            return;
         }
 
         $uuid = wp_generate_uuid4();
@@ -308,15 +302,14 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
         // Check if scheduling was successful.
         if ( false === $scheduled ) {
-            $this->return_api_response(
+            return $this->return_api_response(
                 \WP_Http::INTERNAL_SERVER_ERROR,
                 'Failed to schedule refresh.',
                 array()
             );
-            return;
         }
 
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::CREATED,
             'You\'ve successfully scheduled a site refresh.',
             array(

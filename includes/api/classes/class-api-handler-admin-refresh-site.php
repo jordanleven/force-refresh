@@ -50,14 +50,14 @@ class Api_Handler_Admin_Refresh_Site extends Api_Handler_Admin implements Api_Ha
     /**
      * Method for refreshing the site version.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function refresh_site(): void {
+    public function refresh_site(): \WP_REST_Response {
         $site_version = Versions_Storage_Service::get_new_version();
 
         Versions_Storage_Service::set_site_version( $site_version );
 
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::CREATED,
             'You\'ve successfully requested all browsers to refresh',
             array(
