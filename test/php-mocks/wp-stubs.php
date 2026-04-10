@@ -5,72 +5,10 @@
  * @package ForceRefresh
  */
 
-if ( ! class_exists( 'WP_Http' ) ) {
-    /**
-     * Stub for WP_Http.
-     */
-    class WP_Http {
-        const OK                    = 200;
-        const CREATED               = 201;
-        const ACCEPTED              = 202;
-        const BAD_REQUEST           = 400;
-        const UNAUTHORIZED          = 401;
-        const FORBIDDEN             = 403;
-        const NOT_FOUND             = 404;
-        const INTERNAL_SERVER_ERROR = 500;
-    }
-}
-
-if ( ! class_exists( 'WP_REST_Server' ) ) {
-    /**
-     * Stub for WP_REST_Server.
-     */
-    class WP_REST_Server {
-        const CREATABLE  = 'POST';
-        const EDITABLE   = 'POST, PUT, PATCH';
-        const READABLE   = 'GET';
-        const DELETABLE  = 'DELETE';
-        const ALLMETHODS = 'GET, POST, PUT, PATCH, DELETE';
-    }
-}
-
-if ( ! class_exists( 'WP_REST_Request' ) ) {
-    /**
-     * Stub for WP_REST_Request.
-     */
-    class WP_REST_Request {
-
-        /**
-         * The request params.
-         *
-         * @var array
-         */
-        private array $params = array();
-
-        /**
-         * Set a request parameter.
-         *
-         * @param string $key   The parameter key.
-         * @param mixed  $value The parameter value.
-         *
-         * @return void
-         */
-        public function set_param( string $key, $value ): void {
-            $this->params[ $key ] = $value;
-        }
-
-        /**
-         * Get a request parameter.
-         *
-         * @param string $key The parameter key.
-         *
-         * @return mixed
-         */
-        public function get_param( string $key ) {
-            return $this->params[ $key ] ?? null;
-        }
-    }
-}
+require_once __DIR__ . '/wp-stub-wp-http.php';
+require_once __DIR__ . '/wp-stub-wp-rest-server.php';
+require_once __DIR__ . '/wp-stub-wp-rest-request.php';
+require_once __DIR__ . '/wp-stub-wp-rest-response.php';
 
 if ( ! defined( 'WP_FORCE_REFRESH_CAPABILITY' ) ) {
     define( 'WP_FORCE_REFRESH_CAPABILITY', 'manage_options' );
