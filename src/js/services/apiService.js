@@ -1,30 +1,38 @@
-import axios from 'axios';
 import { error } from './loggingService.js';
 
-const axiosConfig = {
-  headers: {},
-};
+const headers = {};
 
-const handleAxiosRequest = async (method) => {
+const buildUrl = (url, params) => (params ? `${url}?${new URLSearchParams(params)}` : url);
+
+const handleFetchRequest = async (url, options = {}) => {
   try {
-    const { data } = await method;
-    return data;
+    const response = await fetch(url, {
+      ...options,
+      headers: { ...headers, ...options.headers },
+    });
+    const { data } = await response.json();
+    return { code: response.status, data };
   } catch (e) {
     error(e);
-    return e?.response?.data;
+    return undefined;
   }
 };
 
+const buildJsonRequest = (method) => (url, payload) => handleFetchRequest(url, {
+  body: JSON.stringify(payload),
+  headers: { 'Content-Type': 'application/json' },
+  method,
+});
+
 export default (args) => {
-  // If we have a set nonce, then set it.
   if (args?.nonce) {
-    axiosConfig.headers['X-WP-Nonce'] = args.nonce;
+    headers['X-WP-Nonce'] = args.nonce;
   }
 
   return {
-    delete: async (url, payload) => handleAxiosRequest(axios.delete(url, { ...axiosConfig, params: payload })),
-    get: async (url, payload) => handleAxiosRequest(axios.get(url, { ...axiosConfig, params: payload })),
-    post: async (url, payload) => handleAxiosRequest(axios.post(url, payload, axiosConfig)),
-    put: async (url, payload) => handleAxiosRequest(axios.put(url, payload, axiosConfig)),
+    delete: (url, payload) => handleFetchRequest(buildUrl(url, payload), { method: 'DELETE' }),
+    get: (url, payload) => handleFetchRequest(buildUrl(url, payload)),
+    post: buildJsonRequest('POST'),
+    put: buildJsonRequest('PUT'),
   };
 };

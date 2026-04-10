@@ -41,7 +41,7 @@ class Api_Handler_Admin_Refresh_Page extends Api_Handler_Admin implements Api_Ha
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
-                'methods'             => \WP_REST_Server::EDITABLE,
+                'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( $this, 'refresh_page' ),
                 'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
             ),
@@ -53,15 +53,15 @@ class Api_Handler_Admin_Refresh_Page extends Api_Handler_Admin implements Api_Ha
      *
      * @param \WP_REST_Request $request The request object.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function refresh_page( \WP_REST_Request $request ): void {
+    public function refresh_page( \WP_REST_Request $request ): \WP_REST_Response {
         $page_id      = $request->get_param( 'postId' ) ?? null;
         $page_version = Versions_Storage_Service::get_new_version();
 
         Versions_Storage_Service::set_page_version( $page_id, $page_version );
 
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::CREATED,
             'You\'ve successfully requested all browsers to refresh this page.',
             array(

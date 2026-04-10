@@ -28,20 +28,6 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     const SERVICES_NAMESPACE = 'JordanLeven\\Plugins\\ForceRefresh\\Services';
 
     /**
-     * Mock for `status_header`.
-     *
-     * @var Mocks\Mock_Status_Header
-     */
-    private static $mock_status_header;
-
-    /**
-     * Mock for `wp_json_encode`.
-     *
-     * @var Mocks\Mock_Wp_Json_Encode
-     */
-    private static $mock_wp_json_encode;
-
-    /**
      * Mock for `current_time` in the services namespace.
      *
      * @var Mocks\Mock_Current_Time
@@ -138,21 +124,19 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
      * @return void
      */
     public static function setUpBeforeClass(): void {
-        self::$mock_status_header             = new Mocks\Mock_Status_Header( __NAMESPACE__ );
-        self::$mock_wp_json_encode            = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
-        self::$mock_current_time              = new Mocks\Mock_Current_Time( self::SERVICES_NAMESPACE );
-        self::$mock_wp_hash                   = new Mocks\Mock_WP_Hash( self::SERVICES_NAMESPACE );
-        self::$mock_delete_option             = new Mocks\Mock_Delete_Option( self::SERVICES_NAMESPACE );
-        self::$mock_add_option                = new Mocks\Mock_Add_Option( self::SERVICES_NAMESPACE );
-        self::$mock_get_option                = new Mocks\Mock_Get_Option( __NAMESPACE__ );
-        self::$mock_wp_schedule_single_event  = new Mocks\Mock_Wp_Schedule_Single_Event( __NAMESPACE__ );
-        self::$mock_wp_clear_scheduled_hook   = new Mocks\Mock_Wp_Clear_Scheduled_Hook( __NAMESPACE__ );
-        self::$mock_register_rest_route       = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
-        self::$mock_add_action                = new Mocks\Mock_Add_Action( __NAMESPACE__ );
-        self::$mock_get_current_blog_id       = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
-        self::$mock_get_rest_url              = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
-        self::$mock_current_user_can          = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
-        self::$mock_wp_generate_uuid4         = new Mocks\Mock_Wp_Generate_Uuid4( __NAMESPACE__ );
+        self::$mock_current_time             = new Mocks\Mock_Current_Time( self::SERVICES_NAMESPACE );
+        self::$mock_wp_hash                  = new Mocks\Mock_WP_Hash( self::SERVICES_NAMESPACE );
+        self::$mock_delete_option            = new Mocks\Mock_Delete_Option( self::SERVICES_NAMESPACE );
+        self::$mock_add_option               = new Mocks\Mock_Add_Option( self::SERVICES_NAMESPACE );
+        self::$mock_get_option               = new Mocks\Mock_Get_Option( __NAMESPACE__ );
+        self::$mock_wp_schedule_single_event = new Mocks\Mock_Wp_Schedule_Single_Event( __NAMESPACE__ );
+        self::$mock_wp_clear_scheduled_hook  = new Mocks\Mock_Wp_Clear_Scheduled_Hook( __NAMESPACE__ );
+        self::$mock_register_rest_route      = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
+        self::$mock_add_action               = new Mocks\Mock_Add_Action( __NAMESPACE__ );
+        self::$mock_get_current_blog_id      = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
+        self::$mock_get_rest_url             = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
+        self::$mock_current_user_can         = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
+        self::$mock_wp_generate_uuid4        = new Mocks\Mock_Wp_Generate_Uuid4( __NAMESPACE__ );
     }
 
     /**
@@ -161,8 +145,6 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
      * @return void
      */
     public static function tearDownAfterClass(): void {
-        self::$mock_status_header->disable();
-        self::$mock_wp_json_encode->disable();
         self::$mock_current_time->disable();
         self::$mock_wp_hash->disable();
         self::$mock_delete_option->disable();
@@ -317,7 +299,6 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
      * Test that get_scheduled_refreshes_site returns a 200 response with scheduled refreshes.
      */
     public function testGetScheduledRefreshSiteReturns200Response() {
-        self::$mock_status_header->resetInvocationIndex();
         $timestamp = 1234567890;
         self::$mock_get_option->set_return_value(
             array(
@@ -329,11 +310,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
             )
         );
 
-        ob_start();
-        ( new Api_Handler_Admin_Schedule_Refresh_Site() )->get_scheduled_refreshes_site();
-        ob_get_clean();
+        $response = ( new Api_Handler_Admin_Schedule_Refresh_Site() )->get_scheduled_refreshes_site();
 
-        $this->assertEquals( 200, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 200, $response->get_status() );
     }
 
     /**
@@ -349,9 +328,7 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'schedule_refresh_timestamp', $timestamp );
 
-        ob_start();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->schedule_refresh_site( $request );
-        ob_get_clean();
 
         $args = self::$mock_wp_schedule_single_event->get_invocation_arguments( 0 );
         $this->assertEquals( $expected_unix_time, $args[0] );
@@ -363,16 +340,12 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
      * Test that schedule_refresh_site returns a 201 response.
      */
     public function testScheduleRefreshSiteReturns201Response() {
-        self::$mock_status_header->resetInvocationIndex();
-
         $request = new \WP_REST_Request();
         $request->set_param( 'schedule_refresh_timestamp', '2026-12-31 12:00:00' );
 
-        ob_start();
-        ( new Api_Handler_Admin_Schedule_Refresh_Site() )->schedule_refresh_site( $request );
-        ob_get_clean();
+        $response = ( new Api_Handler_Admin_Schedule_Refresh_Site() )->schedule_refresh_site( $request );
 
-        $this->assertEquals( 201, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 201, $response->get_status() );
     }
 
     /**
@@ -396,9 +369,7 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'id', $uuid );
 
-        ob_start();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );
-        ob_get_clean();
 
         $args = self::$mock_wp_clear_scheduled_hook->get_invocation_arguments( 0 );
         $this->assertEquals( 'force_refresh_scheduled_site_refresh', $args[0] );
@@ -409,8 +380,6 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
      * Test that delete_schedule_refresh_site returns a 202 response.
      */
     public function testDeleteScheduleRefreshSiteReturns202Response() {
-        self::$mock_status_header->resetInvocationIndex();
-
         $uuid = 'test-uuid-1234';
         self::$mock_get_option->set_return_value(
             array(
@@ -426,11 +395,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'id', $uuid );
 
-        ob_start();
-        ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );
-        ob_get_clean();
+        $response = ( new Api_Handler_Admin_Schedule_Refresh_Site() )->delete_schedule_refresh_site( $request );
 
-        $this->assertEquals( 202, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 202, $response->get_status() );
     }
 
     /**

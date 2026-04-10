@@ -20,20 +20,6 @@ require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-client.
 final class ApiHandlerClientTest extends TestCase {
 
     /**
-     * Mock for `status_header`.
-     *
-     * @var Mocks\Mock_Status_Header
-     */
-    private static $mock_status_header;
-
-    /**
-     * Mock for `wp_json_encode`.
-     *
-     * @var Mocks\Mock_Wp_Json_Encode
-     */
-    private static $mock_wp_json_encode;
-
-    /**
      * Mock for `get_option`.
      *
      * @var Mocks\Mock_Get_Option
@@ -74,8 +60,6 @@ final class ApiHandlerClientTest extends TestCase {
      * @return void
      */
     public static function setUpBeforeClass(): void {
-        self::$mock_status_header       = new Mocks\Mock_Status_Header( __NAMESPACE__ );
-        self::$mock_wp_json_encode      = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
         self::$mock_get_option          = new Mocks\Mock_Get_Option( __NAMESPACE__ );
         self::$mock_get_post_meta       = new Mocks\Mock_Get_Post_Meta( __NAMESPACE__ );
         self::$mock_register_rest_route = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
@@ -89,8 +73,6 @@ final class ApiHandlerClientTest extends TestCase {
      * @return void
      */
     public static function tearDownAfterClass(): void {
-        self::$mock_status_header->disable();
-        self::$mock_wp_json_encode->disable();
         self::$mock_get_option->disable();
         self::$mock_get_post_meta->disable();
         self::$mock_register_rest_route->disable();
@@ -116,15 +98,12 @@ final class ApiHandlerClientTest extends TestCase {
         $site_version = 'abc123';
         self::$mock_get_option->set_return_value( $site_version );
 
-        $request = new \WP_REST_Request();
+        $request  = new \WP_REST_Request();
+        $response = ( new Api_Handler_Client() )->get_version( $request );
+        $data     = $response->get_data();
 
-        ob_start();
-        ( new Api_Handler_Client() )->get_version( $request );
-        $output = ob_get_clean();
-
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( $site_version, $decoded['data']['currentVersionSite'] );
-        $this->assertArrayNotHasKey( 'currentVersionPage', $decoded['data'] );
+        $this->assertEquals( $site_version, $data['data']['currentVersionSite'] );
+        $this->assertArrayNotHasKey( 'currentVersionPage', $data['data'] );
     }
 
     /**
@@ -133,14 +112,11 @@ final class ApiHandlerClientTest extends TestCase {
     public function testGetVersionReturnsZeroWhenNoSiteVersionSet() {
         self::$mock_get_option->set_return_value( null );
 
-        $request = new \WP_REST_Request();
+        $request  = new \WP_REST_Request();
+        $response = ( new Api_Handler_Client() )->get_version( $request );
+        $data     = $response->get_data();
 
-        ob_start();
-        ( new Api_Handler_Client() )->get_version( $request );
-        $output = ob_get_clean();
-
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( '0', $decoded['data']['currentVersionSite'] );
+        $this->assertEquals( '0', $data['data']['currentVersionSite'] );
     }
 
     /**
@@ -155,13 +131,11 @@ final class ApiHandlerClientTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'postId', 42 );
 
-        ob_start();
-        ( new Api_Handler_Client() )->get_version( $request );
-        $output = ob_get_clean();
+        $response = ( new Api_Handler_Client() )->get_version( $request );
+        $data     = $response->get_data();
 
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( $site_version, $decoded['data']['currentVersionSite'] );
-        $this->assertEquals( $page_version, $decoded['data']['currentVersionPage'] );
+        $this->assertEquals( $site_version, $data['data']['currentVersionSite'] );
+        $this->assertEquals( $page_version, $data['data']['currentVersionPage'] );
     }
 
     /**
@@ -174,28 +148,22 @@ final class ApiHandlerClientTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'postId', 99 );
 
-        ob_start();
-        ( new Api_Handler_Client() )->get_version( $request );
-        $output = ob_get_clean();
+        $response = ( new Api_Handler_Client() )->get_version( $request );
+        $data     = $response->get_data();
 
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( '0', $decoded['data']['currentVersionPage'] );
+        $this->assertEquals( '0', $data['data']['currentVersionPage'] );
     }
 
     /**
      * Test that get_version returns a 200 response.
      */
     public function testGetVersionReturns200Response() {
-        self::$mock_status_header->resetInvocationIndex();
         self::$mock_get_option->set_return_value( 'v1' );
 
-        $request = new \WP_REST_Request();
+        $request  = new \WP_REST_Request();
+        $response = ( new Api_Handler_Client() )->get_version( $request );
 
-        ob_start();
-        ( new Api_Handler_Client() )->get_version( $request );
-        ob_get_clean();
-
-        $this->assertEquals( 200, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 200, $response->get_status() );
     }
 
     /**

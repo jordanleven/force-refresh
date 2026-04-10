@@ -181,18 +181,15 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
      * Test that refresh_page returns a 201 response.
      */
     public function testRefreshPageReturns201Response() {
-        self::$mock_status_header->resetInvocationIndex();
         self::$mock_current_time->set_return_value( '2007-06-29 18:00:00' );
         self::$mock_get_option_services->set_return_value( 120 );
 
         $request = new \WP_REST_Request();
         $request->set_param( 'postId', 1 );
 
-        ob_start();
-        ( new Api_Handler_Admin_Refresh_Page() )->refresh_page( $request );
-        ob_get_clean();
+        $response = ( new Api_Handler_Admin_Refresh_Page() )->refresh_page( $request );
 
-        $this->assertEquals( 201, self::$mock_status_header->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 201, $response->get_status() );
     }
 
     /**
@@ -207,14 +204,12 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
         $request = new \WP_REST_Request();
         $request->set_param( 'postId', $post_id );
 
-        ob_start();
-        ( new Api_Handler_Admin_Refresh_Page() )->refresh_page( $request );
-        $output = ob_get_clean();
+        $response = ( new Api_Handler_Admin_Refresh_Page() )->refresh_page( $request );
+        $data     = $response->get_data();
 
-        $decoded = json_decode( $output, true );
-        $this->assertEquals( $post_id, $decoded['data']['page_id'] );
-        $this->assertEquals( 'hash-198', $decoded['data']['new_page_version'] );
-        $this->assertEquals( $refresh_interval, $decoded['data']['refresh_interval'] );
+        $this->assertEquals( $post_id, $data['data']['page_id'] );
+        $this->assertEquals( 'hash-198', $data['data']['new_page_version'] );
+        $this->assertEquals( $refresh_interval, $data['data']['refresh_interval'] );
     }
 
     /**

@@ -50,9 +50,9 @@ class Api_Handler_Client extends Api_Handler {
      *
      * @param \WP_REST_Request $request The ReST Request object.
      *
-     * @return void
+     * @return \WP_REST_Response
      */
-    public function get_version( \WP_REST_Request $request ): void {
+    public function get_version( \WP_REST_Request $request ): \WP_REST_Response {
         $post_id = $request->get_param( 'postId' ) ?? null;
 
         $response = array(
@@ -63,7 +63,7 @@ class Api_Handler_Client extends Api_Handler {
             $response['currentVersionPage'] = $this->get_current_version_post( $post_id );
         }
 
-        $this->return_api_response(
+        return $this->return_api_response(
             \WP_Http::OK,
             'The current site version has been successfully retrieved.',
             $response,
