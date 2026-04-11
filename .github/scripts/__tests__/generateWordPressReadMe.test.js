@@ -51,9 +51,25 @@ const CHANGELOG_FIXTURE = `\
 * Performance enhancements and bug fixes.
 `;
 
+const CHANGELOG_FIXTURE_MERGED_SECTIONS = `\
+# Changelog
+
+## 2.1.0 - 2007-06-29
+### Changed (minor)
+* Update the plugin description.
+
+### Dependencies & security
+* Performance enhancements and bug fixes.
+`;
+
 describe('generateWordPressReadMe', () => {
   it('generates correctly formatted README content from markdown inputs', async () => {
     const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE, '2.1.0');
+    expect(result).toMatchSnapshot();
+  });
+
+  it('merges multiple categories that share the same section header into one section', async () => {
+    const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE_MERGED_SECTIONS, '2.1.0');
     expect(result).toMatchSnapshot();
   });
 });
