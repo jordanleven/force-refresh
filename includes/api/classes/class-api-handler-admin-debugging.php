@@ -40,7 +40,7 @@ class Api_Handler_Admin_Debugging extends Api_Handler_Admin implements Api_Handl
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
-                'methods'             => \WP_REST_Server::CREATABLE,
+                'methods'             => \WP_REST_Server::EDITABLE,
                 'callback'            => array( $this, 'save_options' ),
                 'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
             ),
