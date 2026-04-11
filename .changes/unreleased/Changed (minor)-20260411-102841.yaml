@@ -1,3 +1,3 @@
 kind: Changed (minor)
-body: Resolves an issue where Force Refresh downloads unnecessarily contained WordPress.org plugin marketing assets.
+body: Resolves an issue where Force Refresh unnecessarily contained WordPress.org plugin marketing assets.
 time: 2026-04-11T10:28:41.155516-04:00
