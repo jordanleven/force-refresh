@@ -6,22 +6,78 @@ getCurrentBranchName() {
   git branch | sed -n -e 's/^\* \(.*\)/\1/p'
 }
 
-getReleaseOverride() {
-  release_option=$1
-  case $release_option in
-    --major) echo 'major' ;;
-    --minor) echo 'minor' ;;
-    --patch) echo 'patch' ;;
-    *)       echo ''      ;;
-  esac
+getNextVersion() {
+  release_kind=$1
+  npx changie next "$release_kind"
 }
 
-getNextVersion() {
-  override=$1
-  if [ -n "$override" ]; then
-    npx changie next "$override"
+appendUniqueOption() {
+  version=$1
+  label=$2
+
+  [ -n "$version" ] || return
+  [ "$version" = "$option_1_version" ] && return
+  [ "$version" = "$option_2_version" ] && return
+  [ "$version" = "$option_3_version" ] && return
+  [ "$version" = "$option_4_version" ] && return
+
+  if [ -z "$option_1_version" ]; then
+    option_1_version=$version
+    option_1="${version}  (${label})"
+  elif [ -z "$option_2_version" ]; then
+    option_2_version=$version
+    option_2="${version}  (${label})"
+  elif [ -z "$option_3_version" ]; then
+    option_3_version=$version
+    option_3="${version}  (${label})"
+  elif [ -z "$option_4_version" ]; then
+    option_4_version=$version
+    option_4="${version}  (${label})"
+  fi
+}
+
+selectReleaseVersion() {
+  auto_version=$(getNextVersion auto)
+  major_version=$(getNextVersion major)
+  minor_version=$(getNextVersion minor)
+  patch_version=$(getNextVersion patch)
+
+  option_1_version=''
+  option_2_version=''
+  option_3_version=''
+  option_4_version=''
+  option_1=''
+  option_2=''
+  option_3=''
+  option_4=''
+
+  appendUniqueOption "$auto_version" auto
+  appendUniqueOption "$major_version" major
+  appendUniqueOption "$minor_version" minor
+  appendUniqueOption "$patch_version" patch
+
+  if [ -n "$option_4" ]; then
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1" \
+      "$option_2" \
+      "$option_3" \
+      "$option_4"
+  elif [ -n "$option_3" ]; then
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1" \
+      "$option_2" \
+      "$option_3"
+  elif [ -n "$option_2" ]; then
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1" \
+      "$option_2"
   else
-    npx changie next auto
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1"
   fi
 }
 
@@ -51,7 +107,6 @@ bumpVersion() {
 }
 
 current_branch=$(getCurrentBranchName)
-release_override=$(getReleaseOverride "$1")
 
 if [ "$current_branch" != "$production_branch" ]; then
   printf "\033[1;31mCannot release while on branch %s\n\033[0m" "$current_branch"
@@ -63,18 +118,16 @@ if ! hasUnreleasedFragments; then
   exit 1
 fi
 
-next_version=$(getNextVersion "$release_override")
+selection=$(selectReleaseVersion) || {
+  printf "\033[1;31mRelease was aborted.\033[0m\n"
+  exit 1
+}
+
+next_version=${selection%%  *}
 
 printf "\033[37m=====================\033[0m\n"
 printf "\033[37m%s\033[0m\n" "Preparing to release version ${next_version}."
-printf "\033[33m\n\nPress \"y\" to proceed with this release or press any other key to abort.\033[0m\n"
 
-read -r REPLY
-if echo "$REPLY" | grep -q "^[Yy]$"
-then
-  bumpVersion "$next_version"
-  git push --follow-tags
-  printf "\033[1;32mPackage successfully updated and pushed to the remote.\033[0m\n"
-else
-  printf "\033[1;31mRelease was aborted.\033[0m\n"
-fi
+bumpVersion "$next_version"
+git push --follow-tags
+printf "\033[1;32mPackage successfully updated and pushed to the remote.\033[0m\n"

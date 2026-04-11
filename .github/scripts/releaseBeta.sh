@@ -9,6 +9,9 @@ getCurrentBranchName() {
 getPrereleaseName() {
   current_branch_name=$(getCurrentBranchName)
   commit_sha=$(git log master.."$current_branch_name" --oneline --format=format:%H | tail -1)
+  if [ -z "$commit_sha" ]; then
+    commit_sha=$(git rev-parse HEAD)
+  fi
   prerelease_name=$(echo "$commit_sha" | cut -c1-6 | awk '{ print toupper($0) }')
   echo "$prerelease_name"
 }
@@ -26,7 +29,8 @@ hasUnreleasedFragments() {
 }
 
 getNextBaseVersion() {
-  npx changie next auto
+  release_kind=$1
+  npx changie next "$release_kind"
 }
 
 getExistingBuildNumber() {
@@ -65,7 +69,7 @@ getNextBetaReleaseVersion() {
 }
 
 getBetaReleaseVersion() {
-  next_base=$(getNextBaseVersion)
+  next_base=$1
   current_base=$(getCurrentBaseVersion)
   prerelease_name=$(getPrereleaseName)
 
@@ -78,6 +82,76 @@ getBetaReleaseVersion() {
   echo "$beta_release_version"
 }
 
+appendUniqueOption() {
+  version=$1
+  label=$2
+
+  [ -n "$version" ] || return
+  [ "$version" = "$option_1_version" ] && return
+  [ "$version" = "$option_2_version" ] && return
+  [ "$version" = "$option_3_version" ] && return
+  [ "$version" = "$option_4_version" ] && return
+
+  if [ -z "$option_1_version" ]; then
+    option_1_version=$version
+    option_1="${version}  (${label})"
+  elif [ -z "$option_2_version" ]; then
+    option_2_version=$version
+    option_2="${version}  (${label})"
+  elif [ -z "$option_3_version" ]; then
+    option_3_version=$version
+    option_3="${version}  (${label})"
+  elif [ -z "$option_4_version" ]; then
+    option_4_version=$version
+    option_4="${version}  (${label})"
+  fi
+}
+
+selectReleaseVersion() {
+  auto_version=$(getBetaReleaseVersion "$(getNextBaseVersion auto)")
+  major_version=$(getBetaReleaseVersion "$(getNextBaseVersion major)")
+  minor_version=$(getBetaReleaseVersion "$(getNextBaseVersion minor)")
+  patch_version=$(getBetaReleaseVersion "$(getNextBaseVersion patch)")
+
+  option_1_version=''
+  option_2_version=''
+  option_3_version=''
+  option_4_version=''
+  option_1=''
+  option_2=''
+  option_3=''
+  option_4=''
+
+  appendUniqueOption "$auto_version" auto
+  appendUniqueOption "$major_version" major
+  appendUniqueOption "$minor_version" minor
+  appendUniqueOption "$patch_version" patch
+
+  if [ -n "$option_4" ]; then
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1" \
+      "$option_2" \
+      "$option_3" \
+      "$option_4"
+  elif [ -n "$option_3" ]; then
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1" \
+      "$option_2" \
+      "$option_3"
+  elif [ -n "$option_2" ]; then
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1" \
+      "$option_2"
+  else
+    node "$(dirname "$0")/selectVersion.js" \
+      "Select a version to release" \
+      "$option_1"
+  fi
+}
+
 current_branch=$(getCurrentBranchName)
 
 if ! hasUnreleasedFragments; then
@@ -85,24 +159,22 @@ if ! hasUnreleasedFragments; then
   exit 1
 fi
 
-next_version=$(getBetaReleaseVersion)
-
 if [ "$current_branch" = "$production_branch" ]
   then
   printf "\033[1;31mCannot release betas while on branch %s\n\033[0m" "$production_branch"
   exit 1
 fi
 
+selection=$(selectReleaseVersion) || {
+  printf "\033[1;31mRelease was aborted.\033[0m\n\n"
+  exit 1
+}
+
+next_version=${selection%%  *}
+
 printf "\033[37m=====================\033[0m\n"
 printf "\033[37mPreparing to release beta version %s.\033[0m\n\n" "$next_version"
-printf "\033[33mPress \"y\" to proceed with this beta release or press any other key to abort.\033[0m "
 
-read -r REPLY
-if echo "$REPLY" | grep -q "^[Yy]$"
-then
-  bumpVersionPackage "$next_version"
-  git push --force-with-lease --follow-tags
-  printf "\033[1;32m\n\nPackage succesfully updated and pushed to the remote.\033[0m\n\n"
-else
-  printf "\033[1;31mRelease was aborted.\033[0m\n\n"
-fi
+bumpVersionPackage "$next_version"
+git push --force-with-lease --follow-tags
+printf "\033[1;32m\n\nPackage succesfully updated and pushed to the remote.\033[0m\n\n"
