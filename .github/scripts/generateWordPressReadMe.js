@@ -106,37 +106,37 @@ const getFormattedSectionContent = (sections) => {
 };
 
 /**
- * Function to get the release details of a specific release in the changelog.
- * @param   {object}  content              The section content object
- * @param   {string}  content.raw          The raw section content
- * @param   {string}  releaseCategory      The release category parsed from the changelog
- * @return  {string}                       The formatted release content
+ * Function to resolve the section header for a given changie release category.
+ * @param   {string}  releaseCategory  The release category parsed from the changelog
+ * @return  {string}                   The section header string
  */
-const getReleaseDetails = ({ raw }, releaseCategory) => {
-  const releaseNoteSplit = SINGLE_ENTRY_RELEASE_NOTES[releaseCategory]
-    ? [SINGLE_ENTRY_RELEASE_NOTES[releaseCategory]]
-    : raw.split('\n').filter((v) => !!v).map((v) => `${v.trim()}\n`);
-  let releaseNote;
+const getReleaseHeader = (releaseCategory) => {
   switch (releaseCategory) {
     case 'Feature (major)':
     case 'Feature (minor)':
     case 'Feature':
     case 'Features':
     case 'New Features':
-      releaseNote = [MESSAGE_NOTES_HEADERS.FEATURE, ...releaseNoteSplit];
-      break;
+      return MESSAGE_NOTES_HEADERS.FEATURE;
     case 'Bug fix':
     case 'Bug Fixes':
-    case 'Security':
-    case 'Dependencies & Security':
-      releaseNote = [MESSAGE_NOTES_HEADERS.BUG, ...releaseNoteSplit];
-      break;
+      return MESSAGE_NOTES_HEADERS.BUG;
     default:
-      releaseNote = [MESSAGE_NOTES_HEADERS.CHANGED, ...releaseNoteSplit];
-      break;
+      return MESSAGE_NOTES_HEADERS.CHANGED;
   }
-  return `${releaseNote.join('')}\n`;
 };
+
+/**
+ * Function to get the bullet lines for a specific release category.
+ * @param   {object}  content              The section content object
+ * @param   {string}  content.raw          The raw section content
+ * @param   {string}  releaseCategory      The release category parsed from the changelog
+ * @return  {string[]}                     The bullet lines for this category
+ */
+const getReleaseCategoryLines = ({ raw }, releaseCategory) =>
+  SINGLE_ENTRY_RELEASE_NOTES[releaseCategory]
+    ? [SINGLE_ENTRY_RELEASE_NOTES[releaseCategory]]
+    : raw.split('\n').filter((v) => !!v).map((v) => `${v.trim()}\n`);
 
 /**
  * Function to get a formatted release note for a specific release.
@@ -150,7 +150,18 @@ const getFormattedReleaseNote = async (release, releaseVersion, pluginVersion) =
 
   const releaseDetails =
     Object.entries(release)
-      .map(([category, content]) => getReleaseDetails(content, category))
+      .reduce((groups, [category, content]) => {
+        const header = getReleaseHeader(category);
+        const existing = groups.find((g) => g.header === header);
+        const lines = getReleaseCategoryLines(content, category);
+        if (existing) {
+          existing.lines.push(...lines);
+        } else {
+          groups.push({ header, lines });
+        }
+        return groups;
+      }, [])
+      .map(({ header, lines }) => `${header}${lines.join('')}\n`)
       .join('')
       .replace(/^\-/, '*')
       .replace(/\[\]/g, '')
