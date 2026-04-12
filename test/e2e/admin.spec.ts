@@ -115,17 +115,17 @@ test.describe('Admin', () => {
         await page.close();
       });
 
-      test('No debug banner is shown when entering troubleshooting mode', async () => {
-        await expect(page.locator('.notice-force-refresh.notice-warning')).not.toBeVisible();
+      test('No debug badge is shown when entering troubleshooting mode', async () => {
+        await expect(page.locator('.header-row__badges .admin-header-badge--debug')).not.toBeVisible();
       });
 
-      test('Enabling debug mode shows a debug banner', async () => {
+      test('Enabling debug mode shows a debug badge', async () => {
         await page.locator('[data-test="toggle-debug-mode"] label').click();
-        await expect(page.locator('.notice-force-refresh.notice-warning')).toBeVisible();
+        await expect(page.locator('.header-row__badges .admin-header-badge--debug')).toBeVisible();
 
         // Restore: turn debug mode back off so subsequent tests aren't affected
         await page.locator('[data-test="toggle-debug-mode"] label').click();
-        await expect(page.locator('.notice-force-refresh.notice-warning')).not.toBeVisible();
+        await expect(page.locator('.header-row__badges .admin-header-badge--debug')).not.toBeVisible();
       });
     });
 
