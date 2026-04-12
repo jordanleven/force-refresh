@@ -60,7 +60,7 @@ export default {
   }
 
   50% {
-    box-shadow: 0 0 10px 4px rgba(var.$red, 0.6);
+    box-shadow: 0 0 15px 4px rgba(var.$red, 0.6);
   }
 }
 
@@ -109,14 +109,14 @@ export default {
         var.$black 6px,
         var.$black 12px
       );
-    animation: admin-header-badge-debug-glow 2.5s ease-in-out infinite;
+    animation: admin-header-badge-debug-glow 2s ease-in-out infinite;
 
     &::before {
       content: "";
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background-color: rgba(var.$black, 0.8);
+      background-color: rgba(var.$black, 0.65);
       backdrop-filter: blur(1px);
     }
 
