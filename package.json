@@ -31,6 +31,7 @@
     "db:update": "./db/updateDatabases.sh"
   },
   "dependencies": {
+    "@floating-ui/vue": "^1.1.11",
     "@fortawesome/fontawesome-svg-core": "^7.2.0",
     "@fortawesome/free-brands-svg-icons": "^7.2.0",
     "@fortawesome/free-solid-svg-icons": "^7.2.0",
