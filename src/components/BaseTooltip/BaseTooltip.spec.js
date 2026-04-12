@@ -1,12 +1,12 @@
 import { shallowMount } from '@vue/test-utils';
-import Tooltip from './Tooltip.vue';
+import Tooltip from './BaseTooltip.vue';
 
 jest.mock('@floating-ui/vue', () => ({
-  useFloating: () => ({ floatingStyles: { position: 'absolute', top: '0', left: '0' } }),
   autoUpdate: jest.fn(),
-  offset: jest.fn(),
   flip: jest.fn(),
+  offset: jest.fn(),
   shift: jest.fn(),
+  useFloating: () => ({ floatingStyles: { left: '0', position: 'absolute', top: '0' } }),
 }));
 
 const getWrapper = (props = {}) => shallowMount(Tooltip, {

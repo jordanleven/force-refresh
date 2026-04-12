@@ -8,9 +8,9 @@ library.add(faBug);
 
 // Render the slot so we can inspect the badge element inside
 const TooltipStub = {
-  name: 'Tooltip',
-  template: '<div><slot /></div>',
+  name: 'BaseTooltip',
   props: ['content'],
+  template: '<div><slot /></div>',
 };
 
 const getWrapper = (props = {}) => shallowMount(AdminHeaderBadge, {

@@ -13,7 +13,7 @@
 
 <script>
 import VueTypes from 'vue-types';
-import Tooltip from '@/components/Tooltip/Tooltip.vue';
+import Tooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 
 export default {
   name: 'AdminHeaderBadge',

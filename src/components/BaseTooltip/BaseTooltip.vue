@@ -32,7 +32,7 @@ import { ref } from 'vue';
 import VueTypes from 'vue-types';
 
 export default {
-  name: 'Tooltip',
+  name: 'BaseTooltip',
   props: {
     content: VueTypes.string,
   },
@@ -42,16 +42,16 @@ export default {
     const isVisible = ref(false);
 
     const { floatingStyles } = useFloating(reference, floating, {
-      placement: 'bottom',
       middleware: [offset(8), flip(), shift({ padding: 8 })],
+      placement: 'bottom',
       whileElementsMounted: autoUpdate,
     });
 
     return {
-      reference,
       floating,
       floatingStyles,
       isVisible,
+      reference,
     };
   },
 };
