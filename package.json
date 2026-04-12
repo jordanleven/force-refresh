@@ -25,6 +25,7 @@
     "changelog:build": "node ./.github/scripts/createWordPressReadMe.js",
     "changelog:new": "npx changie new",
     "changelog:preview": "./.github/scripts/previewRelease.sh",
+    "prerelease:beta": "npm run lint && npm run build && npm test",
     "release": "./.github/scripts/release.sh",
     "release:beta": "./.github/scripts/releaseBeta.sh",
     "checkNodeVersion": "check-node-version --package",
