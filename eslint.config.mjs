@@ -154,7 +154,14 @@ export default [
     },
   },
   {
-    files: ['playwright.config*.ts', 'test/**/*.ts'],
+    files: [
+      'playwright.config*.ts',
+      'test/**/*.ts',
+      'test/**/*.js',
+      'jest-vue-transformer.js',
+      '**/*.spec.js',
+      '**/*.test.js',
+    ],
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     },

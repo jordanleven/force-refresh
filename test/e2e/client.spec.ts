@@ -1,5 +1,9 @@
 import { test, expect } from '@playwright/test';
-import { goToPluginPage } from './helpers/auth';
+import {
+  goToPluginPage,
+  waitForDebugModeDisabled,
+  waitForDebugModeEnabled,
+} from './helpers/auth';
 import { triggerRefreshAndWaitForReload } from './helpers/client';
 import { getAuthFile } from './helpers/constants';
 
@@ -42,8 +46,7 @@ test.describe('Client', () => {
       // Enable debug mode and check if it actually took effect
       await adminPage.locator('[data-test="btn-troubleshooting"]').click();
       await adminPage.locator('[data-test="toggle-debug-mode"] label').click();
-      debugModeEnabled = await adminPage.locator('.notice-force-refresh.notice-warning')
-        .waitFor({ state: 'visible', timeout: 5_000 })
+      debugModeEnabled = await waitForDebugModeEnabled(adminPage)
         .then(() => true)
         .catch(() => false);
 
@@ -90,7 +93,7 @@ test.describe('Client', () => {
       await goToPluginPage(adminPage);
       await adminPage.locator('[data-test="btn-troubleshooting"]').click();
       await adminPage.locator('[data-test="toggle-debug-mode"] label').click();
-      await expect(adminPage.locator('.notice-force-refresh.notice-warning')).not.toBeVisible({ timeout: 10_000 });
+      await waitForDebugModeDisabled(adminPage);
     });
 
     test('Shows a countdown log to the next refresh', () => {

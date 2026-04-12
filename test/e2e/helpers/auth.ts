@@ -5,6 +5,7 @@ export const ADMIN_PASSWORD = 'dross_dread_motto1polopony9treacle*SERAGLIO.unctu
 
 const LOGIN_MAX_ATTEMPTS = 3;
 const LOGIN_TIMEOUT_MS = 30_000;
+const DEBUG_BADGE_SELECTOR = '.admin-header-badge.admin-header-badge--debug';
 
 async function dismissWordPressInterstitials(page: Page): Promise<void> {
   // Admin email confirmation screen
@@ -54,4 +55,20 @@ export async function goToPluginPage(page: Page): Promise<void> {
       await page.goto('/wp-admin/tools.php?page=force_refresh');
       await page.locator('select[name="refresh-interval"]').waitFor();
     });
+}
+
+export function getDebugBadge(page: Page) {
+  return page.locator(DEBUG_BADGE_SELECTOR);
+}
+
+export async function isDebugModeEnabled(page: Page): Promise<boolean> {
+  return getDebugBadge(page).isVisible();
+}
+
+export async function waitForDebugModeEnabled(page: Page): Promise<void> {
+  await getDebugBadge(page).waitFor({ state: 'visible', timeout: 5_000 });
+}
+
+export async function waitForDebugModeDisabled(page: Page): Promise<void> {
+  await getDebugBadge(page).waitFor({ state: 'hidden', timeout: LOGIN_TIMEOUT_MS });
 }

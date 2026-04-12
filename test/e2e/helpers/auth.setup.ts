@@ -1,5 +1,10 @@
-import { test as setup, expect } from '@playwright/test';
-import { loginAsAdmin, goToPluginPage } from './auth';
+import { test as setup } from '@playwright/test';
+import {
+  isDebugModeEnabled,
+  loginAsAdmin,
+  goToPluginPage,
+  waitForDebugModeDisabled,
+} from './auth';
 import { getAuthFile } from './constants';
 
 setup('authenticate and verify initial state', async ({ page, baseURL }) => {
@@ -8,12 +13,11 @@ setup('authenticate and verify initial state', async ({ page, baseURL }) => {
 
   await goToPluginPage(page);
 
-  const debugBanner = page.locator('.notice-force-refresh.notice-warning');
-  const isDebugActive = await debugBanner.isVisible();
+  const isDebugActive = await isDebugModeEnabled(page);
 
   if (isDebugActive) {
     await page.locator('[data-test="btn-troubleshooting"]').click();
     await page.locator('[data-test="toggle-debug-mode"] label').click();
-    await expect(debugBanner).not.toBeVisible({ timeout: 10_000 });
+    await waitForDebugModeDisabled(page);
   }
 });
