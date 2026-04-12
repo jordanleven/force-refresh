@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
+## 2.17.0 - 2026-04-12
+### Feature (minor)
+* Release notes are now grouped by minor version for easier browsing. You can also click any release to view the full details on the official GitHub repository.
+### Changed (minor)
+* Resolves an issue where Force Refresh unnecessarily contained WordPress.org plugin marketing assets.
+* Updated plugin status messaging in the admin interface to better highlight available updates, pre-release builds, and debugging mode.
+### Dependencies & security
+* Performance enhancements and bug fixes.
+* Performance enhancements and bug fixes.
 ## 2.16.2 - 2026-04-08
 ### Dependencies & security
 * Performance enhancements and bug fixes.
