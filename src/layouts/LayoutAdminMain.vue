@@ -357,9 +357,8 @@ export default {
 }
 
 .admin-window {
-  transition: backdrop-filter var.$transition-medium, background-color var.$transition-medium;
-
   &.admin-window--active {
+    transition: backdrop-filter var.$transition-medium, background-color var.$transition-medium;
     position: fixed;
     top: 0;
     left: 0;
