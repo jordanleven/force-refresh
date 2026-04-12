@@ -97,6 +97,7 @@ prependToChangelog() {
 
 bumpVersion() {
   version=$1
+  node "$(dirname "$0")/dedupeUnreleasedDependencyFragments.js"
   npx changie batch "$version"
   prependToChangelog "$version"
   npm version "$version" --no-git-tag-version

@@ -10,278 +10,159 @@ All notable changes to this project will be documented in this file.
 * Updated plugin status messaging in the admin interface to better highlight available updates, pre-release builds, and debugging mode.
 ### Dependencies & security
 * Performance enhancements and bug fixes.
-* Performance enhancements and bug fixes.
 ## 2.16.2 - 2026-04-08
 ### Dependencies & security
 * Performance enhancements and bug fixes.
-### [2.16.1](https://github.com/jordanleven/force-refresh/compare/v2.16.0...v2.16.1) (2026-03-10)
-
-## [2.16.0](https://github.com/jordanleven/force-refresh/compare/v2.15.0...v2.16.0) (2026-02-24)
-
-
+## 2.16.1 (2026-03-10)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.16.0 (2026-02-24)
 ### Changed
-
-* Update minimum PHP version to 8.2. ([bf34412](https://github.com/jordanleven/force-refresh/commit/bf3441222e607225008e5d3123522f4c39fe528e))
-
-## [2.15.0](https://github.com/jordanleven/force-refresh/compare/v2.14.0...v2.15.0) (2026-02-24)
-
-
+* Update minimum PHP version to 8.2.
+## 2.15.0 (2026-02-24)
 ### Changed
-
-* Update minimum WordPress version to 6.3. ([47f9113](https://github.com/jordanleven/force-refresh/commit/47f911391deac8166031dbc1da3b25a8241f97b2))
-
-## [2.14.0](https://github.com/jordanleven/force-refresh/compare/v2.13.2...v2.14.0) (2025-11-29)
-
-
+* Update minimum WordPress version to 6.3.
+## 2.14.0 (2025-11-29)
 ### Features
-
-* Add support for WordPress 6.9. ([233b4ae](https://github.com/jordanleven/force-refresh/commit/233b4ae5b4f9efdf877d969851db1918a9852604))
-
-### [2.13.2](https://github.com/jordanleven/force-refresh/compare/v2.13.1...v2.13.2) (2025-08-29)
-
-
+* Add support for WordPress 6.9.
+## 2.13.2 (2025-08-29)
 ### Bug Fixes
-
-* Resolves an issue where Force Refresh could fail to activate on sites running PHP 8.2. ([f3efc66](https://github.com/jordanleven/force-refresh/commit/f3efc66df52b993d13d3871490c9ef0e922f492f))
-
-### [2.13.1](https://github.com/jordanleven/force-refresh/compare/v2.13.0...v2.13.1) (2025-08-09)
-
-## [2.13.0](https://github.com/jordanleven/force-refresh/compare/v2.12.1...v2.13.0) (2025-04-21)
-
-
+* Resolves an issue where Force Refresh could fail to activate on sites running PHP 8.2.
+## 2.13.1 (2025-08-09)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.13.0 (2025-04-21)
 ### Features
-
-* Add support for WordPress 6.8. ([89f779e](https://github.com/jordanleven/force-refresh/commit/89f779ef0d9f0e8a6911b9f40513a5e87e818595))
-
-### [2.12.1](https://github.com/jordanleven/force-refresh/compare/v2.12.0...v2.12.1) (2025-01-12)
-
-## [2.12.0](https://github.com/jordanleven/force-refresh/compare/v2.11.1...v2.12.0) (2024-10-28)
-
-
+* Add support for WordPress 6.8.
+## 2.12.1 (2025-01-12)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.12.0 (2024-10-28)
 ### Features
-
-* Add support for WordPress 6.7. ([c982043](https://github.com/jordanleven/force-refresh/commit/c982043d62fcd65116a2573b5da7d16c65095f78))
-
-### [2.11.1](https://github.com/jordanleven/force-refresh/compare/v2.11.0...v2.11.1) (2024-09-15)
-
-## [2.11.0](https://github.com/jordanleven/force-refresh/compare/v2.10.2...v2.11.0) (2024-07-07)
-
-
+* Add support for WordPress 6.7.
+## 2.11.1 (2024-09-15)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.11.0 (2024-07-07)
 ### Features
-
-* Add support for WordPress 6.6. ([2637408](https://github.com/jordanleven/force-refresh/commit/263740857143a22e46fb39124d75d1146c05f2d0))
-
-### [2.10.2](https://github.com/jordanleven/force-refresh/compare/v2.10.1...v2.10.2) (2024-05-27)
-
-### [2.10.1](https://github.com/jordanleven/force-refresh/compare/v2.10.0...v2.10.1) (2024-03-24)
-
-## [2.10.0](https://github.com/jordanleven/force-refresh/compare/v2.9.4...v2.10.0) (2024-03-24)
-
-
+* Add support for WordPress 6.6.
+## 2.10.2 (2024-05-27)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.10.1 (2024-03-24)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.10.0 (2024-03-24)
 ### Features
-
-* Add support for WordPress 6.5. ([b2ae45b](https://github.com/jordanleven/force-refresh/commit/b2ae45bb786a7333091eb6aa2f8edc642244cafb))
-
-
+* Add support for WordPress 6.5.
 ### Bug Fixes
-
-* Resolves an issue where missing build files showed an unclear activation error. ([75910ba](https://github.com/jordanleven/force-refresh/commit/75910bae49ed717f795facff750e2d5c826d8b7a))
-
-### [2.9.4](https://github.com/jordanleven/force-refresh/compare/v2.9.3...v2.9.4) (2024-02-10)
-
-
+* Resolves an issue where missing build files showed an unclear activation error.
+## 2.9.4 (2024-02-10)
 ### Bug Fixes
-
-* Resolves an issue where icons could fail to load in the admin UI. ([d2e3c02](https://github.com/jordanleven/force-refresh/commit/d2e3c027ebbfd01afe485d550cd215cde2a4bf40))
-
-### [2.9.3](https://github.com/jordanleven/force-refresh/compare/v2.9.2...v2.9.3) (2023-12-09)
-
-
+* Resolves an issue where icons could fail to load in the admin UI.
+## 2.9.3 (2023-12-09)
 ### Bug Fixes
-
-* Resolves an issue where the Release Notes modal did not load correctly. ([dc8f80a](https://github.com/jordanleven/force-refresh/commit/dc8f80a51b4601e709e3cad6375b894e8b45ba09))
-
-### [2.9.2](https://github.com/jordanleven/force-refresh/compare/v2.9.1...v2.9.2) (2023-11-17)
-
-
+* Resolves an issue where the Release Notes modal did not load correctly.
+## 2.9.2 (2023-11-17)
 ### Bug Fixes
-
-* Resolves an issue where the admin bar confirmation message did not include the selected refresh interval. ([6f39068](https://github.com/jordanleven/force-refresh/commit/6f390685820c6932076c4e4e1f6ecbf05aa14362))
-* Resolves an issue where the refresh button label in the WordPress admin bar was incorrect. ([20b4796](https://github.com/jordanleven/force-refresh/commit/20b47963031341f9fd5dd6643cb470fb30aae621))
-* Resolves an issue where search results pages could refresh continuously. ([87f3b11](https://github.com/jordanleven/force-refresh/commit/87f3b1107a6bdd50cd59b9b45ee02bed9d38cfd4))
-* Resolves an issue where refreshing an individual page or post did not save correctly. ([eb9c211](https://github.com/jordanleven/force-refresh/commit/eb9c2117190364ccaaf9223c0e31189a7571477e))
-* Resolves an issue where Admin Bar refresh settings were not saved correctly in the plugin options. ([432edf2](https://github.com/jordanleven/force-refresh/commit/432edf2e780b31b258ddaf806089e5549c7ec674))
-
-### [2.9.1](https://github.com/jordanleven/force-refresh/compare/v2.9.0...v2.9.1) (2023-11-10)
-
-
+* Resolves an issue where the admin bar confirmation message did not include the selected refresh interval.
+* Resolves an issue where the refresh button label in the WordPress admin bar was incorrect.
+* Resolves an issue where search results pages could refresh continuously.
+* Resolves an issue where refreshing an individual page or post did not save correctly.
+* Resolves an issue where Admin Bar refresh settings were not saved correctly in the plugin options.
+## 2.9.1 (2023-11-10)
 ### Bug Fixes
-
-* Resolves an issue where activating Force Refresh could cause a site to crash. ([c005c1a](https://github.com/jordanleven/force-refresh/commit/c005c1a71ddcfa8d1b80a3dd6f6963a8cd5d4204))
-
-## [2.9.0](https://github.com/jordanleven/force-refresh/compare/v2.8.2...v2.9.0) (2023-11-10)
-
-
+* Resolves an issue where activating Force Refresh could cause a site to crash.
+## 2.9.0 (2023-11-10)
 ### Features
-
-* Add support for WordPress 6.4. ([18433d9](https://github.com/jordanleven/force-refresh/commit/18433d9f40c3021bf69fbd49c6b56240abccb55f))
-
-### [2.8.3](https://github.com/jordanleven/force-refresh/compare/v2.8.2...v2.8.3) (2023-09-09)
-
-### [2.8.2](https://github.com/jordanleven/force-refresh/compare/v2.8.1...v2.8.2) (2023-08-09)
-
-
+* Add support for WordPress 6.4.
+## 2.8.3 (2023-09-09)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.8.2 (2023-08-09)
 ### Bug Fixes
-
-* Resolves an issue where release notes could display duplicate periods. ([a657e68](https://github.com/jordanleven/force-refresh/commit/a657e687126aa0ad55251bafe55a0314451d95a8))
-* Resolves an issue where release notes could break on sites running PHP 7.4. ([1b6e44f](https://github.com/jordanleven/force-refresh/commit/1b6e44f822e9dce118efa8e354c130f6ae0b4f22))
-
-### [2.8.1](https://github.com/jordanleven/force-refresh/compare/v2.8.0...v2.8.1) (2023-08-05)
-
-## [2.8.0](https://github.com/jordanleven/force-refresh/compare/v2.7.0...v2.8.0) (2023-08-05)
-
-
+* Resolves an issue where release notes could display duplicate periods.
+* Resolves an issue where release notes could break on sites running PHP 7.4.
+## 2.8.1 (2023-08-05)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.8.0 (2023-08-05)
 ### Features
-
-* Add support for leaving plugin reviews from the admin UI. ([0fa8c54](https://github.com/jordanleven/force-refresh/commit/0fa8c546fd51dc66f16616bd321830c24be08925))
-* Add support for custom refresh intervals between thirty seconds and four hours. ([082169a](https://github.com/jordanleven/force-refresh/commit/082169a00e364c14b7472c043345ec3e729eed4c))
-* Add support for viewing plugin release notes from within the admin UI. ([b5ac691](https://github.com/jordanleven/force-refresh/commit/b5ac6914c99aaac984cf40448d6c5975378d7084))
-
-
+* Add support for leaving plugin reviews from the admin UI.
+* Add support for custom refresh intervals between thirty seconds and four hours.
+* Add support for viewing plugin release notes from within the admin UI.
 ### Bug Fixes
-
-* Resolves an issue where dismissed admin notifications could block interaction with the rest of the admin interface. ([35ff43b](https://github.com/jordanleven/force-refresh/commit/35ff43bab3ceaee9e0c31275ff7b63c9c3583cf7))
-* Resolves an issue where logo animations in the admin interface did not run with the intended timing. ([e439d91](https://github.com/jordanleven/force-refresh/commit/e439d91e990f99071ed4251c220c5a20ba9e1028))
-
-## [2.7.0](https://github.com/jordanleven/force-refresh/compare/v2.6.1...v2.7.0) (2023-07-26)
-
-
+* Resolves an issue where dismissed admin notifications could block interaction with the rest of the admin interface.
+* Resolves an issue where logo animations in the admin interface did not run with the intended timing.
+## 2.7.0 (2023-07-26)
 ### Features
-
-* Add support for WordPress 6.3. ([6bd2682](https://github.com/jordanleven/force-refresh/commit/6bd268288704e9cefa064632a261866a80db738b))
-
-### [2.6.1](https://github.com/jordanleven/force-refresh/compare/v2.6.0...v2.6.1) (2023-03-04)
-
-## [2.6.0](https://github.com/jordanleven/force-refresh/compare/v2.5.2...v2.6.0) (2022-06-11)
-
-
+* Add support for WordPress 6.3.
+## 2.6.1 (2023-03-04)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.6.0 (2022-06-11)
 ### Features
-
-* Add support for opening the troubleshooting page directly from the main admin screen. ([6543e75](https://github.com/jordanleven/force-refresh/commit/6543e75f526c0502e54be37504df4d3d1611eea9))
-
-
+* Add support for opening the troubleshooting page directly from the main admin screen.
 ### Bug Fixes
-
-* Resolves an issue where the refresh instructions read awkwardly on sites without a configured site name. ([986a950](https://github.com/jordanleven/force-refresh/commit/986a9506104a8b84206976af1d9f58b5a091bbef))
-
-### [2.5.2](https://github.com/jordanleven/force-refresh/compare/v2.5.1...v2.5.2) (2022-01-23)
-
-
+* Resolves an issue where the refresh instructions read awkwardly on sites without a configured site name.
+## 2.5.2 (2022-01-23)
 ### Bug Fixes
-
-* Resolves an issue where the production release workflow shipped the beta JavaScript bundle instead of the production build. ([216e6bc](https://github.com/jordanleven/force-refresh/commit/216e6bc3fb8f70bfd9455364aa50427e8dbd5b46))
-
-### [2.5.1](https://github.com/jordanleven/force-refresh/compare/v2.5.0...v2.5.1) (2022-01-23)
-
-
+* Resolves an issue where the production release workflow shipped the beta JavaScript bundle instead of the production build.
+## 2.5.1 (2022-01-23)
 ### Features
-
-* Add support for troubleshooting version checks that include development version strings. ([32ad2eb](https://github.com/jordanleven/force-refresh/commit/32ad2ebee87f2f9fcac8456b48816dcd89b5de74))
-* Update WordPress version requirements. ([bdd7038](https://github.com/jordanleven/force-refresh/commit/bdd70387955474cf9898f9313c76718e580729ed))
-
-## [2.5.0](https://github.com/jordanleven/force-refresh/compare/v2.4.0...v2.5.0) (2022-01-08)
-
-
+* Add support for troubleshooting version checks that include development version strings.
+* Update WordPress version requirements.
+## 2.5.0 (2022-01-08)
 ### Features
-
-* Add support for showing an admin notice when the installed plugin version is out of date. ([724eac5](https://github.com/jordanleven/force-refresh/commit/724eac5d5d05695a0e22dde2a2a52f273cad6feb))
-
-## [2.4.0](https://github.com/jordanleven/force-refresh/compare/v2.3.0...v2.4.0) (2021-12-04)
-
-
+* Add support for showing an admin notice when the installed plugin version is out of date.
+## 2.4.0 (2021-12-04)
 ### Features
-
-* Add support for debug logging during the refresh countdown when Debug Mode is enabled. ([8d880cb](https://github.com/jordanleven/force-refresh/commit/8d880cbc13940e0abf5397589c5a0e0f39dc2344))
-* Add support for a troubleshooting screen with debug information and a browser-console Debug Mode toggle. ([a87ca7d](https://github.com/jordanleven/force-refresh/commit/a87ca7dcb3db65d30159aabdee512bf5070a6823))
-
-
+* Add support for debug logging during the refresh countdown when Debug Mode is enabled.
+* Add support for a troubleshooting screen with debug information and a browser-console Debug Mode toggle.
 ### Bug Fixes
-
-* Resolves an issue where the refresh flow could continue after an unsuccessful refresh request. ([55c41f3](https://github.com/jordanleven/force-refresh/commit/55c41f32d067f1a246257726ce22ccb639368c83))
-* Resolves an issue where refresh checks could fail for site visitors. ([6df7016](https://github.com/jordanleven/force-refresh/commit/6df70167654f1ec4f173ff777d850765a2546bda))
-
-## [2.3.0](https://github.com/jordanleven/force-refresh/compare/v2.2.0...v2.3.0) (2021-03-07)
-
-
+* Resolves an issue where the refresh flow could continue after an unsuccessful refresh request.
+* Resolves an issue where refresh checks could fail for site visitors.
+## 2.3.0 (2021-03-07)
 ### Bug Fixes
-
-* Resolves an issue where the admin options UI did not show the default 120-second interval as selected. ([2bd86a3](https://github.com/jordanleven/force-refresh/commit/2bd86a365a065560744350ab818b8b7016349878))
-* Resolves an issue where the admin bar button label incorrectly said "Force Refresh Sites." ([2e35c26](https://github.com/jordanleven/force-refresh/commit/2e35c26a79213f6664017ebb60b55290b098d241))
-
-## [2.2.0](https://github.com/jordanleven/force-refresh/compare/v2.1.6...v2.2.0) (2020-11-29)
-
-
+* Resolves an issue where the admin options UI did not show the default 120-second interval as selected.
+* Resolves an issue where the admin bar button label incorrectly said "Force Refresh Sites."
+## 2.2.0 (2020-11-29)
 ### Features
-
-* Add support for WordPress 5.5.3. ([2cc2bb0](https://github.com/jordanleven/force-refresh/commit/2cc2bb0011fba80dabd66101a3957c9068a239f3))
-* Add support for a Vue-powered admin UI in place of the legacy Handlebars interface. ([0f3a899](https://github.com/jordanleven/force-refresh/commit/0f3a899c9257e4ff36c78fe4ee3804a20ba440ac))
-
-
+* Add support for WordPress 5.5.3.
+* Add support for a Vue-powered admin UI in place of the legacy Handlebars interface.
 ### Bug Fixes
-
-* Resolves an issue where per-page refresh controls did not work correctly for posts whose slugs contained encoded characters. ([0cc8989](https://github.com/jordanleven/force-refresh/commit/0cc8989458b43dfd6a7ea7ebb1d51cbde01de1be))
-
-### [2.1.6](https://github.com/jordanleven/force-refresh/compare/v2.1.5...v2.1.6) (2020-09-29)
-
-
+* Resolves an issue where per-page refresh controls did not work correctly for posts whose slugs contained encoded characters.
+## 2.1.6 (2020-09-29)
 ### Bug Fixes
-
-* Resolves an issue where client refresh checks ignored the configured refresh interval. ([22507af](https://github.com/jordanleven/force-refresh/commit/22507af9eda0febc66bdff3ad0c7b7c857b84f95))
-
-### [2.1.5](https://github.com/jordanleven/force-refresh/compare/v2.1.4...v2.1.5) (2020-09-17)
-
-
+* Resolves an issue where client refresh checks ignored the configured refresh interval.
+## 2.1.5 (2020-09-17)
 ### Bug Fixes
-
-* Resolves issues running Force Refresh on sites using PHP 7.2. ([62229d3](https://github.com/jordanleven/force-refresh/commit/62229d3b094b7c9330138768b111ac58986a79d5))
-
-### [2.1.4](https://github.com/jordanleven/force-refresh/compare/v2.1.3...v2.1.4) (2020-09-16)
-
-
+* Resolves issues running Force Refresh on sites using PHP 7.2.
+## 2.1.4 (2020-09-16)
 ### Bug Fixes
-
-* Resolves an issue where pages without a stored refresh version could enter a refresh loop after activation. ([c70fc22](https://github.com/jordanleven/force-refresh/commit/c70fc22ba9ebaa1cb56b15b744be4521b7e306f9))
-* Resolves an issue where the admin panel did not display the default refresh interval as the selected option. ([95fe173](https://github.com/jordanleven/force-refresh/commit/95fe17394f7f884977e69f5f86a4a53b66cb727a))
-
-### [2.1.3](https://github.com/jordanleven/force-refresh/compare/v2.1.2...v2.1.3) (2020-09-16)
-
-
+* Resolves an issue where pages without a stored refresh version could enter a refresh loop after activation.
+* Resolves an issue where the admin panel did not display the default refresh interval as the selected option.
+## 2.1.3 (2020-09-16)
 ### Bug Fixes
-
-* Resolves an issue where users without the Force Refresh capability could still request refreshes. ([78d7ae7](https://github.com/jordanleven/force-refresh/commit/78d7ae7a2d1158441f094f8350bb3f97b87b0f36))
-
-### [2.1.2](https://github.com/jordanleven/force-refresh/compare/v2.1.1...v2.1.2) (2020-09-07)
-
-### [2.1.1](https://github.com/jordanleven/force-refresh/compare/v2.1.0...v2.1.1) (2020-09-07)
-
+* Resolves an issue where users without the Force Refresh capability could still request refreshes.
+## 2.1.2 (2020-09-07)
+### Dependencies & security
+* Performance enhancements and bug fixes.
+## 2.1.1 (2020-09-07)
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 2.1.0
-
 ### Features
-
 * Add support for requesting refreshes on custom post types.
-
 ## 2.0.0
-
 ### Features
-
 * Add support for HTML templating with LightnCandy.
-
 ## 1.1.2
-
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 1.1.1
-
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 1.0.0
-
 ### Features
-
 * Initial release.
