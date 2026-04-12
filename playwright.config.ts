@@ -19,10 +19,12 @@ export default defineConfig({
     })),
     ...WP_INSTANCES.map(({ name, baseURL }) => ({
       name,
+      workers: 1,
       use: {
         ...devices['Desktop Chrome'],
         baseURL,
         storageState: getAuthFile(baseURL),
+        headless: true,
       },
       dependencies: [`setup-${name}`],
     })),
