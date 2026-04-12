@@ -19,11 +19,6 @@
           variant="update"
           :icon="faArrowCircleUp"
           :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_OUTDATED', { latestVersion: troubleshootingInformation.versions.forceRefresh.required })"
-          :tooltip="
-            $t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_OUTDATED_TOOLTIP', {
-              installedVersion: troubleshootingInformation.versions.forceRefresh.version
-            })
-          "
           href="/wp-admin/plugins.php"
         />
         <AdminHeaderBadge

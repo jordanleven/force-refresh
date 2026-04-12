@@ -1,20 +1,25 @@
 <template>
-  <component
-    :is="componentTag"
-    :class="componentClass"
-    :title="componentTitle"
-    :href="componentHref"
-  >
-    <font-awesome-icon class="admin-header-badge__icon" :icon="icon" />
-    <span class="admin-header-badge__label">{{ label }}</span>
-  </component>
+  <Tooltip :content="tooltip">
+    <component
+      :is="componentTag"
+      :class="componentClass"
+      :href="componentHref"
+    >
+      <font-awesome-icon class="admin-header-badge__icon" :icon="icon" />
+      <span class="admin-header-badge__label">{{ label }}</span>
+    </component>
+  </Tooltip>
 </template>
 
 <script>
 import VueTypes from 'vue-types';
+import Tooltip from '@/components/Tooltip/Tooltip.vue';
 
 export default {
   name: 'AdminHeaderBadge',
+  components: {
+    Tooltip,
+  },
   props: {
     href: VueTypes.string,
     icon: VueTypes.object.isRequired,
@@ -34,9 +39,6 @@ export default {
     },
     componentTag() {
       return this.href ? 'a' : 'span';
-    },
-    componentTitle() {
-      return this.tooltip || undefined;
     },
   },
 };
@@ -68,7 +70,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: var.$space-small;
-  padding: var.$space-small var.$space-medium;
+  padding: 0.5rem 1rem;
   border-radius: var.$border-radius;
   font-size: 0.9rem;
   font-weight: 500;

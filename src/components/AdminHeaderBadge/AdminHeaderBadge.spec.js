@@ -6,9 +6,17 @@ import AdminHeaderBadge from './AdminHeaderBadge.vue';
 
 library.add(faBug);
 
+// Render the slot so we can inspect the badge element inside
+const TooltipStub = {
+  name: 'Tooltip',
+  template: '<div><slot /></div>',
+  props: ['content'],
+};
+
 const getWrapper = (props = {}) => shallowMount(AdminHeaderBadge, {
   global: {
     components: { FontAwesomeIcon },
+    stubs: { Tooltip: TooltipStub },
   },
   props: {
     icon: faBug,
@@ -23,13 +31,13 @@ describe('Admin header badge', () => {
     it('renders as a span when no href is provided', () => {
       const wrapper = getWrapper();
 
-      expect(wrapper.element.tagName.toLowerCase()).toBe('span');
+      expect(wrapper.find('.admin-header-badge').element.tagName.toLowerCase()).toBe('span');
     });
 
     it('renders as an anchor when an href is provided', () => {
       const wrapper = getWrapper({ href: '/wp-admin/plugins.php' });
 
-      expect(wrapper.element.tagName.toLowerCase()).toBe('a');
+      expect(wrapper.find('.admin-header-badge').element.tagName.toLowerCase()).toBe('a');
     });
   });
 
@@ -37,13 +45,13 @@ describe('Admin header badge', () => {
     it('sets the href attribute when provided', () => {
       const wrapper = getWrapper({ href: '/wp-admin/plugins.php' });
 
-      expect(wrapper.attributes('href')).toBe('/wp-admin/plugins.php');
+      expect(wrapper.find('.admin-header-badge').attributes('href')).toBe('/wp-admin/plugins.php');
     });
 
     it('omits the href attribute when not provided', () => {
       const wrapper = getWrapper();
 
-      expect(wrapper.attributes('href')).toBeUndefined();
+      expect(wrapper.find('.admin-header-badge').attributes('href')).toBeUndefined();
     });
   });
 
@@ -59,27 +67,27 @@ describe('Admin header badge', () => {
     it('applies the variant modifier class', () => {
       const wrapper = getWrapper({ variant: 'update' });
 
-      expect(wrapper.classes()).toContain('admin-header-badge--update');
+      expect(wrapper.find('.admin-header-badge').classes()).toContain('admin-header-badge--update');
     });
 
     it('always includes the base class', () => {
       const wrapper = getWrapper({ variant: 'debug' });
 
-      expect(wrapper.classes()).toContain('admin-header-badge');
+      expect(wrapper.find('.admin-header-badge').classes()).toContain('admin-header-badge');
     });
   });
 
   describe('Tooltip', () => {
-    it('sets the title attribute when a tooltip is provided', () => {
+    it('passes the tooltip text to the Tooltip component', () => {
       const wrapper = getWrapper({ tooltip: 'Debug mode is active' });
 
-      expect(wrapper.attributes('title')).toBe('Debug mode is active');
+      expect(wrapper.findComponent(TooltipStub).props('content')).toBe('Debug mode is active');
     });
 
-    it('omits the title attribute when no tooltip is provided', () => {
+    it('passes no content to the Tooltip component when no tooltip is provided', () => {
       const wrapper = getWrapper();
 
-      expect(wrapper.attributes('title')).toBeUndefined();
+      expect(wrapper.findComponent(TooltipStub).props('content')).toBeFalsy();
     });
   });
 });

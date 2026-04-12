@@ -127,6 +127,18 @@ test.describe('Admin', () => {
         await page.locator('[data-test="toggle-debug-mode"] label').click();
         await expect(page.locator('.header-row__badges .admin-header-badge--debug')).not.toBeVisible();
       });
+
+      test('Hovering the debug badge shows the tooltip message', async () => {
+        await page.locator('[data-test="toggle-debug-mode"] label').click();
+        await expect(page.locator('.header-row__badges .admin-header-badge--debug')).toBeVisible();
+
+        await page.locator('.header-row__badges .admin-header-badge--debug').hover();
+        await expect(page.locator('.tooltip.tooltip--visible')).toBeVisible();
+
+        // Restore: turn debug mode back off so subsequent tests aren't affected
+        await page.locator('[data-test="toggle-debug-mode"] label').click();
+        await expect(page.locator('.header-row__badges .admin-header-badge--debug')).not.toBeVisible();
+      });
     });
 
     test('Clicking Exit Troubleshooting returns to the main admin page', async ({ page }) => {
