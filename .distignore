@@ -19,7 +19,7 @@ composer.*
 CONTRIBUTING.md
 db
 docker-compose.yml
-docs/*
+docs
 eslint.config.mjs
 Force-Refresh-*.zip
 jest.config.js
@@ -29,10 +29,10 @@ package-lock.json
 package.json
 phpcs.xml
 phpunit*.xml
-playwright.config.ts
+playwright.config*.ts
 qa
 README.md
 release-notes.md
 src
-test/*
+test
 webpack.config.js
