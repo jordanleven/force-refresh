@@ -37,8 +37,9 @@ Upload Force Refresh to your site and activate it. When you're ready to request 
 ## Screenshots
 
 1. Under Tools, you'll find all settings for Force Refresh.
-2. You can enable Force Refresh in the WordPress admin bar for quick access from anywhere in the dashboard.
-3. Choose from popular refresh intervals or set a custom one. You'll receive confirmation that browsers were requested to refresh.
-4. To refresh a single page or post, locate the "Force Refresh" section under any page.
-5. Want to see the latest features? Clicking "View Release Notes" will display the most recent features and fixes for Force Refresh.
-6. If you're having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow you to enter Debugging Mode: an enhanced browser console logging mode that can be used to diagnose issues.
+2. Use Schedule Force Refresh to pick a specific date and time for the refresh: no need to be at your desk when it goes out.
+3. You can enable Force Refresh in the WordPress admin bar for quick access from anywhere in the dashboard.
+4. Choose from popular refresh intervals or set a custom one. You'll receive confirmation that browsers were requested to refresh.
+5. To refresh a single page or post, locate the "Force Refresh" section under any page.
+6. Want to see the latest features? Clicking "View Release Notes" will display the most recent features and fixes for Force Refresh.
+7. If you're having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow you to enter Debugging Mode: an enhanced browser console logging mode that can be used to diagnose issues.

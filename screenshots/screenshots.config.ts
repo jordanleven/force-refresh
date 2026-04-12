@@ -31,6 +31,7 @@ export const SCREENSHOT_VIEWPORT = { width: 1280, height: 831 };
 const CAPTIONS = {
   adminBar: 'You can enable Force Refresh in the WordPress admin bar for quick access from anywhere in the dashboard.',
   pluginPage: "Under Tools, you'll find all settings for Force Refresh.",
+  scheduleRefresh: 'Use Schedule Force Refresh to pick a specific date and time for the refresh: no need to be at your desk when it goes out.',
   releaseNotes: 'Want to see the latest features? Clicking "View Release Notes" will display the most recent features and fixes for Force Refresh.',
   singlePage: 'To refresh a single page or post, locate the "Force Refresh" section under any page.',
   toolsRefresh: "Choose from popular refresh intervals or set a custom one. You'll receive confirmation that browsers were requested to refresh.",
@@ -45,6 +46,22 @@ export const screenshots: ScreenshotDefinition[] = [
       { type: 'waitForSelector', selector: 'select[name="refresh-interval"]' },
       { type: 'addStyle', css: '.force-refresh__container { padding-top: 24px; }' },
       { type: 'ensureSidebarCollapsed' },
+    ],
+  },
+  {
+    caption: CAPTIONS.scheduleRefresh,
+    actions: [
+      { type: 'navigate', path: '/wp-admin/tools.php?page=force_refresh' },
+      { type: 'waitForSelector', selector: 'select[name="refresh-interval"]' },
+      { type: 'ensureSidebarCollapsed' },
+      { type: 'click', selector: '[data-test="btn-schedule-refresh"]' },
+      { type: 'waitForSelector', selector: '#schedule-datetime-picker' },
+      {
+        type: 'highlightElement',
+        selector: '#schedule-datetime-picker',
+        padding: 10,
+      },
+      { type: 'waitForTimeout', ms: 300 },
     ],
   },
   {
