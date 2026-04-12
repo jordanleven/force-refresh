@@ -1,21 +1,45 @@
 <template>
   <div class="wrap">
-    <h1 class="header">
-      {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
-    </h1>
-    <template v-if="getPluginWarningText">
-      <p class="admin-section__warning">
-        {{ getPluginWarningText }}
-      </p>
-    </template>
+    <div class="header-row">
+      <h1 class="header">
+        {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
+      </h1>
+      <transition-group name="header-row-badge" tag="div" class="header-row__badges">
+        <AdminHeaderBadge
+          v-if="isDebugActive"
+          key="debug"
+          variant="debug"
+          :icon="faBug"
+          :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_DEBUG_MODE')"
+          :tooltip="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_DEBUG_MODE_TOOLTIP')"
+        />
+        <AdminHeaderBadge
+          v-if="isVersionOutdated"
+          key="update"
+          variant="update"
+          :icon="faArrowCircleUp"
+          :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_OUTDATED', { latestVersion: troubleshootingInformation.versions.forceRefresh.required })"
+          :tooltip="
+            $t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_OUTDATED_TOOLTIP', {
+              installedVersion: troubleshootingInformation.versions.forceRefresh.version
+            })
+          "
+          href="/wp-admin/plugins.php"
+        />
+        <AdminHeaderBadge
+          v-if="isVersionPreRelease"
+          key="prerelease"
+          variant="prerelease"
+          :icon="faExclamationCircle"
+          :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_PRE_RELEASE')"
+          :tooltip="$t(
+            'ADMIN_REFRESH_MAIN.PLUGIN_BADGE_PRE_RELEASE_TOOLTIP',
+            { installedVersion: troubleshootingInformation.versions.forceRefresh.version }
+          )"
+        />
+      </transition-group>
+    </div>
     <div class="admin-section__notifications">
-      <AdminNotification
-        v-if="isDebugActive"
-        :message="$t('ADMIN_NOTIFICATIONS.DEBUG_MODE_ACTIVE')"
-        :is-dismissible="false"
-        type="warning"
-        size="large"
-      />
       <AdminNotification
         v-if="isAdminNotificationSet"
         :message="notificationMessage.message"
@@ -83,8 +107,11 @@
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faArrowCircleUp, faBug, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
+import AdminHeaderBadge from '@/components/AdminHeaderBadge/AdminHeaderBadge.vue';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
@@ -93,9 +120,12 @@ import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTrouble
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
 import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
 
+library.add([faArrowCircleUp, faBug, faExclamationCircle]);
+
 export default {
   name: 'LayoutAdminMain',
   components: {
+    AdminHeaderBadge,
     AdminMain,
     AdminNotification,
     AdminReleaseNotes,
@@ -107,6 +137,9 @@ export default {
   },
   data() {
     return {
+      faArrowCircleUp,
+      faBug,
+      faExclamationCircle,
       notificationMessage: {},
       releaseNotesPageActive: false,
       scheduleRefreshPageActive: false,
@@ -124,25 +157,6 @@ export default {
         this.scheduleRefreshPageActive && 'admin-window--active',
       ];
     },
-    getPluginWarningText() {
-      const { required, version } = this.troubleshootingInformation.versions.forceRefresh;
-      const versionSanitized = getSanitizedVersion(version);
-
-      switch (true) {
-        case !versionSatisfies(required, versionSanitized):
-          return this.$t('ADMIN_REFRESH_MAIN.PLUGIN_WARNING_OUTDATED', {
-            currentVersion: this.troubleshootingInformation.versions.forceRefresh.required,
-            installedVersion: this.troubleshootingInformation.versions.forceRefresh.version,
-          });
-        case isDevelopmentVersion(version):
-          return this.$t('ADMIN_REFRESH_MAIN.PLUGIN_WARNING_DEVELOPMENT_BUILD', {
-            currentVersion: this.troubleshootingInformation.versions.forceRefresh.required,
-            installedVersion: this.troubleshootingInformation.versions.forceRefresh.version,
-          });
-        default:
-          return null;
-      }
-    },
     headerClass() {
       return [
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
@@ -153,6 +167,15 @@ export default {
     },
     isScheduledRefreshEnabled() {
       return this.isFeatureEnabled('scheduledRefresh');
+    },
+    isVersionOutdated() {
+      const { required, version } = this.troubleshootingInformation.versions.forceRefresh;
+      if (!required) return false;
+      return !versionSatisfies(required, getSanitizedVersion(version));
+    },
+    isVersionPreRelease() {
+      const { version } = this.troubleshootingInformation.versions.forceRefresh;
+      return isDevelopmentVersion(version);
     },
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
@@ -287,6 +310,32 @@ export default {
 @use "@/scss/variables" as var;
 @use "@/scss/utilities" as utils;
 
+.header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-row__badges {
+  display: flex;
+  align-items: center;
+  gap: var.$space-small;
+}
+
+.header-row-badge-enter-active,
+.header-row-badge-leave-active,
+.header-row-badge-move {
+  transition:
+    opacity var.$transition-medium ease,
+    transform var.$transition-medium ease;
+}
+
+.header-row-badge-enter-from,
+.header-row-badge-leave-to {
+  opacity: 0;
+  transform: translateY(-0.75rem);
+}
+
 .header {
   display: inline;
   user-select: none;
@@ -312,13 +361,6 @@ export default {
 
 .admin-section__troubleshooting {
   z-index: 2;
-}
-
-.admin-section__warning {
-  font-style: italic;
-  margin-bottom: 0;
-  color: var.$status-error;
-  font-size: 0.9rem;
 }
 
 @keyframes fade-and-scale-main {
