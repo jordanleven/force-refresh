@@ -36,8 +36,9 @@ Upload Force Refresh to your site and activate it. When you're ready to request 
 
 ## Screenshots
 
-1. Find all Force Refresh settings under Tools.
-2. Choose a common refresh interval or set your own. After clicking "Refresh Site", you'll see a confirmation that connected browsers have been asked to refresh.
-3. Refresh a single page or post from the "Force Refresh" section on the edit screen.
-4. Open "View Release Notes" to see the latest improvements in Force Refresh.
-5. Open "Troubleshooting" to review current settings and enable Debugging Mode for more detailed browser console logging.
+1. The Force Refresh admin panel, under Tools, lets you instantly push a site-wide refresh to all connected browsers and configure how often they check for a new version.
+2. Use Schedule Force Refresh to pick a specific date and time for the refresh — no need to be at your desk when it goes out.
+3. Scheduled refreshes appear in a queue on the main panel, where you can review or remove them before they run.
+4. Refresh any individual page or post directly from the block editor without triggering a site-wide refresh.
+5. View Release Notes shows the full changelog for every version of the plugin, directly in the admin panel.
+6. The Troubleshooting panel shows your PHP, WordPress, and Force Refresh versions at a glance, and lets you enable Debug Mode for detailed browser console logging.
