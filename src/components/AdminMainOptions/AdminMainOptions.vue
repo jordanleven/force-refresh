@@ -273,7 +273,7 @@ export default {
   border-radius: 10px;
 
   @include utils.small {
-    margin: 0 20px;
+    margin-left: 10px;
   }
 
   .force-refresh-options-header {
@@ -309,7 +309,7 @@ export default {
   text-align: right;
 
   @include utils.small {
-    margin: 50px 20px 0;
+    margin: 50px 0 0 20px;
   }
 
   .force-refresh-admin__options-utility {
