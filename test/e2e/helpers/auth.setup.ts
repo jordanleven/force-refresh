@@ -8,12 +8,12 @@ setup('authenticate and verify initial state', async ({ page, baseURL }) => {
 
   await goToPluginPage(page);
 
-  const debugBanner = page.locator('.notice-force-refresh.notice-warning');
-  const isDebugActive = await debugBanner.isVisible();
+  const debugBadge = page.locator('.admin-header-badge.admin-header-badge--debug');
+  const isDebugActive = await debugBadge.isVisible();
 
   if (isDebugActive) {
     await page.locator('[data-test="btn-troubleshooting"]').click();
     await page.locator('[data-test="toggle-debug-mode"] label').click();
-    await expect(debugBanner).not.toBeVisible({ timeout: 10_000 });
+    await expect(debugBadge).not.toBeVisible({ timeout: 10_000 });
   }
 });
