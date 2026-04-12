@@ -1,4 +1,4 @@
-import { mount } from '@vue/test-utils';
+import { shallowMount } from '@vue/test-utils';
 import Tooltip from './Tooltip.vue';
 
 jest.mock('@floating-ui/vue', () => ({
@@ -9,7 +9,12 @@ jest.mock('@floating-ui/vue', () => ({
   shift: jest.fn(),
 }));
 
-const getWrapper = (props = {}) => mount(Tooltip, {
+const getWrapper = (props = {}) => shallowMount(Tooltip, {
+  global: {
+    stubs: {
+      Teleport: { template: '<div><slot /></div>' },
+    },
+  },
   props,
   slots: {
     default: '<button>Trigger</button>',
@@ -17,10 +22,6 @@ const getWrapper = (props = {}) => mount(Tooltip, {
 });
 
 describe('Tooltip', () => {
-  afterEach(() => {
-    document.body.innerHTML = '';
-  });
-
   describe('Slot', () => {
     it('renders the default slot content', () => {
       const wrapper = getWrapper();
@@ -31,23 +32,23 @@ describe('Tooltip', () => {
 
   describe('Tooltip content', () => {
     it('does not render the tooltip element when no content is provided', () => {
-      getWrapper();
+      const wrapper = getWrapper();
 
-      expect(document.body.querySelector('.tooltip')).toBeNull();
+      expect(wrapper.find('.tooltip').exists()).toBe(false);
     });
 
     it('renders the tooltip with the provided content', () => {
-      getWrapper({ content: 'Debug mode is active' });
+      const wrapper = getWrapper({ content: 'Debug mode is active' });
 
-      expect(document.body.querySelector('.tooltip').textContent.trim()).toBe('Debug mode is active');
+      expect(wrapper.find('.tooltip').text()).toBe('Debug mode is active');
     });
   });
 
   describe('Visibility', () => {
     it('is hidden by default', () => {
-      getWrapper({ content: 'Some tooltip' });
+      const wrapper = getWrapper({ content: 'Some tooltip' });
 
-      expect(document.body.querySelector('.tooltip').classList).not.toContain('tooltip--visible');
+      expect(wrapper.find('.tooltip').classes()).not.toContain('tooltip--visible');
     });
 
     it('becomes visible on mouseenter', async () => {
@@ -55,7 +56,7 @@ describe('Tooltip', () => {
 
       await wrapper.find('.tooltip-wrapper').trigger('mouseenter');
 
-      expect(document.body.querySelector('.tooltip').classList).toContain('tooltip--visible');
+      expect(wrapper.find('.tooltip').classes()).toContain('tooltip--visible');
     });
 
     it('becomes hidden again on mouseleave', async () => {
@@ -64,7 +65,7 @@ describe('Tooltip', () => {
       await wrapper.find('.tooltip-wrapper').trigger('mouseenter');
       await wrapper.find('.tooltip-wrapper').trigger('mouseleave');
 
-      expect(document.body.querySelector('.tooltip').classList).not.toContain('tooltip--visible');
+      expect(wrapper.find('.tooltip').classes()).not.toContain('tooltip--visible');
     });
   });
 });
