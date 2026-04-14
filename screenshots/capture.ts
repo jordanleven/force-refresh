@@ -4,31 +4,27 @@ import { test, Page } from '@playwright/test';
 import { screenshots, ScreenshotAction, SCREENSHOT_VIEWPORT } from './screenshots.config';
 
 const WORDPRESS_ORG_DIR = path.resolve(__dirname, '../.wordpress-org');
+const HIGHLIGHT_OVERLAY_OPACITY = 0.75;
 
-async function runAction(page: Page, action: ScreenshotAction): Promise<void> {
-  switch (action.type) {
-    case 'navigate':
-      await page.goto(action.path);
-      break;
-    case 'click':
-      await page.locator(action.selector).click();
-      break;
-    case 'hover':
-      await page.locator(action.selector).hover();
-      break;
-    case 'waitForSelector':
-      await page.locator(action.selector).first().waitFor({ state: 'visible' });
-      break;
-    case 'waitForTimeout':
-      await page.waitForTimeout(action.ms);
-      break;
-    case 'waitForNetworkIdle':
-      await page.waitForLoadState('networkidle');
-      break;
-    case 'scrollTo':
-      await page.locator(action.selector).scrollIntoViewIfNeeded();
-      break;
-  }
+type ActionHandlers = {
+  [K in ScreenshotAction['type']]: (_page: Page, _action: Extract<ScreenshotAction, { type: K }>) => Promise<void>;
+};
+
+type AnyActionHandler = (_page: Page, _action: ScreenshotAction) => Promise<void>;
+
+const ACTION_HANDLERS: ActionHandlers = {
+  navigate: (page, { path: p }) => page.goto(p).then(() => undefined),
+  click: (page, { selector }) => page.locator(selector).click(),
+  hover: (page, { selector }) => page.locator(selector).hover(),
+  waitForSelector: (page, { selector }) => page.locator(selector).first().waitFor({ state: 'visible' }),
+  waitForTimeout: (page, { ms }) => page.waitForTimeout(ms),
+  // cspell:ignore networkidle
+  waitForNetworkIdle: (page) => page.waitForLoadState('networkidle'),
+  scrollTo: (page, { selector }) => page.locator(selector).scrollIntoViewIfNeeded(),
+};
+
+function runAction(page: Page, action: ScreenshotAction): Promise<void> {
+  return (ACTION_HANDLERS[action.type] as AnyActionHandler)(page, action);
 }
 
 function syncCaptions(): void {
@@ -58,21 +54,22 @@ function syncCaptions(): void {
 }
 
 test('Capture WordPress.org screenshots', async ({ page }) => {
-  for (let i = 0; i < screenshots.length; i++) {
-    const definition = screenshots[i];
-    const viewport = definition.viewport ?? SCREENSHOT_VIEWPORT;
+  await screenshots.reduce<Promise<void>>(async (chain, definition, i) => {
+    await chain;
 
+    const viewport = definition.viewport ?? SCREENSHOT_VIEWPORT;
     await page.setViewportSize(viewport);
 
-    for (const action of definition.actions) {
-      await runAction(page, action);
-    }
+    await definition.actions.reduce(
+      (actionChain, action) => actionChain.then(() => runAction(page, action)),
+      Promise.resolve(),
+    );
 
     const outputPath = path.join(WORDPRESS_ORG_DIR, `screenshot-${i + 1}.png`);
     await page.screenshot({ path: outputPath });
 
     console.log(`Captured screenshot-${i + 1}.png`);
-  }
+  }, Promise.resolve());
 
   syncCaptions();
   console.log('Captions synced to readme.txt and README.md');

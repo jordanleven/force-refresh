@@ -5,6 +5,7 @@ const INSTANCE = { name: 'WordPress 6.9', baseURL: 'http://wp6.force-refresh.loc
 
 export default defineConfig({
   testDir: './screenshots',
+  testMatch: '**/capture.ts',
   timeout: 120_000,
   reporter: 'list',
   workers: 1,

@@ -151,11 +151,13 @@ export default [
           ignoreUrls: true,
         },
       ],
+      'no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
     },
   },
   {
     files: [
       'playwright.config*.ts',
+      'screenshots/**/*.ts',
       'test/**/*.ts',
       'test/**/*.js',
       'jest-vue-transformer.js',
@@ -164,6 +166,7 @@ export default [
     ],
     rules: {
       'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
+      'no-console': 'off',
     },
   },
 ];
