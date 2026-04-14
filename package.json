@@ -19,6 +19,7 @@
     "test": "jest",
     "test:e2e": "playwright test",
     "test:e2e:qa": "playwright test --config=playwright.config.qa.ts",
+    "screenshots": "playwright test --config=playwright.config.screenshots.ts",
     "lint": "npm run lint:css && npm run lint:js",
     "lint:css": "stylelint '**/*.{scss,vue}' --formatter verbose",
     "lint:js": "eslint .",
