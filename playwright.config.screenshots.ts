@@ -27,7 +27,7 @@ export default defineConfig({
         ...devices['Desktop Chrome'],
         baseURL: INSTANCE.baseURL,
         storageState: getAuthFile(INSTANCE.baseURL),
-        viewport: { width: 1600, height: 999 },
+        viewport: { width: 1280, height: 831 },
         headless: process.env.HEADLESS === 'true',
       },
       dependencies: [`setup-${INSTANCE.name}`],
