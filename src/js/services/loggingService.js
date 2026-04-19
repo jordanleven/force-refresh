@@ -1,6 +1,5 @@
 import { getDebugMode } from '@/js/services/debugService.js';
 
-/* eslint-disable no-console */
 const { name: packageName } = require('../../../package.json');
 
 const clearAndUpper = (text) => text.replace(/-/, '').toUpperCase();
