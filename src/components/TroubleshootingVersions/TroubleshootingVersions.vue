@@ -1,22 +1,26 @@
 <template>
-  <div class="plugin-versions">
-    <div class="plugin-versions__label">
-      <BaseTooltip :content="versionTip">
-        <span
-          v-if="!versionIsDevelopmentVersion"
-          class="tip-dot"
-          :class="statusDotClass"
-        />
-        <font-awesome-icon
-          v-else
-          class="tip-dot--prerelease"
-          :icon="faTriangleExclamation"
-        />
-      </BaseTooltip>
-      {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}
-    </div>
-    <span class="plugin-versions__version">{{ version }}</span>
-  </div>
+  <TroubleshootingRow>
+    <template #label>
+      <div class="plugin-versions__label">
+        <BaseTooltip :content="versionTip">
+          <span
+            v-if="!versionIsDevelopmentVersion"
+            class="tip-dot"
+            :class="statusDotClass"
+          />
+          <font-awesome-icon
+            v-else
+            class="tip-dot--prerelease"
+            :icon="faTriangleExclamation"
+          />
+        </BaseTooltip>
+        {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}
+      </div>
+    </template>
+    <template #value>
+      <span class="plugin-versions__version">{{ version }}</span>
+    </template>
+  </TroubleshootingRow>
 </template>
 
 <script>
@@ -24,6 +28,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
+import TroubleshootingRow from '@/components/TroubleshootingRow/TroubleshootingRow.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
 library.add(faTriangleExclamation);
@@ -32,6 +37,7 @@ export default {
   name: 'TroubleshootingVersions',
   components: {
     BaseTooltip,
+    TroubleshootingRow,
   },
   props: {
     label: VueTypes.string.isRequired,
@@ -72,23 +78,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
-
-.plugin-versions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0.625rem 1.125rem;
-  font-size: 0.844rem;
-  font-weight: 400;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  border-bottom: 1px solid rgb(0, 0, 0, 4%);
-
-  &:last-child {
-    border-bottom: none;
-  }
-}
 
 .plugin-versions__label {
   display: flex;

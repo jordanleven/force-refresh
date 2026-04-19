@@ -117,6 +117,10 @@ import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshInterva
 
 library.add([faArrowCircleUp, faBug, faTriangleExclamation]);
 
+const isTroubleshootingViewActiveOnLoad = () => (
+  typeof window !== 'undefined' && window.location.hash === '#troubleshooting'
+);
+
 export default {
   name: 'LayoutAdminMain',
   components: {
@@ -139,7 +143,7 @@ export default {
       pageTransitionName: 'page-enter',
       releaseNotesPageActive: false,
       scheduleRefreshPageActive: false,
-      troubleshootingPageIsActive: false,
+      troubleshootingPageIsActive: isTroubleshootingViewActiveOnLoad(),
     };
   },
   computed: {
@@ -198,6 +202,7 @@ export default {
     activateTroubleshootingPage() {
       this.pageTransitionName = 'page-enter';
       this.troubleshootingPageIsActive = true;
+      this.updateViewHash('troubleshooting');
     },
     checkForOptionsUpdated() {
       if (window.location.href.indexOf('optionsUpdated') > -1) {
@@ -219,6 +224,7 @@ export default {
     exitTroubleshooting() {
       this.pageTransitionName = 'page-exit';
       this.troubleshootingPageIsActive = false;
+      this.updateViewHash(null);
     },
     notificationMessageClear() {
       this.notificationMessage = null;
@@ -291,6 +297,17 @@ export default {
       } else {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_FAILURE'));
       }
+    },
+    updateViewHash(view) {
+      const url = new URL(window.location.href);
+
+      if (view) {
+        url.hash = view;
+      } else {
+        url.hash = '';
+      }
+
+      window.history.replaceState({}, '', url);
     },
     ...mapActions([
       'requestDeleteScheduledRefresh',

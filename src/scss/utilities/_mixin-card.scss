@@ -1,16 +1,16 @@
-$_card-bg: rgb(255, 255, 255, 55%);
-$_card-border: rgb(255, 255, 255, 70%);
-$_card-border-bottom: rgb(0, 0, 0, 6%);
-$_card-blur: blur(28px) saturate(1.8);
-$_card-shadow: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
-$_card-radius: 1.25rem;
+$card-bg-default: rgb(255, 255, 255, 55%);
+$card-border-default: rgb(255, 255, 255, 70%);
+$card-border-bottom-default: rgb(0, 0, 0, 6%);
+$card-blur-default: blur(28px) saturate(1.8);
+$card-shadow-default: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
+$card-radius-default: 1.25rem;
 
-@mixin card-surface($bg: $_card-bg) {
+@mixin card-surface($bg: $card-bg-default) {
   background: $bg;
-  backdrop-filter: $_card-blur;
-  border-radius: $_card-radius;
-  box-shadow: $_card-shadow;
-  border: 1px solid $_card-border;
-  border-bottom-color: $_card-border-bottom;
+  backdrop-filter: $card-blur-default;
+  border-radius: $card-radius-default;
+  box-shadow: $card-shadow-default;
+  border: 1px solid $card-border-default;
+  border-bottom-color: $card-border-bottom-default;
   overflow: hidden;
 }

@@ -3,15 +3,15 @@
     <div class="debug-banner-group">
       <div
         class="debug-banner"
-        :class="{ 'debug-banner--open': isSubmitDebugRowVisible }"
+        :class="debugBannerClasses"
       >
         <div
           class="debug-icon-wrap"
-          :class="{ 'debug-icon-wrap--active': isDebugActive }"
+          :class="debugIconWrapClasses"
         >
           <font-awesome-icon
             class="debug-icon"
-            :class="{ 'debug-icon--active': isDebugActive }"
+            :class="debugIconClasses"
             :icon="faBug"
           />
         </div>
@@ -47,11 +47,11 @@
 
     <div
       class="content-grid"
-      :class="{ 'content-grid--with-terminal': isTerminalEnabled }"
+      :class="contentGridClasses"
     >
       <div
         class="col-left"
-        :class="{ 'col-left--stacked': isTerminalEnabled }"
+        :class="contentColumnClasses"
       >
         <div class="info-card">
           <div class="info-card__header">
@@ -128,10 +128,35 @@ export default {
   },
   emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
   computed: {
+    contentColumnClasses() {
+      return [
+        this.isTerminalEnabled && 'col-left--stacked',
+      ];
+    },
+    contentGridClasses() {
+      return [
+        this.isTerminalEnabled && 'content-grid--with-terminal',
+      ];
+    },
+    debugBannerClasses() {
+      return [
+        this.isSubmitDebugRowVisible && 'debug-banner--open',
+      ];
+    },
     debugCopy() {
       return this.isDebugActive
         ? this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_ACTIVE')
         : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_INACTIVE');
+    },
+    debugIconClasses() {
+      return [
+        this.isDebugActive && 'debug-icon--active',
+      ];
+    },
+    debugIconWrapClasses() {
+      return [
+        this.isDebugActive && 'debug-icon-wrap--active',
+      ];
     },
     isSubmitDebugEnabled() {
       return this.isFeatureEnabled('troubleshootingSubmitDebug');
@@ -229,32 +254,6 @@ $blue: #0071e3;
   letter-spacing: 0.07em;
 }
 
-// ── Deep overrides for child component rows inside glass cards ───────────────
-
-.force-refresh-troubleshooting .info-card :deep(.descriptive-list) {
-  padding: 0.625rem 1.125rem;
-  font-size: 0.844rem;
-  font-weight: 400;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  border-bottom: 1px solid rgb(0, 0, 0, 4%);
-
-  &:nth-child(odd) {
-    background-color: transparent;
-  }
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  dt {
-    color: #1d1d1f;
-  }
-
-  dd {
-    color: #6e6e73;
-  }
-}
-
 // ── Debug banner ─────────────────────────────────────────────────────────────
 
 .debug-banner-group {
@@ -263,6 +262,7 @@ $blue: #0071e3;
 
 .debug-banner {
   @include utils.card-surface($card-bg-heavy);
+
   padding: var.$space-medium 1.375rem;
   display: flex;
   align-items: center;
@@ -348,19 +348,6 @@ $blue: #0071e3;
   animation: expand-down 0.34s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-@keyframes expand-down {
-  from {
-    max-height: 0;
-    opacity: 0;
-    padding-top: 0;
-    padding-bottom: 0;
-  }
-
-  to {
-    max-height: 5rem;
-    opacity: 1;
-  }
-}
 
 .debug-submit-label {
   font-size: 0.8125rem;
