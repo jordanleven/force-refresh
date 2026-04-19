@@ -53,15 +53,15 @@
         class="col-left"
         :class="{ 'col-left--stacked': isTerminalEnabled }"
       >
-        <div class="glass-card">
-          <div class="glass-card-header">
+        <div class="info-card">
+          <div class="info-card__header">
             <span class="card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_SITE_SETTINGS') }}</span>
           </div>
           <TroubleshootingSettings :settings="versionsTroubleshootingSettings" />
         </div>
 
-        <div class="glass-card">
-          <div class="glass-card-header">
+        <div class="info-card">
+          <div class="info-card__header">
             <span class="card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_HEALTH') }}</span>
           </div>
           <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
@@ -193,13 +193,12 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-// Glass material tokens
-$glass-bg: rgb(255, 255, 255, 55%);
-$glass-bg-heavy: rgb(255, 255, 255, 72%);
-$glass-border: rgb(255, 255, 255, 70%);
-$glass-border-bottom: rgb(0, 0, 0, 6%);
-$glass-blur: blur(28px) saturate(1.8);
-$glass-shadow: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
+$card-bg: rgb(255, 255, 255, 55%);
+$card-bg-heavy: rgb(255, 255, 255, 72%);
+$card-border: rgb(255, 255, 255, 70%);
+$card-border-bottom: rgb(0, 0, 0, 6%);
+$card-blur: blur(28px) saturate(1.8);
+$card-shadow: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
 $card-radius: 1.25rem;
 $blue: #0071e3;
 
@@ -210,19 +209,17 @@ $blue: #0071e3;
   background: #f0f2f5;
 }
 
-// ── Glass card ──────────────────────────────────────────────────────────────
-
-.glass-card {
-  background: $glass-bg;
-  backdrop-filter: $glass-blur;
+.info-card {
+  background: $card-bg;
+  backdrop-filter: $card-blur;
   border-radius: $card-radius;
-  box-shadow: $glass-shadow;
-  border: 1px solid $glass-border;
-  border-bottom-color: $glass-border-bottom;
+  box-shadow: $card-shadow;
+  border: 1px solid $card-border;
+  border-bottom-color: $card-border-bottom;
   overflow: hidden;
 }
 
-.glass-card-header {
+.info-card__header {
   padding: 0.75rem var.$space-medium 0.625rem;
   border-bottom: 1px solid rgb(0, 0, 0, 5%);
   display: flex;
@@ -240,7 +237,7 @@ $blue: #0071e3;
 
 // ── Deep overrides for child component rows inside glass cards ───────────────
 
-.force-refresh-troubleshooting .glass-card :deep(.descriptive-list) {
+.force-refresh-troubleshooting .info-card :deep(.descriptive-list) {
   padding: 0.625rem 1.125rem;
   font-size: 0.844rem;
   font-weight: 400;
@@ -271,12 +268,12 @@ $blue: #0071e3;
 }
 
 .debug-banner {
-  background: $glass-bg-heavy;
-  backdrop-filter: $glass-blur;
+  background: $card-bg-heavy;
+  backdrop-filter: $card-blur;
   border-radius: $card-radius;
-  box-shadow: $glass-shadow;
-  border: 1px solid $glass-border;
-  border-bottom-color: $glass-border-bottom;
+  box-shadow: $card-shadow;
+  border: 1px solid $card-border;
+  border-bottom-color: $card-border-bottom;
   padding: var.$space-medium 1.375rem;
   display: flex;
   align-items: center;
@@ -348,7 +345,7 @@ $blue: #0071e3;
 
 .debug-submit-row {
   background: rgb(0, 113, 227, 6%);
-  backdrop-filter: $glass-blur;
+  backdrop-filter: $card-blur;
   border: 1px solid rgb(255, 255, 255, 60%);
   border-top: 1px solid rgb(0, 113, 227, 10%);
   border-radius: 0 0 $card-radius $card-radius;
@@ -408,7 +405,7 @@ $blue: #0071e3;
   &:active { transform: scale(0.97); }
 }
 
-.btn-glass {
+.btn-frosted {
   background: rgb(255, 255, 255, 60%);
   backdrop-filter: blur(12px);
   color: #1d1d1f;
