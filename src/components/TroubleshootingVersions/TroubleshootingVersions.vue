@@ -1,18 +1,13 @@
 <template>
-  <BaseDescriptiveList
-    class="plugin-versions"
-    :class="pluginInfoClasses"
-  >
+  <BaseDescriptiveList>
     <template #term>
       <div class="plugin-versions__label">
-        <span v-if="versionRequired" class="version-status">
-          <font-awesome-icon
-            class="version-status__icon"
-            :title="versionStatusMessage"
-            :icon="versionStatus"
-          />
-        </span>
-        {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}:
+        <BaseTooltip :content="versionTip">
+          <span class="status-indicator" :class="statusClass">
+            <font-awesome-icon :icon="statusIcon" />
+          </span>
+        </BaseTooltip>
+        {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}
       </div>
     </template>
     <template #definition>
@@ -23,17 +18,19 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheckCircle, faTimesCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faInfo, faExclamation } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
+import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
-library.add([faCheckCircle, faTimesCircle, faQuestionCircle]);
+library.add(faCheck, faInfo, faExclamation);
 
 export default {
   name: 'TroubleshootingVersions',
   components: {
     BaseDescriptiveList,
+    BaseTooltip,
   },
   props: {
     label: VueTypes.string.isRequired,
@@ -41,59 +38,33 @@ export default {
     versionRequired: VueTypes.oneOfType([String, null]),
   },
   computed: {
-    pluginInfoClasses() {
-      return [
-        this.versionIsOutdated && 'plugin-info--is-outdated',
-      ];
+    statusClass() {
+      if (this.versionIsDevelopmentVersion) return 'status-indicator--warning';
+      if (this.versionIsOutdated) return 'status-indicator--error';
+      return 'status-indicator--okay';
+    },
+    statusIcon() {
+      if (this.versionIsDevelopmentVersion) return faInfo;
+      return this.versionIsOutdated ? faExclamation : faCheck;
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
     },
     versionIsOutdated() {
-      // In case the version is actually a development build
       const versionSanitized = getSanitizedVersion(this.version);
       return !versionSatisfies(this.versionRequired, versionSanitized);
     },
-    versionStatus() {
-      switch (true) {
-        case this.versionIsDevelopmentVersion:
-          return faQuestionCircle;
-        case this.versionIsOutdated:
-          return faTimesCircle;
-        default:
-          return faCheckCircle;
+    versionTip() {
+      if (this.versionIsDevelopmentVersion) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION', { label: this.label });
       }
-    },
-    versionStatusMessage() {
-      switch (true) {
-        case this.versionIsDevelopmentVersion:
-          return this.$t(
-            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION',
-            {
-              label: this.label,
-            },
-          );
-        case this.versionIsOutdated:
-          return this.$t(
-            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED',
-            {
-              label: this.label,
-              versionRequired: this.versionRequired,
-            },
-          );
-        default:
-          return this.$t(
-            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE',
-            {
-              label: this.label,
-            },
-          );
+      if (this.versionIsOutdated) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED', {
+          label: this.label,
+          versionRequired: this.versionRequired,
+        });
       }
-    },
-  },
-  methods: {
-    compareVersion() {
-      return false;
+      return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
     },
   },
 };
@@ -103,56 +74,59 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-$icon-size: 1.125rem;
-
-.version-status {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  height: 100%;
-  left: var.$space-medium;
-  font-size: $icon-size;
-  color: var.$status-success;
+.plugin-versions__label {
   display: flex;
   align-items: center;
-  justify-content: center;
-
-  &::before {
-    content: "";
-    display: block;
-    border-radius: 100%;
-    height: calc(#{$icon-size} - 2px);
-    width: calc(#{$icon-size} - 2px);
-    background-color: #fff;
-    top: 0;
-    bottom: 0;
-    margin: 0;
-    left: 0;
-    z-index: 1;
-  }
-}
-
-.version-status__icon {
-  position: absolute;
-  z-index: 2;
-  cursor: help;
-
-  &.fa-question-circle {
-    color: var.$status-warning;
-  }
-
-  &.fa-times-circle {
-    color: var.$status-error;
-  }
-}
-
-.plugin-versions__label {
-  margin-left: 1.825rem;
-  display: inline-block;
+  gap: var.$space-small;
+  color: var.$text-primary;
 }
 
 .plugin-versions__version {
-  @include utils.typeface-code;
+  color: var.$text-secondary;
+}
+
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: 0.25rem;
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.5rem;
+  background: var.$dark-grey;
+
+  &--okay {
+    background: var.$green;
+    box-shadow: 0 0 0 2.5px rgba(var.$green, 0.2);
+  }
+
+  &--error {
+    background: var.$red;
+    box-shadow: 0 0 0 0 rgba(var.$red, 0.4);
+
+    @include utils.animation('sonar-error', 1.6s, ease-out infinite);
+
+    @include utils.generate-animation('sonar-error') {
+      0%   { box-shadow: 0 0 0 0 rgba(var.$red, 0.45); }
+      70%  { box-shadow: 0 0 0 0.375rem rgba(var.$red, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(var.$red, 0); }
+    }
+  }
+
+  &--warning {
+    background: var.$orange;
+    box-shadow: 0 0 0 0 rgba(var.$orange, 0.4);
+
+    @include utils.animation('sonar-warning', 1.6s, ease-out infinite);
+
+    @include utils.generate-animation('sonar-warning') {
+      0%   { box-shadow: 0 0 0 0 rgba(var.$orange, 0.45); }
+      70%  { box-shadow: 0 0 0 0.375rem rgba(var.$orange, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(var.$orange, 0); }
+    }
+  }
 }
 </style>

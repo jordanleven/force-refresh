@@ -1,18 +1,5 @@
 <template>
-  <ul class="troubleshooting-console">
-    <li class="troubleshooting-console__admin">
-      <h4 class="console-header">
-        Admin
-      </h4>
-      <BaseConsole class="console" :output="outputAdmin" />
-    </li>
-    <li class="troubleshooting-console__client">
-      <h4 class="console-header">
-        Client
-      </h4>
-      <BaseConsole class="console" :output="outputClient" />
-    </li>
-  </ul>
+  <BaseConsole class="troubleshooting-console" :output="output" />
 </template>
 
 <script>
@@ -27,20 +14,15 @@ export default {
   },
   data() {
     return {
-      outputAdmin: [],
-      outputClient: [],
+      output: [],
     };
   },
   mounted() {
-    this.addAdminMessage(`Beginning admin troubleshooting (${currentTimezone}).`);
-    this.addClientMessage(`Beginning client troubleshooting (${currentTimezone}).`);
+    this.addMessage(`Beginning troubleshooting (${currentTimezone}).`);
   },
   methods: {
-    addAdminMessage(message) {
-      this.outputAdmin.unshift(`${this.getTimestamp()} – ${message}`);
-    },
-    addClientMessage(message) {
-      this.outputClient.unshift(`${this.getTimestamp()} – ${message}`);
+    addMessage(message) {
+      this.output.unshift(`${this.getTimestamp()} – ${message}`);
     },
     getTimestamp() {
       return new Date().toLocaleDateString(
@@ -60,29 +42,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/utilities" as utils;
-@use "@/scss/variables" as var;
-
-.console-header {
-  @include utils.typeface-code;
-}
-
-.troubleshooting-console__admin,
-.troubleshooting-console__client {
-  width: 100%;
+.troubleshooting-console {
   height: 100%;
-
-  .console {
-    height: 300px;
-    overflow: scroll;
-  }
-}
-
-.troubleshooting-console__admin {
-  padding-right: var.$space-small;
-}
-
-.troubleshooting-console__client {
-  padding-left: var.$space-small;
+  overflow: auto;
 }
 </style>

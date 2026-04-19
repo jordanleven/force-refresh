@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { getDebugMode } from '@/js/services/debugService.js';
 
 const { name: packageName } = require('../../../package.json');

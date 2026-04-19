@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 export type ScreenshotAction =
   | { type: 'navigate'; path: string }
   | { type: 'click'; selector: string }
@@ -33,8 +34,7 @@ const CAPTIONS = {
   releaseNotes: 'Want to see the latest features? Clicking "View Release Notes" will display the most recent features and fixes for Force Refresh.',
   singlePage: 'To refresh a single page or post, locate the "Force Refresh" section under any page.',
   toolsRefresh: "Choose from popular refresh intervals or set a custom one. You'll receive confirmation that browsers were requested to refresh.",
-  troubleshooting: `If you're having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow
-  you to enter Debugging Mode: an enhanced browser console logging mode that can be used to diagnose issues.`,
+  troubleshooting: 'If you\'re having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow you to enter Debugging Mode: an enhanced browser console logging mode that can be used to diagnose issues.',
 } as const;
 
 export const screenshots: ScreenshotDefinition[] = [
