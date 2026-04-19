@@ -193,12 +193,7 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-$card-bg: rgb(255, 255, 255, 55%);
 $card-bg-heavy: rgb(255, 255, 255, 72%);
-$card-border: rgb(255, 255, 255, 70%);
-$card-border-bottom: rgb(0, 0, 0, 6%);
-$card-blur: blur(28px) saturate(1.8);
-$card-shadow: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
 $card-radius: 1.25rem;
 $blue: #0071e3;
 
@@ -210,13 +205,7 @@ $blue: #0071e3;
 }
 
 .info-card {
-  background: $card-bg;
-  backdrop-filter: $card-blur;
-  border-radius: $card-radius;
-  box-shadow: $card-shadow;
-  border: 1px solid $card-border;
-  border-bottom-color: $card-border-bottom;
-  overflow: hidden;
+  @include utils.card-surface;
 }
 
 .info-card__header {
@@ -268,12 +257,7 @@ $blue: #0071e3;
 }
 
 .debug-banner {
-  background: $card-bg-heavy;
-  backdrop-filter: $card-blur;
-  border-radius: $card-radius;
-  box-shadow: $card-shadow;
-  border: 1px solid $card-border;
-  border-bottom-color: $card-border-bottom;
+  @include utils.card-surface($card-bg-heavy);
   padding: var.$space-medium 1.375rem;
   display: flex;
   align-items: center;
@@ -345,7 +329,7 @@ $blue: #0071e3;
 
 .debug-submit-row {
   background: rgb(0, 113, 227, 6%);
-  backdrop-filter: $card-blur;
+  backdrop-filter: blur(28px) saturate(1.8);
   border: 1px solid rgb(255, 255, 255, 60%);
   border-top: 1px solid rgb(0, 113, 227, 10%);
   border-radius: 0 0 $card-radius $card-radius;
