@@ -307,6 +307,7 @@ export default {
 
 .force-refresh-admin__options-utilities {
   text-align: right;
+  margin-top: 20px;
 
   @include utils.small {
     margin: 50px 0 0 20px;

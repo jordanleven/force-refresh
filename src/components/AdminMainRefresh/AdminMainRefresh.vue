@@ -118,7 +118,7 @@ export default {
 
 .admin__container {
   width: 100%;
-  padding: 20px 0 30px;
+  padding: 20px 10px 30px;
   text-align: center;
   border: 2px solid var.$light_grey;
   border-radius: 10px;
