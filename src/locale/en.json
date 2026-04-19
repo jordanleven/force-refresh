@@ -33,6 +33,7 @@
     "DEBUG_MODE_DESCRIPTION_INACTIVE": "Debugging mode is currently turned off. This means that Force Refresh will operate normally.",
     "TROUBLESHOOTING_DEBUG_MODE": "Debug Mode",
     "TROUBLESHOOTING_HEADER": "Troubleshooting",
+    "TROUBLESHOOTING_HEADER_CONSOLE": "Console",
     "TROUBLESHOOTING_HEADER_HEALTH": "Health",
     "TROUBLESHOOTING_HEADER_SITE_SETTINGS": "Site Settings",
     "TROUBLESHOOTING_LABEL_CURRENT_SITE_ID": "Current Site ID",

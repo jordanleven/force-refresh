@@ -72,7 +72,12 @@
         v-if="isTerminalEnabled"
         class="col-right"
       >
-        <TroubleshootingConsole />
+        <div class="info-card info-card--terminal">
+          <div class="info-card__header">
+            <span class="card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_CONSOLE') }}</span>
+          </div>
+          <TroubleshootingConsole />
+        </div>
       </div>
     </div>
 
@@ -425,6 +430,17 @@ $blue: #0071e3;
 
 .col-right {
   height: 100%;
+}
+
+.info-card--terminal {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  :deep(.troubleshooting-console) {
+    flex: 1;
+    min-height: 0;
+  }
 }
 
 // ── Footer ───────────────────────────────────────────────────────────────────
