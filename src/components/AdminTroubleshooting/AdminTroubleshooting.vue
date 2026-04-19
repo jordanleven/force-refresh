@@ -1,58 +1,71 @@
 <template>
   <div class="force-refresh-troubleshooting">
-    <h2 class="header">
-      {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER') }}
-    </h2>
-    <ul class="plugin-info__container">
-      <li class="plugin-info">
-        <h4 class="plugin-info__header">
-          {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_HEALTH') }}
-        </h4>
-        <div class="plugin-info__inner">
-          <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
-        </div>
-      </li>
-      <li class="plugin-info">
-        <h4 class="plugin-info__header">
-          {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_SITE_SETTINGS') }}
-        </h4>
-        <div class="plugin-info__inner">
+    <TroubleshootingDebug
+      :is-debug-active="isDebugActive"
+      @toggled="toggleDebugMode"
+    />
+
+    <div
+      class="troubleshooting__content"
+      :class="classesContentGrid"
+    >
+      <div
+        class="troubleshooting__col-left"
+        :class="classesContentColumn"
+      >
+        <div class="troubleshooting__card">
+          <div class="troubleshooting__card-header">
+            <span class="troubleshooting__card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_SITE_SETTINGS') }}</span>
+          </div>
           <TroubleshootingSettings :settings="versionsTroubleshootingSettings" />
         </div>
-      </li>
-    </ul>
-    <hr>
-    <h2 class="header">
-      {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_DEBUG_MODE') }}
-    </h2>
-    <p>{{ debugCopy }}</p>
-    <BaseToggle data-test="toggle-debug-mode" :is-checked="isDebugActive" @toggled="toggleDebugMode" />
-    <hr>
-    <template v-if="false">
-      <h4>
-        Console
-      </h4>
-      <TroubleshootingConsole />
-      <hr>
-    </template>
-    <button class="button-primary" data-test="btn-exit-troubleshooting" @click="exitTroubleshooting">
-      {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_EXIT_TROUBLESHOOTING_MODE') }}
-    </button>
+
+        <div class="troubleshooting__card">
+          <div class="troubleshooting__card-header">
+            <span class="troubleshooting__card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_HEALTH') }}</span>
+          </div>
+          <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
+        </div>
+      </div>
+
+      <div
+        v-if="isTerminalEnabled"
+        class="troubleshooting__col-right"
+      >
+        <div class="troubleshooting__card troubleshooting__card--terminal">
+          <div class="troubleshooting__card-header">
+            <span class="troubleshooting__card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_CONSOLE') }}</span>
+          </div>
+          <TroubleshootingConsole />
+        </div>
+      </div>
+    </div>
+
+    <div class="troubleshooting__footer">
+      <button
+        class="button-primary"
+        data-test="btn-exit-troubleshooting"
+        @click="exitTroubleshooting"
+      >
+        {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_EXIT_TROUBLESHOOTING_MODE') }}
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 import VueTypes from 'vue-types';
-import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
+import { mapGetters } from 'vuex';
 import TroubleshootingConsole from '@/components/TroubleshootingConsole/TroubleshootingConsole.vue';
+import TroubleshootingDebug from '@/components/TroubleshootingDebug/TroubleshootingDebug.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
 import TroubleshootingVersionsList from '@/components/TroubleshootingVersionsList/TroubleshootingVersionsList.vue';
 
 export default {
   name: 'AdminTroubleshooting',
   components: {
-    BaseToggle,
     TroubleshootingConsole,
+    TroubleshootingDebug,
     TroubleshootingSettings,
     TroubleshootingVersionsList,
   },
@@ -71,10 +84,18 @@ export default {
   },
   emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
   computed: {
-    debugCopy() {
-      return this.isDebugActive
-        ? this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_ACTIVE')
-        : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_INACTIVE');
+    classesContentColumn() {
+      return [
+        this.isTerminalEnabled && 'troubleshooting__col-left--stacked',
+      ];
+    },
+    classesContentGrid() {
+      return [
+        this.isTerminalEnabled && 'troubleshooting__content--with-terminal',
+      ];
+    },
+    isTerminalEnabled() {
+      return this.isFeatureEnabled('troubleshootingTerminal');
     },
     versionsTroubleshootingInformation() {
       const { forceRefresh, php, wordPress } = this.troubleshootingInfo.versions;
@@ -104,7 +125,9 @@ export default {
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_MULTISITE_INSTALLATION'),
-          value: this.troubleshootingInfo.isMultiSite,
+          value: this.troubleshootingInfo.isMultiSite
+            ? this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_YES')
+            : this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NO'),
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_CURRENT_SITE_ID'),
@@ -112,6 +135,7 @@ export default {
         },
       ];
     },
+    ...mapGetters(['isFeatureEnabled']),
   },
   methods: {
     exitTroubleshooting() {
@@ -130,34 +154,73 @@ export default {
 
 .force-refresh-troubleshooting {
   width: 100%;
+  background: var.$surface-subtle;
 }
 
-.plugin-info__container {
-  display: flex;
-}
+.troubleshooting {
+  &__content {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var.$space-medium;
+    align-items: start;
 
-.plugin-info {
-  width: 50%;
-
-  &:nth-child(odd) {
-    padding-right: var.$space-medium;
+    &--with-terminal {
+      grid-template-columns: 1fr 1.65fr;
+      align-items: stretch;
+    }
   }
 
-  &:nth-child(even) {
-    padding-left: var.$space-medium;
+  &__col-left {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var.$space-medium;
+
+    &--stacked {
+      grid-template-columns: 1fr;
+    }
   }
-}
 
-.plugin-info__header {
-  margin: 0;
-}
+  &__col-right {
+    height: 100%;
+  }
 
-.plugin-info__inner {
-  margin-top: var.$space-small;
-  padding: var.$space-medium 0;
-  text-align: left;
-  border: 2px solid var.$light_grey;
-  border-radius: 10px;
-  background-color: white;
+  &__card {
+    @include utils.card-surface;
+
+    padding-bottom: 0.25rem;
+
+    &--terminal {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+
+      :deep(.troubleshooting-console) {
+        flex: 1;
+        min-height: 0;
+      }
+    }
+  }
+
+  &__card-header {
+    padding: 0.75rem var.$space-medium 0.625rem;
+    border-bottom: 1px solid var.$border-subtle-strong;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__card-title {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var.$text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: var.$space-large;
+  }
 }
 </style>

@@ -32,9 +32,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/utilities" as utils;
+@use "@/scss/variables" as var;
 
 .setting-value {
-  @include utils.typeface-code;
+  color: var.$text-secondary;
 }
 </style>
