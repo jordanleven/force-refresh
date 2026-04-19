@@ -43,7 +43,7 @@
       />
     </div>
     <div class="admin-section">
-      <transition name="fade-and-scale__troubleshooting">
+      <transition :name="pageTransitionName">
         <AdminTroubleshooting
           v-if="troubleshootingActive"
           class="admin-section__troubleshooting"
@@ -53,7 +53,7 @@
           @debug-mode-was-updated="updateDebugMode"
         />
       </transition>
-      <transition name="fade-and-scale__main">
+      <transition :name="pageTransitionName">
         <AdminMain
           v-if="!troubleshootingActive"
           class="admin-section__main"
@@ -136,6 +136,7 @@ export default {
       faBug,
       faExclamationCircle,
       notificationMessage: {},
+      pageTransitionName: 'page-enter',
       releaseNotesPageActive: false,
       scheduleRefreshPageActive: false,
       troubleshootingPageIsActive: false,
@@ -195,6 +196,7 @@ export default {
       this.releaseNotesPageActive = true;
     },
     activateTroubleshootingPage() {
+      this.pageTransitionName = 'page-enter';
       this.troubleshootingPageIsActive = true;
     },
     checkForOptionsUpdated() {
@@ -215,6 +217,7 @@ export default {
       this.scheduleRefreshPageActive = false;
     },
     exitTroubleshooting() {
+      this.pageTransitionName = 'page-exit';
       this.troubleshootingPageIsActive = false;
     },
     notificationMessageClear() {
@@ -358,29 +361,6 @@ export default {
   z-index: 2;
 }
 
-@keyframes fade-and-scale-main {
-  0% {
-    opacity: 0;
-    transform: scale(2) translateY(-100px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes fade-and-scale-troubleshooting {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-
-  100% {
-    opacity: 1;
-  }
-}
-
 @keyframes fade-and-move {
   0% {
     opacity: 0;
@@ -423,46 +403,36 @@ export default {
   animation-duration: var.$transition-medium;
 }
 
-.fade-and-scale__main-enter-active,
-.fade-and-scale__main-leave-active,
-.fade-and-scale__troubleshooting-enter-active,
-.fade-and-scale__troubleshooting-leave-active {
-  animation-fill-mode: both;
+.page-enter-enter-active,
+.page-enter-leave-active,
+.page-exit-enter-active,
+.page-exit-leave-active {
   position: absolute;
   width: 100%;
+  transition:
+    opacity var.$transition-medium cubic-bezier(0.32, 0.72, 0, 1),
+    transform var.$transition-medium cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-.fade-and-scale__main-enter-active,
-.fade-and-scale__main-leave-active {
-  animation-name: fade-and-scale-main;
+// Entering troubleshooting — both pages move upward
+.page-enter-enter-from {
+  opacity: 0;
+  transform: translateY(1rem);
 }
 
-.fade-and-scale__main-enter-active {
-  animation-delay: var.$transition-medium;
-  animation-duration: var.$transition-medium;
+.page-enter-leave-to {
+  opacity: 0;
+  transform: translateY(-1rem);
 }
 
-.fade-and-scale__main-leave-active {
-  animation-duration: var.$transition-medium;
+// Exiting troubleshooting — both pages move downward
+.page-exit-enter-from {
+  opacity: 0;
+  transform: translateY(-1rem);
 }
 
-.fade-and-scale__troubleshooting-enter-active,
-.fade-and-scale__troubleshooting-leave-active {
-  animation-duration: var.$transition-long;
-  animation-name: fade-and-scale-troubleshooting;
-}
-
-.fade-and-scale__troubleshooting-enter-active {
-  animation-delay: var.$transition-medium;
-  animation-duration: var.$transition-long;
-}
-
-.fade-and-scale__troubleshooting-leave-active {
-  animation-duration: var.$transition-medium;
-}
-
-.fade-and-scale__main-leave-active,
-.fade-and-scale__troubleshooting-leave-active {
-  animation-direction: reverse;
+.page-exit-leave-to {
+  opacity: 0;
+  transform: translateY(1rem);
 }
 </style>
