@@ -32,9 +32,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/utilities" as utils;
-
 .setting-value {
-  @include utils.typeface-code;
+  color: #6e6e73;
 }
 </style>

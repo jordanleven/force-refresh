@@ -1,99 +1,71 @@
 <template>
-  <BaseDescriptiveList
-    class="plugin-versions"
-    :class="pluginInfoClasses"
-  >
-    <template #term>
-      <div class="plugin-versions__label">
-        <span v-if="versionRequired" class="version-status">
-          <font-awesome-icon
-            class="version-status__icon"
-            :title="versionStatusMessage"
-            :icon="versionStatus"
-          />
-        </span>
-        {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}:
-      </div>
-    </template>
-    <template #definition>
-      <span class="plugin-versions__version">{{ version }}</span>
-    </template>
-  </BaseDescriptiveList>
+  <div class="plugin-versions">
+    <div class="plugin-versions__label">
+      <BaseTooltip :content="versionTip">
+        <span
+          v-if="!versionIsDevelopmentVersion"
+          class="tip-dot"
+          :class="statusDotClass"
+        />
+        <font-awesome-icon
+          v-else
+          class="tip-dot--prerelease"
+          :icon="faTriangleExclamation"
+        />
+      </BaseTooltip>
+      {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}
+    </div>
+    <span class="plugin-versions__version">{{ version }}</span>
+  </div>
 </template>
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheckCircle, faTimesCircle, faQuestionCircle } from '@fortawesome/free-solid-svg-icons';
+import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
-import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
+import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
-library.add([faCheckCircle, faTimesCircle, faQuestionCircle]);
+library.add(faTriangleExclamation);
 
 export default {
   name: 'TroubleshootingVersions',
   components: {
-    BaseDescriptiveList,
+    BaseTooltip,
   },
   props: {
     label: VueTypes.string.isRequired,
     version: VueTypes.string.isRequired,
     versionRequired: VueTypes.oneOfType([String, null]),
   },
+  data() {
+    return {
+      faTriangleExclamation,
+    };
+  },
   computed: {
-    pluginInfoClasses() {
-      return [
-        this.versionIsOutdated && 'plugin-info--is-outdated',
-      ];
+    statusDotClass() {
+      if (this.versionIsOutdated) return 'tip-dot--red';
+      return 'tip-dot--green';
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
     },
     versionIsOutdated() {
-      // In case the version is actually a development build
       const versionSanitized = getSanitizedVersion(this.version);
       return !versionSatisfies(this.versionRequired, versionSanitized);
     },
-    versionStatus() {
-      switch (true) {
-        case this.versionIsDevelopmentVersion:
-          return faQuestionCircle;
-        case this.versionIsOutdated:
-          return faTimesCircle;
-        default:
-          return faCheckCircle;
+    versionTip() {
+      if (this.versionIsDevelopmentVersion) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION', { label: this.label });
       }
-    },
-    versionStatusMessage() {
-      switch (true) {
-        case this.versionIsDevelopmentVersion:
-          return this.$t(
-            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION',
-            {
-              label: this.label,
-            },
-          );
-        case this.versionIsOutdated:
-          return this.$t(
-            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED',
-            {
-              label: this.label,
-              versionRequired: this.versionRequired,
-            },
-          );
-        default:
-          return this.$t(
-            'ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE',
-            {
-              label: this.label,
-            },
-          );
+      if (this.versionIsOutdated) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED', {
+          label: this.label,
+          versionRequired: this.versionRequired,
+        });
       }
-    },
-  },
-  methods: {
-    compareVersion() {
-      return false;
+      return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
     },
   },
 };
@@ -103,56 +75,84 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-$icon-size: 1.125rem;
-
-.version-status {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  margin: auto;
-  height: 100%;
-  left: var.$space-medium;
-  font-size: $icon-size;
-  color: var.$status-success;
+.plugin-versions {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.844rem;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  border-bottom: 1px solid rgb(0, 0, 0, 4%);
 
-  &::before {
-    content: "";
-    display: block;
-    border-radius: 100%;
-    height: calc(#{$icon-size} - 2px);
-    width: calc(#{$icon-size} - 2px);
-    background-color: #fff;
-    top: 0;
-    bottom: 0;
-    margin: 0;
-    left: 0;
-    z-index: 1;
-  }
-}
-
-.version-status__icon {
-  position: absolute;
-  z-index: 2;
-  cursor: help;
-
-  &.fa-question-circle {
-    color: var.$status-warning;
-  }
-
-  &.fa-times-circle {
-    color: var.$status-error;
+  &:last-child {
+    border-bottom: none;
   }
 }
 
 .plugin-versions__label {
-  margin-left: 1.825rem;
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  gap: var.$space-small;
+  color: #1d1d1f;
 }
 
 .plugin-versions__version {
-  @include utils.typeface-code;
+  color: #6e6e73;
+}
+
+.tip-dot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* Green — circle with checkmark */
+.tip-dot--green {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: #34c759;
+  box-shadow: 0 0 0 2.5px rgb(52, 199, 89, 20%);
+
+  &::after {
+    content: "✓";
+    color: #fff;
+    font-size: 0.5rem;
+    font-weight: 900;
+    line-height: 1;
+  }
+}
+
+/* Red — filled circle with ! */
+.tip-dot--red {
+  width: 0.875rem;
+  height: 0.875rem;
+  border-radius: 50%;
+  background: #ff3b30;
+  color: #fff;
+  font-size: 0.5625rem;
+  font-weight: 800;
+  box-shadow: 0 0 0 0 rgb(255, 59, 48, 40%);
+  animation: pulse-red 1.6s ease-out infinite;
+
+  &::after {
+    content: "!";
+    line-height: 1;
+  }
+}
+
+@keyframes pulse-red {
+  0%   { box-shadow: 0 0 0 0 rgb(255, 59, 48, 45%); }
+  70%  { box-shadow: 0 0 0 0.375rem rgb(255, 59, 48, 0%); }
+  100% { box-shadow: 0 0 0 0 rgb(255, 59, 48, 0%); }
+}
+
+/* Orange — FA triangle for pre-release */
+.tip-dot--prerelease {
+  color: #ff9f0a;
+  font-size: 0.875rem;
+  flex-shrink: 0;
 }
 </style>

@@ -1,52 +1,104 @@
 <template>
   <div class="force-refresh-troubleshooting">
-    <h2 class="header">
-      {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER') }}
-    </h2>
-    <ul class="plugin-info__container">
-      <li class="plugin-info">
-        <h4 class="plugin-info__header">
-          {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_HEALTH') }}
-        </h4>
-        <div class="plugin-info__inner">
-          <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
+    <div class="debug-banner-group">
+      <div
+        class="debug-banner"
+        :class="{ 'debug-banner--open': isSubmitDebugRowVisible }"
+      >
+        <div
+          class="debug-icon-wrap"
+          :class="{ 'debug-icon-wrap--active': isDebugActive }"
+        >
+          <font-awesome-icon
+            class="debug-icon"
+            :class="{ 'debug-icon--active': isDebugActive }"
+            :icon="faBug"
+          />
         </div>
-      </li>
-      <li class="plugin-info">
-        <h4 class="plugin-info__header">
-          {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_SITE_SETTINGS') }}
-        </h4>
-        <div class="plugin-info__inner">
+        <div class="debug-body">
+          <div class="debug-banner-title">
+            {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_DEBUG_MODE') }}
+          </div>
+          <div class="debug-banner-sub">
+            {{ debugCopy }}
+          </div>
+        </div>
+        <div class="debug-actions">
+          <BaseToggle
+            data-test="toggle-debug-mode"
+            :is-checked="isDebugActive"
+            @toggled="toggleDebugMode"
+          />
+        </div>
+      </div>
+
+      <div
+        v-if="isSubmitDebugRowVisible"
+        class="debug-submit-row"
+      >
+        <span class="debug-submit-label">
+          {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
+        </span>
+        <button class="btn btn-blue">
+          {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
+        </button>
+      </div>
+    </div>
+
+    <div
+      class="content-grid"
+      :class="{ 'content-grid--with-terminal': isTerminalEnabled }"
+    >
+      <div
+        class="col-left"
+        :class="{ 'col-left--stacked': isTerminalEnabled }"
+      >
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <span class="card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_SITE_SETTINGS') }}</span>
+          </div>
           <TroubleshootingSettings :settings="versionsTroubleshootingSettings" />
         </div>
-      </li>
-    </ul>
-    <hr>
-    <h2 class="header">
-      {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_DEBUG_MODE') }}
-    </h2>
-    <p>{{ debugCopy }}</p>
-    <BaseToggle data-test="toggle-debug-mode" :is-checked="isDebugActive" @toggled="toggleDebugMode" />
-    <hr>
-    <template v-if="false">
-      <h4>
-        Console
-      </h4>
-      <TroubleshootingConsole />
-      <hr>
-    </template>
-    <button class="button-primary" data-test="btn-exit-troubleshooting" @click="exitTroubleshooting">
-      {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_EXIT_TROUBLESHOOTING_MODE') }}
-    </button>
+
+        <div class="glass-card">
+          <div class="glass-card-header">
+            <span class="card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_HEALTH') }}</span>
+          </div>
+          <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
+        </div>
+      </div>
+
+      <div
+        v-if="isTerminalEnabled"
+        class="col-right"
+      >
+        <TroubleshootingConsole />
+      </div>
+    </div>
+
+    <div class="page-footer">
+      <button
+        class="button"
+        data-test="btn-exit-troubleshooting"
+        @click="exitTroubleshooting"
+      >
+        {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_EXIT_TROUBLESHOOTING_MODE') }}
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
+import { library } from '@fortawesome/fontawesome-svg-core';
+import { faBug } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import { mapGetters } from 'vuex';
 import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
 import TroubleshootingConsole from '@/components/TroubleshootingConsole/TroubleshootingConsole.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
 import TroubleshootingVersionsList from '@/components/TroubleshootingVersionsList/TroubleshootingVersionsList.vue';
+
+library.add(faBug);
 
 export default {
   name: 'AdminTroubleshooting',
@@ -75,6 +127,15 @@ export default {
       return this.isDebugActive
         ? this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_ACTIVE')
         : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_INACTIVE');
+    },
+    isSubmitDebugEnabled() {
+      return this.isFeatureEnabled('troubleshootingSubmitDebug');
+    },
+    isSubmitDebugRowVisible() {
+      return this.isDebugActive && this.isSubmitDebugEnabled;
+    },
+    isTerminalEnabled() {
+      return this.isFeatureEnabled('troubleshootingTerminal');
     },
     versionsTroubleshootingInformation() {
       const { forceRefresh, php, wordPress } = this.troubleshootingInfo.versions;
@@ -112,6 +173,10 @@ export default {
         },
       ];
     },
+    ...mapGetters(['isFeatureEnabled']),
+  },
+  created() {
+    this.faBug = faBug;
   },
   methods: {
     exitTroubleshooting() {
@@ -128,36 +193,264 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
+// Glass material tokens
+$glass-bg: rgb(255, 255, 255, 55%);
+$glass-bg-heavy: rgb(255, 255, 255, 72%);
+$glass-border: rgb(255, 255, 255, 70%);
+$glass-border-bottom: rgb(0, 0, 0, 6%);
+$glass-blur: blur(28px) saturate(1.8);
+$glass-shadow: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
+$card-radius: 1.25rem;
+$blue: #0071e3;
+
 .force-refresh-troubleshooting {
   width: 100%;
+  margin: -0.625rem -1.5rem 0;
+  padding: var.$space-large var.$space-large 5rem;
+  background: #f0f2f5;
 }
 
-.plugin-info__container {
+// ── Glass card ──────────────────────────────────────────────────────────────
+
+.glass-card {
+  background: $glass-bg;
+  backdrop-filter: $glass-blur;
+  border-radius: $card-radius;
+  box-shadow: $glass-shadow;
+  border: 1px solid $glass-border;
+  border-bottom-color: $glass-border-bottom;
+  overflow: hidden;
+}
+
+.glass-card-header {
+  padding: 0.75rem var.$space-medium 0.625rem;
+  border-bottom: 1px solid rgb(0, 0, 0, 5%);
   display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.plugin-info {
-  width: 50%;
+.card-title {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: #aeaeb2;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+// ── Deep overrides for child component rows inside glass cards ───────────────
+
+.force-refresh-troubleshooting .glass-card :deep(.descriptive-list) {
+  padding: 0.625rem 1.125rem;
+  font-size: 0.844rem;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  border-bottom: 1px solid rgb(0, 0, 0, 4%);
 
   &:nth-child(odd) {
-    padding-right: var.$space-medium;
+    background-color: transparent;
   }
 
-  &:nth-child(even) {
-    padding-left: var.$space-medium;
+  &:last-child {
+    border-bottom: none;
+  }
+
+  dt {
+    color: #1d1d1f;
+  }
+
+  dd {
+    color: #6e6e73;
   }
 }
 
-.plugin-info__header {
-  margin: 0;
+// ── Debug banner ─────────────────────────────────────────────────────────────
+
+.debug-banner-group {
+  margin-bottom: var.$space-medium;
 }
 
-.plugin-info__inner {
-  margin-top: var.$space-small;
-  padding: var.$space-medium 0;
-  text-align: left;
-  border: 2px solid var.$light_grey;
-  border-radius: 10px;
-  background-color: white;
+.debug-banner {
+  background: $glass-bg-heavy;
+  backdrop-filter: $glass-blur;
+  border-radius: $card-radius;
+  box-shadow: $glass-shadow;
+  border: 1px solid $glass-border;
+  border-bottom-color: $glass-border-bottom;
+  padding: var.$space-medium 1.375rem;
+  display: flex;
+  align-items: center;
+  gap: var.$space-medium;
+
+  &--open {
+    border-radius: $card-radius $card-radius 0 0;
+    margin-bottom: 0;
+  }
+}
+
+.debug-icon-wrap {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: rgb(0, 113, 227, 12%);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgb(0, 113, 227, 15%);
+  box-shadow: inset 0 1px 0 rgb(255, 255, 255, 50%);
+  transition: background 0.2s ease, border-color 0.2s ease;
+
+  &--active {
+    background: rgba(var.$red, 0.12);
+    border-color: rgba(var.$red, 0.2);
+  }
+}
+
+.debug-icon {
+  color: $blue;
+  font-size: 1.125rem;
+  opacity: 0.3;
+  transition: color 0.2s ease, opacity 0.2s ease;
+
+  &--active {
+    color: var.$red;
+    opacity: 1;
+  }
+}
+
+.debug-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.debug-banner-title {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.0125rem;
+  margin-bottom: 0.0625rem;
+}
+
+.debug-banner-sub {
+  font-size: 0.8125rem;
+  color: #6e6e73;
+  line-height: 1.45;
+}
+
+.debug-actions {
+  display: flex;
+  align-items: center;
+  gap: var.$space-small;
+  flex-shrink: 0;
+}
+
+.debug-submit-row {
+  background: rgb(0, 113, 227, 6%);
+  backdrop-filter: $glass-blur;
+  border: 1px solid rgb(255, 255, 255, 60%);
+  border-top: 1px solid rgb(0, 113, 227, 10%);
+  border-radius: 0 0 $card-radius $card-radius;
+  padding: 0.75rem 1.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: -1px;
+  box-shadow: 0 8px 24px rgb(0, 0, 0, 7%), inset 0 -1px 0 rgb(255, 255, 255, 50%);
+  overflow: hidden;
+  animation: expand-down 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+@keyframes expand-down {
+  from {
+    max-height: 0;
+    opacity: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  to {
+    max-height: 5rem;
+    opacity: 1;
+  }
+}
+
+.debug-submit-label {
+  font-size: 0.8125rem;
+  color: #6e6e73;
+}
+
+// ── Buttons ──────────────────────────────────────────────────────────────────
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var.$space-small;
+  padding: 0 var.$space-medium;
+  height: 2.125rem;
+  font-size: 0.844rem;
+  font-weight: 500;
+  border-radius: 980px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s;
+  letter-spacing: -0.0063rem;
+}
+
+.btn-blue {
+  background: $blue;
+  color: #fff;
+  box-shadow: 0 2px 8px rgb(0, 113, 227, 35%), inset 0 1px 0 rgb(255, 255, 255, 20%);
+
+  &:hover { filter: brightness(1.07); }
+  &:active { transform: scale(0.97); }
+}
+
+.btn-glass {
+  background: rgb(255, 255, 255, 60%);
+  backdrop-filter: blur(12px);
+  color: #1d1d1f;
+  border: 1px solid rgb(255, 255, 255, 80%);
+  box-shadow: 0 2px 8px rgb(0, 0, 0, 8%), inset 0 1px 0 rgb(255, 255, 255, 90%);
+
+  &:hover { background: rgb(255, 255, 255, 75%); }
+}
+
+// ── Content grid ─────────────────────────────────────────────────────────────
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var.$space-medium;
+  align-items: start;
+
+  &--with-terminal {
+    grid-template-columns: 1fr 1.65fr;
+    align-items: stretch;
+  }
+}
+
+.col-left {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var.$space-medium;
+
+  &--stacked {
+    grid-template-columns: 1fr;
+  }
+}
+
+.col-right {
+  height: 100%;
+}
+
+// ── Footer ───────────────────────────────────────────────────────────────────
+
+.page-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var.$space-large;
 }
 </style>

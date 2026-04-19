@@ -25,7 +25,7 @@
           v-if="isVersionPreRelease"
           key="prerelease"
           variant="prerelease"
-          :icon="faExclamationCircle"
+          :icon="faTriangleExclamation"
           :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_PRE_RELEASE')"
           :tooltip="$t(
             'ADMIN_REFRESH_MAIN.PLUGIN_BADGE_PRE_RELEASE_TOOLTIP',
@@ -103,7 +103,7 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowCircleUp, faBug, faExclamationCircle } from '@fortawesome/free-solid-svg-icons';
+import { faArrowCircleUp, faBug, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminHeaderBadge from '@/components/AdminHeaderBadge/AdminHeaderBadge.vue';
@@ -115,7 +115,7 @@ import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTrouble
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
 import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
 
-library.add([faArrowCircleUp, faBug, faExclamationCircle]);
+library.add([faArrowCircleUp, faBug, faTriangleExclamation]);
 
 export default {
   name: 'LayoutAdminMain',
@@ -134,7 +134,7 @@ export default {
     return {
       faArrowCircleUp,
       faBug,
-      faExclamationCircle,
+      faTriangleExclamation,
       notificationMessage: {},
       pageTransitionName: 'page-enter',
       releaseNotesPageActive: false,
