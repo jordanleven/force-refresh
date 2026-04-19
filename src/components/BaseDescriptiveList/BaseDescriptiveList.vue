@@ -16,19 +16,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/utilities" as utils;
-@use "@/scss/variables" as var;
-
 .descriptive-list {
-  padding: var.$space-medium;
-  font-size: 0.825rem;
-  margin: 0;
-  position: relative;
   display: flex;
-
-  &:nth-child(odd) {
-    background-color: rgba(var.$medium-grey, 0.5);
-  }
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.625rem 1.125rem;
+  font-size: 0.844rem;
+  font-weight: 400;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+  border-bottom: 1px solid rgb(0, 0, 0, 4%);
+  margin: 0;
 
   dt,
   dd {
@@ -39,11 +36,17 @@ export default {
 
   dt {
     flex: 1;
+    color: #1d1d1f;
   }
 
   dd {
     text-align: right;
     margin-left: auto;
+    color: #6e6e73;
+  }
+
+  &:last-child {
+    border-bottom: none;
   }
 }
 </style>

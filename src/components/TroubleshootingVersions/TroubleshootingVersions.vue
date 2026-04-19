@@ -1,6 +1,6 @@
 <template>
-  <TroubleshootingRow>
-    <template #label>
+  <BaseDescriptiveList>
+    <template #term>
       <div class="plugin-versions__label">
         <BaseTooltip :content="versionTip">
           <span
@@ -17,18 +17,18 @@
         {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}
       </div>
     </template>
-    <template #value>
+    <template #definition>
       <span class="plugin-versions__version">{{ version }}</span>
     </template>
-  </TroubleshootingRow>
+  </BaseDescriptiveList>
 </template>
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
-import TroubleshootingRow from '@/components/TroubleshootingRow/TroubleshootingRow.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
 library.add(faTriangleExclamation);
@@ -36,8 +36,8 @@ library.add(faTriangleExclamation);
 export default {
   name: 'TroubleshootingVersions',
   components: {
+    BaseDescriptiveList,
     BaseTooltip,
-    TroubleshootingRow,
   },
   props: {
     label: VueTypes.string.isRequired,

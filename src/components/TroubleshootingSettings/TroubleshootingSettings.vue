@@ -1,29 +1,29 @@
 <template>
   <div>
-    <TroubleshootingRow
+    <BaseDescriptiveList
       v-for="({ label, value }, index) in settings"
       :key="index"
     >
-      <template #label>
+      <template #term>
         {{ label }}
       </template>
-      <template #value>
+      <template #definition>
         <span class="setting-value">
           {{ value }}
         </span>
       </template>
-    </TroubleshootingRow>
+    </BaseDescriptiveList>
   </div>
 </template>
 
 <script>
 import VueTypes from 'vue-types';
-import TroubleshootingRow from '@/components/TroubleshootingRow/TroubleshootingRow.vue';
+import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
 
 export default {
   name: 'TroubleshootingSettings',
   components: {
-    TroubleshootingRow,
+    BaseDescriptiveList,
   },
   props: {
     settings: VueTypes.array.def([]),
