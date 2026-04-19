@@ -44,6 +44,8 @@
     "TROUBLESHOOTING_LABEL_SITE_NAME": "Site Name",
     "TROUBLESHOOTING_LABEL_VERSION": "Version",
     "TROUBLESHOOTING_LABEL_WORDPRESS": "WordPress",
+    "TROUBLESHOOTING_VALUE_NO": "No",
+    "TROUBLESHOOTING_VALUE_YES": "Yes",
     "TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION": "Your version of {label} is an unsupported development version.",
     "TROUBLESHOOTING_VERSION_IS_OUTDATED": "Your version of {label} is outdated. Please update to version {versionRequired}.",
     "TROUBLESHOOTING_VERSION_IS_UP_TO_DATE": "Your version of {label} is up-to-date."

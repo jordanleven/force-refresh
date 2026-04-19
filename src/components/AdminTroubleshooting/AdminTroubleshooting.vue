@@ -195,7 +195,9 @@ export default {
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_MULTISITE_INSTALLATION'),
-          value: this.troubleshootingInfo.isMultiSite,
+          value: this.troubleshootingInfo.isMultiSite
+            ? this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_YES')
+            : this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NO'),
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_CURRENT_SITE_ID'),
