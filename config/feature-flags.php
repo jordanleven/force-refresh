@@ -9,5 +9,7 @@
  */
 
 return array(
-    'scheduledRefresh' => false,
+    'scheduledRefresh'           => false,
+    'troubleshootingTerminal'    => false,
+    'troubleshootingSubmitDebug' => false,
 );
