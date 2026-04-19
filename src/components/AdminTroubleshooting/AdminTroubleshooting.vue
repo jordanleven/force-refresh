@@ -83,7 +83,7 @@
 
     <div class="page-footer">
       <button
-        class="button"
+        class="button-primary"
         data-test="btn-exit-troubleshooting"
         @click="exitTroubleshooting"
       >
