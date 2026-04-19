@@ -40,4 +40,4 @@ Upload the Force Refresh plugin to your site, and then simply activate it. To fo
 3. Choose from popular refresh intervals or set a custom one. You'll receive confirmation that browsers were requested to refresh.
 4. To refresh a single page or post, locate the "Force Refresh" section under any page.
 5. Want to see the latest features? Clicking "View Release Notes" will display the most recent features and fixes for Force Refresh.
-6. If you're having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow you to enter Debugging Mode — an enhanced browser console logging mode that can be used to diagnose issues.
+6. If you're having trouble, clicking on "Troubleshooting" will allow you to view the current settings for Force Refresh and allow you to enter Debugging Mode: an enhanced browser console logging mode that can be used to diagnose issues.
