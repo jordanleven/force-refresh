@@ -16,6 +16,8 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use "@/scss/variables" as var;
+
 .descriptive-list {
   display: flex;
   align-items: center;
@@ -23,8 +25,8 @@ export default {
   padding: 0.625rem 1.125rem;
   font-size: 0.844rem;
   font-weight: 400;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-  border-bottom: 1px solid rgb(0, 0, 0, 4%);
+  font-family: var.$font-family-system;
+  border-bottom: 1px solid var.$border-subtle;
   margin: 0;
 
   dt,
@@ -36,13 +38,13 @@ export default {
 
   dt {
     flex: 1;
-    color: #1d1d1f;
+    color: var.$text-primary;
   }
 
   dd {
     text-align: right;
     margin-left: auto;
-    color: #6e6e73;
+    color: var.$text-secondary;
   }
 
   &:last-child {

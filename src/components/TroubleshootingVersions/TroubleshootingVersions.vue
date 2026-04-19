@@ -84,11 +84,11 @@ export default {
   display: flex;
   align-items: center;
   gap: var.$space-small;
-  color: #1d1d1f;
+  color: var.$text-primary;
 }
 
 .plugin-versions__version {
-  color: #6e6e73;
+  color: var.$text-secondary;
 }
 
 .tip-dot {
@@ -103,8 +103,8 @@ export default {
   width: 0.875rem;
   height: 0.875rem;
   border-radius: 50%;
-  background: #34c759;
-  box-shadow: 0 0 0 2.5px rgb(52, 199, 89, 20%);
+  background: var.$green-bright;
+  box-shadow: 0 0 0 2.5px rgba(var.$green-bright, 0.2);
 
   &::after {
     content: "✓";
@@ -120,11 +120,11 @@ export default {
   width: 0.875rem;
   height: 0.875rem;
   border-radius: 50%;
-  background: #ff3b30;
+  background: var.$red;
   color: #fff;
   font-size: 0.5625rem;
   font-weight: 800;
-  box-shadow: 0 0 0 0 rgb(255, 59, 48, 40%);
+  box-shadow: 0 0 0 0 rgba(var.$red, 0.4);
   animation: pulse-red 1.6s ease-out infinite;
 
   &::after {
@@ -134,14 +134,14 @@ export default {
 }
 
 @keyframes pulse-red {
-  0%   { box-shadow: 0 0 0 0 rgb(255, 59, 48, 45%); }
-  70%  { box-shadow: 0 0 0 0.375rem rgb(255, 59, 48, 0%); }
-  100% { box-shadow: 0 0 0 0 rgb(255, 59, 48, 0%); }
+  0%   { box-shadow: 0 0 0 0 rgba(var.$red, 0.45); }
+  70%  { box-shadow: 0 0 0 0.375rem rgba(var.$red, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(var.$red, 0); }
 }
 
 /* Orange — FA triangle for pre-release */
 .tip-dot--prerelease {
-  color: #ff9f0a;
+  color: var.$orange-bright;
   font-size: 0.875rem;
   flex-shrink: 0;
 }

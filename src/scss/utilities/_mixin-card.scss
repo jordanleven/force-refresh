@@ -1,16 +1,15 @@
-$card-bg-default: rgb(255, 255, 255, 55%);
-$card-border-default: rgb(255, 255, 255, 70%);
-$card-border-bottom-default: rgb(0, 0, 0, 6%);
+@use "@/scss/variables" as var;
+
 $card-blur-default: blur(28px) saturate(1.8);
-$card-shadow-default: 0 8px 32px rgb(0, 0, 0, 10%), 0 2px 8px rgb(0, 0, 0, 6%), inset 0 1px 0 rgb(255, 255, 255, 80%);
+$card-shadow-default: 0 8px 32px rgba(var.$black, 0.1), 0 2px 8px rgba(var.$black, 0.06), inset 0 1px 0 rgba(var.$white, 0.8);
 $card-radius-default: 1.25rem;
 
-@mixin card-surface($bg: $card-bg-default) {
+@mixin card-surface($bg: var.$surface-glass) {
   background: $bg;
   backdrop-filter: $card-blur-default;
   border-radius: $card-radius-default;
   box-shadow: $card-shadow-default;
-  border: 1px solid $card-border-default;
-  border-bottom-color: $card-border-bottom-default;
+  border: 1px solid var.$surface-glass-border;
+  border-bottom-color: var.$surface-glass-border-bottom;
   overflow: hidden;
 }

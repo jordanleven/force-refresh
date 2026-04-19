@@ -225,15 +225,13 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-$card-bg-heavy: rgb(255, 255, 255, 72%);
 $card-radius: 1.25rem;
-$blue: #0071e3;
 
 .force-refresh-troubleshooting {
   width: 100%;
   margin: -0.625rem -1.5rem 0;
   padding: var.$space-large var.$space-large 5rem;
-  background: #f0f2f5;
+  background: var.$surface-subtle;
 }
 
 .info-card {
@@ -242,7 +240,7 @@ $blue: #0071e3;
 
 .info-card__header {
   padding: 0.75rem var.$space-medium 0.625rem;
-  border-bottom: 1px solid rgb(0, 0, 0, 5%);
+  border-bottom: 1px solid var.$border-subtle-strong;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -251,7 +249,7 @@ $blue: #0071e3;
 .card-title {
   font-size: 0.6875rem;
   font-weight: 600;
-  color: #aeaeb2;
+  color: var.$text-tertiary;
   text-transform: uppercase;
   letter-spacing: 0.07em;
 }
@@ -263,7 +261,7 @@ $blue: #0071e3;
 }
 
 .debug-banner {
-  @include utils.card-surface($card-bg-heavy);
+  @include utils.card-surface(var.$surface-glass-heavy);
 
   padding: var.$space-medium 1.375rem;
   display: flex;
@@ -280,14 +278,14 @@ $blue: #0071e3;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: rgb(0, 113, 227, 12%);
+  background: rgba(var.$brand-blue-strong, 0.12);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgb(0, 113, 227, 15%);
-  box-shadow: inset 0 1px 0 rgb(255, 255, 255, 50%);
+  border: 1px solid rgba(var.$brand-blue-strong, 0.15);
+  box-shadow: inset 0 1px 0 rgba(var.$white, 0.5);
   transition: background 0.2s ease, border-color 0.2s ease;
 
   &--active {
@@ -297,7 +295,7 @@ $blue: #0071e3;
 }
 
 .debug-icon {
-  color: $blue;
+  color: var.$brand-blue-strong;
   font-size: 1.125rem;
   opacity: 0.3;
   transition: color 0.2s ease, opacity 0.2s ease;
@@ -316,14 +314,14 @@ $blue: #0071e3;
 .debug-banner-title {
   font-size: 0.9375rem;
   font-weight: 600;
-  color: #1d1d1f;
+  color: var.$text-primary;
   letter-spacing: -0.0125rem;
   margin-bottom: 0.0625rem;
 }
 
 .debug-banner-sub {
   font-size: 0.8125rem;
-  color: #6e6e73;
+  color: var.$text-secondary;
   line-height: 1.45;
 }
 
@@ -335,25 +333,23 @@ $blue: #0071e3;
 }
 
 .debug-submit-row {
-  background: rgb(0, 113, 227, 6%);
+  background: rgba(var.$brand-blue-strong, 0.06);
   backdrop-filter: blur(28px) saturate(1.8);
-  border: 1px solid rgb(255, 255, 255, 60%);
-  border-top: 1px solid rgb(0, 113, 227, 10%);
+  border: 1px solid rgba(var.$white, 0.6);
+  border-top: 1px solid rgba(var.$brand-blue-strong, 0.1);
   border-radius: 0 0 $card-radius $card-radius;
   padding: 0.75rem 1.375rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-top: -1px;
-  box-shadow: 0 8px 24px rgb(0, 0, 0, 7%), inset 0 -1px 0 rgb(255, 255, 255, 50%);
-  overflow: hidden;
-  animation: expand-down 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+  box-shadow: 0 8px 24px rgba(var.$black, 0.07), inset 0 -1px 0 rgba(var.$white, 0.5);
 }
 
 
 .debug-submit-label {
   font-size: 0.8125rem;
-  color: #6e6e73;
+  color: var.$text-secondary;
 }
 
 // ── Buttons ──────────────────────────────────────────────────────────────────
@@ -375,22 +371,22 @@ $blue: #0071e3;
 }
 
 .btn-blue {
-  background: $blue;
-  color: #fff;
-  box-shadow: 0 2px 8px rgb(0, 113, 227, 35%), inset 0 1px 0 rgb(255, 255, 255, 20%);
+  background: var.$brand-blue-strong;
+  color: var.$white;
+  box-shadow: 0 2px 8px rgba(var.$brand-blue-strong, 0.35), inset 0 1px 0 rgba(var.$white, 0.2);
 
   &:hover { filter: brightness(1.07); }
   &:active { transform: scale(0.97); }
 }
 
 .btn-frosted {
-  background: rgb(255, 255, 255, 60%);
+  background: rgba(var.$white, 0.6);
   backdrop-filter: blur(12px);
-  color: #1d1d1f;
-  border: 1px solid rgb(255, 255, 255, 80%);
-  box-shadow: 0 2px 8px rgb(0, 0, 0, 8%), inset 0 1px 0 rgb(255, 255, 255, 90%);
+  color: var.$text-primary;
+  border: 1px solid rgba(var.$white, 0.8);
+  box-shadow: 0 2px 8px rgba(var.$black, 0.08), inset 0 1px 0 rgba(var.$white, 0.9);
 
-  &:hover { background: rgb(255, 255, 255, 75%); }
+  &:hover { background: rgba(var.$white, 0.75); }
 }
 
 // ── Content grid ─────────────────────────────────────────────────────────────

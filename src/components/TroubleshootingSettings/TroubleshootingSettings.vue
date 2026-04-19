@@ -32,7 +32,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use "@/scss/variables" as var;
+
 .setting-value {
-  color: #6e6e73;
+  color: var.$text-secondary;
 }
 </style>
