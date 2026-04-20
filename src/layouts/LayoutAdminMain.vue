@@ -431,7 +431,6 @@ export default {
     transform var.$transition-medium cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-// Entering troubleshooting — both pages move upward
 .page-enter-enter-from {
   opacity: 0;
   transform: translateY(1rem);
@@ -442,7 +441,6 @@ export default {
   transform: translateY(-1rem);
 }
 
-// Exiting troubleshooting — both pages move downward
 .page-exit-enter-from {
   opacity: 0;
   transform: translateY(-1rem);
