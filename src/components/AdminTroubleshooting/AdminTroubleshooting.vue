@@ -279,13 +279,13 @@ $card-radius: 1.25rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 0.75rem;
-  background: rgba(var.$brand-blue-strong, 0.12);
+  background: rgba(var.$blue, 0.12);
   backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(var.$brand-blue-strong, 0.15);
+  border: 1px solid rgba(var.$blue, 0.15);
   box-shadow: inset 0 1px 0 rgba(var.$white, 0.5);
   transition: background 0.2s ease, border-color 0.2s ease;
 
@@ -296,7 +296,7 @@ $card-radius: 1.25rem;
 }
 
 .debug-icon {
-  color: var.$brand-blue-strong;
+  color: var.$blue;
   font-size: 1.125rem;
   opacity: 0.2;
   transition: color 0.2s ease, opacity 0.2s ease;
@@ -334,10 +334,10 @@ $card-radius: 1.25rem;
 }
 
 .debug-submit-row {
-  background: rgba(var.$brand-blue-strong, 0.06);
+  background: rgba(var.$blue, 0.06);
   backdrop-filter: blur(28px) saturate(1.8);
   border: 1px solid rgba(var.$white, 0.6);
-  border-top: 1px solid rgba(var.$brand-blue-strong, 0.1);
+  border-top: 1px solid rgba(var.$blue, 0.1);
   border-radius: 0 0 $card-radius $card-radius;
   padding: 0.75rem 1.375rem;
   display: flex;
@@ -371,9 +371,9 @@ $card-radius: 1.25rem;
 }
 
 .btn-blue {
-  background: var.$brand-blue-strong;
+  background: var.$blue;
   color: var.$white;
-  box-shadow: 0 2px 8px rgba(var.$brand-blue-strong, 0.35), inset 0 1px 0 rgba(var.$white, 0.2);
+  box-shadow: 0 2px 8px rgba(var.$blue, 0.35), inset 0 1px 0 rgba(var.$white, 0.2);
 
   &:hover { filter: brightness(1.07); }
   &:active { transform: scale(0.97); }

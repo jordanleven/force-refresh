@@ -103,8 +103,8 @@ export default {
   width: 0.875rem;
   height: 0.875rem;
   border-radius: 50%;
-  background: var.$green-bright;
-  box-shadow: 0 0 0 2.5px rgba(var.$green-bright, 0.2);
+  background: var.$green;
+  box-shadow: 0 0 0 2.5px rgba(var.$green, 0.2);
 
   &::after {
     content: "✓";
@@ -141,7 +141,7 @@ export default {
 
 /* Orange — FA triangle for pre-release */
 .tip-dot--prerelease {
-  color: var.$orange-bright;
+  color: var.$orange;
   font-size: 0.875rem;
   flex-shrink: 0;
 }
