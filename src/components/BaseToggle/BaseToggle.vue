@@ -41,7 +41,7 @@ export default {
 <style scoped lang="scss">
 @use "@/scss/variables" as var;
 
-$toggle-height: 30px;
+$toggle-height: 25px;
 $padding: $toggle-height * 0.1;
 
 .c-base-toggle {
@@ -51,7 +51,7 @@ $padding: $toggle-height * 0.1;
 label {
   cursor: pointer;
   text-indent: -9999px;
-  width: $toggle-height * 2;
+  width: $toggle-height * 2.3;
   height: $toggle-height;
   background: grey;
   display: block;
@@ -64,7 +64,7 @@ label {
     position: absolute;
     top: $padding;
     left: $padding;
-    width: $toggle-height - ($padding * 2);
+    width: $toggle-height * 1.5 - ($padding * 2);
     height: $toggle-height - ($padding * 2);
     background: #fff;
     border-radius: $toggle-height - ($padding * 2);
@@ -81,7 +81,7 @@ input[type="checkbox"] {
   visibility: hidden;
 
   &:checked + label {
-    background: var.$green;
+    background: var.$blue;
 
     &::after {
       left: calc(100% - #{$padding});
