@@ -56,12 +56,7 @@ export const screenshots: ScreenshotDefinition[] = [
       { type: 'ensureSidebarCollapsed' },
       { type: 'click', selector: '[data-test="btn-schedule-refresh"]' },
       { type: 'waitForSelector', selector: '#schedule-datetime-picker' },
-      {
-        type: 'highlightElement',
-        selector: '#schedule-datetime-picker',
-        padding: 10,
-      },
-      { type: 'waitForTimeout', ms: 300 },
+      { type: 'waitForTimeout', ms: 1200 },
     ],
   },
   {
