@@ -2,17 +2,24 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faBug } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
+import { createStore } from 'vuex';
 import TroubleshootingDebug from './TroubleshootingDebug.vue';
 
 library.add(faBug);
+
+const createVuexStore = (isSubmitDebugEnabled) => createStore({
+  getters: {
+    isFeatureEnabled: () => (flag) => flag === 'troubleshootingSubmitDebug' && isSubmitDebugEnabled,
+  },
+});
 
 const getWrapper = ({ isDebugActive = false, isSubmitDebugEnabled = false } = {}) => shallowMount(TroubleshootingDebug, {
   global: {
     components: { FontAwesomeIcon },
     mocks: {
       $t: (key) => key,
-      isFeatureEnabled: (flag) => flag === 'troubleshootingSubmitDebug' && isSubmitDebugEnabled,
     },
+    plugins: [createVuexStore(isSubmitDebugEnabled)],
   },
   props: {
     isDebugActive,
