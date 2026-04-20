@@ -5,12 +5,12 @@
         <BaseTooltip :content="versionTip">
           <span
             v-if="!versionIsDevelopmentVersion"
-            class="tip-dot"
+            class="status-dot"
             :class="statusDotClass"
           />
           <font-awesome-icon
             v-else
-            class="tip-dot--prerelease"
+            class="status-dot status-dot--prerelease"
             :icon="faTriangleExclamation"
           />
         </BaseTooltip>
@@ -51,8 +51,8 @@ export default {
   },
   computed: {
     statusDotClass() {
-      if (this.versionIsOutdated) return 'tip-dot--red';
-      return 'tip-dot--green';
+      if (this.versionIsOutdated) return 'status-dot--red';
+      return 'status-dot--green';
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
@@ -91,46 +91,49 @@ export default {
   color: var.$text-secondary;
 }
 
-.tip-dot {
+.status-dot {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   margin-right: 0.25rem;
-}
 
-/* Green — circle with checkmark */
-.tip-dot--green {
-  width: 0.875rem;
-  height: 0.875rem;
-  border-radius: 50%;
-  background: var.$green;
-  box-shadow: 0 0 0 2.5px rgba(var.$green, 0.2);
+  &--green {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: var.$green;
+    box-shadow: 0 0 0 2.5px rgba(var.$green, 0.2);
 
-  &::after {
-    content: "✓";
-    color: #fff;
-    font-size: 0.5rem;
-    font-weight: 900;
-    line-height: 1;
+    &::after {
+      content: "✓";
+      color: #fff;
+      font-size: 0.5rem;
+      font-weight: 900;
+      line-height: 1;
+    }
   }
-}
 
-/* Red — filled circle with ! */
-.tip-dot--red {
-  width: 0.875rem;
-  height: 0.875rem;
-  border-radius: 50%;
-  background: var.$red;
-  color: #fff;
-  font-size: 0.5625rem;
-  font-weight: 800;
-  box-shadow: 0 0 0 0 rgba(var.$red, 0.4);
-  animation: pulse-red 1.6s ease-out infinite;
+  &--red {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-radius: 50%;
+    background: var.$red;
+    color: #fff;
+    font-size: 0.5625rem;
+    font-weight: 800;
+    box-shadow: 0 0 0 0 rgba(var.$red, 0.4);
+    animation: pulse-red 1.6s ease-out infinite;
 
-  &::after {
-    content: "!";
-    line-height: 1;
+    &::after {
+      content: "!";
+      line-height: 1;
+    }
+  }
+
+  &--prerelease {
+    color: var.$orange;
+    font-size: 0.875rem;
   }
 }
 
@@ -138,12 +141,5 @@ export default {
   0%   { box-shadow: 0 0 0 0 rgba(var.$red, 0.45); }
   70%  { box-shadow: 0 0 0 0.375rem rgba(var.$red, 0); }
   100% { box-shadow: 0 0 0 0 rgba(var.$red, 0); }
-}
-
-/* Orange — FA triangle for pre-release */
-.tip-dot--prerelease {
-  color: var.$orange;
-  font-size: 0.875rem;
-  flex-shrink: 0;
 }
 </style>
