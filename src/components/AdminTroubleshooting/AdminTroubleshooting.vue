@@ -1,49 +1,9 @@
 <template>
   <div class="force-refresh-troubleshooting">
-    <div class="debug-panel">
-      <div
-        class="debug-panel__banner"
-        :class="debugBannerClasses"
-      >
-        <div
-          class="debug-panel__icon-wrap"
-          :class="debugIconWrapClasses"
-        >
-          <font-awesome-icon
-            class="debug-panel__icon"
-            :class="debugIconClasses"
-            :icon="faBug"
-          />
-        </div>
-        <div class="debug-panel__body">
-          <div class="debug-panel__title">
-            {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_DEBUG_MODE') }}
-          </div>
-          <div class="debug-panel__subtitle">
-            {{ debugCopy }}
-          </div>
-        </div>
-        <div class="debug-panel__actions">
-          <BaseToggle
-            data-test="toggle-debug-mode"
-            :is-checked="isDebugActive"
-            @toggled="toggleDebugMode"
-          />
-        </div>
-      </div>
-
-      <div
-        v-if="isSubmitDebugRowVisible"
-        class="debug-panel__submit-row"
-      >
-        <span class="debug-panel__submit-label">
-          {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
-        </span>
-        <button class="btn btn-blue">
-          {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
-        </button>
-      </div>
-    </div>
+    <TroubleshootingDebug
+      :is-debug-active="isDebugActive"
+      @toggled="toggleDebugMode"
+    />
 
     <div
       class="content-grid"
@@ -94,22 +54,18 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapGetters } from 'vuex';
-import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
 import TroubleshootingConsole from '@/components/TroubleshootingConsole/TroubleshootingConsole.vue';
+import TroubleshootingDebug from '@/components/TroubleshootingDebug/TroubleshootingDebug.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
 import TroubleshootingVersionsList from '@/components/TroubleshootingVersionsList/TroubleshootingVersionsList.vue';
-
-library.add(faBug);
 
 export default {
   name: 'AdminTroubleshooting',
   components: {
-    BaseToggle,
     TroubleshootingConsole,
+    TroubleshootingDebug,
     TroubleshootingSettings,
     TroubleshootingVersionsList,
   },
@@ -206,9 +162,6 @@ export default {
       ];
     },
     ...mapGetters(['isFeatureEnabled']),
-  },
-  created() {
-    this.faBug = faBug;
   },
   methods: {
     exitTroubleshooting() {
