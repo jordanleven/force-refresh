@@ -96,6 +96,7 @@ export default {
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  margin-right: 0.25rem;
 }
 
 /* Green — circle with checkmark */
