@@ -4,12 +4,12 @@ $card-blur-default: blur(28px) saturate(1.8);
 $card-shadow-default: 0 8px 32px rgba(var.$black, 0.1), 0 2px 8px rgba(var.$black, 0.06), inset 0 1px 0 rgba(var.$white, 0.8);
 $card-radius-default: 0.75rem;
 
-@mixin card-surface($bg: var.$surface-frosted) {
+@mixin card-surface($bg: var.$card-surface) {
   background: $bg;
   backdrop-filter: $card-blur-default;
   border-radius: $card-radius-default;
   box-shadow: $card-shadow-default;
-  border: 1px solid var.$surface-frosted-border;
-  border-bottom-color: var.$surface-frosted-border-bottom;
+  border: 1px solid var.$card-border;
+  border-bottom-color: var.$card-border-bottom;
   overflow: hidden;
 }
