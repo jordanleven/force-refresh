@@ -140,7 +140,7 @@ export default {
       faBug,
       faTriangleExclamation,
       notificationMessage: {},
-      pageTransitionName: 'page-enter',
+      pageTransitionName: null,
       releaseNotesPageActive: false,
       scheduleRefreshPageActive: false,
       troubleshootingPageIsActive: isTroubleshootingViewActiveOnLoad(),
