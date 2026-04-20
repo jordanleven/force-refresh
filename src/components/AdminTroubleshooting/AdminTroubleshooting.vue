@@ -297,7 +297,7 @@ $card-radius: 1.25rem;
 .debug-icon {
   color: var.$brand-blue-strong;
   font-size: 1.125rem;
-  opacity: 0.3;
+  opacity: 0.2;
   transition: color 0.2s ease, opacity 0.2s ease;
 
   &--active {
