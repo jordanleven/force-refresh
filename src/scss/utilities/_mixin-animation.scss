@@ -22,3 +22,4 @@
 @mixin animation($animation-name, $speed: 2s , $timing-function: infinite, $delay : null) {
   animation: string.unquote($animation-name) $speed $timing-function $delay;
 }
+

@@ -94,32 +94,6 @@ export default {
         this.isTerminalEnabled && 'content-grid--with-terminal',
       ];
     },
-    debugBannerClasses() {
-      return [
-        this.isSubmitDebugRowVisible && 'debug-panel__banner--open',
-      ];
-    },
-    debugCopy() {
-      return this.isDebugActive
-        ? this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_ACTIVE')
-        : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODE_DESCRIPTION_INACTIVE');
-    },
-    debugIconClasses() {
-      return [
-        this.isDebugActive && 'debug-panel__icon--active',
-      ];
-    },
-    debugIconWrapClasses() {
-      return [
-        this.isDebugActive && 'debug-panel__icon-wrap--active',
-      ];
-    },
-    isSubmitDebugEnabled() {
-      return this.isFeatureEnabled('troubleshootingSubmitDebug');
-    },
-    isSubmitDebugRowVisible() {
-      return this.isDebugActive && this.isSubmitDebugEnabled;
-    },
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');
     },
