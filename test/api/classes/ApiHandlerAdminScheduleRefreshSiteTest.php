@@ -91,6 +91,20 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     private static $mock_add_action;
 
     /**
+     * Mock for `update_option`.
+     *
+     * @var Mocks\Mock_Update_Option
+     */
+    private static $mock_update_option;
+
+    /**
+     * Mock for `wp_doing_cron`.
+     *
+     * @var Mocks\Mock_Wp_Doing_Cron
+     */
+    private static $mock_wp_doing_cron;
+
+    /**
      * Mock for `get_current_blog_id`.
      *
      * @var Mocks\Mock_Get_Current_Blog_Id
@@ -133,6 +147,8 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_wp_clear_scheduled_hook  = new Mocks\Mock_Wp_Clear_Scheduled_Hook( __NAMESPACE__ );
         self::$mock_register_rest_route      = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
         self::$mock_add_action               = new Mocks\Mock_Add_Action( __NAMESPACE__ );
+        self::$mock_update_option            = new Mocks\Mock_Update_Option( __NAMESPACE__ );
+        self::$mock_wp_doing_cron            = new Mocks\Mock_Wp_Doing_Cron( __NAMESPACE__ );
         self::$mock_get_current_blog_id      = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
         self::$mock_get_rest_url             = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
         self::$mock_current_user_can         = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
@@ -154,6 +170,8 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_wp_clear_scheduled_hook->disable();
         self::$mock_register_rest_route->disable();
         self::$mock_add_action->disable();
+        self::$mock_update_option->disable();
+        self::$mock_wp_doing_cron->disable();
         self::$mock_get_current_blog_id->disable();
         self::$mock_get_rest_url->disable();
         self::$mock_current_user_can->disable();
@@ -177,8 +195,8 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     public function testRegisterActionsRegistersHook() {
         self::$mock_add_action->resetInvocationIndex();
         ( new Api_Handler_Admin_Schedule_Refresh_Site() )->register_actions();
-        $args = self::$mock_add_action->get_invocation_arguments( 0 );
-        $this->assertEquals( 'force_refresh_scheduled_site_refresh', $args[0] );
+        $this->assertEquals( 'init', self::$mock_add_action->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 'force_refresh_scheduled_site_refresh', self::$mock_add_action->get_last_invocation_arguments()[0] );
     }
 
     /**
@@ -193,6 +211,42 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
 
         $this->assertEquals( 'force_refresh_current_site_version', self::$mock_delete_option->get_invocation_arguments( 0 )[0] );
         $this->assertEquals( 'force_refresh_current_site_version', self::$mock_add_option->get_invocation_arguments( 0 )[0] );
+    }
+
+    /**
+     * Test that track_cron_run saves the latest cron timestamp during cron requests.
+     */
+    public function testTrackCronRunSavesLatestCronTimestampDuringCronRequests() {
+        self::$mock_wp_doing_cron->set_return_value( true );
+        self::$mock_update_option->resetInvocationIndex();
+
+        ( new Api_Handler_Admin_Schedule_Refresh_Site() )->track_cron_run();
+
+        $this->assertLastCronRunWasUpdated();
+    }
+
+    /**
+     * Test that track_cron_run does nothing outside cron requests.
+     */
+    public function testTrackCronRunSkipsNonCronRequests() {
+        self::$mock_wp_doing_cron->set_return_value( false );
+        $initial_invocation_count = self::$mock_update_option->get_invocation_count();
+
+        ( new Api_Handler_Admin_Schedule_Refresh_Site() )->track_cron_run();
+
+        $this->assertSame( $initial_invocation_count, self::$mock_update_option->get_invocation_count() );
+    }
+
+    /**
+     * Assert that the last cron run option was updated with a timestamp.
+     *
+     * @return void
+     */
+    private function assertLastCronRunWasUpdated(): void {
+        $args = self::$mock_update_option->get_last_invocation_arguments();
+
+        $this->assertEquals( 'force_refresh_last_cron_run', $args[0] );
+        $this->assertIsInt( $args[1] );
     }
 
     /**

@@ -32,6 +32,10 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
 
     const ACTION_NAME_SCHEDULE_REFRESH_SITE = 'force_refresh_scheduled_site_refresh';
 
+    const ENDPOINT_PATH_CRON_STATUS = '/cron-status';
+
+    const OPTION_NAME_LAST_CRON_RUN = 'force_refresh_last_cron_run';
+
     /**
      * Method for registering the endpoints for this class.
      *
@@ -52,6 +56,16 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
                     'callback'            => array( $this, 'schedule_refresh_site' ),
                     'permission_callback' => $this->get_admin_permission_callback(),
                 ),
+            ),
+        );
+
+        self::register_rest_endpoint(
+            self::ENDPOINT_PATH_CRON_STATUS,
+            self::ENDPOINT_VERSION,
+            array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( $this, 'get_cron_status' ),
+                'permission_callback' => $this->get_admin_permission_callback(),
             ),
         );
 
@@ -82,7 +96,21 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return  void
      */
     public function register_actions(): void {
+        add_action( 'init', array( $this, 'track_cron_run' ) );
         add_action( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $this, 'executeSiteRefresh' ) );
+    }
+
+    /**
+     * Record the most recent WordPress cron request timestamp.
+     *
+     * @return void
+     */
+    public function track_cron_run(): void {
+        if ( ! wp_doing_cron() ) {
+            return;
+        }
+
+        self::save_last_cron_run( time() );
     }
 
     /**
@@ -95,6 +123,27 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     public function executeSiteRefresh( string $uuid ): void {
         $site_version = Versions_Storage_Service::get_new_version();
         Versions_Storage_Service::set_site_version( $site_version );
+    }
+
+    /**
+     * Method for getting the timestamp of the last cron execution.
+     *
+     * @return int|null Unix timestamp of the last run, or null if never run.
+     */
+    public static function get_last_cron_run(): ?int {
+        $value = get_option( self::OPTION_NAME_LAST_CRON_RUN, null );
+        return null !== $value ? (int) $value : null;
+    }
+
+    /**
+     * Persist the latest tracked cron run timestamp.
+     *
+     * @param int $timestamp The Unix timestamp for the cron run.
+     *
+     * @return void
+     */
+    private static function save_last_cron_run( int $timestamp ): void {
+        update_option( self::OPTION_NAME_LAST_CRON_RUN, $timestamp );
     }
 
     /**
@@ -320,11 +369,35 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     }
 
     /**
+     * Returns the cron status for this site.
+     *
+     * @return \WP_REST_Response
+     */
+    public function get_cron_status(): \WP_REST_Response {
+        return $this->return_api_response(
+            \WP_Http::OK,
+            'Successfully retrieved cron status.',
+            array(
+                'last_cron_run' => self::get_last_cron_run(),
+            )
+        );
+    }
+
+    /**
      * Method for getting the endpoint for this service.
      *
      * @return  string  The service endpoint.
      */
     public static function get_rest_endpoint(): string {
         return self::get_formatted_rest_endpoint( self::ENDPOINT_PATH, self::ENDPOINT_VERSION );
+    }
+
+    /**
+     * Method for getting the cron status endpoint.
+     *
+     * @return string The cron status endpoint.
+     */
+    public static function get_rest_endpoint_cron_status(): string {
+        return self::get_formatted_rest_endpoint( self::ENDPOINT_PATH_CRON_STATUS, self::ENDPOINT_VERSION );
     }
 }

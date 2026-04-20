@@ -125,7 +125,7 @@ export default {
     .admin-header-badge__icon,
     .admin-header-badge__label {
       position: relative;
-      z-index: 1;
+      z-index: var.$z-index-base;
     }
   }
 }

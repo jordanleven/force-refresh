@@ -332,7 +332,7 @@ export default {
   border-bottom: 0;
   position: sticky;
   top: 0;
-  z-index: 2;
+  z-index: var.$z-index-sticky;
 }
 
 .release-note-group__title {

@@ -347,11 +347,11 @@ export default {
 }
 
 .admin-section__main {
-  z-index: 1;
+  z-index: var.$z-index-base;
 }
 
 .admin-section__troubleshooting {
-  z-index: 2;
+  z-index: var.$z-index-sticky;
 }
 
 .page-enter-enter-active,

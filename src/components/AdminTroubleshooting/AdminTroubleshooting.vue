@@ -56,7 +56,7 @@
 
 <script>
 import VueTypes from 'vue-types';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import TroubleshootingConsole from '@/components/TroubleshootingConsole/TroubleshootingConsole.vue';
 import TroubleshootingDebug from '@/components/TroubleshootingDebug/TroubleshootingDebug.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
@@ -75,6 +75,8 @@ export default {
     troubleshootingInfo: VueTypes.shape({
       currentSiteId: VueTypes.number.isRequired,
       isMultiSite: VueTypes.bool.isRequired,
+      lastCronRun: VueTypes.number,
+      scheduledRefreshesCount: VueTypes.number.isRequired,
       siteName: VueTypes.string.isRequired,
       siteUrl: VueTypes.string.isRequired,
       versions: VueTypes.shape({
@@ -102,6 +104,13 @@ export default {
         siteUrl: this.troubleshootingInfo.siteUrl,
         versions: this.troubleshootingInfo.versions,
       };
+    },
+    formattedLastCronRun() {
+      if (!this.troubleshootingInfo.lastCronRun) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NEVER');
+      }
+
+      return this.formatTimestamp(this.troubleshootingInfo.lastCronRun);
     },
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');
@@ -144,13 +153,34 @@ export default {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_CURRENT_SITE_ID'),
           value: this.troubleshootingInfo.currentSiteId,
         },
+        {
+          label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_SCHEDULED_REFRESHES'),
+          value: this.troubleshootingInfo.scheduledRefreshesCount,
+        },
+        {
+          label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
+          value: this.formattedLastCronRun,
+        },
       ];
     },
     ...mapGetters(['isFeatureEnabled']),
   },
+  async created() {
+    await this.requestCronStatus();
+  },
   methods: {
+    ...mapActions(['requestCronStatus']),
     exitTroubleshooting() {
       this.$emit('exit-troubleshooting');
+    },
+    formatTimestamp(timestamp) {
+      return new Intl.DateTimeFormat('en-US', {
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }).format(new Date(timestamp * 1000));
     },
     toggleDebugMode(val) {
       this.$emit('debug-mode-was-updated', val);
@@ -185,6 +215,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var.$space-medium;
+    align-items: start;
 
     &--stacked {
       grid-template-columns: 1fr;

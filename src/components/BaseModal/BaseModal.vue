@@ -133,7 +133,7 @@ export default {
 .modal-window {
   position: fixed;
   inset: 0;
-  z-index: 100000;
+  z-index: var.$z-index-modal;
   display: flex;
   visibility: hidden;
   justify-content: center;
@@ -181,10 +181,9 @@ export default {
   }
 
   &--bottom-sheet {
-    background: rgb(245, 245, 247, 92%);
-    backdrop-filter: blur(60px) saturate(2.2);
+    background: var.$surface-subtle;
     box-shadow: 0 -1px 0 rgba(var.$black, 0.05), 0 -0.75rem 3.75rem rgba(var.$black, 0.18);
-    border-top: 1px solid rgba(var.$white, 0.7);
+    border-top: 1px solid rgba(var.$black, 0.06);
     max-height: 88vh;
     transform: translateY(100%);
     transition: transform 0.44s cubic-bezier(0.32, 0.72, 0, 1);

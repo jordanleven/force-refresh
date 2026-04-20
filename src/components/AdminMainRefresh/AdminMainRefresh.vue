@@ -120,6 +120,7 @@ export default {
   width: 100%;
   padding: 20px 10px 30px;
   text-align: center;
+
   @include utils.card-surface;
 }
 

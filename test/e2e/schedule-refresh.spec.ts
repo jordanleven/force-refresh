@@ -31,6 +31,30 @@ async function scheduleRefreshApiRequest(page: Page, method: 'POST' | 'DELETE', 
 }
 
 /**
+ * Returns all scheduled refreshes via the REST API.
+ */
+async function getScheduledRefreshesViaApi(page: Page): Promise<Array<{ id: string; timestamp: number }>> {
+  const response = await page.evaluate(async () => {
+    const { nonce } = (window as any).forceRefreshMain.localData;
+    const result = await fetch('/wp-json/force-refresh/v1/schedule-site-version', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': nonce,
+      },
+    });
+
+    return {
+      status: result.status,
+      json: await result.json(),
+    };
+  });
+
+  expect(response.status).toBe(200);
+  return response.json.data.scheduled_refreshes as Array<{ id: string; timestamp: number }>;
+}
+
+/**
  * Schedules a site refresh via the REST API and returns the scheduled event's id.
  */
 async function scheduleRefreshViaApi(page: Page, scheduledDate: Date): Promise<string> {
@@ -48,6 +72,17 @@ async function scheduleRefreshViaApi(page: Page, scheduledDate: Date): Promise<s
 async function deleteScheduledRefreshViaApi(page: Page, id: string): Promise<void> {
   const response = await scheduleRefreshApiRequest(page, 'DELETE', `/${id}`);
   expect(response.status).toBe(202);
+}
+
+/**
+ * Removes all scheduled refreshes so the test starts from a known state.
+ */
+async function clearScheduledRefreshesViaApi(page: Page): Promise<void> {
+  const scheduledRefreshes = await getScheduledRefreshesViaApi(page);
+
+  await Promise.all(
+    scheduledRefreshes.map(({ id }) => deleteScheduledRefreshViaApi(page, id)),
+  );
 }
 
 /**
@@ -95,7 +130,16 @@ async function selectScheduledRefreshInUi(page: Page, scheduledDate: Date): Prom
   await page.locator('.mx-time-column [data-type="ampm"] .mx-time-item', { hasText: meridiem }).click();
 }
 
-test.describe.skip('Schedule Refresh', () => {
+test.describe('Schedule Refresh', () => {
+  test.beforeAll(async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
+    const page = await context.newPage();
+    await goToPluginPage(page);
+    await clearScheduledRefreshesViaApi(page);
+    await page.close();
+    await context.close();
+  });
+
   test.describe('Scheduling modal', () => {
     test.describe.configure({ mode: 'serial' });
     let page: Page;
@@ -112,7 +156,7 @@ test.describe.skip('Schedule Refresh', () => {
     });
 
     test('Clicking "Schedule Refresh" opens the scheduling modal', async () => {
-      await expect(page.locator('.modal-window')).toBeVisible();
+      await expect(page.locator('[data-test="schedule-refresh-modal-content"]')).toBeVisible();
     });
 
     test('The modal contains a date picker', async () => {
@@ -126,18 +170,27 @@ test.describe.skip('Schedule Refresh', () => {
 
   test.describe('Scheduling through the UI', () => {
     test('Submitting the scheduling modal creates a scheduled refresh', async ({ page }) => {
+      const scheduledDate = tomorrowAtTenThirtyPm();
+
       await goToPluginPage(page);
       await page.locator('[data-test="btn-schedule-refresh"]').click();
 
-      await selectScheduledRefreshInUi(page, tomorrowAtTenThirtyPm());
-      await expect(page.locator('[data-test="btn-submit-schedule-refresh"]')).toBeEnabled();
-      await page.locator('[data-test="btn-submit-schedule-refresh"]').click({ force: true });
+      await selectScheduledRefreshInUi(page, scheduledDate);
+      const submitButton = page.locator('[data-test="btn-submit-schedule-refresh"]');
+      await expect(submitButton).toBeEnabled();
+
+      // Reuse the browser-formatted label instead of rebuilding it in Node,
+      // which avoids timezone drift between the test runner and the page.
+      const scheduledRefreshLabel = (await submitButton.innerText()).replace(/^Schedule refresh for /, '');
+      await submitButton.click({ force: true });
+
+      const scheduledRefreshItem = page.locator('.scheduled-refreshes__list li').filter({ hasText: scheduledRefreshLabel });
 
       await expect(page.locator('.notice-force-refresh.notice-success')).toBeVisible();
-      await expect(page.locator('.scheduled-refreshes__list li')).toHaveCount(1);
+      await expect(scheduledRefreshItem).toBeVisible();
 
-      await page.locator('[data-test="btn-delete-scheduled-refresh"]').click();
-      await expect(page.locator('.scheduled-refreshes__list')).not.toBeVisible();
+      await scheduledRefreshItem.getByRole('button', { name: 'Delete' }).click();
+      await expect(scheduledRefreshItem).toHaveCount(0);
     });
   });
 
@@ -150,6 +203,7 @@ test.describe.skip('Schedule Refresh', () => {
       const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
       page = await context.newPage();
       await goToPluginPage(page);
+      await clearScheduledRefreshesViaApi(page);
       scheduledId = await scheduleRefreshViaApi(page, oneHourFromNow());
       await page.reload();
       await page.locator('.scheduled-refreshes__list').waitFor();
@@ -164,19 +218,19 @@ test.describe.skip('Schedule Refresh', () => {
     });
 
     test('A scheduled refresh appears in the list', async () => {
-      await expect(page.locator('.scheduled-refreshes__list li')).toHaveCount(1);
+      await expect(page.locator(`[data-test="scheduled-refresh-${scheduledId}"]`)).toBeVisible();
     });
 
     test('The scheduled refresh shows a formatted date', async () => {
-      const text = await page.locator('.scheduled-refreshes__list li').first().textContent();
+      const text = await page.locator(`[data-test="scheduled-refresh-${scheduledId}"]`).textContent();
       // Matches "Month Day, Year at H:MM AM/PM"
       expect(text).toMatch(/\w+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (AM|PM)/);
     });
 
     test('Deleting a scheduled refresh removes it from the list', async () => {
-      await page.locator('[data-test="btn-delete-scheduled-refresh"]').click();
+      await page.locator(`[data-test="btn-delete-scheduled-refresh-${scheduledId}"]`).click();
+      await expect(page.locator(`[data-test="scheduled-refresh-${scheduledId}"]`)).toHaveCount(0);
       scheduledId = '';
-      await expect(page.locator('.scheduled-refreshes__list')).not.toBeVisible();
     });
   });
 

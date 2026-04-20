@@ -3,7 +3,10 @@
     :header="$t('SCHEDULE_REFRESH.HEADER')"
     v-bind="$attrs"
   >
-    <div class="admin-scheduled-refresh__inner">
+    <div
+      class="admin-scheduled-refresh__inner"
+      data-test="schedule-refresh-modal-content"
+    >
       <div>
         <p>{{ $t("SCHEDULE_REFRESH.DESCRIPTION") }}</p>
       </div>
@@ -79,7 +82,7 @@ export default {
 <style lang="scss">
   @use "@/scss/variables" as var;
   @use "@/scss/utilities" as utils;
-  @use 'vue-datepicker-next/scss/index';
+  @use 'vue-datepicker-next/scss/index' with ($popup-z-index: var.$z-index-datepicker);
 
   .admin-scheduled-refresh__inner {
     text-align: center;

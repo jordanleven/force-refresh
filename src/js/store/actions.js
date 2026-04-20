@@ -1,5 +1,6 @@
 import {
   deleteScheduledRefresh,
+  getCronStatus,
   getScheduledRefreshes,
   requestPostRefreshByPostID,
   requestSiteRefresh,
@@ -18,6 +19,12 @@ import {
 const isSuccess = (response) => response?.code && [200, 201, 202].includes(response.code);
 
 export default {
+  requestCronStatus: async ({ commit }) => {
+    const response = await getCronStatus();
+    if (isSuccess(response)) {
+      commit('SET_LAST_CRON_RUN', response.data.last_cron_run ?? null);
+    }
+  },
   requestDeleteScheduledRefresh: async ({ commit }, id) => {
     const response = await deleteScheduledRefresh(id);
     const success = isSuccess(response);

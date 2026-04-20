@@ -83,6 +83,7 @@ function get_admin_api_endpoints(): array {
         'refreshPage'         => Api_Handler_Admin_Refresh_Page::get_rest_endpoint(),
         'options'             => Api_Handler_Admin_Options::get_rest_endpoint(),
         'debugging'           => Api_Handler_Admin_Debugging::get_rest_endpoint(),
+        'cronStatus'          => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint_cron_status(),
         'scheduleRefreshSite' => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint(),
         'debugEmail'          => Api_Handler_Admin_Debug_Email::get_rest_endpoint(),
     );
@@ -100,6 +101,7 @@ function get_localized_data(): array {
         'localData' => array(
             'siteId'                      => get_current_blog_id(),
             'scheduledRefreshes'          => Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes(),
+            'lastCronRun'                 => Api_Handler_Admin_Schedule_Refresh_Site::get_last_cron_run(),
             // Create a nonce for the user.
             'nonce'                       => wp_create_nonce( 'wp_rest' ),
             'adminEndpoints'              => get_admin_api_endpoints(),

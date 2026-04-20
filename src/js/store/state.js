@@ -9,6 +9,7 @@ export default (localizedData) => ({
   },
   site: {
     isMultiSite: localizedData.isMultiSite,
+    lastCronRun: localizedData.lastCronRun ?? null,
     scheduledRefreshes: localizedData.scheduledRefreshes,
     siteId: localizedData.siteId,
     siteName: localizedData.siteName,

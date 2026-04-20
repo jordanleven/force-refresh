@@ -268,6 +268,7 @@ export default {
 
 .force-refresh-admin__options-inner {
   padding: 0 20px 10px;
+
   @include utils.card-surface;
 
   @include utils.small {
