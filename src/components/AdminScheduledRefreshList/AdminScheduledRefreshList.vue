@@ -254,7 +254,7 @@ export default {
     margin-left: var.$space-small;
 
     &:disabled {
-      color: var.$medium_grey;
+      color: var.$medium-grey;
       cursor: not-allowed;
     }
   }

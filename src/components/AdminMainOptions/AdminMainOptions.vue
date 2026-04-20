@@ -269,7 +269,7 @@ export default {
 .force-refresh-admin__options-inner {
   padding: 0 20px 10px;
   background-color: white;
-  border: 2px solid var.$light_grey;
+  border: 2px solid var.$light-grey;
   border-radius: 10px;
 
   @include utils.small {
