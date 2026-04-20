@@ -260,7 +260,7 @@ $card-radius: 1.25rem;
   margin-bottom: var.$space-medium;
 
   &__banner {
-    @include utils.card-surface(var.$surface-glass-heavy);
+    @include utils.card-surface(var.$surface-frosted-heavy);
 
     padding: var.$space-medium 1.375rem;
     display: flex;
