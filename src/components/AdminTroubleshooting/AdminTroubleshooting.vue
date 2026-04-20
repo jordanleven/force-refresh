@@ -236,6 +236,7 @@ $card-radius: 1.25rem;
 
 .info-card {
   @include utils.card-surface;
+
   padding-bottom: 0.25rem;
 }
 
