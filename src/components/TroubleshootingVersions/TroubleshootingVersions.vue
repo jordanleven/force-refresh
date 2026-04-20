@@ -106,7 +106,9 @@ export default {
   &--error {
     background: var.$red;
     box-shadow: 0 0 0 0 rgba(var.$red, 0.4);
+
     @include utils.animation('sonar-error', 1.6s, ease-out infinite);
+
     @include utils.generate-animation('sonar-error') {
       0%   { box-shadow: 0 0 0 0 rgba(var.$red, 0.45); }
       70%  { box-shadow: 0 0 0 0.375rem rgba(var.$red, 0); }
@@ -117,7 +119,9 @@ export default {
   &--warning {
     background: var.$orange;
     box-shadow: 0 0 0 0 rgba(var.$orange, 0.4);
+
     @include utils.animation('sonar-warning', 1.6s, ease-out infinite);
+
     @include utils.generate-animation('sonar-warning') {
       0%   { box-shadow: 0 0 0 0 rgba(var.$orange, 0.45); }
       70%  { box-shadow: 0 0 0 0.375rem rgba(var.$orange, 0); }
