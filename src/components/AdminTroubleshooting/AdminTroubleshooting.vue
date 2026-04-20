@@ -236,6 +236,7 @@ $card-radius: 1.25rem;
 
 .info-card {
   @include utils.card-surface;
+  padding-bottom: 0.25rem;
 }
 
 .info-card__header {
@@ -345,7 +346,6 @@ $card-radius: 1.25rem;
   margin-top: -1px;
   box-shadow: 0 8px 24px rgba(var.$black, 0.07), inset 0 -1px 0 rgba(var.$white, 0.5);
 }
-
 
 .debug-submit-label {
   font-size: 0.8125rem;
