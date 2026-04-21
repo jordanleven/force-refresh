@@ -33,11 +33,11 @@ describe('apiService', () => {
       expect(global.fetch).toHaveBeenCalledWith(`${EXAMPLE_URL}?postId=42`, expect.anything());
     });
 
-    it('returns { code, data } shaped from the HTTP status and response body', async () => {
+    it('returns { code, data, message } shaped from the HTTP status and response body', async () => {
       const data = { currentVersionSite: '1.0' };
-      global.fetch.mockResolvedValue(mockFetchResponse(200, { data }));
+      global.fetch.mockResolvedValue(mockFetchResponse(200, { data, message: 'OK' }));
       const result = await api.get(EXAMPLE_URL);
-      expect(result).toEqual({ code: 200, data });
+      expect(result).toEqual({ code: 200, data, message: 'OK' });
     });
 
     it('returns the HTTP status code as code for non-2xx responses', async () => {
@@ -73,9 +73,9 @@ describe('apiService', () => {
 
     it('returns { code, data } from the response', async () => {
       const data = { id: 'abc' };
-      global.fetch.mockResolvedValue(mockFetchResponse(201, { data }));
+      global.fetch.mockResolvedValue(mockFetchResponse(201, { data, message: 'Created' }));
       const result = await api.post(EXAMPLE_URL, {});
-      expect(result).toEqual({ code: 201, data });
+      expect(result).toEqual({ code: 201, data, message: 'Created' });
     });
   });
 
@@ -92,9 +92,9 @@ describe('apiService', () => {
 
     it('returns { code, data } from the response', async () => {
       const data = { refresh_interval: 30 };
-      global.fetch.mockResolvedValue(mockFetchResponse(200, { data }));
+      global.fetch.mockResolvedValue(mockFetchResponse(200, { data, message: 'Saved' }));
       const result = await api.put(EXAMPLE_URL, {});
-      expect(result).toEqual({ code: 200, data });
+      expect(result).toEqual({ code: 200, data, message: 'Saved' });
     });
   });
 
@@ -115,9 +115,9 @@ describe('apiService', () => {
 
     it('returns { code, data } from the response', async () => {
       const data = { id: 'abc' };
-      global.fetch.mockResolvedValue(mockFetchResponse(202, { data }));
+      global.fetch.mockResolvedValue(mockFetchResponse(202, { data, message: 'Deleted' }));
       const result = await api.delete(`${EXAMPLE_URL}/abc`);
-      expect(result).toEqual({ code: 202, data });
+      expect(result).toEqual({ code: 202, data, message: 'Deleted' });
     });
   });
 

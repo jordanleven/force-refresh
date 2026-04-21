@@ -10,8 +10,8 @@ const handleFetchRequest = async (url, options = {}) => {
       ...options,
       headers: { ...headers, ...options.headers },
     });
-    const { data } = await response.json();
-    return { code: response.status, data };
+    const { data, message } = await response.json();
+    return { code: response.status, data, message };
   } catch (e) {
     error(e);
     return undefined;

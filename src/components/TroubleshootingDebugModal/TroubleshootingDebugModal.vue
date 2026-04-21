@@ -36,12 +36,6 @@
               <p class="debug-modal__title">
                 {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_TITLE') }}
               </p>
-              <p
-                v-if="fetchedData"
-                class="debug-modal__subtitle"
-              >
-                {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: fetchedData.submitterEmail }) }}
-              </p>
             </div>
             <button
               class="debug-modal__close"
@@ -49,6 +43,17 @@
             >
               <font-awesome-icon :icon="faXmark" />
             </button>
+          </div>
+
+          <div
+            v-if="fetchedData"
+            class="debug-modal__note"
+          >
+            <font-awesome-icon
+              class="debug-modal__note-icon"
+              :icon="faCircleInfo"
+            />
+            <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: submitterEmail }) }}</span>
           </div>
 
           <div class="debug-modal__divider" />
@@ -65,6 +70,27 @@
             </template>
 
             <template v-else>
+              <div class="debug-modal__field">
+                <p class="debug-modal__field-description">
+                  {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_DESCRIPTION') }}
+                </p>
+                <input
+                  id="debug-support-topic-url"
+                  v-model.trim="supportTopicUrl"
+                  class="debug-modal__field-input"
+                  :class="supportTopicUrlError && 'debug-modal__field-input--error'"
+                  type="url"
+                  :placeholder="$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_PLACEHOLDER')"
+                  @input="onSupportTopicUrlInput"
+                >
+                <p
+                  v-if="supportTopicUrlError"
+                  class="debug-modal__field-error"
+                >
+                  {{ supportTopicUrlError }}
+                </p>
+              </div>
+
               <div class="debug-modal__rows">
                 <div
                   v-for="row in payloadRows"
@@ -77,10 +103,10 @@
               </div>
 
               <p
-                v-if="status === 'error'"
+                v-if="status === 'error' && requestError"
                 class="debug-modal__error"
               >
-                {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR') }}
+                {{ requestError }}
               </p>
             </template>
           </div>
@@ -94,7 +120,7 @@
             </button>
             <button
               class="button-primary"
-              :disabled="status === 'loading' || status === 'sending'"
+              :disabled="status === 'loading' || status === 'sending' || !supportTopicUrl"
               @click="onSend"
             >
               {{ status === 'sending'
@@ -131,7 +157,10 @@ export default {
   data() {
     return {
       fetchedData: null,
+      requestError: '',
       status: STATUS_IDLE,
+      supportTopicUrl: '',
+      supportTopicUrlError: '',
     };
   },
   computed: {
@@ -151,6 +180,9 @@ export default {
         value: row.value,
       }));
     },
+    submitterEmail() {
+      return this.fetchedData?.submitterEmail ?? '';
+    },
   },
   watch: {
     async isOpen(val) {
@@ -163,11 +195,16 @@ export default {
           return;
         }
         this.fetchedData = data;
+        this.requestError = '';
+        this.supportTopicUrlError = '';
         this.status = STATUS_IDLE;
       } else {
         setTimeout(() => {
+          this.requestError = '';
           this.status = STATUS_IDLE;
           this.fetchedData = null;
+          this.supportTopicUrl = '';
+          this.supportTopicUrlError = '';
         }, 450);
       }
     },
@@ -189,10 +226,37 @@ export default {
       this.$emit('close');
     },
     async onSend() {
+      if (!this.supportTopicUrl) {
+        this.supportTopicUrlError = this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_REQUIRED');
+        return;
+      }
+
+      this.requestError = '';
+      this.supportTopicUrlError = '';
       this.status = STATUS_SENDING;
-      const result = await sendDebugEmail();
+      const result = await sendDebugEmail({ supportTopicUrl: this.supportTopicUrl });
       const succeeded = result?.code >= 200 && result?.code < 300;
-      this.status = succeeded ? STATUS_SENT : STATUS_ERROR;
+
+      if (succeeded) {
+        this.status = STATUS_SENT;
+        return;
+      }
+
+      if (result?.data?.field === 'supportTopicUrl') {
+        this.supportTopicUrlError = result?.message
+          ? this.$t(result.message)
+          : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR');
+      } else {
+        this.requestError = result?.message
+          ? this.$t(result.message)
+          : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR');
+      }
+
+      this.status = STATUS_ERROR;
+    },
+    onSupportTopicUrlInput() {
+      this.requestError = '';
+      this.supportTopicUrlError = '';
     },
   },
 };
@@ -253,12 +317,6 @@ export default {
     letter-spacing: -0.02em;
   }
 
-  &__subtitle {
-    font-size: 0.8125rem;
-    color: var.$text-secondary;
-    margin-top: 0.125rem;
-  }
-
   &__close {
     width: 1.875rem;
     height: 1.875rem;
@@ -298,7 +356,7 @@ export default {
     padding: 0.625rem 0.875rem;
     font-size: 0.8125rem;
     color: color.adjust(var.$blue, $lightness: -15%);
-    margin-bottom: 0.875rem;
+    margin: 0 1.375rem 0.875rem;
     display: flex;
     gap: 0.5rem;
     align-items: flex-start;
@@ -311,11 +369,71 @@ export default {
     margin-top: 0.125rem;
   }
 
+  &__field {
+    margin-bottom: 0.875rem;
+  }
+
+  &__field-description {
+    font-size: 0.8125rem;
+    color: var.$text-secondary;
+    margin-bottom: 0.5rem;
+    line-height: 1.45;
+  }
+
+  &__field-input {
+    width: 100%;
+    border: 1px solid rgba(var.$black, 0.1);
+    border-radius: 0.75rem;
+    background: rgba(var.$white, 0.82);
+    color: var.$text-primary;
+    font-size: 0.875rem;
+    padding: 0.75rem 0.875rem;
+    transition: border-color 0.12s ease, box-shadow 0.12s ease;
+
+    &:focus {
+      outline: none;
+      border-color: rgba(var.$blue, 0.55);
+      box-shadow: 0 0 0 3px rgba(var.$blue, 0.16);
+    }
+
+    &--error {
+      border-color: rgba(var.$red, 0.4);
+      box-shadow: 0 0 0 3px rgba(var.$red, 0.1);
+    }
+  }
+
+  &__field-error {
+    font-size: 0.8125rem;
+    color: var.$red;
+    margin-top: 0.5rem;
+  }
+
   &__rows {
     border-radius: 0.75rem;
     overflow: hidden;
     border: 1px solid rgba(var.$black, 0.06);
     background: rgba(var.$white, 0.6);
+  }
+
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgba(var.$black, 0.06);
+    background: rgba(var.$white, 0.6);
+    padding: 0.625rem 0.875rem;
+  }
+
+  &__skeleton-row {
+    height: 0.8125rem;
+    border-radius: 0.375rem;
+    background: rgba(var.$black, 0.07);
+    animation: debug-modal-shimmer 1.4s ease-in-out infinite;
+
+    &:nth-child(odd) { width: 60%; }
+    &:nth-child(even) { width: 80%; }
   }
 
   &__row {
@@ -343,27 +461,6 @@ export default {
     font-weight: 500;
     text-align: right;
     word-break: break-all;
-  }
-
-  &__loading {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    border-radius: 0.75rem;
-    overflow: hidden;
-    border: 1px solid rgba(var.$black, 0.06);
-    background: rgba(var.$white, 0.6);
-    padding: 0.625rem 0.875rem;
-  }
-
-  &__skeleton-row {
-    height: 0.8125rem;
-    border-radius: 0.375rem;
-    background: rgba(var.$black, 0.07);
-    animation: debug-modal-shimmer 1.4s ease-in-out infinite;
-
-    &:nth-child(odd) { width: 60%; }
-    &:nth-child(even) { width: 80%; }
   }
 
   &__error {

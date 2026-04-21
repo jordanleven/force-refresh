@@ -32,7 +32,10 @@ const getWrapper = ({ isOpen = false } = {}) => mount(TroubleshootingDebugModal,
   global: {
     components: { FontAwesomeIcon },
     mocks: {
-      $t: (key) => key,
+      $t: (key, values = {}) => {
+        if (!Object.keys(values).length) return key;
+        return `${key}:${JSON.stringify(values)}`;
+      },
     },
     stubs: {
       teleport: true,
@@ -121,6 +124,51 @@ describe('TroubleshootingDebugModal', () => {
     });
   });
 
+  describe('Support topic URL', () => {
+    it('disables send until a support topic URL is provided', async () => {
+      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });
+      const wrapper = getWrapper({ isOpen: false });
+
+      await wrapper.setProps({ isOpen: true });
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('.debug-modal__footer .button-primary').attributes('disabled')).toBeDefined();
+    });
+
+    it('sends the entered support topic URL with the report request', async () => {
+      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });
+      sendDebugEmail.mockResolvedValueOnce({ code: 200 });
+      const wrapper = getWrapper({ isOpen: false });
+
+      await wrapper.setProps({ isOpen: true });
+      await wrapper.vm.$nextTick();
+      await wrapper.find('.debug-modal__field-input').setValue('https://wordpress.org/support/topic/test-topic/');
+      await wrapper.find('.debug-modal__footer .button-primary').trigger('click');
+
+      expect(sendDebugEmail).toHaveBeenCalledWith({
+        supportTopicUrl: 'https://wordpress.org/support/topic/test-topic/',
+      });
+    });
+
+    it('shows the API validation error under the field when URL validation fails', async () => {
+      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });
+      sendDebugEmail.mockResolvedValueOnce({
+        code: 400,
+        data: { field: 'supportTopicUrl' },
+        message: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_INVALID',
+      });
+      const wrapper = getWrapper({ isOpen: false });
+
+      await wrapper.setProps({ isOpen: true });
+      await wrapper.vm.$nextTick();
+      await wrapper.find('.debug-modal__field-input').setValue('https://example.com/topic/test-topic/');
+      await wrapper.find('.debug-modal__footer .button-primary').trigger('click');
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('.debug-modal__field-error').text()).toBe('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_INVALID');
+    });
+  });
+
   describe('Close button', () => {
     it('emits close when the close button is clicked', async () => {
       getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });
@@ -179,7 +227,8 @@ describe('TroubleshootingDebugModal', () => {
 
       await wrapper.setProps({ isOpen: true });
       await wrapper.vm.$nextTick();
-      await wrapper.find('.debug-modal__footer .button-primary').trigger('click');
+      await wrapper.find('.debug-modal__field-input').setValue('https://wordpress.org/support/topic/test-topic/');
+      await wrapper.vm.onSend();
       await wrapper.vm.$nextTick();
       await wrapper.vm.$nextTick();
 
@@ -188,12 +237,13 @@ describe('TroubleshootingDebugModal', () => {
 
     it('shows the error message after a failed send', async () => {
       getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });
-      sendDebugEmail.mockResolvedValueOnce({ code: 500 });
+      sendDebugEmail.mockResolvedValueOnce({ code: 500, message: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SEND_FAILED' });
       const wrapper = getWrapper({ isOpen: false });
 
       await wrapper.setProps({ isOpen: true });
       await wrapper.vm.$nextTick();
-      await wrapper.find('.debug-modal__footer .button-primary').trigger('click');
+      await wrapper.find('.debug-modal__field-input').setValue('https://wordpress.org/support/topic/test-topic/');
+      await wrapper.vm.onSend();
       await wrapper.vm.$nextTick();
       await wrapper.vm.$nextTick();
 
