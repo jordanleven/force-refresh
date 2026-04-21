@@ -117,11 +117,7 @@ export default {
     debugInfo: VueTypes.shape({
       siteName: VueTypes.string.isRequired,
       siteUrl: VueTypes.string.isRequired,
-      versions: VueTypes.shape({
-        forceRefresh: VueTypes.shape({ version: VueTypes.string.isRequired }).isRequired,
-        php: VueTypes.shape({ version: VueTypes.string.isRequired }).isRequired,
-        wordPress: VueTypes.shape({ version: VueTypes.string.isRequired }).isRequired,
-      }).isRequired,
+      versions: VueTypes.object.isRequired,
     }).isRequired,
     isOpen: VueTypes.bool.isRequired,
   },
