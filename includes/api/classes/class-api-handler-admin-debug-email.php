@@ -9,6 +9,8 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
+use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
  * Main class controller.
@@ -68,7 +70,56 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      * @return \WP_REST_Response
      */
     public function get_debug_data(): \WP_REST_Response {
-        return $this->return_api_response( \WP_Http::OK, $this->get_debug_payload() );
+        $current_user = wp_get_current_user();
+
+        return $this->return_api_response(
+            \WP_Http::OK,
+            '',
+            array(
+                'rows'           => $this->get_debug_rows(),
+                'submitterEmail' => $current_user->user_email ?: null,
+            )
+        );
+    }
+
+    /**
+     * Builds the ordered list of rows for the debug preview UI.
+     *
+     * @return array Array of { key, value } objects.
+     */
+    private function get_debug_rows(): array {
+        $payload = $this->get_debug_payload();
+
+        return array(
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME',
+              'value' => $payload['siteName'],
+            ),
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL',
+              'value' => $payload['siteUrl'],
+            ),
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION',
+              'value' => $payload['forceRefreshVersion'],
+            ),
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_VERSION',
+              'value' => $payload['siteVersion'],
+            ),
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL',
+              'value' => sprintf( '%ss', $payload['refreshInterval'] ),
+            ),
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION',
+              'value' => $payload['wordPressVersion'],
+            ),
+            array(
+              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION',
+              'value' => $payload['phpVersion'],
+            ),
+        );
     }
 
     /**
@@ -77,14 +128,16 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      * @return array The debug payload.
      */
     private function get_debug_payload(): array {
-        $plugin_data = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
+        $plugin_data  = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
 
         return array(
-            'siteUrl'            => get_bloginfo( 'url' ),
-            'siteName'           => get_bloginfo( 'name' ),
-            'wordPressVersion'   => get_bloginfo( 'version' ),
-            'phpVersion'         => phpversion(),
+            'siteUrl'             => get_bloginfo( 'url' ),
+            'siteName'            => get_bloginfo( 'name' ),
+            'wordPressVersion'    => get_bloginfo( 'version' ),
+            'phpVersion'          => phpversion(),
             'forceRefreshVersion' => $plugin_data['Version'],
+            'siteVersion'         => Versions_Storage_Service::get_site_version(),
+            'refreshInterval'     => Options_Storage_Service::get_refresh_interval(),
         );
     }
 
@@ -104,6 +157,8 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 sprintf( 'Site Name:              %s', $payload['siteName'] ),
                 sprintf( 'Site URL:               %s', $payload['siteUrl'] ),
                 sprintf( 'Force Refresh Version:  %s', $payload['forceRefreshVersion'] ),
+                sprintf( 'Site Version:           %s', $payload['siteVersion'] ),
+                sprintf( 'Refresh Interval:       %ss', $payload['refreshInterval'] ),
                 sprintf( 'WordPress Version:      %s', $payload['wordPressVersion'] ),
                 sprintf( 'PHP Version:            %s', $payload['phpVersion'] ),
                 '',

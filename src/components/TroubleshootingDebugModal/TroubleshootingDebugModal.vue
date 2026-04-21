@@ -10,7 +10,7 @@
         :class="classesSheet"
       >
         <div
-          v-if="phase === 'sent'"
+          v-if="status === 'sent'"
           class="debug-modal__sent"
         >
           <div class="debug-modal__sent-icon">
@@ -36,8 +36,11 @@
               <p class="debug-modal__title">
                 {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_TITLE') }}
               </p>
-              <p class="debug-modal__subtitle">
-                {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUBTITLE') }}
+              <p
+                v-if="fetchedData"
+                class="debug-modal__subtitle"
+              >
+                {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: fetchedData.submitterEmail }) }}
               </p>
             </div>
             <button
@@ -51,10 +54,10 @@
           <div class="debug-modal__divider" />
 
           <div class="debug-modal__body">
-            <template v-if="phase === 'loading'">
+            <template v-if="status === 'loading'">
               <div class="debug-modal__loading">
                 <div
-                  v-for="n in 5"
+                  v-for="n in payloadRowCount"
                   :key="n"
                   class="debug-modal__skeleton-row"
                 />
@@ -62,14 +65,6 @@
             </template>
 
             <template v-else>
-              <div class="debug-modal__note">
-                <font-awesome-icon
-                  class="debug-modal__note-icon"
-                  :icon="faCircleInfo"
-                />
-                <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE') }}</span>
-              </div>
-
               <div class="debug-modal__rows">
                 <div
                   v-for="row in payloadRows"
@@ -82,7 +77,7 @@
               </div>
 
               <p
-                v-if="phase === 'error'"
+                v-if="status === 'error'"
                 class="debug-modal__error"
               >
                 {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR') }}
@@ -99,10 +94,10 @@
             </button>
             <button
               class="button-primary"
-              :disabled="phase === 'loading' || phase === 'sending'"
+              :disabled="status === 'loading' || status === 'sending'"
               @click="onSend"
             >
-              {{ phase === 'sending'
+              {{ status === 'sending'
                 ? $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SENDING')
                 : $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SEND') }}
             </button>
@@ -121,6 +116,12 @@ import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/refreshSe
 
 library.add(faCheck, faCircleInfo, faXmark);
 
+const STATUS_IDLE = 'idle';
+const STATUS_LOADING = 'loading';
+const STATUS_SENDING = 'sending';
+const STATUS_SENT = 'sent';
+const STATUS_ERROR = 'error';
+
 export default {
   name: 'TroubleshootingDebugModal',
   props: {
@@ -130,7 +131,7 @@ export default {
   data() {
     return {
       fetchedData: null,
-      phase: 'idle',
+      status: STATUS_IDLE,
     };
   },
   computed: {
@@ -140,42 +141,32 @@ export default {
     classesSheet() {
       return [this.isOpen && 'debug-modal__sheet--open'];
     },
+    payloadRowCount() {
+      return this.payloadRows.length || 7;
+    },
     payloadRows() {
       if (!this.fetchedData) return [];
-      return [
-        {
-          label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME'),
-          value: this.fetchedData.siteName,
-        },
-        {
-          label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL'),
-          value: this.fetchedData.siteUrl,
-        },
-        {
-          label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION'),
-          value: this.fetchedData.forceRefreshVersion,
-        },
-        {
-          label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION'),
-          value: this.fetchedData.wordPressVersion,
-        },
-        {
-          label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION'),
-          value: this.fetchedData.phpVersion,
-        },
-      ];
+      return this.fetchedData.rows.map((row) => ({
+        label: this.$t(row.key),
+        value: row.value,
+      }));
     },
   },
   watch: {
     async isOpen(val) {
       if (val) {
-        this.phase = 'loading';
+        this.status = STATUS_LOADING;
         const result = await getDebugEmailData();
-        this.fetchedData = result?.data ?? null;
-        this.phase = this.fetchedData ? 'idle' : 'error';
+        const data = result?.data ?? null;
+        if (!data?.submitterEmail) {
+          this.onClose();
+          return;
+        }
+        this.fetchedData = data;
+        this.status = STATUS_IDLE;
       } else {
         setTimeout(() => {
-          this.phase = 'idle';
+          this.status = STATUS_IDLE;
           this.fetchedData = null;
         }, 450);
       }
@@ -198,10 +189,10 @@ export default {
       this.$emit('close');
     },
     async onSend() {
-      this.phase = 'sending';
+      this.status = STATUS_SENDING;
       const result = await sendDebugEmail();
       const succeeded = result?.code >= 200 && result?.code < 300;
-      this.phase = succeeded ? 'sent' : 'error';
+      this.status = succeeded ? STATUS_SENT : STATUS_ERROR;
     },
   },
 };

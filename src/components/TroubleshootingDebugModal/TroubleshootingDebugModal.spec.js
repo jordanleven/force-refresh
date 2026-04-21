@@ -12,12 +12,19 @@ jest.mock('@/js/services/admin/refreshService.js', () => ({
 
 library.add(faCheck, faCircleInfo, faXmark);
 
+const mockRows = [
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME', value: 'Test Site' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL', value: 'https://example.com' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION', value: '2.0.0' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_VERSION', value: 'abc12345' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL', value: '120s' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION', value: '6.5.0' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION', value: '8.2.0' },
+];
+
 const mockPayload = {
-  siteName: 'Test Site',
-  siteUrl: 'https://example.com',
-  forceRefreshVersion: '2.0.0',
-  wordPressVersion: '6.5.0',
-  phpVersion: '8.2.0',
+  rows: mockRows,
+  submitterEmail: 'admin@example.com',
 };
 
 const getWrapper = ({ isOpen = false } = {}) => mount(TroubleshootingDebugModal, {
@@ -99,7 +106,7 @@ describe('TroubleshootingDebugModal', () => {
       await wrapper.setProps({ isOpen: true });
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.findAll('.debug-modal__row')).toHaveLength(5);
+      expect(wrapper.findAll('.debug-modal__row')).toHaveLength(7);
     });
 
     it('displays the fetched values in each row', async () => {
@@ -110,13 +117,7 @@ describe('TroubleshootingDebugModal', () => {
       await wrapper.vm.$nextTick();
 
       const values = wrapper.findAll('.debug-modal__row-value').map((el) => el.text());
-      expect(values).toEqual([
-        mockPayload.siteName,
-        mockPayload.siteUrl,
-        mockPayload.forceRefreshVersion,
-        mockPayload.wordPressVersion,
-        mockPayload.phpVersion,
-      ]);
+      expect(values).toEqual(mockRows.map((row) => row.value));
     });
   });
 
