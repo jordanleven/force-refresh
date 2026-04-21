@@ -157,7 +157,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 sprintf( 'Site Name:              %s', $payload['siteName'] ),
                 sprintf( 'Site URL:               %s', $payload['siteUrl'] ),
                 sprintf( 'Force Refresh Version:  %s', $payload['forceRefreshVersion'] ),
-                sprintf( 'Site Version:           %s', $payload['siteVersion'] ),
+                sprintf( 'Current Site Version:   %s', $payload['siteVersion'] ),
                 sprintf( 'Refresh Interval:       %ss', $payload['refreshInterval'] ),
                 sprintf( 'WordPress Version:      %s', $payload['wordPressVersion'] ),
                 sprintf( 'PHP Version:            %s', $payload['phpVersion'] ),
