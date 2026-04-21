@@ -78,7 +78,7 @@
         @modal-was-closed="exitAdminWindow"
       />
       <AdminScheduleRefresh
-        v-if="isScheduledRefreshEnabled && !troubleshootingActive"
+        v-if="isScheduledRefreshEnabled && !troubleshootingActive && scheduleRefreshPageActive"
         :is-open="scheduleRefreshPageActive"
         @modal-was-closed="exitAdminWindow"
         @schedule-refresh="refreshWasScheduled"

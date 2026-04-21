@@ -2,12 +2,12 @@
   <Teleport to="body">
     <div
       class="modal-window"
-      :class="modalWindowClasses"
+      :class="classesModalWindow"
       @click.self="onOverlayClick"
     >
       <div
         class="modal"
-        :class="modalClasses"
+        :class="classesModal"
         :style="modalStyles"
       >
         <div
@@ -49,7 +49,7 @@
 
         <div
           class="modal__inner"
-          :class="innerClasses"
+          :class="classesInner"
         >
           <slot />
         </div>
@@ -94,12 +94,12 @@ export default {
     hasHeader() {
       return !!this.header || !!this.$slots.header || this.showHeaderCloseButton;
     },
-    innerClasses() {
+    classesInner() {
       return [
         this.scrollInner && 'modal__inner--scrollable',
       ];
     },
-    modalClasses() {
+    classesModal() {
       return [
         `modal--${this.variant}`,
         this.isOpen && 'modal--open',
@@ -108,7 +108,7 @@ export default {
     modalStyles() {
       return this.maxWidth ? { '--modal-max-width': this.maxWidth } : {};
     },
-    modalWindowClasses() {
+    classesModalWindow() {
       return [
         `modal-window--${this.variant}`,
         this.isOpen && 'modal-window--open',
