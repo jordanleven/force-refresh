@@ -77,7 +77,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             '',
             array(
                 'rows'           => $this->get_debug_rows(),
-                'submitterEmail' => $current_user->user_email ?: null,
+                'submitterEmail' => ! empty( $current_user->user_email ) ? $current_user->user_email : null,
             )
         );
     }
@@ -110,32 +110,32 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
 
         return array(
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME',
-              'value' => $payload['siteName'],
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME',
+                'value' => $payload['siteName'],
             ),
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL',
-              'value' => $payload['siteUrl'],
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL',
+                'value' => $payload['siteUrl'],
             ),
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION',
-              'value' => $payload['forceRefreshVersion'],
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION',
+                'value' => $payload['forceRefreshVersion'],
             ),
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_VERSION',
-              'value' => $payload['siteVersion'],
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_VERSION',
+                'value' => $payload['siteVersion'],
             ),
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL',
-              'value' => sprintf( '%ss', $payload['refreshInterval'] ),
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL',
+                'value' => sprintf( '%ss', $payload['refreshInterval'] ),
             ),
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION',
-              'value' => $payload['wordPressVersion'],
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION',
+                'value' => $payload['wordPressVersion'],
             ),
             array(
-              'key' => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION',
-              'value' => $payload['phpVersion'],
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION',
+                'value' => $payload['phpVersion'],
             ),
         );
     }
@@ -146,7 +146,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      * @return array The debug payload.
      */
     private function get_debug_payload(): array {
-        $plugin_data  = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
+        $plugin_data = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
 
         return array(
             'siteUrl'             => get_bloginfo( 'url' ),

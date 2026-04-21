@@ -53,7 +53,7 @@
     "DEBUG_MODAL_LABEL_REFRESH_INTERVAL": "Refresh Interval",
     "DEBUG_MODAL_BUTTON_CANCEL": "Cancel",
     "DEBUG_MODAL_BUTTON_SEND": "Send Report",
-    "DEBUG_MODAL_BUTTON_SENDING": "Sending\u2026",
+    "DEBUG_MODAL_BUTTON_SENDING": "Sending...",
     "DEBUG_MODAL_BUTTON_DONE": "Done",
     "DEBUG_MODAL_SENT_TITLE": "Report Sent",
     "DEBUG_MODAL_SENT_SUBTITLE": "Thank you! Your report has been received and we'll follow up in the support thread.",

@@ -264,6 +264,7 @@ export default {
 
 <style lang="scss" scoped>
 @use "sass:color";
+@use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
 .debug-modal {
@@ -287,7 +288,9 @@ export default {
   &__sheet {
     background: rgb(245, 245, 247, 92%);
     backdrop-filter: blur(60px) saturate(2.2);
-    border-radius: 1.75rem 1.75rem 0 0;
+
+    @include utils.card-radius-top(utils.$card-radius-sheet);
+
     width: 100%;
     max-width: 40rem;
     max-height: 88vh;
@@ -352,7 +355,7 @@ export default {
 
   &__note {
     background: rgba(var.$blue, 0.08);
-    border-radius: 0.75rem;
+    border-radius: utils.$card-radius-default;
     padding: 0.625rem 0.875rem;
     font-size: 0.8125rem;
     color: color.adjust(var.$blue, $lightness: -15%);
@@ -383,7 +386,7 @@ export default {
   &__field-input {
     width: 100%;
     border: 1px solid rgba(var.$black, 0.1);
-    border-radius: 0.75rem;
+    border-radius: utils.$card-radius-default;
     background: rgba(var.$white, 0.82);
     color: var.$text-primary;
     font-size: 0.875rem;
@@ -409,7 +412,7 @@ export default {
   }
 
   &__rows {
-    border-radius: 0.75rem;
+    border-radius: utils.$card-radius-default;
     overflow: hidden;
     border: 1px solid rgba(var.$black, 0.06);
     background: rgba(var.$white, 0.6);
@@ -419,7 +422,7 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    border-radius: 0.75rem;
+    border-radius: utils.$card-radius-default;
     overflow: hidden;
     border: 1px solid rgba(var.$black, 0.06);
     background: rgba(var.$white, 0.6);

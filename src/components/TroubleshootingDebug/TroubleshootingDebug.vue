@@ -147,7 +147,8 @@ export default {
     gap: var.$space-medium;
 
     &--open {
-      border-radius: 0.75rem 0.75rem 0 0;
+      @include utils.card-radius-top;
+
       margin-bottom: 0;
     }
   }
@@ -155,7 +156,7 @@ export default {
   &__icon-wrap {
     width: 2.5rem;
     height: 2.5rem;
-    border-radius: 0.75rem;
+    border-radius: utils.$card-radius-default;
     background: rgba(var.$blue, 0.12);
     backdrop-filter: blur(8px);
     display: flex;
@@ -215,7 +216,9 @@ export default {
     backdrop-filter: blur(28px) saturate(1.8);
     border: 1px solid rgba(var.$white, 0.6);
     border-top: 1px solid rgba(var.$blue, 0.1);
-    border-radius: 0 0 0.75rem 0.75rem;
+
+    @include utils.card-radius-bottom;
+
     padding: 0.75rem 1.375rem;
     display: flex;
     align-items: center;
