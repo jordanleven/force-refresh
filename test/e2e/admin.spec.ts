@@ -170,6 +170,20 @@ test.describe('Admin', () => {
       });
 
       test('The modal shows a loading state while fetching data', async () => {
+        await page.locator('[data-test="btn-cancel-debug-email"]').click();
+        await expect(page.locator('.modal-window')).not.toBeVisible();
+
+        await page.route('**/wp-json/force-refresh/v1/debug-email', async (route, request) => {
+          if (request.method() !== 'GET') {
+            await route.continue();
+            return;
+          }
+
+          await page.waitForTimeout(750);
+          await route.continue();
+        }, { times: 1 });
+
+        await page.locator('[data-test="btn-submit-debug-info"]').click();
         await expect(page.locator('.debug-modal__loading')).toBeVisible();
       });
 
