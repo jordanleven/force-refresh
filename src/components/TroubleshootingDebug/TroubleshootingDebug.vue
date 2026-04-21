@@ -50,7 +50,7 @@
 
     <TroubleshootingDebugModal
       :is-open="isModalOpen"
-      @close="onModalClose"
+      @modal-was-closed="onModalClose"
     />
   </div>
 </template>

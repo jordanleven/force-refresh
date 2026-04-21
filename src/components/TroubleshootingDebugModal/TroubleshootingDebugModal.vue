@@ -162,7 +162,7 @@ export default {
   props: {
     isOpen: VueTypes.bool.isRequired,
   },
-  emits: ['close'],
+  emits: ['modal-was-closed'],
   data() {
     return {
       fetchedData: null,
@@ -244,7 +244,7 @@ export default {
   },
   methods: {
     onClose() {
-      this.$emit('close');
+      this.$emit('modal-was-closed');
     },
     async onSend() {
       if (!this.supportTopicUrl) {
