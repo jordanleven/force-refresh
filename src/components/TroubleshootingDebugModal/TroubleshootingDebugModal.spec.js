@@ -12,19 +12,19 @@ jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
 
 library.add(faCheck, faCircleInfo);
 
-const mockRows = [
+const mockDebugData = [
   { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME', value: 'Test Site' },
-  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL', value: 'https://example.com' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL', value: 'https://my-great-site.com' },
   { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION', value: '2.0.0' },
-  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_VERSION', value: 'abc12345' },
-  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL', value: '120s' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_VERSION', value: '06292007' },
+  { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL', value: '1984s' },
   { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION', value: '6.5.0' },
   { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION', value: '8.2.0' },
 ];
 
 const mockPayload = {
-  debugData: mockRows,
-  submitterEmail: 'admin@example.com',
+  debugData: mockDebugData,
+  submitterEmail: 'johnny-appleseed@example.com',
 };
 
 const getWrapper = ({ isOpen = false } = {}) => mount(TroubleshootingDebugModal, {
@@ -120,7 +120,7 @@ describe('TroubleshootingDebugModal', () => {
       await wrapper.vm.$nextTick();
 
       const values = wrapper.findAll('.debug-modal__row-value').map((el) => el.text());
-      expect(values).toEqual(mockRows.map((row) => row.value));
+      expect(values).toEqual(mockDebugData.map((row) => row.value));
     });
   });
 
