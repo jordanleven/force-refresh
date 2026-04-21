@@ -44,3 +44,8 @@ export const requestPostRefreshByPostID = async (postId) => {
   debug(`Requesting refresh for post ${postId}`);
   return apiClient.post(adminEndpoints.refreshPage, { postId });
 };
+
+export const sendDebugEmail = async () => {
+  debug('Sending debug email report');
+  return apiClient.post(adminEndpoints.debugEmail);
+};
