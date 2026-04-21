@@ -170,18 +170,22 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
     private function is_valid_support_topic_url( string $support_topic_url ): bool {
         $parsed_url = wp_parse_url( $support_topic_url );
 
+        // Support topic has to be on the wordpress.org domain.
         if ( empty( $parsed_url['host'] ) || 'wordpress.org' !== strtolower( $parsed_url['host'] ) ) {
             return false;
         }
 
+        // Support topic has to use http or https.
         if ( empty( $parsed_url['scheme'] ) || ! in_array( strtolower( $parsed_url['scheme'] ), array( 'http', 'https' ), true ) ) {
             return false;
         }
 
+        // Support topic path has to exist
         if ( empty( $parsed_url['path'] ) ) {
             return false;
         }
 
+        // Support topics have to match the WordPress support topic patterns
         return 1 === preg_match( '#^/support/topic/[^/]+/?$#', $parsed_url['path'] );
     }
 
@@ -289,6 +293,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             );
         }
 
+        // Only allow users to submit reports for support topics that are still unresolved
         $support_topic_validation = $this->validate_support_topic_is_unresolved( $support_topic_url );
 
         if ( true !== $support_topic_validation ) {
@@ -298,15 +303,6 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         $payload    = $this->get_debug_data();
         $subject    = sprintf( '[Force Refresh] Debug Report — %s', $payload['siteName'] );
         $body       = $this->format_email_body( $payload, $support_topic_url );
-        $mail_error = null;
-
-        add_action(
-            'wp_mail_failed',
-            function ( \WP_Error $error ) use ( &$mail_error ) {
-                $mail_error = $error->get_error_message();
-            }
-        );
-
         $current_user = wp_get_current_user();
         $headers      = $current_user->user_email
             ? array( sprintf( 'Cc: %s', $current_user->user_email ) )
