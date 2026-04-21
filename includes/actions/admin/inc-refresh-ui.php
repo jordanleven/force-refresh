@@ -110,6 +110,7 @@ function get_localized_data(): array {
             'postName'                    => get_the_title(),
             'isMultiSite'                 => (bool) is_multisite(),
             'currentSiteId'               => (int) get_current_blog_id(),
+            'siteUrl'                     => get_bloginfo( 'url' ),
             'versions'                    => $versions,
             'featureFlags'                => Feature_Flag_Service::get_all(),
         ),

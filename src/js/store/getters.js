@@ -20,6 +20,7 @@ export default {
     currentSiteId: site.siteId,
     isMultiSite: site.isMultiSite,
     siteName: site.siteName,
+    siteUrl: site.siteUrl,
   }),
   troubleshootingInformationVersions: ({ site }) => ({
     versions: {
