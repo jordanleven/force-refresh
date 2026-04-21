@@ -204,7 +204,7 @@ export default {
     transform: translateY(100%);
     transition: transform 0.44s cubic-bezier(0.32, 0.72, 0, 1);
 
-    @include utils.card-radius-top();
+    @include utils.card-radius-top;
   }
 
   &--open {
