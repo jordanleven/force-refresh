@@ -46,11 +46,29 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             self::ENDPOINT_PATH,
             self::ENDPOINT_VERSION,
             array(
+                'methods'             => \WP_REST_Server::READABLE,
+                'callback'            => array( $this, 'get_debug_data' ),
+                'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+            ),
+        );
+        self::register_rest_endpoint(
+            self::ENDPOINT_PATH,
+            self::ENDPOINT_VERSION,
+            array(
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( $this, 'send_debug_email' ),
                 'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
             ),
         );
+    }
+
+    /**
+     * Handles the request to return the debug payload.
+     *
+     * @return \WP_REST_Response
+     */
+    public function get_debug_data(): \WP_REST_Response {
+        return $this->return_api_response( \WP_Http::OK, $this->get_debug_payload() );
     }
 
     /**
@@ -112,7 +130,12 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             }
         );
 
-        $sent = wp_mail( self::RECIPIENT_EMAIL, $subject, $body );
+        $current_user = wp_get_current_user();
+        $headers      = $current_user->user_email
+            ? array( sprintf( 'Cc: %s', $current_user->user_email ) )
+            : array();
+
+        $sent = wp_mail( self::RECIPIENT_EMAIL, $subject, $body, $headers );
 
         if ( ! $sent ) {
             return $this->return_api_response(
