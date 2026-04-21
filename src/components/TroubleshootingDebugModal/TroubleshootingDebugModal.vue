@@ -182,7 +182,8 @@ export default {
     async onSend() {
       this.phase = 'sending';
       const result = await sendDebugEmail();
-      this.phase = result ? 'sent' : 'error';
+      const succeeded = result?.code >= 200 && result?.code < 300;
+      this.phase = succeeded ? 'sent' : 'error';
     },
   },
 };
