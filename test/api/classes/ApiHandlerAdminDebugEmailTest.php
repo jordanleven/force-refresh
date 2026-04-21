@@ -76,11 +76,11 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     private static $mock_get_bloginfo;
 
     /**
-     * Mock for `get_plugin_data`.
+     * Mock for `get_plugin_header_data`.
      *
      * @var Mocks\Mock_Function
      */
-    private static $mock_get_plugin_data;
+    private static $mock_get_plugin_header_data;
 
     /**
      * Mock for `get_option`.
@@ -168,22 +168,22 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
             'get_bloginfo',
             function ( string $key ) {
                 $map = array(
-                    'url'     => 'https://example.com',
-                    'name'    => 'Test Site',
+                    'url'     => 'https://example.com/1984',
+                    'name'    => 'Force Refresh Test Site',
                     'version' => '6.9.0',
                 );
 
                 return $map[ $key ] ?? null;
             }
         );
-        self::$mock_get_plugin_data               = new Mocks\Mock_Function( __NAMESPACE__, 'get_plugin_data' );
+        self::$mock_get_plugin_header_data        = new Mocks\Mock_Function( self::PLUGIN_NAMESPACE, 'get_plugin_header_data' );
         self::$mock_get_option                    = new Mocks\Mock_Function(
             self::SERVICES_NAMESPACE,
             'get_option',
             function ( string $key, $default = null ) {
                 $map = array(
-                    'force_refresh_current_site_version' => 'abc12345',
-                    'force_refresh_refresh_interval'     => '120',
+                    'force_refresh_current_site_version' => '20070629',
+                    'force_refresh_refresh_interval'     => '1984',
                 );
 
                 return $map[ $key ] ?? $default;
@@ -232,7 +232,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         self::$mock_current_user_can->disable();
         self::$mock_wp_get_current_user->disable();
         self::$mock_get_bloginfo->disable();
-        self::$mock_get_plugin_data->disable();
+        self::$mock_get_plugin_header_data->disable();
         self::$mock_get_option->disable();
         self::$mock_esc_url_raw->disable();
         self::$mock_wp_parse_url->disable();
@@ -251,19 +251,19 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     protected function setUp(): void {
-        self::$mock_get_plugin_data->set_return_value( array( 'Version' => '2.18.0' ) );
+        self::$mock_get_plugin_header_data->set_return_value( array( 'Version' => '2.18.0' ) );
         self::$mock_get_main_plugin_file->set_return_value( '/tmp/force-refresh.php' );
         self::$mock_wp_get_current_user->set_return_value(
-            (object) array(
-                'user_email' => 'noreply@wordpress.com',
+            array(
+                'user_email' => 'johnnyappleseed@wordpress.com',
             )
         );
         self::$mock_wp_remote_get->set_return_value(
             array(
+                'body'     => 'Status: not resolved',
                 'response' => array(
                     'code' => 200,
                 ),
-                'body'     => 'Status: not resolved',
             )
         );
         self::$mock_wp_mail->set_return_value( true );
@@ -275,7 +275,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return array
      */
     private function get_debug_data_payload(): array {
-        $response = ( new Api_Handler_Admin_Debug_Email() )->get_debug_data();
+        $response = ( new Api_Handler_Admin_Debug_Email() )->get_debug_email();
         return $response->get_data();
     }
 
@@ -329,7 +329,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     public function testGetDebugDataReturns200Response(): void {
-        $response = ( new Api_Handler_Admin_Debug_Email() )->get_debug_data();
+        $response = ( new Api_Handler_Admin_Debug_Email() )->get_debug_email();
 
         $this->assertEquals( 200, $response->get_status() );
     }
@@ -342,7 +342,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     public function testGetDebugDataReturnsSubmitterEmail(): void {
         $data = $this->get_debug_data_payload();
 
-        $this->assertEquals( 'noreply@wordpress.com', $data['data']['submitterEmail'] );
+        $this->assertEquals( 'johnnyappleseed@wordpress.com', $data['data']['submitterEmail'] );
     }
 
     /**
@@ -356,7 +356,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         $this->assertContains(
             array(
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME',
-                'value' => 'Test Site',
+                'value' => 'Force Refresh Test Site',
             ),
             $rows,
         );
@@ -373,7 +373,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         $this->assertContains(
             array(
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL',
-                'value' => '120s',
+                'value' => '1984s',
             ),
             $rows,
         );
@@ -480,10 +480,10 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     public function testSendDebugEmailRejectsResolvedSupportTopicWith409(): void {
         self::$mock_wp_remote_get->set_return_value(
             array(
+                              'body'     => 'Status: resolved',
                 'response' => array(
                     'code' => 200,
                 ),
-                'body'     => 'Status: resolved',
             )
         );
 
@@ -568,7 +568,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
 
         $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
 
-        $this->assertStringContainsString( 'Current Site Version:   abc12345', $mail_args[2] );
+        $this->assertStringContainsString( 'Current Site Version:   20070629', $mail_args[2] );
     }
 
     /**
@@ -583,7 +583,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
 
         $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
 
-        $this->assertEquals( array( 'Cc: noreply@wordpress.com' ), $mail_args[3] );
+        $this->assertEquals( array( 'Cc: johnnyappleseed@wordpress.com' ), $mail_args[3] );
     }
 
     /**

@@ -127,6 +127,11 @@ function get_force_refresh_plugin_url( $file = null ) {
  *
  * @return void
  */
+function get_plugin_header_data(): array {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    return get_plugin_data( get_main_plugin_file() );
+}
+
 function logger( $log ): void {
     if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
         // phpcs:disable WordPress.PHP.DevelopmentFunctions
