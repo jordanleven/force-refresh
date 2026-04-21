@@ -39,7 +39,7 @@
         {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
       </span>
       <button
-        class="btn btn-blue"
+        class="btn btn-submit-report"
         data-test="btn-submit-debug-info"
         @click="onSubmitDebugInfo"
       >
@@ -220,12 +220,19 @@ export default {
 
     @include utils.card-radius-bottom;
 
-    padding: 0.75rem 1.375rem;
+    padding: 1.5rem 1.375rem;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
     margin-top: -1px;
     box-shadow: 0 8px 24px rgba(var.$black, 0.07), inset 0 -1px 0 rgba(var.$white, 0.5);
+
+    @include utils.small {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
   }
 
   &__submit-label {
@@ -238,7 +245,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: var.$space-small;
-  padding: var.$space-medium / 2 var.$space-medium;
+  padding: var.$space-medium / 1.5 var.$space-medium;
   font-size: 0.844rem;
   font-weight: 500;
   border-radius: 980px;
@@ -246,13 +253,26 @@ export default {
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
-  letter-spacing: -0.0063rem;
+
+  @include utils.small {
+    padding: var.$space-medium / 2 var.$space-medium;
+  }
 }
 
-.btn-blue {
+.btn-submit-report {
   background: var.$blue;
   color: var.$white;
   box-shadow: 0 2px 8px rgba(var.$blue, 0.35), inset 0 1px 0 rgba(var.$white, 0.2);
+  justify-content: center;
+  width: 100%;
+  max-width: 15rem;
+  margin: var.$space-medium auto 0;
+
+  @include utils.small {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
 
   &:hover { filter: brightness(1.07); }
   &:active { transform: scale(0.97); }

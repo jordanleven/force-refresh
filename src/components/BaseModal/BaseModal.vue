@@ -24,15 +24,6 @@
               </h2>
             </slot>
           </div>
-          <button
-            v-if="showHeaderCloseButton"
-            type="button"
-            class="modal__close"
-            :aria-label="$t('MODAL.CLOSE')"
-            @click="close"
-          >
-            <span aria-hidden="true">&times;</span>
-          </button>
         </div>
 
         <div
@@ -86,14 +77,10 @@ export default {
     scrollInner: VueTypes.bool.def(true),
     showDefaultFooter: VueTypes.bool.def(true),
     showDivider: VueTypes.bool.def(true),
-    showHeaderCloseButton: VueTypes.bool.def(false),
     variant: VueTypes.oneOf(['center', 'bottom-sheet']).def('center'),
   },
-  emits: ['close', 'modal-was-closed'],
+  emits: ['modal-was-closed'],
   computed: {
-    hasHeader() {
-      return !!this.header || !!this.$slots.header || this.showHeaderCloseButton;
-    },
     classesInner() {
       return [
         this.scrollInner && 'modal__inner--scrollable',
@@ -105,14 +92,17 @@ export default {
         this.isOpen && 'modal--open',
       ];
     },
-    modalStyles() {
-      return this.maxWidth ? { '--modal-max-width': this.maxWidth } : {};
-    },
     classesModalWindow() {
       return [
         `modal-window--${this.variant}`,
         this.isOpen && 'modal-window--open',
       ];
+    },
+    hasHeader() {
+      return !!this.header || !!this.$slots.header;
+    },
+    modalStyles() {
+      return this.maxWidth ? { '--modal-max-width': this.maxWidth } : {};
     },
   },
   mounted() {
@@ -129,7 +119,6 @@ export default {
   },
   methods: {
     close() {
-      this.$emit('close');
       this.$emit('modal-was-closed');
     },
     onOverlayClick() {

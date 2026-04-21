@@ -4,10 +4,9 @@
     variant="bottom-sheet"
     max-width="40rem"
     :show-default-footer="false"
-    :show-divider="status !== 'sent'"
-    :show-header-close-button="status !== 'sent'"
+    :show-divider="!isStatusSent"
     :scroll-inner="false"
-    @close="onClose"
+    @modal-was-closed="onClose"
   >
     <template
       v-if="!isStatusSent"
@@ -190,6 +189,12 @@ export default {
     isStatusSent() {
       return this.status === STATUS.SENT;
     },
+    noteText() {
+      if (!this.submitterEmail) {
+        return this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE_NO_EMAIL');
+      }
+      return this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: this.submitterEmail });
+    },
     payloadRowCount() {
       return this.payloadRows.length || 7;
     },
@@ -202,12 +207,6 @@ export default {
     },
     submitterEmail() {
       return this.fetchedData?.submitterEmail ?? '';
-    },
-    noteText() {
-      if (!this.submitterEmail) {
-        return this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE_NO_EMAIL');
-      }
-      return this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: this.submitterEmail });
     },
   },
   watch: {
