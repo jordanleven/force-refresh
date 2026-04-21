@@ -5,6 +5,10 @@ import { shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import TroubleshootingDebug from './TroubleshootingDebug.vue';
 
+jest.mock('@/js/services/admin/refreshService.js', () => ({
+  sendDebugEmail: jest.fn(),
+}));
+
 library.add(faBug);
 
 const createVuexStore = (isSubmitDebugEnabled) => createStore({
@@ -12,6 +16,16 @@ const createVuexStore = (isSubmitDebugEnabled) => createStore({
     isFeatureEnabled: () => (flag) => flag === 'troubleshootingSubmitDebug' && isSubmitDebugEnabled,
   },
 });
+
+const debugInfo = {
+  siteName: 'Test Site',
+  siteUrl: 'https://example.com',
+  versions: {
+    forceRefresh: { version: '2.0.0' },
+    php: { version: '8.2.0' },
+    wordPress: { version: '6.5.0' },
+  },
+};
 
 const getWrapper = ({ isDebugActive = false, isSubmitDebugEnabled = false } = {}) => shallowMount(TroubleshootingDebug, {
   global: {
@@ -22,6 +36,7 @@ const getWrapper = ({ isDebugActive = false, isSubmitDebugEnabled = false } = {}
     plugins: [createVuexStore(isSubmitDebugEnabled)],
   },
   props: {
+    debugInfo,
     isDebugActive,
   },
 });

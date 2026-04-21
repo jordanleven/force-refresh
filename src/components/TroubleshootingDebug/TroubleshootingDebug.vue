@@ -38,10 +38,19 @@
       <span class="debug-panel__submit-label">
         {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
       </span>
-      <button class="btn btn-blue">
+      <button
+        class="btn btn-blue"
+        @click="onSubmitDebugInfo"
+      >
         {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
       </button>
     </div>
+
+    <TroubleshootingDebugModal
+      :debug-info="debugInfo"
+      :is-open="isModalOpen"
+      @close="onModalClose"
+    />
   </div>
 </template>
 
@@ -51,6 +60,7 @@ import { faBug } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapGetters } from 'vuex';
 import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
+import TroubleshootingDebugModal from '@/components/TroubleshootingDebugModal/TroubleshootingDebugModal.vue';
 
 library.add(faBug);
 
@@ -58,11 +68,22 @@ export default {
   name: 'TroubleshootingDebug',
   components: {
     BaseToggle,
+    TroubleshootingDebugModal,
   },
   props: {
+    debugInfo: VueTypes.shape({
+      siteName: VueTypes.string.isRequired,
+      siteUrl: VueTypes.string.isRequired,
+      versions: VueTypes.object.isRequired,
+    }).isRequired,
     isDebugActive: VueTypes.bool.isRequired,
   },
   emits: ['toggled'],
+  data() {
+    return {
+      isModalOpen: false,
+    };
+  },
   computed: {
     classesBanner() {
       return [
@@ -96,6 +117,12 @@ export default {
     this.faBug = faBug;
   },
   methods: {
+    onModalClose() {
+      this.isModalOpen = false;
+    },
+    onSubmitDebugInfo() {
+      this.isModalOpen = true;
+    },
     onToggled(val) {
       this.$emit('toggled', val);
     },
