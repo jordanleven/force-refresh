@@ -217,7 +217,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         }
 
         $response_body = wp_remote_retrieve_body( $response );
-        $normalized    = strtolower( preg_replace( '/\s+/', ' ', wp_strip_all_tags( $response_body ) ) );
+        $normalized    = strtolower( preg_replace( '/\s+/', ' ', \wp_strip_all_tags( $response_body ) ) );
 
         if ( false !== strpos( $normalized, 'status: not resolved' ) ) {
             return true;
