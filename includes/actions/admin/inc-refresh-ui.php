@@ -11,6 +11,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debugging;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Options;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debug_Email;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
@@ -77,6 +78,7 @@ function get_admin_api_endpoints(): array {
         'options'             => Api_Handler_Admin_Options::get_rest_endpoint(),
         'debugging'           => Api_Handler_Admin_Debugging::get_rest_endpoint(),
         'scheduleRefreshSite' => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint(),
+        'debugEmail'          => Api_Handler_Admin_Debug_Email::get_rest_endpoint(),
     );
 }
 
