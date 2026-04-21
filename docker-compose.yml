@@ -19,6 +19,15 @@ services:
       timeout: 10s
       retries: 10
 
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: force-refresh-mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    labels:
+      - "traefik.enable=false"
+
   db-qa:
     container_name: 'force-refresh-db-dev-container-wp-qa'
     image: mariadb:10.3
@@ -38,6 +47,7 @@ services:
     container_name: 'force-refresh-dev-container-wp-qa'
     depends_on:
       - db-qa
+      - mailpit
       - traefik
     image: 'wordpress:6.9.4-php8.3-apache'
     ports:
@@ -54,6 +64,7 @@ services:
     volumes:
       - "./.docker-build/wordpress_qa:/var/www/html"
       - "./qa:/var/www/html/wp-content/plugins/force-refresh"
+      - "./docker/mu-plugins/smtp.php:/var/www/html/wp-content/mu-plugins/smtp.php"
     labels:
       - "traefik.http.routers.qa.rule=host(`qa.force-refresh.localhost`)"
       - "traefik.http.services.qa.loadbalancer.server.port=80"
@@ -77,6 +88,7 @@ services:
     container_name: 'force-refresh-dev-container-wp-6'
     depends_on:
       - db-6
+      - mailpit
       - traefik
     image: 'wordpress:6.9-php8.3-apache'
     ports:
@@ -99,6 +111,7 @@ services:
     volumes:
       - "./.docker-build/wordpress_6:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
+      - "./docker/mu-plugins/smtp.php:/var/www/html/wp-content/mu-plugins/smtp.php"
     labels:
       - "traefik.http.routers.wp6.rule=host(`wp6.force-refresh.localhost`)"
       - "traefik.http.services.wp6.loadbalancer.server.port=80"
@@ -123,6 +136,7 @@ services:
     container_name: 'force-refresh-dev-container-wp-6-3'
     depends_on:
       - db-6-3
+      - mailpit
       - traefik
     image: 'wordpress:6.3-php8.2-apache'
     ports:
@@ -145,6 +159,7 @@ services:
     volumes:
       - "./.docker-build/wordpress_6_3:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
+      - "./docker/mu-plugins/smtp.php:/var/www/html/wp-content/mu-plugins/smtp.php"
     labels:
       - "traefik.http.routers.wp6-3.rule=host(`wp6-3.force-refresh.localhost`)"
       - "traefik.http.services.wp6-3.loadbalancer.server.port=80"

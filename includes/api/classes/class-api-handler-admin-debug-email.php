@@ -100,16 +100,24 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      * @return \WP_REST_Response
      */
     public function send_debug_email(): \WP_REST_Response {
-        $payload = $this->get_debug_payload();
-        $subject = sprintf( '[Force Refresh] Debug Report — %s', $payload['siteName'] );
-        $body    = $this->format_email_body( $payload );
+        $payload    = $this->get_debug_payload();
+        $subject    = sprintf( '[Force Refresh] Debug Report — %s', $payload['siteName'] );
+        $body       = $this->format_email_body( $payload );
+        $mail_error = null;
+
+        add_action(
+            'wp_mail_failed',
+            function ( \WP_Error $error ) use ( &$mail_error ) {
+                $mail_error = $error->get_error_message();
+            }
+        );
 
         $sent = wp_mail( self::RECIPIENT_EMAIL, $subject, $body );
 
         if ( ! $sent ) {
             return $this->return_api_response(
                 \WP_Http::INTERNAL_SERVER_ERROR,
-                'The debug report could not be sent. Please try again.'
+                $mail_error ?? 'The debug report could not be sent. Please try again.'
             );
         }
 
