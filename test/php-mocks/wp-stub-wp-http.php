@@ -17,6 +17,8 @@ if ( ! class_exists( 'WP_Http' ) ) {
         const UNAUTHORIZED          = 401;
         const FORBIDDEN             = 403;
         const NOT_FOUND             = 404;
+        const CONFLICT              = 409;
+        const BAD_GATEWAY           = 502;
         const INTERNAL_SERVER_ERROR = 500;
     }
 }
