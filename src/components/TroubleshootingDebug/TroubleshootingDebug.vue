@@ -48,7 +48,6 @@
     </div>
 
     <TroubleshootingDebugModal
-      :debug-info="debugInfo"
       :is-open="isModalOpen"
       @close="onModalClose"
     />
@@ -136,8 +135,6 @@ export default {
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
-$card-radius: 1.25rem;
-
 .debug-panel {
   margin-bottom: var.$space-medium;
 
@@ -150,7 +147,7 @@ $card-radius: 1.25rem;
     gap: var.$space-medium;
 
     &--open {
-      border-radius: $card-radius $card-radius 0 0;
+      border-radius: 0.75rem 0.75rem 0 0;
       margin-bottom: 0;
     }
   }
@@ -218,7 +215,7 @@ $card-radius: 1.25rem;
     backdrop-filter: blur(28px) saturate(1.8);
     border: 1px solid rgba(var.$white, 0.6);
     border-top: 1px solid rgba(var.$blue, 0.1);
-    border-radius: 0 0 $card-radius $card-radius;
+    border-radius: 0 0 0.75rem 0.75rem;
     padding: 0.75rem 1.375rem;
     display: flex;
     align-items: center;

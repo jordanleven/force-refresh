@@ -32,7 +32,7 @@
     "DEBUG_MODE_DESCRIPTION_ACTIVE": "Debugging mode is currently turned on. This means that Force Refresh will log additional output to the browser console and will not refresh connected browsers.",
     "DEBUG_MODE_DESCRIPTION_INACTIVE": "Debugging mode is currently turned off. This means that Force Refresh will operate normally.",
     "BUTTON_SUBMIT_DEBUG_INFO": "Submit Debug Info",
-    "SUBMIT_DEBUG_LABEL": "Having an issue? Submit your debug information to help diagnose the problem.",
+    "SUBMIT_DEBUG_LABEL": "Have an open support ticket? Submit your debug information to help diagnose the problem.",
     "DEBUG_MODAL_TITLE": "Submit Debug Report",
     "DEBUG_MODAL_SUBTITLE": "Review what will be sent",
     "DEBUG_MODAL_NOTE": "Only diagnostic data is included — no post content or personal information.",

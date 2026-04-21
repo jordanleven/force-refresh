@@ -9,8 +9,6 @@
         class="debug-modal__sheet"
         :class="classesSheet"
       >
-        <div class="debug-modal__handle" />
-
         <div
           v-if="phase === 'sent'"
           class="debug-modal__sent"
@@ -53,31 +51,43 @@
           <div class="debug-modal__divider" />
 
           <div class="debug-modal__body">
-            <div class="debug-modal__note">
-              <font-awesome-icon
-                class="debug-modal__note-icon"
-                :icon="faCircleInfo"
-              />
-              <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE') }}</span>
-            </div>
-
-            <div class="debug-modal__rows">
-              <div
-                v-for="row in payloadRows"
-                :key="row.label"
-                class="debug-modal__row"
-              >
-                <span class="debug-modal__row-label">{{ row.label }}</span>
-                <span class="debug-modal__row-value">{{ row.value }}</span>
+            <template v-if="phase === 'loading'">
+              <div class="debug-modal__loading">
+                <div
+                  v-for="n in 5"
+                  :key="n"
+                  class="debug-modal__skeleton-row"
+                />
               </div>
-            </div>
+            </template>
 
-            <p
-              v-if="phase === 'error'"
-              class="debug-modal__error"
-            >
-              {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR') }}
-            </p>
+            <template v-else>
+              <div class="debug-modal__note">
+                <font-awesome-icon
+                  class="debug-modal__note-icon"
+                  :icon="faCircleInfo"
+                />
+                <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE') }}</span>
+              </div>
+
+              <div class="debug-modal__rows">
+                <div
+                  v-for="row in payloadRows"
+                  :key="row.label"
+                  class="debug-modal__row"
+                >
+                  <span class="debug-modal__row-label">{{ row.label }}</span>
+                  <span class="debug-modal__row-value">{{ row.value }}</span>
+                </div>
+              </div>
+
+              <p
+                v-if="phase === 'error'"
+                class="debug-modal__error"
+              >
+                {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR') }}
+              </p>
+            </template>
           </div>
 
           <div class="debug-modal__footer">
@@ -89,7 +99,7 @@
             </button>
             <button
               class="button-primary"
-              :disabled="phase === 'sending'"
+              :disabled="phase === 'loading' || phase === 'sending'"
               @click="onSend"
             >
               {{ phase === 'sending'
@@ -107,23 +117,19 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
-import { sendDebugEmail } from '@/js/services/admin/refreshService.js';
+import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/refreshService.js';
 
 library.add(faCheck, faCircleInfo, faXmark);
 
 export default {
   name: 'TroubleshootingDebugModal',
   props: {
-    debugInfo: VueTypes.shape({
-      siteName: VueTypes.string.isRequired,
-      siteUrl: VueTypes.string.isRequired,
-      versions: VueTypes.object.isRequired,
-    }).isRequired,
     isOpen: VueTypes.bool.isRequired,
   },
   emits: ['close'],
   data() {
     return {
+      fetchedData: null,
       phase: 'idle',
     };
   },
@@ -135,36 +141,52 @@ export default {
       return [this.isOpen && 'debug-modal__sheet--open'];
     },
     payloadRows() {
+      if (!this.fetchedData) return [];
       return [
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME'),
-          value: this.debugInfo.siteName,
+          value: this.fetchedData.siteName,
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_URL'),
-          value: this.debugInfo.siteUrl,
+          value: this.fetchedData.siteUrl,
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_FR_VERSION'),
-          value: this.debugInfo.versions.forceRefresh.version,
+          value: this.fetchedData.forceRefreshVersion,
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION'),
-          value: this.debugInfo.versions.wordPress.version,
+          value: this.fetchedData.wordPressVersion,
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION'),
-          value: this.debugInfo.versions.php.version,
+          value: this.fetchedData.phpVersion,
         },
       ];
     },
   },
   watch: {
-    isOpen(val) {
-      if (!val) {
-        setTimeout(() => { this.phase = 'idle'; }, 450);
+    async isOpen(val) {
+      if (val) {
+        this.phase = 'loading';
+        const result = await getDebugEmailData();
+        this.fetchedData = result?.data ?? null;
+        this.phase = this.fetchedData ? 'idle' : 'error';
+      } else {
+        setTimeout(() => {
+          this.phase = 'idle';
+          this.fetchedData = null;
+        }, 450);
       }
     },
+  },
+  mounted() {
+    this.keydownHandler = (e) => { if (e.key === 'Escape') this.onClose(); };
+    window.addEventListener('keydown', this.keydownHandler);
+  },
+  beforeUnmount() {
+    window.removeEventListener('keydown', this.keydownHandler);
   },
   created() {
     this.faCheck = faCheck;
@@ -224,15 +246,6 @@ export default {
     &--open {
       transform: translateY(0);
     }
-  }
-
-  &__handle {
-    width: 2.25rem;
-    height: 0.3125rem;
-    border-radius: 0.1875rem;
-    background: rgb(60, 60, 67, 25%);
-    margin: 0.75rem auto 0;
-    flex-shrink: 0;
   }
 
   &__header {
@@ -341,6 +354,27 @@ export default {
     word-break: break-all;
   }
 
+  &__loading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    border: 1px solid rgba(var.$black, 0.06);
+    background: rgba(var.$white, 0.6);
+    padding: 0.625rem 0.875rem;
+  }
+
+  &__skeleton-row {
+    height: 0.8125rem;
+    border-radius: 0.375rem;
+    background: rgba(var.$black, 0.07);
+    animation: debug-modal-shimmer 1.4s ease-in-out infinite;
+
+    &:nth-child(odd) { width: 60%; }
+    &:nth-child(even) { width: 80%; }
+  }
+
   &__error {
     font-size: 0.8125rem;
     color: var.$red;
@@ -401,5 +435,10 @@ export default {
     transform: scale(1);
     opacity: 1;
   }
+}
+
+@keyframes debug-modal-shimmer {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 </style>
