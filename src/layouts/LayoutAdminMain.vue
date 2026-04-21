@@ -71,32 +71,18 @@
           @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
-      <div class="admin-window" :class="classAdminReleaseNotes">
-        <transition name="fade-and-move">
-          <div
-            v-if="!troubleshootingActive && releaseNotesPageActive"
-            class="admin-window__inner"
-          >
-            <AdminReleaseNotes
-              :release-notes="releaseNotes"
-              @modal-was-closed="exitAdminWindow"
-            />
-          </div>
-        </transition>
-      </div>
-      <div class="admin-window" :class="classAdminScheduleRefresh">
-        <transition name="fade-and-move">
-          <div
-            v-if="isScheduledRefreshEnabled && !troubleshootingActive && scheduleRefreshPageActive"
-            class="admin-window__inner"
-          >
-            <AdminScheduleRefresh
-              @modal-was-closed="exitAdminWindow"
-              @schedule-refresh="refreshWasScheduled"
-            />
-          </div>
-        </transition>
-      </div>
+      <AdminReleaseNotes
+        v-if="!troubleshootingActive"
+        :is-open="releaseNotesPageActive"
+        :release-notes="releaseNotes"
+        @modal-was-closed="exitAdminWindow"
+      />
+      <AdminScheduleRefresh
+        v-if="isScheduledRefreshEnabled && !troubleshootingActive"
+        :is-open="scheduleRefreshPageActive"
+        @modal-was-closed="exitAdminWindow"
+        @schedule-refresh="refreshWasScheduled"
+      />
     </div>
   </div>
 </template>
@@ -147,16 +133,6 @@ export default {
     };
   },
   computed: {
-    classAdminReleaseNotes() {
-      return [
-        this.releaseNotesPageActive && 'admin-window--active',
-      ];
-    },
-    classAdminScheduleRefresh() {
-      return [
-        this.scheduleRefreshPageActive && 'admin-window--active',
-      ];
-    },
     headerClass() {
       return [
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
@@ -376,48 +352,6 @@ export default {
 
 .admin-section__troubleshooting {
   z-index: 2;
-}
-
-@keyframes fade-and-move {
-  0% {
-    opacity: 0;
-    transform: translateY(100px);
-  }
-
-  100% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.admin-window {
-  &.admin-window--active {
-    transition: backdrop-filter var.$transition-medium, background-color var.$transition-medium;
-    position: fixed;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    background-color: rgba(var.$black, 0.4);
-    backdrop-filter: blur(0.125rem);
-    z-index: 9999;
-  }
-
-  .admin-window__inner {
-    width: 100vw;
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-}
-
-.fade-and-move-enter-active {
-  animation-fill-mode: both;
-  position: absolute;
-  animation-name: fade-and-move;
-  animation-delay: var.$transition-medium;
-  animation-duration: var.$transition-medium;
 }
 
 .page-enter-enter-active,

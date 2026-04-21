@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { mount } from '@vue/test-utils';
 import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
@@ -10,7 +10,7 @@ jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
   sendDebugEmail: jest.fn(),
 }));
 
-library.add(faCheck, faCircleInfo, faXmark);
+library.add(faCheck, faCircleInfo);
 
 const mockRows = [
   { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME', value: 'Test Site' },
@@ -56,13 +56,13 @@ describe('TroubleshootingDebugModal', () => {
     it('does not apply the open modifier when closed', () => {
       const wrapper = getWrapper({ isOpen: false });
 
-      expect(wrapper.find('.debug-modal__overlay').classes()).not.toContain('debug-modal__overlay--open');
+      expect(wrapper.find('.modal-window').classes()).not.toContain('modal-window--open');
     });
 
     it('applies the open modifier when open', () => {
       const wrapper = getWrapper({ isOpen: true });
 
-      expect(wrapper.find('.debug-modal__overlay').classes()).toContain('debug-modal__overlay--open');
+      expect(wrapper.find('.modal-window').classes()).toContain('modal-window--open');
     });
   });
 
@@ -70,13 +70,13 @@ describe('TroubleshootingDebugModal', () => {
     it('does not apply the open modifier when closed', () => {
       const wrapper = getWrapper({ isOpen: false });
 
-      expect(wrapper.find('.debug-modal__sheet').classes()).not.toContain('debug-modal__sheet--open');
+      expect(wrapper.find('.modal').classes()).not.toContain('modal--open');
     });
 
     it('applies the open modifier when open', () => {
       const wrapper = getWrapper({ isOpen: true });
 
-      expect(wrapper.find('.debug-modal__sheet').classes()).toContain('debug-modal__sheet--open');
+      expect(wrapper.find('.modal').classes()).toContain('modal--open');
     });
   });
 
@@ -176,7 +176,7 @@ describe('TroubleshootingDebugModal', () => {
 
       await wrapper.setProps({ isOpen: true });
       await wrapper.vm.$nextTick();
-      await wrapper.find('.debug-modal__close').trigger('click');
+      await wrapper.find('.modal__close').trigger('click');
 
       expect(wrapper.emitted('close')).toHaveLength(1);
     });
@@ -186,7 +186,7 @@ describe('TroubleshootingDebugModal', () => {
     it('emits close when the overlay is clicked', async () => {
       const wrapper = getWrapper({ isOpen: true });
 
-      await wrapper.find('.debug-modal__overlay').trigger('click');
+      await wrapper.find('.modal-window').trigger('click');
 
       expect(wrapper.emitted('close')).toHaveLength(1);
     });

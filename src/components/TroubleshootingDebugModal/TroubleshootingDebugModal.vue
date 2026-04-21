@@ -1,146 +1,146 @@
 <template>
-  <Teleport to="body">
-    <div
-      class="debug-modal__overlay"
-      :class="classesOverlay"
-      @click.self="onClose"
+  <BaseModal
+    :is-open="isOpen"
+    variant="bottom-sheet"
+    max-width="40rem"
+    :show-default-footer="false"
+    :show-divider="status !== 'sent'"
+    :show-header-close-button="status !== 'sent'"
+    :scroll-inner="false"
+    @close="onClose"
+  >
+    <template
+      v-if="status !== 'sent'"
+      #header
     >
-      <div
-        class="debug-modal__sheet"
-        :class="classesSheet"
+      <p class="debug-modal__title">
+        {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_TITLE') }}
+      </p>
+    </template>
+
+    <template
+      v-if="status !== 'sent' && fetchedData"
+      #subheader
+    >
+      <div class="debug-modal__note">
+        <font-awesome-icon
+          class="debug-modal__note-icon"
+          :icon="faCircleInfo"
+        />
+        <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: submitterEmail }) }}</span>
+      </div>
+    </template>
+
+    <div
+      v-if="status === 'sent'"
+      class="debug-modal__sent"
+    >
+      <div class="debug-modal__sent-icon">
+        <font-awesome-icon :icon="faCheck" />
+      </div>
+      <p class="debug-modal__sent-title">
+        {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SENT_TITLE') }}
+      </p>
+      <p class="debug-modal__sent-subtitle">
+        {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SENT_SUBTITLE') }}
+      </p>
+      <button
+        class="button-primary"
+        @click="onClose"
       >
-        <div
-          v-if="status === 'sent'"
-          class="debug-modal__sent"
-        >
-          <div class="debug-modal__sent-icon">
-            <font-awesome-icon :icon="faCheck" />
-          </div>
-          <p class="debug-modal__sent-title">
-            {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SENT_TITLE') }}
+        {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_DONE') }}
+      </button>
+    </div>
+
+    <div
+      v-else
+      class="debug-modal__body"
+    >
+      <template v-if="status === 'loading'">
+        <div class="debug-modal__loading">
+          <div
+            v-for="n in payloadRowCount"
+            :key="n"
+            class="debug-modal__skeleton-row"
+          />
+        </div>
+      </template>
+
+      <template v-else>
+        <div class="debug-modal__field">
+          <p class="debug-modal__field-description">
+            {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_DESCRIPTION') }}
           </p>
-          <p class="debug-modal__sent-subtitle">
-            {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SENT_SUBTITLE') }}
-          </p>
-          <button
-            class="button-primary"
-            @click="onClose"
+          <input
+            id="debug-support-topic-url"
+            v-model.trim="supportTopicUrl"
+            class="debug-modal__field-input"
+            :class="supportTopicUrlError && 'debug-modal__field-input--error'"
+            type="url"
+            :placeholder="$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_PLACEHOLDER')"
+            @input="onSupportTopicUrlInput"
           >
-            {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_DONE') }}
-          </button>
+          <p
+            v-if="supportTopicUrlError"
+            class="debug-modal__field-error"
+          >
+            {{ supportTopicUrlError }}
+          </p>
         </div>
 
-        <template v-else>
-          <div class="debug-modal__header">
-            <div>
-              <p class="debug-modal__title">
-                {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_TITLE') }}
-              </p>
-            </div>
-            <button
-              class="debug-modal__close"
-              @click="onClose"
-            >
-              <font-awesome-icon :icon="faXmark" />
-            </button>
-          </div>
-
+        <div class="debug-modal__rows">
           <div
-            v-if="fetchedData"
-            class="debug-modal__note"
+            v-for="row in payloadRows"
+            :key="row.label"
+            class="debug-modal__row"
           >
-            <font-awesome-icon
-              class="debug-modal__note-icon"
-              :icon="faCircleInfo"
-            />
-            <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: submitterEmail }) }}</span>
+            <span class="debug-modal__row-label">{{ row.label }}</span>
+            <span class="debug-modal__row-value">{{ row.value }}</span>
           </div>
+        </div>
 
-          <div class="debug-modal__divider" />
-
-          <div class="debug-modal__body">
-            <template v-if="status === 'loading'">
-              <div class="debug-modal__loading">
-                <div
-                  v-for="n in payloadRowCount"
-                  :key="n"
-                  class="debug-modal__skeleton-row"
-                />
-              </div>
-            </template>
-
-            <template v-else>
-              <div class="debug-modal__field">
-                <p class="debug-modal__field-description">
-                  {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_DESCRIPTION') }}
-                </p>
-                <input
-                  id="debug-support-topic-url"
-                  v-model.trim="supportTopicUrl"
-                  class="debug-modal__field-input"
-                  :class="supportTopicUrlError && 'debug-modal__field-input--error'"
-                  type="url"
-                  :placeholder="$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_PLACEHOLDER')"
-                  @input="onSupportTopicUrlInput"
-                >
-                <p
-                  v-if="supportTopicUrlError"
-                  class="debug-modal__field-error"
-                >
-                  {{ supportTopicUrlError }}
-                </p>
-              </div>
-
-              <div class="debug-modal__rows">
-                <div
-                  v-for="row in payloadRows"
-                  :key="row.label"
-                  class="debug-modal__row"
-                >
-                  <span class="debug-modal__row-label">{{ row.label }}</span>
-                  <span class="debug-modal__row-value">{{ row.value }}</span>
-                </div>
-              </div>
-
-              <p
-                v-if="status === 'error' && requestError"
-                class="debug-modal__error"
-              >
-                {{ requestError }}
-              </p>
-            </template>
-          </div>
-
-          <div class="debug-modal__footer">
-            <button
-              class="button"
-              @click="onClose"
-            >
-              {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_CANCEL') }}
-            </button>
-            <button
-              class="button-primary"
-              :disabled="status === 'loading' || status === 'sending' || !supportTopicUrl"
-              @click="onSend"
-            >
-              {{ status === 'sending'
-                ? $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SENDING')
-                : $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SEND') }}
-            </button>
-          </div>
-        </template>
-      </div>
+        <p
+          v-if="status === 'error' && requestError"
+          class="debug-modal__error"
+        >
+          {{ requestError }}
+        </p>
+      </template>
     </div>
-  </Teleport>
+
+    <template
+      v-if="status !== 'sent'"
+      #footer
+    >
+      <div class="debug-modal__footer">
+        <button
+          class="button"
+          @click="onClose"
+        >
+          {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_CANCEL') }}
+        </button>
+        <button
+          class="button-primary"
+          :disabled="status === 'loading' || status === 'sending' || !supportTopicUrl"
+          @click="onSend"
+        >
+          {{ status === 'sending'
+            ? $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SENDING')
+            : $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SEND') }}
+        </button>
+      </div>
+    </template>
+  </BaseModal>
 </template>
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import BaseModal from '@/components/BaseModal/BaseModal.vue';
 import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
 
-library.add(faCheck, faCircleInfo, faXmark);
+library.add(faCheck, faCircleInfo);
 
 const STATUS_IDLE = 'idle';
 const STATUS_LOADING = 'loading';
@@ -150,6 +150,9 @@ const STATUS_ERROR = 'error';
 
 export default {
   name: 'TroubleshootingDebugModal',
+  components: {
+    BaseModal,
+  },
   props: {
     isOpen: VueTypes.bool.isRequired,
   },
@@ -164,12 +167,6 @@ export default {
     };
   },
   computed: {
-    classesOverlay() {
-      return [this.isOpen && 'debug-modal__overlay--open'];
-    },
-    classesSheet() {
-      return [this.isOpen && 'debug-modal__sheet--open'];
-    },
     payloadRowCount() {
       return this.payloadRows.length || 7;
     },
@@ -209,17 +206,9 @@ export default {
       }
     },
   },
-  mounted() {
-    this.keydownHandler = (e) => { if (e.key === 'Escape') this.onClose(); };
-    window.addEventListener('keydown', this.keydownHandler);
-  },
-  beforeUnmount() {
-    window.removeEventListener('keydown', this.keydownHandler);
-  },
   created() {
     this.faCheck = faCheck;
     this.faCircleInfo = faCircleInfo;
-    this.faXmark = faXmark;
   },
   methods: {
     onClose() {
@@ -275,83 +264,12 @@ export default {
 }
 
 .debug-modal {
-  &__overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(var.$black, 0);
-    z-index: 100000;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    pointer-events: none;
-    transition: background 0.3s ease;
-
-    &--open {
-      background: rgba(var.$black, 0.35);
-      pointer-events: all;
-    }
-  }
-
-  &__sheet {
-    background: rgb(245, 245, 247, 92%);
-    backdrop-filter: blur(60px) saturate(2.2);
-
-    @include utils.card-radius-top(utils.$card-radius-sheet);
-
-    width: 100%;
-    max-width: 40rem;
-    max-height: 88vh;
-    display: flex;
-    flex-direction: column;
-    transform: translateY(100%);
-    transition: transform 0.44s cubic-bezier(0.32, 0.72, 0, 1);
-    box-shadow: 0 -1px 0 rgba(var.$black, 0.05), 0 -0.75rem 3.75rem rgba(var.$black, 0.18);
-    border-top: 1px solid rgba(var.$white, 0.7);
-
-    &--open {
-      transform: translateY(0);
-    }
-  }
-
-  &__header {
-    padding: 0.875rem 1.375rem 0.75rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  }
-
   &__title {
+    margin: 0;
     font-size: 1.125rem;
     font-weight: 600;
     color: var.$text-primary;
     letter-spacing: -0.02em;
-  }
-
-  &__close {
-    width: 1.875rem;
-    height: 1.875rem;
-    border-radius: 50%;
-    background: rgb(118, 118, 128, 14%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: none;
-    cursor: pointer;
-    color: var.$text-secondary;
-    font-size: 0.875rem;
-    flex-shrink: 0;
-    margin-top: 0.125rem;
-    transition: background 0.12s;
-
-    &:hover {
-      background: rgb(118, 118, 128, 22%);
-    }
-  }
-
-  &__divider {
-    height: 1px;
-    background: rgba(var.$black, 0.06);
-    margin: 0 1.375rem;
   }
 
   &__body {
@@ -366,7 +284,6 @@ export default {
     padding: 0.625rem 0.875rem;
     font-size: 0.8125rem;
     color: color.adjust(var.$blue, $lightness: -15%);
-    margin: 0 1.375rem 0.875rem;
     display: flex;
     gap: 0.5rem;
     align-items: flex-start;
