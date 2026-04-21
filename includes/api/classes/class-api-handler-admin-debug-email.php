@@ -49,7 +49,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             self::ENDPOINT_VERSION,
             array(
                 'methods'             => \WP_REST_Server::READABLE,
-                'callback'            => array( $this, 'get_debug_data' ),
+                'callback'            => array( $this, 'get_debug_email' ),
                 'permission_callback' => $this->get_admin_permission_callback(),
             ),
         );
@@ -69,14 +69,14 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      *
      * @return \WP_REST_Response
      */
-    public function get_debug_data(): \WP_REST_Response {
+    public function get_debug_email(): \WP_REST_Response {
         $current_user = wp_get_current_user();
 
         return $this->return_api_response(
             \WP_Http::OK,
             '',
             array(
-                'debugData'      => $this->get_debug_rows(),
+                'debugData'      => $this->get_debug_data_with_keys(),
                 'submitterEmail' => ! empty( $current_user->user_email ) ? $current_user->user_email : null,
             )
         );
@@ -90,7 +90,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      *
      * @return \WP_REST_Response
      */
-    private function return_support_topic_error_response( int $status_code, string $message_key ): \WP_REST_Response {
+    private function get_support_topic_error_response( int $status_code, string $message_key ): \WP_REST_Response {
         return $this->return_api_response(
             $status_code,
             $message_key,
@@ -105,8 +105,8 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      *
      * @return array Array of { key, value } objects.
      */
-    private function get_debug_rows(): array {
-        $payload = $this->get_debug_payload();
+    private function get_debug_data_with_keys(): array {
+        $payload = $this->get_debug_data();
 
         return array(
             array(
@@ -145,7 +145,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      *
      * @return array The debug payload.
      */
-    private function get_debug_payload(): array {
+    private function get_debug_data(): array {
         $plugin_data = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
 
         return array(
@@ -201,7 +201,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         );
 
         if ( is_wp_error( $response ) ) {
-            return $this->return_support_topic_error_response(
+            return $this->get_support_topic_error_response(
                 \WP_Http::BAD_GATEWAY,
                 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_UNAVAILABLE'
             );
@@ -210,7 +210,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         $status_code = wp_remote_retrieve_response_code( $response );
 
         if ( \WP_Http::OK !== $status_code ) {
-            return $this->return_support_topic_error_response(
+            return $this->get_support_topic_error_response(
                 \WP_Http::BAD_REQUEST,
                 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_NOT_FOUND'
             );
@@ -224,13 +224,13 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         }
 
         if ( false !== strpos( $normalized, 'status: resolved' ) ) {
-            return $this->return_support_topic_error_response(
+            return $this->get_support_topic_error_response(
                 \WP_Http::CONFLICT,
                 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_RESOLVED'
             );
         }
 
-        return $this->return_support_topic_error_response(
+        return $this->get_support_topic_error_response(
             \WP_Http::BAD_GATEWAY,
             'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_UNCONFIRMED'
         );
@@ -275,14 +275,14 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         $support_topic_url = esc_url_raw( trim( (string) $request->get_param( 'supportTopicUrl' ) ) );
 
         if ( empty( $support_topic_url ) ) {
-            return $this->return_support_topic_error_response(
+            return $this->get_support_topic_error_response(
                 \WP_Http::BAD_REQUEST,
                 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_REQUIRED'
             );
         }
 
         if ( ! $this->is_valid_support_topic_url( $support_topic_url ) ) {
-            return $this->return_support_topic_error_response(
+            return $this->get_support_topic_error_response(
                 \WP_Http::BAD_REQUEST,
                 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_INVALID'
             );
@@ -294,7 +294,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             return $support_topic_validation;
         }
 
-        $payload    = $this->get_debug_payload();
+        $payload    = $this->get_debug_data();
         $subject    = sprintf( '[Force Refresh] Debug Report — %s', $payload['siteName'] );
         $body       = $this->format_email_body( $payload, $support_topic_url );
         $mail_error = null;
