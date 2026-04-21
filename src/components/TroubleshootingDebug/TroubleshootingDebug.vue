@@ -42,6 +42,7 @@
         class="btn btn-blue"
         @click="onSubmitDebugInfo"
       >
+        <font-awesome-icon :icon="faPaperPlane" />
         {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
       </button>
     </div>
@@ -56,13 +57,13 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapGetters } from 'vuex';
 import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
 import TroubleshootingDebugModal from '@/components/TroubleshootingDebugModal/TroubleshootingDebugModal.vue';
 
-library.add(faBug);
+library.add(faBug, faPaperPlane);
 
 export default {
   name: 'TroubleshootingDebug',
@@ -115,6 +116,7 @@ export default {
   },
   created() {
     this.faBug = faBug;
+    this.faPaperPlane = faPaperPlane;
   },
   methods: {
     onModalClose() {

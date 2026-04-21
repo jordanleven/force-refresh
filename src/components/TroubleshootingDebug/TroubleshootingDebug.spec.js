@@ -1,5 +1,5 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
@@ -9,7 +9,7 @@ jest.mock('@/js/services/admin/refreshService.js', () => ({
   sendDebugEmail: jest.fn(),
 }));
 
-library.add(faBug);
+library.add(faBug, faPaperPlane);
 
 const createVuexStore = (isSubmitDebugEnabled) => createStore({
   getters: {
