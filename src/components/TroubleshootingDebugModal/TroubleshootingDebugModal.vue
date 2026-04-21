@@ -10,7 +10,7 @@
     @close="onClose"
   >
     <template
-      v-if="status !== 'sent'"
+      v-if="!isStatusSent"
       #header
     >
       <p class="debug-modal__title">
@@ -19,7 +19,7 @@
     </template>
 
     <template
-      v-if="status !== 'sent' && fetchedData"
+      v-if="!isStatusSent && isFetchedDataAvailable"
       #subheader
     >
       <div class="debug-modal__note">
@@ -32,7 +32,7 @@
     </template>
 
     <div
-      v-if="status === 'sent'"
+      v-if="isStatusSent"
       class="debug-modal__sent"
     >
       <div class="debug-modal__sent-icon">
@@ -56,7 +56,7 @@
       v-else
       class="debug-modal__body"
     >
-      <template v-if="status === 'loading'">
+      <template v-if="isStatusLoading">
         <div class="debug-modal__loading">
           <div
             v-for="n in payloadRowCount"
@@ -84,6 +84,7 @@
             v-if="supportTopicUrlError"
             class="debug-modal__field-error"
           >
+            <font-awesome-icon :icon="faCircleExclamation" />
             {{ supportTopicUrlError }}
           </p>
         </div>
@@ -100,7 +101,7 @@
         </div>
 
         <p
-          v-if="status === 'error' && requestError"
+          v-if="isStatusError && requestError"
           class="debug-modal__error"
         >
           {{ requestError }}
@@ -121,7 +122,7 @@
         </button>
         <button
           class="button-primary"
-          :disabled="status === 'loading' || status === 'sending' || !supportTopicUrl"
+          :disabled="isSendButtonDisabled"
           @click="onSend"
         >
           {{ status === 'sending'
@@ -135,18 +136,20 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseModal from '@/components/BaseModal/BaseModal.vue';
 import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
 
-library.add(faCheck, faCircleInfo);
+library.add(faCheck, faCircleExclamation, faCircleInfo);
 
-const STATUS_IDLE = 'idle';
-const STATUS_LOADING = 'loading';
-const STATUS_SENDING = 'sending';
-const STATUS_SENT = 'sent';
-const STATUS_ERROR = 'error';
+const STATUS = {
+  ERROR: 'error',
+  IDLE: 'idle',
+  LOADING: 'loading',
+  SENDING: 'sending',
+  SENT: 'sent',
+};
 
 export default {
   name: 'TroubleshootingDebugModal',
@@ -161,12 +164,28 @@ export default {
     return {
       fetchedData: null,
       requestError: '',
-      status: STATUS_IDLE,
+      status: STATUS.IDLE,
       supportTopicUrl: '',
       supportTopicUrlError: '',
     };
   },
   computed: {
+    isFetchedDataAvailable() {
+      return !!this.fetchedData;
+    },
+    isSendButtonDisabled() {
+      const allowedStatuses = [STATUS.LOADING, STATUS.SENDING];
+      return allowedStatuses.includes(this.status) || !this.supportTopicUrl;
+    },
+    isStatusError() {
+      return this.status === STATUS.ERROR;
+    },
+    isStatusLoading() {
+      return this.status === STATUS.LOADING;
+    },
+    isStatusSent() {
+      return this.status === STATUS.SENT;
+    },
     payloadRowCount() {
       return this.payloadRows.length || 7;
     },
@@ -184,7 +203,7 @@ export default {
   watch: {
     async isOpen(val) {
       if (val) {
-        this.status = STATUS_LOADING;
+        this.status = STATUS.LOADING;
         const result = await getDebugEmailData();
         const data = result?.data ?? null;
         if (!data?.submitterEmail) {
@@ -194,11 +213,11 @@ export default {
         this.fetchedData = data;
         this.requestError = '';
         this.supportTopicUrlError = '';
-        this.status = STATUS_IDLE;
+        this.status = STATUS.IDLE;
       } else {
         setTimeout(() => {
           this.requestError = '';
-          this.status = STATUS_IDLE;
+          this.status = STATUS.IDLE;
           this.fetchedData = null;
           this.supportTopicUrl = '';
           this.supportTopicUrlError = '';
@@ -208,6 +227,7 @@ export default {
   },
   created() {
     this.faCheck = faCheck;
+    this.faCircleExclamation = faCircleExclamation;
     this.faCircleInfo = faCircleInfo;
   },
   methods: {
@@ -222,12 +242,12 @@ export default {
 
       this.requestError = '';
       this.supportTopicUrlError = '';
-      this.status = STATUS_SENDING;
+      this.status = STATUS.SENDING;
       const result = await sendDebugEmail({ supportTopicUrl: this.supportTopicUrl });
       const succeeded = result?.code >= 200 && result?.code < 300;
 
       if (succeeded) {
-        this.status = STATUS_SENT;
+        this.status = STATUS.SENT;
         return;
       }
 
@@ -241,7 +261,7 @@ export default {
           : this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_ERROR');
       }
 
-      this.status = STATUS_ERROR;
+      this.status = STATUS.ERROR;
     },
     onSupportTopicUrlInput() {
       this.requestError = '';
@@ -330,6 +350,9 @@ export default {
   }
 
   &__field-error {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
     font-size: 0.8125rem;
     color: var.$red;
     margin-top: 0.5rem;
