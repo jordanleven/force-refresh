@@ -12,6 +12,7 @@ export default (localizedData) => ({
     scheduledRefreshes: localizedData.scheduledRefreshes,
     siteId: localizedData.siteId,
     siteName: localizedData.siteName,
+    siteUrl: localizedData.siteUrl,
     versionForceRefreshInstalled: localizedData.versions.forceRefresh.version,
     versionForceRefreshRequired: localizedData.versions.forceRefresh.versionRequired,
     versionPhpInstalled: localizedData.versions.php.version,

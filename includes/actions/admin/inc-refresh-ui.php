@@ -11,6 +11,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debugging;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Options;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debug_Email;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
@@ -30,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return  array   The versions data
  */
 function get_localized_data_versions(): array {
-    $force_refresh_plugin_data = get_plugin_data( get_main_plugin_file() );
+    $force_refresh_plugin_data = get_force_refresh_plugin_data();
 
     return array(
         'php'          => array(
@@ -77,6 +78,7 @@ function get_admin_api_endpoints(): array {
         'options'             => Api_Handler_Admin_Options::get_rest_endpoint(),
         'debugging'           => Api_Handler_Admin_Debugging::get_rest_endpoint(),
         'scheduleRefreshSite' => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint(),
+        'debugEmail'          => Api_Handler_Admin_Debug_Email::get_rest_endpoint(),
     );
 }
 
@@ -108,6 +110,7 @@ function get_localized_data(): array {
             'postName'                    => get_the_title(),
             'isMultiSite'                 => (bool) is_multisite(),
             'currentSiteId'               => (int) get_current_blog_id(),
+            'siteUrl'                     => get_bloginfo( 'url' ),
             'versions'                    => $versions,
             'featureFlags'                => Feature_Flag_Service::get_all(),
         ),

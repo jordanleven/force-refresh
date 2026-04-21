@@ -38,31 +38,53 @@
       <span class="debug-panel__submit-label">
         {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
       </span>
-      <button class="btn btn-blue">
+      <button
+        class="btn btn-submit-report"
+        data-test="btn-submit-debug-info"
+        @click="onSubmitDebugInfo"
+      >
+        <font-awesome-icon :icon="faPaperPlane" />
         {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
       </button>
     </div>
+
+    <TroubleshootingDebugModal
+      :is-open="isModalOpen"
+      @modal-was-closed="onModalClose"
+    />
   </div>
 </template>
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapGetters } from 'vuex';
 import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
+import TroubleshootingDebugModal from '@/components/TroubleshootingDebugModal/TroubleshootingDebugModal.vue';
 
-library.add(faBug);
+library.add(faBug, faPaperPlane);
 
 export default {
   name: 'TroubleshootingDebug',
   components: {
     BaseToggle,
+    TroubleshootingDebugModal,
   },
   props: {
+    debugInfo: VueTypes.shape({
+      siteName: VueTypes.string.isRequired,
+      siteUrl: VueTypes.string.isRequired,
+      versions: VueTypes.object.isRequired,
+    }).isRequired,
     isDebugActive: VueTypes.bool.isRequired,
   },
   emits: ['toggled'],
+  data() {
+    return {
+      isModalOpen: false,
+    };
+  },
   computed: {
     classesBanner() {
       return [
@@ -94,8 +116,15 @@ export default {
   },
   created() {
     this.faBug = faBug;
+    this.faPaperPlane = faPaperPlane;
   },
   methods: {
+    onModalClose() {
+      this.isModalOpen = false;
+    },
+    onSubmitDebugInfo() {
+      this.isModalOpen = true;
+    },
     onToggled(val) {
       this.$emit('toggled', val);
     },
@@ -106,8 +135,6 @@ export default {
 <style lang="scss" scoped>
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
-
-$card-radius: 1.25rem;
 
 .debug-panel {
   margin-bottom: var.$space-medium;
@@ -121,7 +148,8 @@ $card-radius: 1.25rem;
     gap: var.$space-medium;
 
     &--open {
-      border-radius: $card-radius $card-radius 0 0;
+      @include utils.card-radius-top;
+
       margin-bottom: 0;
     }
   }
@@ -129,7 +157,7 @@ $card-radius: 1.25rem;
   &__icon-wrap {
     width: 2.5rem;
     height: 2.5rem;
-    border-radius: 0.75rem;
+    border-radius: utils.$card-radius-default;
     background: rgba(var.$blue, 0.12);
     backdrop-filter: blur(8px);
     display: flex;
@@ -189,13 +217,22 @@ $card-radius: 1.25rem;
     backdrop-filter: blur(28px) saturate(1.8);
     border: 1px solid rgba(var.$white, 0.6);
     border-top: 1px solid rgba(var.$blue, 0.1);
-    border-radius: 0 0 $card-radius $card-radius;
-    padding: 0.75rem 1.375rem;
+
+    @include utils.card-radius-bottom;
+
+    padding: 0.875rem 1.375rem;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
     margin-top: -1px;
     box-shadow: 0 8px 24px rgba(var.$black, 0.07), inset 0 -1px 0 rgba(var.$white, 0.5);
+
+    @include utils.small {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
   }
 
   &__submit-label {
@@ -208,8 +245,7 @@ $card-radius: 1.25rem;
   display: inline-flex;
   align-items: center;
   gap: var.$space-small;
-  padding: 0 var.$space-medium;
-  height: 2.125rem;
+  padding: var.$space-medium / 1.5 var.$space-medium;
   font-size: 0.844rem;
   font-weight: 500;
   border-radius: 980px;
@@ -217,13 +253,26 @@ $card-radius: 1.25rem;
   cursor: pointer;
   font-family: inherit;
   transition: all 0.15s;
-  letter-spacing: -0.0063rem;
+
+  @include utils.small {
+    padding: var.$space-medium / 2 var.$space-medium;
+  }
 }
 
-.btn-blue {
+.btn-submit-report {
   background: var.$blue;
   color: var.$white;
   box-shadow: 0 2px 8px rgba(var.$blue, 0.35), inset 0 1px 0 rgba(var.$white, 0.2);
+  justify-content: center;
+  width: 100%;
+  max-width: 15rem;
+  margin: var.$space-medium auto 0;
+
+  @include utils.small {
+    width: auto;
+    max-width: none;
+    margin: 0;
+  }
 
   &:hover { filter: brightness(1.07); }
   &:active { transform: scale(0.97); }

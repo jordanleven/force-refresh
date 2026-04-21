@@ -1,17 +1,31 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
+import { faBug, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import TroubleshootingDebug from './TroubleshootingDebug.vue';
 
-library.add(faBug);
+jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
+  sendDebugEmail: jest.fn(),
+}));
+
+library.add(faBug, faPaperPlane);
 
 const createVuexStore = (isSubmitDebugEnabled) => createStore({
   getters: {
     isFeatureEnabled: () => (flag) => flag === 'troubleshootingSubmitDebug' && isSubmitDebugEnabled,
   },
 });
+
+const debugInfo = {
+  siteName: 'Test Site',
+  siteUrl: 'https://example.com',
+  versions: {
+    forceRefresh: { version: '2.0.0' },
+    php: { version: '8.2.0' },
+    wordPress: { version: '6.5.0' },
+  },
+};
 
 const getWrapper = ({ isDebugActive = false, isSubmitDebugEnabled = false } = {}) => shallowMount(TroubleshootingDebug, {
   global: {
@@ -22,6 +36,7 @@ const getWrapper = ({ isDebugActive = false, isSubmitDebugEnabled = false } = {}
     plugins: [createVuexStore(isSubmitDebugEnabled)],
   },
   props: {
+    debugInfo,
     isDebugActive,
   },
 });

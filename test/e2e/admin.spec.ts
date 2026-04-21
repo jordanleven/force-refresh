@@ -141,6 +141,77 @@ test.describe('Admin', () => {
       });
     });
 
+    test.describe('Debug email', () => {
+      test.describe.configure({ mode: 'serial' });
+      let page: Page;
+
+      test.beforeAll(async ({ browser, baseURL }) => {
+        const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
+        page = await context.newPage();
+        await goToPluginPage(page);
+        await page.locator('[data-test="btn-troubleshooting"]').click();
+        await page.locator('[data-test="toggle-debug-mode"] label').click();
+      });
+
+      test.afterAll(async () => {
+        // Close the modal if it was left open by a failing test
+        const modal = page.locator('.modal-window--open');
+        if (await modal.isVisible()) {
+          await page.locator('[data-test="btn-cancel-debug-email"]').click();
+          await expect(modal).not.toBeVisible();
+        }
+        await page.locator('[data-test="toggle-debug-mode"] label').click();
+        await page.close();
+      });
+
+      test('Clicking Submit Debug Info opens the debug email modal', async () => {
+        await page.locator('[data-test="btn-submit-debug-info"]').click();
+        await expect(page.locator('.modal-window')).toBeVisible();
+      });
+
+      test('The modal shows a loading state while fetching data', async () => {
+        await page.locator('[data-test="btn-cancel-debug-email"]').click();
+        await expect(page.locator('.modal-window')).not.toBeVisible();
+
+        await page.route('**/wp-json/force-refresh/v1/debug-email', async (route, request) => {
+          if (request.method() !== 'GET') {
+            await route.continue();
+            return;
+          }
+
+          await page.waitForTimeout(750);
+          await route.continue();
+        }, { times: 1 });
+
+        await page.locator('[data-test="btn-submit-debug-info"]').click();
+        await expect(page.locator('.debug-modal__loading')).toBeVisible();
+      });
+
+      test('The modal shows debug data rows after loading', async () => {
+        await expect(page.locator('.debug-modal__rows')).toBeVisible({ timeout: 15_000 });
+        await expect(page.locator('.debug-modal__row').first()).toBeVisible();
+      });
+
+      test('The send button is disabled when no URL is entered', async () => {
+        await expect(page.locator('[data-test="btn-send-debug-email"]')).toBeDisabled();
+      });
+
+      test('Entering a valid support URL enables the send button', async () => {
+        await page.locator('#debug-support-topic-url').fill('https://wordpress.org/support/topic/test-issue/');
+        await expect(page.locator('[data-test="btn-send-debug-email"]')).not.toBeDisabled();
+      });
+
+      test('Submitting the form shows the success state', async () => {
+        await page.locator('[data-test="btn-send-debug-email"]').click();
+        await expect(page.locator('[data-test="debug-email-sent"]')).toBeVisible({ timeout: 15_000 });
+      });
+
+      test('Clicking Done on the success state closes the modal', async () => {
+        await page.locator('[data-test="btn-debug-email-done"]').click();
+        await expect(page.locator('.modal-window')).not.toBeVisible();
+      });
+    });
+
     test('Clicking Exit Troubleshooting returns to the main admin page', async ({ page }) => {
       await goToPluginPage(page);
       await page.locator('[data-test="btn-troubleshooting"]').click();

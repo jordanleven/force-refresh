@@ -121,11 +121,19 @@ function get_force_refresh_plugin_url( $file = null ) {
 }
 
 /**
- * Function to conditionally log data based if WP_DEBUG is set.
+ * Gets the current plugin data from the main plugin file.
+ *
+ * @return array The plugin data.
+ */
+function get_force_refresh_plugin_data(): array {
+    require_once ABSPATH . 'wp-admin/includes/plugin.php';
+    return get_plugin_data( get_main_plugin_file() );
+}
+
+/**
+ * Function to conditionally log data if WP_DEBUG is set.
  *
  * @param mixed $log The data to log.
- *
- * @return void
  */
 function logger( $log ): void {
     if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {

@@ -15,6 +15,15 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler;
 abstract class Api_Handler_Admin extends Api_Handler {
 
     /**
+     * Returns the shared admin permission callback for admin endpoints.
+     *
+     * @return array
+     */
+    protected function get_admin_permission_callback(): array {
+        return array( $this, 'user_is_able_to_admin_force_refresh' );
+    }
+
+    /**
      * Method for checking if a user can make changes to Force Refresh.
      *
      * @return  bool    True if use can modify Force Refresh settings.

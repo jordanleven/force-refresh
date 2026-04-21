@@ -11,5 +11,5 @@
 return array(
     'scheduledRefresh'           => false,
     'troubleshootingTerminal'    => false,
-    'troubleshootingSubmitDebug' => false,
+    'troubleshootingSubmitDebug' => true,
 );

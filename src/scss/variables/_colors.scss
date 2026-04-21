@@ -19,6 +19,8 @@ $card-border: rgba($white, 0.7);
 $card-border-bottom: rgba($black, 0.06);
 $border-subtle: rgba($black, 0.04);
 $border-subtle-strong: rgba($black, 0.05);
+$overlay-backdrop-background: rgba($black, 0.4);
+$overlay-backdrop-blur: blur(0.125rem);
 $status-error: $red;
 $status-warning: $yellow;
 $status-success: $green;

@@ -13,3 +13,11 @@ $card-radius-default: 0.75rem;
   border-bottom-color: var.$card-border-bottom;
   overflow: hidden;
 }
+
+@mixin card-radius-top($radius: $card-radius-default) {
+  border-radius: $radius $radius 0 0;
+}
+
+@mixin card-radius-bottom($radius: $card-radius-default) {
+  border-radius: 0 0 $radius $radius;
+}

@@ -19,6 +19,7 @@ composer.*
 CONTRIBUTING.md
 db
 docker-compose.yml
+docker
 docs
 eslint.config.mjs
 Force-Refresh-*.zip
@@ -33,6 +34,8 @@ playwright.config*.ts
 qa
 README.md
 release-notes.md
+screenshots
 src
 test
+tsconfig.json
 webpack.config.js

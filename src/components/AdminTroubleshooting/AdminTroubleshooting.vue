@@ -1,6 +1,7 @@
 <template>
   <div class="force-refresh-troubleshooting">
     <TroubleshootingDebug
+      :debug-info="debugInfo"
       :is-debug-active="isDebugActive"
       @toggled="toggleDebugMode"
     />
@@ -75,6 +76,7 @@ export default {
       currentSiteId: VueTypes.number.isRequired,
       isMultiSite: VueTypes.bool.isRequired,
       siteName: VueTypes.string.isRequired,
+      siteUrl: VueTypes.string.isRequired,
       versions: VueTypes.shape({
         forceRefresh: VueTypes.object.isRequired,
         php: VueTypes.object.isRequired,
@@ -93,6 +95,13 @@ export default {
       return [
         this.isTerminalEnabled && 'troubleshooting__content--with-terminal',
       ];
+    },
+    debugInfo() {
+      return {
+        siteName: this.troubleshootingInfo.siteName,
+        siteUrl: this.troubleshootingInfo.siteUrl,
+        versions: this.troubleshootingInfo.versions,
+      };
     },
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');

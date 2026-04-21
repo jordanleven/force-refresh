@@ -17,3 +17,16 @@ if ( ! defined( 'WP_FORCE_REFRESH_CAPABILITY' ) ) {
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/wp-root/' );
 }
+
+if ( ! function_exists( 'wp_strip_all_tags' ) ) {
+    /**
+     * Stub for wp_strip_all_tags.
+     *
+     * @param string $text The string to clean.
+     *
+     * @return string
+     */
+    function wp_strip_all_tags( string $text ): string {
+        return strip_tags( $text );
+    }
+}

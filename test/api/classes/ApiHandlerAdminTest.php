@@ -129,4 +129,20 @@ final class ApiHandlerAdminTest extends TestCase {
         $handler->user_is_able_to_admin_force_refresh();
         $this->assertEquals( WP_FORCE_REFRESH_CAPABILITY, self::$mock_current_user_can->get_invocation_arguments( 0 )[0] );
     }
+
+    /**
+     * Test that the shared admin permission callback points to the admin capability check.
+     */
+    public function testGetAdminPermissionCallbackReturnsAdminCapabilityCallback() {
+        $handler = new class() extends Api_Handler_Admin_Options {
+            public function get_permission_callback_for_test(): array {
+                return $this->get_admin_permission_callback();
+            }
+        };
+
+        $this->assertEquals(
+            array( $handler, 'user_is_able_to_admin_force_refresh' ),
+            $handler->get_permission_callback_for_test()
+        );
+    }
 }
