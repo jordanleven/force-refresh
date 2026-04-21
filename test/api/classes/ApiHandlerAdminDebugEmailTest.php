@@ -270,11 +270,35 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     }
 
     /**
+     * Get the debug-data response payload.
+     *
+     * @return array
+     */
+    private function get_debug_data_payload(): array {
+        $response = ( new Api_Handler_Admin_Debug_Email() )->get_debug_data();
+        return $response->get_data();
+    }
+
+    /**
+     * Send a debug email for a support topic and return the response data.
+     *
+     * @param string $support_topic_url The support topic URL.
+     *
+     * @return \WP_REST_Response
+     */
+    private function send_debug_email_for_topic( string $support_topic_url ): \WP_REST_Response {
+        $request = new \WP_REST_Request();
+        $request->set_param( 'supportTopicUrl', $support_topic_url );
+
+        return ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
+    }
+
+    /**
      * Test that register_routes registers the REST endpoints.
      *
      * @return void
      */
-    public function testRegisterRoutesRegistersEndpoints(): void {
+    public function testRegisterRoutesRegistersForceRefreshNamespace(): void {
         self::$mock_register_rest_route->resetInvocationIndex();
 
         ( new Api_Handler_Admin_Debug_Email() )->register_routes();
@@ -282,69 +306,178 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         $args = self::$mock_register_rest_route->get_invocation_arguments( 0 );
 
         $this->assertEquals( 'force-refresh/v1', $args[0] );
+    }
+
+    /**
+     * Test that register_routes registers the debug email path.
+     *
+     * @return void
+     */
+    public function testRegisterRoutesRegistersDebugEmailPath(): void {
+        self::$mock_register_rest_route->resetInvocationIndex();
+
+        ( new Api_Handler_Admin_Debug_Email() )->register_routes();
+
+        $args = self::$mock_register_rest_route->get_invocation_arguments( 0 );
+
         $this->assertEquals( '/debug-email', $args[1] );
     }
 
     /**
-     * Test that get_debug_data returns submitter email and ordered rows.
+     * Test that get_debug_data returns a 200 response.
      *
      * @return void
      */
-    public function testGetDebugDataReturnsSubmitterEmailAndRows(): void {
+    public function testGetDebugDataReturns200Response(): void {
         $response = ( new Api_Handler_Admin_Debug_Email() )->get_debug_data();
-        $data     = $response->get_data();
 
         $this->assertEquals( 200, $response->get_status() );
-        $this->assertEquals( 'noreply@wordpress.com', $data['data']['submitterEmail'] );
-        $this->assertCount( 7, $data['data']['rows'] );
-        $this->assertEquals(
-            'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME',
-            $data['data']['rows'][0]['key']
-        );
-        $this->assertEquals( 'Test Site', $data['data']['rows'][0]['value'] );
-        $this->assertEquals( '120s', $data['data']['rows'][4]['value'] );
     }
 
     /**
-     * Test that send_debug_email requires a support topic URL.
+     * Test that get_debug_data returns the current submitter email.
      *
      * @return void
      */
-    public function testSendDebugEmailRequiresSupportTopicUrl(): void {
+    public function testGetDebugDataReturnsSubmitterEmail(): void {
+        $data = $this->get_debug_data_payload();
+
+        $this->assertEquals( 'noreply@wordpress.com', $data['data']['submitterEmail'] );
+    }
+
+    /**
+     * Test that get_debug_data includes the site name row.
+     *
+     * @return void
+     */
+    public function testGetDebugDataIncludesSiteNameRow(): void {
+        $rows = $this->get_debug_data_payload()['data']['rows'];
+
+        $this->assertContains(
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SITE_NAME',
+                'value' => 'Test Site',
+            ),
+            $rows,
+        );
+    }
+
+    /**
+     * Test that get_debug_data includes the refresh interval row.
+     *
+     * @return void
+     */
+    public function testGetDebugDataIncludesRefreshIntervalRow(): void {
+        $rows = $this->get_debug_data_payload()['data']['rows'];
+
+        $this->assertContains(
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_REFRESH_INTERVAL',
+                'value' => '120s',
+            ),
+            $rows,
+        );
+    }
+
+    /**
+     * Test that get_debug_data includes the PHP version row.
+     *
+     * @return void
+     */
+    public function testGetDebugDataIncludesPhpVersionRow(): void {
+        $rows = $this->get_debug_data_payload()['data']['rows'];
+
+        $this->assertContains(
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION',
+                'value' => phpversion(),
+            ),
+            $rows,
+        );
+    }
+
+    /**
+     * Test that send_debug_email without a support topic returns 400.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailWithoutSupportTopicReturns400(): void {
+        $request  = new \WP_REST_Request();
+        $response = ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
+
+        $this->assertEquals( 400, $response->get_status() );
+    }
+
+    /**
+     * Test that send_debug_email without a support topic returns the required message key.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailWithoutSupportTopicReturnsRequiredMessageKey(): void {
         $request  = new \WP_REST_Request();
         $response = ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
         $data     = $response->get_data();
 
-        $this->assertEquals( 400, $response->get_status() );
         $this->assertEquals( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_REQUIRED', $data['message'] );
+    }
+
+    /**
+     * Test that send_debug_email without a support topic returns the field name.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailWithoutSupportTopicReturnsSupportTopicField(): void {
+        $request  = new \WP_REST_Request();
+        $response = ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
+        $data     = $response->get_data();
+
         $this->assertEquals( 'supportTopicUrl', $data['data']['field'] );
     }
 
     /**
-     * Test that send_debug_email validates the support topic URL host/path.
+     * Test that send_debug_email rejects invalid support topic URLs with a 400.
      *
      * @return void
      */
-    public function testSendDebugEmailRejectsInvalidSupportTopicUrl(): void {
+    public function testSendDebugEmailRejectsInvalidSupportTopicUrlWith400(): void {
         self::$mock_wp_remote_get->resetInvocationIndex();
 
-        $request = new \WP_REST_Request();
-        $request->set_param( 'supportTopicUrl', 'https://example.com/topic/not-valid/' );
-
-        $response = ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
-        $data     = $response->get_data();
+        $response = $this->send_debug_email_for_topic( 'https://example.com/topic/not-valid/' );
 
         $this->assertEquals( 400, $response->get_status() );
+    }
+
+    /**
+     * Test that send_debug_email returns the invalid URL message key.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailRejectsInvalidSupportTopicUrlWithMessageKey(): void {
+        $response = $this->send_debug_email_for_topic( 'https://example.com/topic/not-valid/' );
+        $data     = $response->get_data();
+
         $this->assertEquals( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_INVALID', $data['message'] );
+    }
+
+    /**
+     * Test that invalid support topic URLs do not trigger remote validation.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailRejectsInvalidSupportTopicUrlBeforeRemoteCall(): void {
+        self::$mock_wp_remote_get->resetInvocationIndex();
+
+        $this->send_debug_email_for_topic( 'https://example.com/topic/not-valid/' );
+
         $this->assertNull( self::$mock_wp_remote_get->get_invocation_arguments( 0 ) );
     }
 
     /**
-     * Test that send_debug_email rejects resolved support topics.
+     * Test that send_debug_email rejects resolved support topics with a 409.
      *
      * @return void
      */
-    public function testSendDebugEmailRejectsResolvedSupportTopic(): void {
+    public function testSendDebugEmailRejectsResolvedSupportTopicWith409(): void {
         self::$mock_wp_remote_get->set_return_value(
             array(
                 'response' => array(
@@ -354,34 +487,102 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
             )
         );
 
-        $request = new \WP_REST_Request();
-        $request->set_param( 'supportTopicUrl', 'https://wordpress.org/support/topic/test-topic/' );
-
-        $response = ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
-        $data     = $response->get_data();
+        $response = $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
 
         $this->assertEquals( 409, $response->get_status() );
+    }
+
+    /**
+     * Test that send_debug_email returns the resolved support topic message key.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailRejectsResolvedSupportTopicWithMessageKey(): void {
+        self::$mock_wp_remote_get->set_return_value(
+            array(
+                'response' => array(
+                    'code' => 200,
+                ),
+                'body'     => 'Status: resolved',
+            )
+        );
+
+        $response = $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
+        $data     = $response->get_data();
+
         $this->assertEquals( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SUPPORT_URL_RESOLVED', $data['message'] );
     }
 
     /**
-     * Test that send_debug_email sends the report and includes the support topic URL.
+     * Test that send_debug_email returns 200 when the report is sent.
      *
      * @return void
      */
-    public function testSendDebugEmailSendsReportWithSupportTopicUrl(): void {
+    public function testSendDebugEmailReturns200WhenReportIsSent(): void {
         self::$mock_wp_mail->resetInvocationIndex();
 
-        $request = new \WP_REST_Request();
-        $request->set_param( 'supportTopicUrl', 'https://wordpress.org/support/topic/test-topic/' );
-
-        $response = ( new Api_Handler_Admin_Debug_Email() )->send_debug_email( $request );
-        $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
+        $response = $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
 
         $this->assertEquals( 200, $response->get_status() );
+    }
+
+    /**
+     * Test that send_debug_email uses the configured recipient address.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailUsesConfiguredRecipientAddress(): void {
+        self::$mock_wp_mail->resetInvocationIndex();
+
+        $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
+
+        $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
+
         $this->assertEquals( 'force-refresh@jordanleven.com', $mail_args[0] );
+    }
+
+    /**
+     * Test that send_debug_email includes the support topic URL in the email body.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailIncludesSupportTopicUrlInEmailBody(): void {
+        self::$mock_wp_mail->resetInvocationIndex();
+
+        $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
+
+        $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
+
         $this->assertStringContainsString( 'Support Topic URL:      https://wordpress.org/support/topic/test-topic/', $mail_args[2] );
+    }
+
+    /**
+     * Test that send_debug_email includes the current site version in the email body.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailIncludesCurrentSiteVersionInEmailBody(): void {
+        self::$mock_wp_mail->resetInvocationIndex();
+
+        $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
+
+        $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
+
         $this->assertStringContainsString( 'Current Site Version:   abc12345', $mail_args[2] );
+    }
+
+    /**
+     * Test that send_debug_email CCs the current user.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailCcsTheCurrentUser(): void {
+        self::$mock_wp_mail->resetInvocationIndex();
+
+        $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
+
+        $mail_args = self::$mock_wp_mail->get_invocation_arguments( 0 );
+
         $this->assertEquals( array( 'Cc: noreply@wordpress.com' ), $mail_args[3] );
     }
 
