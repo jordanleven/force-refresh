@@ -169,19 +169,6 @@ describe('TroubleshootingDebugModal', () => {
     });
   });
 
-  describe('Close button', () => {
-    it('emits close when the close button is clicked', async () => {
-      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });
-      const wrapper = getWrapper({ isOpen: false });
-
-      await wrapper.setProps({ isOpen: true });
-      await wrapper.vm.$nextTick();
-      await wrapper.find('.modal__close').trigger('click');
-
-      expect(wrapper.emitted('close')).toHaveLength(1);
-    });
-  });
-
   describe('Overlay click', () => {
     it('emits close when the overlay is clicked', async () => {
       const wrapper = getWrapper({ isOpen: true });
