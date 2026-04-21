@@ -35,17 +35,17 @@
       v-if="isSubmitDebugRowVisible"
       class="debug-panel__submit-row"
     >
-          <span class="debug-panel__submit-label">
-            {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
-          </span>
-          <button
-            class="btn btn-blue"
-            data-test="btn-submit-debug-info"
-            @click="onSubmitDebugInfo"
-          >
-            <font-awesome-icon :icon="faPaperPlane" />
-            {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
-          </button>
+      <span class="debug-panel__submit-label">
+        {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
+      </span>
+      <button
+        class="btn btn-blue"
+        data-test="btn-submit-debug-info"
+        @click="onSubmitDebugInfo"
+      >
+        <font-awesome-icon :icon="faPaperPlane" />
+        {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
+      </button>
     </div>
 
     <TroubleshootingDebugModal
@@ -234,13 +234,11 @@ export default {
   }
 }
 
-
 .btn {
   display: inline-flex;
   align-items: center;
   gap: var.$space-small;
-  padding: 0 var.$space-medium;
-  height: 2.125rem;
+  padding: var.$space-medium / 2 var.$space-medium;
   font-size: 0.844rem;
   font-weight: 500;
   border-radius: 980px;
