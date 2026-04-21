@@ -69,8 +69,6 @@ import VueTypes from 'vue-types';
 export default {
   name: 'BaseModal',
   props: {
-    closeOnEscape: VueTypes.bool.def(true),
-    closeOnOverlay: VueTypes.bool.def(true),
     header: VueTypes.string,
     isOpen: VueTypes.bool.def(true),
     maxWidth: VueTypes.string,
@@ -107,7 +105,7 @@ export default {
   },
   mounted() {
     this.keydownHandler = (e) => {
-      if (this.isOpen && this.closeOnEscape && e.key === 'Escape') {
+      if (this.isOpen && e.key === 'Escape') {
         this.close();
       }
     };
@@ -122,9 +120,7 @@ export default {
       this.$emit('modal-was-closed');
     },
     onOverlayClick() {
-      if (this.closeOnOverlay) {
-        this.close();
-      }
+      this.close();
     },
   },
 };
