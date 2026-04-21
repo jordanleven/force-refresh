@@ -2,11 +2,11 @@ import {
   deleteScheduledRefresh,
   getScheduledRefreshes,
   scheduleRequestSiteRefresh,
-} from '../services/admin/refreshService.js';
+} from '../services/admin/forceRefreshAdminService.js';
 import actions from './actions.js';
 
 // Mock the service module
-jest.mock('../services/admin/refreshService.js', () => ({
+jest.mock('../services/admin/forceRefreshAdminService.js', () => ({
   deleteScheduledRefresh: jest.fn(),
   getScheduledRefreshes: jest.fn(),
   requestPostRefreshByPostID: jest.fn(),

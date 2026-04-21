@@ -2,10 +2,10 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { mount } from '@vue/test-utils';
-import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/refreshService.js';
+import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
 import TroubleshootingDebugModal from './TroubleshootingDebugModal.vue';
 
-jest.mock('@/js/services/admin/refreshService.js', () => ({
+jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
   getDebugEmailData: jest.fn(),
   sendDebugEmail: jest.fn(),
 }));

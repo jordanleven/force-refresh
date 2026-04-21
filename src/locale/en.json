@@ -35,7 +35,6 @@
     "SUBMIT_DEBUG_LABEL": "Have an open support ticket? Submit your debug information to help diagnose the problem.",
     "DEBUG_MODAL_TITLE": "Submit Debug Report",
     "DEBUG_MODAL_NOTE": "Only the following diagnostic data will be included. {email} will be CC'd on this report.",
-    "DEBUG_MODAL_SUPPORT_URL_LABEL": "Support topic URL",
     "DEBUG_MODAL_SUPPORT_URL_DESCRIPTION": "Paste the URL for your WordPress.org support topic.",
     "DEBUG_MODAL_SUPPORT_URL_PLACEHOLDER": "https://wordpress.org/support/topic/your-topic/",
     "DEBUG_MODAL_SUPPORT_URL_REQUIRED": "Please enter your WordPress.org support topic URL before sending the report.",

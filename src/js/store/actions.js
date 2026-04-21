@@ -6,7 +6,7 @@ import {
   scheduleRequestSiteRefresh,
   updateForceRefreshDebugMode,
   updateForceRefreshOptions,
-} from '@/js/services/admin/refreshService.js';
+} from '@/js/services/admin/forceRefreshAdminService.js';
 
 /**
  * Function to check if the returned response code is a success.

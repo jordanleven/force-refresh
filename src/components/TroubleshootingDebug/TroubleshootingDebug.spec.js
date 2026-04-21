@@ -5,7 +5,7 @@ import { shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
 import TroubleshootingDebug from './TroubleshootingDebug.vue';
 
-jest.mock('@/js/services/admin/refreshService.js', () => ({
+jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
   sendDebugEmail: jest.fn(),
 }));
 

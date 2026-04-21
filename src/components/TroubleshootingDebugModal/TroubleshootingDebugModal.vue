@@ -138,7 +138,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faCircleInfo, faXmark } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
-import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/refreshService.js';
+import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
 
 library.add(faCheck, faCircleInfo, faXmark);
 
@@ -266,6 +266,13 @@ export default {
 @use "sass:color";
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
+
+@mixin debug-modal-panel {
+  border-radius: utils.$card-radius-default;
+  overflow: hidden;
+  border: 1px solid rgba(var.$black, 0.06);
+  background: rgba(var.$white, 0.6);
+}
 
 .debug-modal {
   &__overlay {
@@ -412,20 +419,15 @@ export default {
   }
 
   &__rows {
-    border-radius: utils.$card-radius-default;
-    overflow: hidden;
-    border: 1px solid rgba(var.$black, 0.06);
-    background: rgba(var.$white, 0.6);
+    @include debug-modal-panel;
   }
 
   &__loading {
+    @include debug-modal-panel;
+
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    border-radius: utils.$card-radius-default;
-    overflow: hidden;
-    border: 1px solid rgba(var.$black, 0.06);
-    background: rgba(var.$white, 0.6);
     padding: 0.625rem 0.875rem;
   }
 
@@ -463,7 +465,7 @@ export default {
     color: var.$text-primary;
     font-weight: 500;
     text-align: right;
-    word-break: break-all;
+    overflow-wrap: anywhere;
   }
 
   &__error {
