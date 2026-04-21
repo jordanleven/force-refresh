@@ -23,7 +23,7 @@ const mockRows = [
 ];
 
 const mockPayload = {
-  rows: mockRows,
+  debugData: mockRows,
   submitterEmail: 'admin@example.com',
 };
 

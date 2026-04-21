@@ -351,7 +351,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     public function testGetDebugDataIncludesSiteNameRow(): void {
-        $rows = $this->get_debug_data_payload()['data']['rows'];
+        $rows = $this->get_debug_data_payload()['data']['debugData'];
 
         $this->assertContains(
             array(
@@ -368,7 +368,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     public function testGetDebugDataIncludesRefreshIntervalRow(): void {
-        $rows = $this->get_debug_data_payload()['data']['rows'];
+        $rows = $this->get_debug_data_payload()['data']['debugData'];
 
         $this->assertContains(
             array(
@@ -385,7 +385,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     public function testGetDebugDataIncludesPhpVersionRow(): void {
-        $rows = $this->get_debug_data_payload()['data']['rows'];
+        $rows = $this->get_debug_data_payload()['data']['debugData'];
 
         $this->assertContains(
             array(

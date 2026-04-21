@@ -195,7 +195,7 @@ export default {
     },
     payloadRows() {
       if (!this.fetchedData) return [];
-      return this.fetchedData.rows.map((row) => ({
+      return this.fetchedData.debugData.map((row) => ({
         label: this.$t(row.key),
         value: row.value,
       }));

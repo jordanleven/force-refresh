@@ -76,7 +76,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             \WP_Http::OK,
             '',
             array(
-                'rows'           => $this->get_debug_rows(),
+                'debugData'      => $this->get_debug_rows(),
                 'submitterEmail' => ! empty( $current_user->user_email ) ? $current_user->user_email : null,
             )
         );
