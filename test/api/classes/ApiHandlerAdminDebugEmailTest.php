@@ -76,11 +76,11 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     private static $mock_get_bloginfo;
 
     /**
-     * Mock for `get_plugin_data`.
+     * Mock for `get_force_refresh_datash_plugin_data`.
      *
      * @var Mocks\Mock_Function
      */
-    private static $mock_get_plugin_data;
+    private static $mock_get_force_refresh_plugin_data;
 
     /**
      * Mock for `get_option`.
@@ -176,7 +176,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
                 return $map[ $key ] ?? null;
             }
         );
-        self::$mock_get_plugin_data        = new Mocks\Mock_Function( self::PLUGIN_NAMESPACE, 'get_plugin_data' );
+        self::$mock_get_force_refresh_plugin_data = new Mocks\Mock_Function( self::PLUGIN_NAMESPACE, 'get_force_refresh_plugin_data' );
         self::$mock_get_option                    = new Mocks\Mock_Function(
             self::SERVICES_NAMESPACE,
             'get_option',
@@ -232,7 +232,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         self::$mock_current_user_can->disable();
         self::$mock_wp_get_current_user->disable();
         self::$mock_get_bloginfo->disable();
-        self::$mock_get_plugin_data->disable();
+        self::$mock_get_force_refresh_plugin_data->disable();
         self::$mock_get_option->disable();
         self::$mock_esc_url_raw->disable();
         self::$mock_wp_parse_url->disable();
@@ -251,7 +251,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     protected function setUp(): void {
-        self::$mock_get_plugin_data->set_return_value( array( 'Version' => '2.18.0' ) );
+        self::$mock_get_force_refresh_plugin_data->set_return_value( array( 'Version' => '2.18.0' ) );
         self::$mock_get_main_plugin_file->set_return_value( '/tmp/force-refresh.php' );
         self::$mock_wp_get_current_user->set_return_value(
             (object) array(

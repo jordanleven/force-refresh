@@ -125,7 +125,7 @@ function get_force_refresh_plugin_url( $file = null ) {
  *
  * @return array The plugin data.
  */
-function get_plugin_data(): array {
+function get_force_refresh_plugin_data(): array {
     require_once ABSPATH . 'wp-admin/includes/plugin.php';
     return get_plugin_data( get_main_plugin_file() );
 }

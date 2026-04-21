@@ -31,7 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return  array   The versions data
  */
 function get_localized_data_versions(): array {
-    $force_refresh_plugin_data = get_plugin_data();
+    $force_refresh_plugin_data = get_force_refresh_plugin_data();
 
     return array(
         'php'          => array(
