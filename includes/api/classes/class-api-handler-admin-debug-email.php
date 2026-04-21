@@ -180,12 +180,12 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             return false;
         }
 
-        // Support topic path has to exist
+        // Support topic path has to exist.
         if ( empty( $parsed_url['path'] ) ) {
             return false;
         }
 
-        // Support topics have to match the WordPress support topic patterns
+        // Support topics have to match the WordPress support topic patterns.
         return 1 === preg_match( '#^/support/topic/[^/]+/?$#', $parsed_url['path'] );
     }
 
@@ -293,16 +293,16 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             );
         }
 
-        // Only allow users to submit reports for support topics that are still unresolved
+        // Only allow users to submit reports for support topics that are still unresolved.
         $support_topic_validation = $this->validate_support_topic_is_unresolved( $support_topic_url );
 
         if ( true !== $support_topic_validation ) {
             return $support_topic_validation;
         }
 
-        $payload    = $this->get_debug_data();
-        $subject    = sprintf( '[Force Refresh] Debug Report — %s', $payload['siteName'] );
-        $body       = $this->format_email_body( $payload, $support_topic_url );
+        $payload      = $this->get_debug_data();
+        $subject      = sprintf( '[Force Refresh] Debug Report — %s', $payload['siteName'] );
+        $body         = $this->format_email_body( $payload, $support_topic_url );
         $current_user = wp_get_current_user();
         $headers      = $current_user->user_email
             ? array( sprintf( 'Cc: %s', $current_user->user_email ) )

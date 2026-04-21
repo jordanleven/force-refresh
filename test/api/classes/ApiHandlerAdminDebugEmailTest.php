@@ -254,7 +254,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         self::$mock_get_plugin_header_data->set_return_value( array( 'Version' => '2.18.0' ) );
         self::$mock_get_main_plugin_file->set_return_value( '/tmp/force-refresh.php' );
         self::$mock_wp_get_current_user->set_return_value(
-            array(
+            (object) array(
                 'user_email' => 'johnnyappleseed@wordpress.com',
             )
         );

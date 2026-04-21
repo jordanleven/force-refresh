@@ -120,18 +120,16 @@ function get_force_refresh_plugin_url( $file = null ) {
     return $plugin_url;
 }
 
-/**
- * Function to conditionally log data based if WP_DEBUG is set.
- *
- * @param mixed $log The data to log.
- *
- * @return void
- */
 function get_plugin_header_data(): array {
     require_once ABSPATH . 'wp-admin/includes/plugin.php';
     return get_plugin_data( get_main_plugin_file() );
 }
 
+/**
+ * Function to conditionally log data if WP_DEBUG is set.
+ *
+ * @param mixed $log The data to log.
+ */
 function logger( $log ): void {
     if ( defined( 'WP_DEBUG' ) && WP_DEBUG === true ) {
         // phpcs:disable WordPress.PHP.DevelopmentFunctions
