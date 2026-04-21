@@ -45,12 +45,12 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
                 array(
                     'methods'             => \WP_REST_Server::READABLE,
                     'callback'            => array( $this, 'get_scheduled_refreshes_site' ),
-                    'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                    'permission_callback' => $this->get_admin_permission_callback(),
                 ),
                 array(
                     'methods'             => \WP_REST_Server::CREATABLE,
                     'callback'            => array( $this, 'schedule_refresh_site' ),
-                    'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                    'permission_callback' => $this->get_admin_permission_callback(),
                 ),
             ),
         );
@@ -63,7 +63,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
                 array(
                     'methods'             => \WP_REST_Server::DELETABLE,
                     'callback'            => array( $this, 'delete_schedule_refresh_site' ),
-                    'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                    'permission_callback' => $this->get_admin_permission_callback(),
                     'args'                => array(
                         'id' => array(
                             'description' => 'The unique identifier of the scheduled refresh.',

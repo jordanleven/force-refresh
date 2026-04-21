@@ -50,7 +50,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             array(
                 'methods'             => \WP_REST_Server::READABLE,
                 'callback'            => array( $this, 'get_debug_data' ),
-                'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                'permission_callback' => $this->get_admin_permission_callback(),
             ),
         );
         self::register_rest_endpoint(
@@ -59,7 +59,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             array(
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( $this, 'send_debug_email' ),
-                'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                'permission_callback' => $this->get_admin_permission_callback(),
             ),
         );
     }

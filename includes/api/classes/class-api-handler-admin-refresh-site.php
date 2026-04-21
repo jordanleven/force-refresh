@@ -42,7 +42,7 @@ class Api_Handler_Admin_Refresh_Site extends Api_Handler_Admin implements Api_Ha
             array(
                 'methods'             => \WP_REST_Server::CREATABLE,
                 'callback'            => array( $this, 'refresh_site' ),
-                'permission_callback' => array( $this, 'user_is_able_to_admin_force_refresh' ),
+                'permission_callback' => $this->get_admin_permission_callback(),
             ),
         );
     }
