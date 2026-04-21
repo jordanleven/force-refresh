@@ -7,6 +7,7 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Api;
 
+use JordanLeven\Plugins\ForceRefresh;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
@@ -146,7 +147,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      * @return array The debug payload.
      */
     private function get_debug_data(): array {
-        $plugin_data = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
+        $plugin_data = get_plugin_data( ForceRefresh\get_main_plugin_file() );
 
         return array(
             'siteUrl'             => get_bloginfo( 'url' ),
