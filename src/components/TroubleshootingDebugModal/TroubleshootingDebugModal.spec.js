@@ -219,6 +219,28 @@ describe('TroubleshootingDebugModal', () => {
     });
   });
 
+  describe('No submitter email', () => {
+    it('keeps the modal open when submitterEmail is null', async () => {
+      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: { ...mockPayload, submitterEmail: null } });
+      const wrapper = getWrapper({ isOpen: false });
+
+      await wrapper.setProps({ isOpen: true });
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.emitted('close')).toBeFalsy();
+    });
+
+    it('shows the no-email note when submitterEmail is null', async () => {
+      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: { ...mockPayload, submitterEmail: null } });
+      const wrapper = getWrapper({ isOpen: false });
+
+      await wrapper.setProps({ isOpen: true });
+      await wrapper.vm.$nextTick();
+
+      expect(wrapper.find('.debug-modal__note span').text()).toBe('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE_NO_EMAIL');
+    });
+  });
+
   describe('Send flow', () => {
     it('shows the sent state after a successful send', async () => {
       getDebugEmailData.mockResolvedValueOnce({ code: 200, data: mockPayload });

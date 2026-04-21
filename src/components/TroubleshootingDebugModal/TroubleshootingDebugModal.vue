@@ -27,7 +27,7 @@
           class="debug-modal__note-icon"
           :icon="faCircleInfo"
         />
-        <span>{{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: submitterEmail }) }}</span>
+        <span>{{ noteText }}</span>
       </div>
     </template>
 
@@ -203,6 +203,12 @@ export default {
     submitterEmail() {
       return this.fetchedData?.submitterEmail ?? '';
     },
+    noteText() {
+      if (!this.submitterEmail) {
+        return this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE_NO_EMAIL');
+      }
+      return this.$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_NOTE', { email: this.submitterEmail });
+    },
   },
   watch: {
     async isOpen(val) {
@@ -210,7 +216,7 @@ export default {
         this.status = STATUS.LOADING;
         const result = await getDebugEmailData();
         const data = result?.data ?? null;
-        if (!data?.submitterEmail) {
+        if (!data) {
           this.onClose();
           return;
         }
