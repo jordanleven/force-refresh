@@ -175,7 +175,7 @@ describe('TroubleshootingDebugModal', () => {
 
       await wrapper.find('.modal-window').trigger('click');
 
-      expect(wrapper.emitted('close')).toHaveLength(1);
+      expect(wrapper.emitted('modal-was-closed')).toHaveLength(1);
     });
   });
 
@@ -185,7 +185,7 @@ describe('TroubleshootingDebugModal', () => {
 
       await window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 
-      expect(wrapper.emitted('close')).toHaveLength(1);
+      expect(wrapper.emitted('modal-was-closed')).toHaveLength(1);
     });
 
     it('does not emit close for other keys', async () => {
@@ -193,7 +193,7 @@ describe('TroubleshootingDebugModal', () => {
 
       await window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter' }));
 
-      expect(wrapper.emitted('close')).toBeFalsy();
+      expect(wrapper.emitted('modal-was-closed')).toBeFalsy();
     });
 
     it('removes the keydown listener on unmount', async () => {
@@ -202,7 +202,7 @@ describe('TroubleshootingDebugModal', () => {
       wrapper.unmount();
       await window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
 
-      expect(wrapper.emitted('close')).toBeFalsy();
+      expect(wrapper.emitted('modal-was-closed')).toBeFalsy();
     });
   });
 
@@ -214,7 +214,7 @@ describe('TroubleshootingDebugModal', () => {
       await wrapper.setProps({ isOpen: true });
       await wrapper.vm.$nextTick();
 
-      expect(wrapper.emitted('close')).toBeFalsy();
+      expect(wrapper.emitted('modal-was-closed')).toBeFalsy();
     });
 
     it('shows the no-email note when submitterEmail is null', async () => {
