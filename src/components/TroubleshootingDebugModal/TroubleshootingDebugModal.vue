@@ -34,6 +34,7 @@
     <div
       v-if="isStatusSent"
       class="debug-modal__sent"
+      data-test="debug-email-sent"
     >
       <div class="debug-modal__sent-icon">
         <font-awesome-icon :icon="faCheck" />
@@ -46,6 +47,7 @@
       </p>
       <button
         class="button-primary"
+        data-test="btn-debug-email-done"
         @click="onClose"
       >
         {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_DONE') }}
@@ -116,12 +118,14 @@
       <div class="debug-modal__footer">
         <button
           class="button"
+          data-test="btn-cancel-debug-email"
           @click="onClose"
         >
           {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_CANCEL') }}
         </button>
         <button
           class="button-primary"
+          data-test="btn-send-debug-email"
           :disabled="isSendButtonDisabled"
           @click="onSend"
         >

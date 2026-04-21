@@ -31,31 +31,22 @@
       </div>
     </div>
 
-    <transition
-      name="debug-panel-submit"
-      @before-enter="onBeforeSubmitRowEnter"
-      @enter="onSubmitRowEnter"
-      @after-enter="onAfterSubmitRowEnter"
-      @before-leave="onBeforeSubmitRowLeave"
-      @leave="onSubmitRowLeave"
-      @after-leave="onAfterSubmitRowLeave"
+    <div
+      v-if="isSubmitDebugRowVisible"
+      class="debug-panel__submit-row"
     >
-      <div
-        v-if="isSubmitDebugRowVisible"
-        class="debug-panel__submit-row"
-      >
-        <span class="debug-panel__submit-label">
-          {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
-        </span>
-        <button
-          class="btn btn-blue"
-          @click="onSubmitDebugInfo"
-        >
-          <font-awesome-icon :icon="faPaperPlane" />
-          {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
-        </button>
-      </div>
-    </transition>
+          <span class="debug-panel__submit-label">
+            {{ $t('ADMIN_TROUBLESHOOTING.SUBMIT_DEBUG_LABEL') }}
+          </span>
+          <button
+            class="btn btn-blue"
+            data-test="btn-submit-debug-info"
+            @click="onSubmitDebugInfo"
+          >
+            <font-awesome-icon :icon="faPaperPlane" />
+            {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
+          </button>
+    </div>
 
     <TroubleshootingDebugModal
       :is-open="isModalOpen"
@@ -128,47 +119,11 @@ export default {
     this.faPaperPlane = faPaperPlane;
   },
   methods: {
-    onAfterSubmitRowEnter(el) {
-      const element = el;
-      element.style.height = 'auto';
-    },
-    onAfterSubmitRowLeave(el) {
-      const element = el;
-      element.style.height = '';
-      element.style.opacity = '';
-      element.style.transform = '';
-    },
-    onBeforeSubmitRowEnter(el) {
-      const element = el;
-      element.style.height = '0px';
-      element.style.opacity = '0';
-      element.style.transform = 'translateY(-0.75rem)';
-    },
-    onBeforeSubmitRowLeave(el) {
-      const element = el;
-      element.style.height = `${element.scrollHeight}px`;
-      element.style.opacity = '1';
-      element.style.transform = 'translateY(0)';
-    },
     onModalClose() {
       this.isModalOpen = false;
     },
     onSubmitDebugInfo() {
       this.isModalOpen = true;
-    },
-    onSubmitRowEnter(el) {
-      const element = el;
-      void element.offsetHeight;
-      element.style.height = `${element.scrollHeight}px`;
-      element.style.opacity = '1';
-      element.style.transform = 'translateY(0)';
-    },
-    onSubmitRowLeave(el) {
-      const element = el;
-      void element.offsetHeight;
-      element.style.height = '0px';
-      element.style.opacity = '0';
-      element.style.transform = 'translateY(-0.75rem)';
     },
     onToggled(val) {
       this.$emit('toggled', val);
@@ -279,15 +234,6 @@ export default {
   }
 }
 
-.debug-panel-submit-enter-active,
-.debug-panel-submit-leave-active {
-  transform-origin: top center;
-  overflow: hidden;
-  transition:
-    opacity var.$transition-medium cubic-bezier(0.32, 0.72, 0, 1),
-    transform var.$transition-medium cubic-bezier(0.32, 0.72, 0, 1),
-    height var.$transition-medium cubic-bezier(0.32, 0.72, 0, 1);
-}
 
 .btn {
   display: inline-flex;
