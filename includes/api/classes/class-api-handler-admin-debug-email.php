@@ -59,7 +59,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
      * @return array The debug payload.
      */
     private function get_debug_payload(): array {
-        $plugin_data = get_plugin_data( get_main_plugin_file() );
+        $plugin_data = get_plugin_data( \JordanLeven\Plugins\ForceRefresh\get_main_plugin_file() );
 
         return array(
             'siteUrl'            => get_bloginfo( 'url' ),
