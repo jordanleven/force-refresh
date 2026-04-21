@@ -19,6 +19,7 @@ composer.*
 CONTRIBUTING.md
 db
 docker-compose.yml
+docker
 docs
 eslint.config.mjs
 Force-Refresh-*.zip
