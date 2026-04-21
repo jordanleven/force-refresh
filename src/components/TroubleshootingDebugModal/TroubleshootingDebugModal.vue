@@ -111,7 +111,7 @@
     </div>
 
     <template
-      v-if="status !== 'sent'"
+      v-if="!isStatusSent"
       #footer
     >
       <div class="debug-modal__footer">
@@ -128,7 +128,7 @@
           :disabled="isSendButtonDisabled"
           @click="onSend"
         >
-          {{ status === 'sending'
+          {{ isStatusSending
             ? $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SENDING')
             : $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_BUTTON_SEND') }}
         </button>
@@ -185,6 +185,9 @@ export default {
     },
     isStatusLoading() {
       return this.status === STATUS.LOADING;
+    },
+    isStatusSending() {
+      return this.status === STATUS.SENDING;
     },
     isStatusSent() {
       return this.status === STATUS.SENT;
