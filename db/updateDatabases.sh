@@ -7,10 +7,10 @@ MYSQL_DB="force-refresh-dev-db"
 
 # Format: "container:output_path"
 DATABASES=(
-  "force-refresh-db-dev-container-wp-4:db/wp-4/force-refresh-dev-database-wp-4.sql"
   "force-refresh-db-dev-container-wp-5:db/wp-5/force-refresh-dev-database-wp-5.sql"
   "force-refresh-db-dev-container-wp-6:db/wp-6/force-refresh-dev-database-wp-6.sql"
   "force-refresh-db-dev-container-wp-7:db/wp-7/force-refresh-dev-database-wp-7.sql"
+  "force-refresh-db-dev-container-wp-qa:db/wp-qa/force-refresh-dev-database-wp-qa.sql"
 )
 
 YELLOW='\033[0;33m'
