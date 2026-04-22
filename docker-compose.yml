@@ -28,6 +28,53 @@ services:
     labels:
       - "traefik.enable=false"
 
+  db-qa:
+    container_name: 'force-refresh-db-dev-container-wp-qa'
+    image: mariadb:10.3
+    volumes:
+      - './.docker-build/data/mysql_qa:/var/lib/mysql'
+      - ./db/wp-qa:/docker-entrypoint-initdb.d
+    ports:
+      - 18768:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: force-refresh_root_password
+      MYSQL_DATABASE: force-refresh-dev-db
+      MYSQL_USER: force-refresh-dev-user
+      MYSQL_PASSWORD: force-refresh-dev-password
+
+  wordpress-qa:
+    hostname: qa.force-refresh.localhost
+    container_name: 'force-refresh-dev-container-wp-qa'
+    depends_on:
+      - db-qa
+      - mailpit
+      - traefik
+    image: 'wordpress:6.9.4-php8.3-apache'
+    ports:
+      - '8086:80'
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost/wp-json/"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 60s
+    environment:
+      WORDPRESS_DB_HOST: 'db-qa:3306'
+      WORDPRESS_DB_NAME: force-refresh-dev-db
+      WORDPRESS_DB_USER: force-refresh-dev-user
+      WORDPRESS_DB_PASSWORD: force-refresh-dev-password
+      WORDPRESS_DEBUG: 1
+      WP_DEBUG_DISPLAY: 1
+      WP_DEBUG_LOG: 1
+      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local');"
+    volumes:
+      - "./.docker-build/wordpress_qa:/var/www/html"
+      - "./qa:/var/www/html/wp-content/plugins/force-refresh"
+      - "./docker/mu-plugins/smtp.php:/var/www/html/wp-content/mu-plugins/smtp.php"
+    labels:
+      - "traefik.http.routers.qa.rule=host(`qa.force-refresh.localhost`)"
+      - "traefik.http.services.qa.loadbalancer.server.port=80"
+
   db-wp5:
     container_name: 'force-refresh-db-dev-container-wp-5'
     image: mariadb:10.3
