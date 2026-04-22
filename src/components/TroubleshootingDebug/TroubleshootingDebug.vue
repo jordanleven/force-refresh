@@ -133,6 +133,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+@use "sass:math";
 @use "@/scss/utilities" as utils;
 @use "@/scss/variables" as var;
 
@@ -245,7 +246,7 @@ export default {
   display: inline-flex;
   align-items: center;
   gap: var.$space-small;
-  padding: var.$space-medium / 1.5 var.$space-medium;
+  padding: math.div(var.$space-medium, 1.5) var.$space-medium;
   font-size: 0.844rem;
   font-weight: 500;
   border-radius: 980px;
@@ -255,7 +256,7 @@ export default {
   transition: all 0.15s;
 
   @include utils.small {
-    padding: var.$space-medium / 2 var.$space-medium;
+    padding: math.div(var.$space-medium, 2) var.$space-medium;
   }
 }
 
