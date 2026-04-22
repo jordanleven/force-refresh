@@ -35,7 +35,7 @@ services:
       - './.docker-build/data/mysql_qa:/var/lib/mysql'
       - ./db/wp-qa:/docker-entrypoint-initdb.d
     ports:
-      - 18768:3306
+      - 18766:3306
     environment:
       MYSQL_ROOT_PASSWORD: force-refresh_root_password
       MYSQL_DATABASE: force-refresh-dev-db
