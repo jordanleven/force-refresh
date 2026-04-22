@@ -87,9 +87,6 @@ export default {
     }),
   },
   emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
-  async created() {
-    await this.requestCronStatus();
-  },
   computed: {
     classesContentColumn() {
       return [
@@ -156,12 +153,21 @@ export default {
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
           value: this.troubleshootingInfo.lastCronRun
-            ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(this.troubleshootingInfo.lastCronRun * 1000))
+            ? new Intl.DateTimeFormat('en-US', {
+              day: 'numeric',
+              hour: 'numeric',
+              minute: '2-digit',
+              month: 'long',
+              year: 'numeric',
+            }).format(new Date(this.troubleshootingInfo.lastCronRun * 1000))
             : this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NEVER'),
         },
       ];
     },
     ...mapGetters(['isFeatureEnabled']),
+  },
+  async created() {
+    await this.requestCronStatus();
   },
   methods: {
     ...mapActions(['requestCronStatus']),

@@ -7,11 +7,11 @@ export default {
     const { scheduledRefreshes } = state.site;
     state.site.scheduledRefreshes = scheduledRefreshes.filter(({ id }) => id !== idToDelete);
   },
-  SET_LAST_CRON_RUN: (state, lastCronRun) => {
-    state.site.lastCronRun = lastCronRun;
-  },
   SET_DEBUG_MODE: (state, updatedDebugMode) => {
     state.settings.isDebugActive = updatedDebugMode;
+  },
+  SET_LAST_CRON_RUN: (state, lastCronRun) => {
+    state.site.lastCronRun = lastCronRun;
   },
   SET_REFRESH_INTERVAL: (state, updatedRefreshInterval) => {
     state.settings.refreshInterval = updatedRefreshInterval;
