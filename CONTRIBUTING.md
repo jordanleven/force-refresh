@@ -9,12 +9,12 @@ To get started, follow the steps below:
 1. Download Docker for your Mac or PC.
 2. Start the environment by running `docker-compose up` in the project directory. This will launch all docker containers.
 
-| WordPress Version | 5.9 (wp5) | 6.9 (wp6) | beta (wp7) |
-| --- | --- | --- | --- |
-| PHP Version | 7.4 | 8.3 | 8.3 |
-| Port | 8083 | 8084 | 8085 |
-| Homepage | [wp5.force-refresh.localhost][wp5] | [wp6.force-refresh.localhost][wp6] | [wp7.force-refresh.localhost][wp7] |
-| Admin page | [wp5.force-refresh.localhost/wp-admin][wp5-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [wp7.force-refresh.localhost/wp-admin][wp7-admin] |
+| WordPress Version | 5.9 | 6.9 | 7 | 6.9.4 (QA) |
+| --- | --- | --- | --- | --- |
+| PHP Version | 7.4 | 8.3 | 8.3 | 8.3 |
+| Port | 8083 | 8084 | 8085 | 8086 |
+| Homepage | [wp5.force-refresh.localhost][wp5] | [wp6.force-refresh.localhost][wp6] | [wp7.force-refresh.localhost][wp7] | [qa.force-refresh.localhost][wpqa] |
+| Admin page | [wp5.force-refresh.localhost/wp-admin][wp5-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [wp7.force-refresh.localhost/wp-admin][wp7-admin] | [qa.force-refresh.localhost/wp-admin][wpqa-admin] |
 
 ## Admin
 
@@ -75,5 +75,7 @@ The script will block if no unreleased fragments exist, show the computed next v
 [wp5-admin]: http://wp5.force-refresh.localhost/wp-admin
 [wp6]: http://wp6.force-refresh.localhost
 [wp6-admin]: http://wp6.force-refresh.localhost/wp-admin
+[wpqa]: http://qa.force-refresh.localhost
+[wpqa-admin]: http://qa.force-refresh.localhost/wp-admin
 [wp7]: http://wp7.force-refresh.localhost
 [wp7-admin]: http://wp7.force-refresh.localhost/wp-admin
