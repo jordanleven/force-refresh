@@ -99,14 +99,14 @@ test.describe('Admin', () => {
         await expect(page.locator('.plugin-versions__label').filter({ hasText: /force refresh/i })).toBeVisible();
       });
 
-      test('On wp4, the PHP version row shows an EOL warning icon', async ({ baseURL }) => {
-        if (!baseURL?.includes('wp4')) test.skip();
+      test('On wp5, the PHP version row shows an EOL warning icon', async ({ baseURL }) => {
+        if (!baseURL?.includes('wp5')) test.skip();
         const phpRow = page.locator('.plugin-versions__label').filter({ hasText: /php/i });
         await expect(phpRow.locator('svg[data-icon="triangle-exclamation"]')).toBeVisible();
       });
 
-      test('On wp4, the WordPress version row shows an EOL warning icon', async ({ baseURL }) => {
-        if (!baseURL?.includes('wp4')) test.skip();
+      test('On wp5, the WordPress version row shows an EOL warning icon', async ({ baseURL }) => {
+        if (!baseURL?.includes('wp5')) test.skip();
         const wpRow = page.locator('.plugin-versions__label').filter({ hasText: /wordpress/i });
         await expect(wpRow.locator('svg[data-icon="triangle-exclamation"]')).toBeVisible();
       });

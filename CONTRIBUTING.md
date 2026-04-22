@@ -9,12 +9,12 @@ To get started, follow the steps below:
 1. Download Docker for your Mac or PC.
 2. Start the environment by running `docker-compose up` in the project directory. This will launch all docker containers.
 
-| WordPress Version | 4.9 (wp4) | 5.9 (wp5) | 6.9 (wp6) | beta (wp7) |
-| --- | --- | --- | --- | --- |
-| PHP Version | 7.2 | 7.4 | 8.3 | 8.3 |
-| Port | 8082 | 8083 | 8084 | 8085 |
-| Homepage | [wp4.force-refresh.localhost][wp4] | [wp5.force-refresh.localhost][wp5] | [wp6.force-refresh.localhost][wp6] | [wp7.force-refresh.localhost][wp7] |
-| Admin page | [wp4.force-refresh.localhost/wp-admin][wp4-admin] | [wp5.force-refresh.localhost/wp-admin][wp5-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [wp7.force-refresh.localhost/wp-admin][wp7-admin] |
+| WordPress Version | 5.9 (wp5) | 6.9 (wp6) | beta (wp7) |
+| --- | --- | --- | --- |
+| PHP Version | 7.4 | 8.3 | 8.3 |
+| Port | 8083 | 8084 | 8085 |
+| Homepage | [wp5.force-refresh.localhost][wp5] | [wp6.force-refresh.localhost][wp6] | [wp7.force-refresh.localhost][wp7] |
+| Admin page | [wp5.force-refresh.localhost/wp-admin][wp5-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [wp7.force-refresh.localhost/wp-admin][wp7-admin] |
 
 ## Admin
 
@@ -71,8 +71,6 @@ The script will block if no unreleased fragments exist, show the computed next v
 
 [Docker]: https://www.docker.com
 [changie]: https://changie.dev/
-[wp4]: http://wp4.force-refresh.localhost
-[wp4-admin]: http://wp4.force-refresh.localhost/wp-admin
 [wp5]: http://wp5.force-refresh.localhost
 [wp5-admin]: http://wp5.force-refresh.localhost/wp-admin
 [wp6]: http://wp6.force-refresh.localhost
