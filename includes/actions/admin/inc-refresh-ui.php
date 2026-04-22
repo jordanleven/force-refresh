@@ -41,12 +41,12 @@ function get_localized_data_versions(): array {
         'php'          => array(
             'version'         => (string) $version_php,
             'versionRequired' => (string) $force_refresh_plugin_data['RequiresPHP'],
-            'eolDate'         => Eol_Storage_Service::get_eol_date( 'php', $version_php ),
+            'eolDate'         => Eol_Storage_Service::get_eol_date_php( $version_php ),
         ),
         'wordPress'    => array(
             'version'         => (string) $version_wp,
             'versionRequired' => (string) $force_refresh_plugin_data['RequiresWP'],
-            'eolDate'         => Eol_Storage_Service::get_eol_date( 'wordpress', $version_wp ),
+            'eolDate'         => Eol_Storage_Service::get_eol_date_wordpress( $version_wp ),
         ),
         'forceRefresh' => array(
             'version'         => (string) $force_refresh_plugin_data['Version'],
