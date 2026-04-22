@@ -7,15 +7,15 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
-use PHPUnit\Framework\TestCase;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
+require_once __DIR__ . '/class-mocked-service-test-case.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-eol-storage-service.php';
 
 /**
  * Test for EOL Storage Service
  */
-final class EolStorageServiceTest extends TestCase {
+final class EolStorageServiceTest extends Mocked_Service_Test_Case {
 
     /**
      * @var Mocks\Mock_Get_Transient
@@ -65,11 +65,15 @@ final class EolStorageServiceTest extends TestCase {
     }
 
     public static function tearDownAfterClass(): void {
-        self::$mock_get_transient->disable();
-        self::$mock_set_transient->disable();
-        self::$mock_wp_remote_get->disable();
-        self::$mock_is_wp_error->disable();
-        self::$mock_wp_remote_retrieve_body->disable();
+        self::disable_mocks(
+            array(
+                self::$mock_get_transient,
+                self::$mock_set_transient,
+                self::$mock_wp_remote_get,
+                self::$mock_is_wp_error,
+                self::$mock_wp_remote_retrieve_body,
+            )
+        );
     }
 
     /**
@@ -103,10 +107,7 @@ final class EolStorageServiceTest extends TestCase {
      * @return void
      */
     private function assertLastTransientSet( string $transient_key, array $value ): void {
-        $this->assertEquals(
-            array( $transient_key, $value, DAY_IN_SECONDS ),
-            self::$mock_set_transient->get_last_invocation_arguments()
-        );
+        $this->assert_last_mock_call_equals( self::$mock_set_transient, array( $transient_key, $value, DAY_IN_SECONDS ) );
     }
 
     /**

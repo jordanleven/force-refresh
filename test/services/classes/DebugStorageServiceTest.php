@@ -7,18 +7,15 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
-use PHPUnit\Framework\TestCase;
-use Mockery;
-use phpmock\MockBuilder;
-use phpmock\Mock;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
+require_once __DIR__ . '/class-mocked-service-test-case.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-debug-storage-service.php';
 
 /**
  * Test for Debug Storage Service
  */
-final class DebugStorageServiceTest extends TestCase {
+final class DebugStorageServiceTest extends Mocked_Service_Test_Case {
 
     /**
      * Our store for the mock of `get_option`.
@@ -66,10 +63,14 @@ final class DebugStorageServiceTest extends TestCase {
      * @return void
      */
     public static function tearDownAfterClass(): void {
-        self::$mock_get_option->disable();
-        self::$mock_current_time->disable();
-        self::$mock_update_option->disable();
-        self::$mock_delete_option->disable();
+        self::disable_mocks(
+            array(
+                self::$mock_get_option,
+                self::$mock_current_time,
+                self::$mock_update_option,
+                self::$mock_delete_option,
+            )
+        );
     }
 
     /**
@@ -122,7 +123,7 @@ final class DebugStorageServiceTest extends TestCase {
         self::$mock_update_option->set_return_value( $mock_current_date );
         Debug_Storage_Service::set_debug_mode( true );
 
-        $this->assertEquals( self::$mock_update_option->get_invocation_arguments( 0 )[1], $mock_current_date );
+        $this->assert_last_mock_argument_equals( self::$mock_update_option, 1, $mock_current_date );
     }
 
     /**
