@@ -48,9 +48,12 @@ final class EolStorageServiceTest extends TestCase {
      * @var array
      */
     private static $sample_eol_data = array(
-        array( 'cycle' => '7.4', 'eol' => '2022-11-28' ),
-        array( 'cycle' => '8.0', 'eol' => '2023-11-26' ),
-        array( 'cycle' => '8.1', 'eol' => '2025-12-31' ),
+        // 1984-01-24: Original Macintosh launch
+        array( 'cycle' => '7.4', 'eol' => '1984-01-24' ),
+        // 2007-01-09: iPhone announced
+        array( 'cycle' => '8.0', 'eol' => '2007-01-09' ),
+        // 2010-01-27: iPad announced
+        array( 'cycle' => '8.1', 'eol' => '2010-01-27' ),
     );
 
     public static function setUpBeforeClass(): void {
@@ -79,7 +82,7 @@ final class EolStorageServiceTest extends TestCase {
         $result                  = Eol_Storage_Service::get_eol_date_php( '7.4.33' );
 
         $this->assertEquals( $remote_get_count_before, self::$mock_wp_remote_get->get_invocation_count() );
-        $this->assertEquals( '2022-11-28', $result );
+        $this->assertEquals( '1984-01-24', $result );
     }
 
     /**
@@ -97,7 +100,7 @@ final class EolStorageServiceTest extends TestCase {
 
         $this->assertEquals( $remote_get_count_before + 1, self::$mock_wp_remote_get->get_invocation_count() );
         $this->assertEquals( $set_transient_count_before + 1, self::$mock_set_transient->get_invocation_count() );
-        $this->assertEquals( '2023-11-26', $result );
+        $this->assertEquals( '2007-01-09', $result );
     }
 
     /**
@@ -123,7 +126,7 @@ final class EolStorageServiceTest extends TestCase {
 
         $result = Eol_Storage_Service::get_eol_date_php( '7.4.33' );
 
-        $this->assertEquals( '2022-11-28', $result );
+        $this->assertEquals( '1984-01-24', $result );
     }
 
     /**
@@ -132,13 +135,14 @@ final class EolStorageServiceTest extends TestCase {
     public function testWordPressVersionLookupUsesPublicHelper() {
         self::$mock_get_transient->set_return_value(
             array(
-                array( 'cycle' => '6.8', 'eol' => '2026-12-31' ),
+                // 2001-10-23: iPod announced
+                array( 'cycle' => '6.8', 'eol' => '2001-10-23' ),
             )
         );
 
         $result = Eol_Storage_Service::get_eol_date_wordpress( '6.8.1' );
 
-        $this->assertEquals( '2026-12-31', $result );
+        $this->assertEquals( '2001-10-23', $result );
     }
 
     /**
