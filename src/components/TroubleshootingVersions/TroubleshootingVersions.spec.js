@@ -41,6 +41,10 @@ const getWrapper = (props = {}) => shallowMount(TroubleshootingVersions, {
 });
 
 describe('TroubleshootingVersions', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   describe('EOL state', () => {
     it('shows the warning triangle icon when eolDate is in the past', () => {
       const wrapper = getWrapper({ eolDate: PAST_DATE });
@@ -58,6 +62,12 @@ describe('TroubleshootingVersions', () => {
       const tooltip = wrapper.findComponent({ name: 'BaseTooltip' });
       expect(tooltip.props('content')).toContain('TROUBLESHOOTING_VERSION_IS_EOL');
     });
+
+    it('formats the EOL date as a local calendar day in the tooltip', () => {
+      const wrapper = getWrapper({ eolDate: '2024-01-09' });
+      const tooltip = wrapper.findComponent({ name: 'BaseTooltip' });
+      expect(tooltip.props('content')).toContain('"eolDate":"January 9, 2024"');
+    });
   });
 
   describe('Non-EOL state (null eolDate)', () => {
@@ -74,6 +84,14 @@ describe('TroubleshootingVersions', () => {
   });
 
   describe('Future eolDate (not yet EOL)', () => {
+    it('does not mark the version as EOL on the local day before the EOL date', () => {
+      jest.useFakeTimers();
+      jest.setSystemTime(new Date(2024, 0, 8, 20, 0, 0));
+
+      const wrapper = getWrapper({ eolDate: '2024-01-09' });
+      expect(wrapper.find('.status-indicator').classes()).toContain('status-indicator--okay');
+    });
+
     it('shows the checkmark icon when eolDate is in the future', () => {
       const wrapper = getWrapper({ eolDate: FUTURE_DATE });
       const icon = wrapper.findComponent(FontAwesomeIcon);

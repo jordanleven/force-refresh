@@ -23,13 +23,13 @@ const makeSiteState = (overrides = {}) => ({
 
 describe('Getters', () => {
   describe('troubleshootingInformationVersions', () => {
-    it('includes eolDate for php', () => {
+    it('includes eolDate for PHP', () => {
       const state = makeSiteState();
       const result = getters.troubleshootingInformationVersions(state);
       expect(result.versions.php.eolDate).toBe('2022-11-28');
     });
 
-    it('includes eolDate for wordPress', () => {
+    it('includes eolDate for WordPress', () => {
       const state = makeSiteState();
       const result = getters.troubleshootingInformationVersions(state);
       expect(result.versions.wordPress.eolDate).toBe('2024-01-09');

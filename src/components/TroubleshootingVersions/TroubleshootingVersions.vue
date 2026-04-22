@@ -43,10 +43,24 @@ export default {
     version: VueTypes.string.isRequired,
     versionRequired: VueTypes.oneOfType([String, null]),
   },
+  methods: {
+    getEolDateObject() {
+      if (!this.eolDate) return null;
+
+      const [year, month, day] = this.eolDate.split('-').map(Number);
+
+      if (!year || !month || !day) return null;
+
+      return new Date(year, month - 1, day);
+    },
+  },
   computed: {
     eolDateFormatted() {
-      if (!this.eolDate) return null;
-      return new Date(this.eolDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+      const eolDate = this.getEolDateObject();
+
+      if (!eolDate) return null;
+
+      return eolDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
     },
     statusClass() {
       if (this.versionIsOutdated) return 'status-indicator--error';
@@ -63,7 +77,14 @@ export default {
       return isDevelopmentVersion(this.version);
     },
     versionIsEol() {
-      return !!this.eolDate && new Date(this.eolDate) < new Date();
+      const eolDate = this.getEolDateObject();
+
+      if (!eolDate) return false;
+
+      const today = new Date();
+      const todayAtMidnight = new Date( today.getFullYear(), today.getMonth(), today.getDate() );
+
+      return eolDate < todayAtMidnight;
     },
     versionIsOutdated() {
       const versionSanitized = getSanitizedVersion(this.version);
