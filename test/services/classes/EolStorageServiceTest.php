@@ -7,15 +7,15 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
-use PHPUnit\Framework\TestCase;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
+require_once __DIR__ . '/class-mocked-service-test-case.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-eol-storage-service.php';
 
 /**
  * Test for EOL Storage Service
  */
-final class EolStorageServiceTest extends TestCase {
+final class EolStorageServiceTest extends Mocked_Service_Test_Case {
 
     /**
      * @var Mocks\Mock_Get_Transient
@@ -65,11 +65,49 @@ final class EolStorageServiceTest extends TestCase {
     }
 
     public static function tearDownAfterClass(): void {
-        self::$mock_get_transient->disable();
-        self::$mock_set_transient->disable();
-        self::$mock_wp_remote_get->disable();
-        self::$mock_is_wp_error->disable();
-        self::$mock_wp_remote_retrieve_body->disable();
+        self::disable_mocks(
+            array(
+                self::$mock_get_transient,
+                self::$mock_set_transient,
+                self::$mock_wp_remote_get,
+                self::$mock_is_wp_error,
+                self::$mock_wp_remote_retrieve_body,
+            )
+        );
+    }
+
+    /**
+     * Configure the service to read from a cold cache.
+     *
+     * @return void
+     */
+    private function mockCacheMiss(): void {
+        self::$mock_get_transient->set_return_value( false );
+    }
+
+    /**
+     * Configure a successful remote fetch for EOL data.
+     *
+     * @param array $data The EOL payload returned by the remote API.
+     *
+     * @return void
+     */
+    private function mockRemoteSuccess( array $data ): void {
+        self::$mock_wp_remote_get->set_return_value( array( 'body' => '[]' ) );
+        self::$mock_is_wp_error->set_return_value( false );
+        self::$mock_wp_remote_retrieve_body->set_return_value( json_encode( $data ) );
+    }
+
+    /**
+     * Assert the latest transient write matches the expected payload.
+     *
+     * @param string $transient_key The transient key.
+     * @param array  $value         The transient value.
+     *
+     * @return void
+     */
+    private function assertLastTransientSet( string $transient_key, array $value ): void {
+        $this->assert_last_mock_call_equals( self::$mock_set_transient, array( $transient_key, $value, DAY_IN_SECONDS ) );
     }
 
     /**
@@ -89,10 +127,8 @@ final class EolStorageServiceTest extends TestCase {
      * Cache miss + successful fetch: wp_remote_get is called, set_transient is called.
      */
     public function testCacheMissCallsRemoteGetAndSetsTransient() {
-        self::$mock_get_transient->set_return_value( false );
-        self::$mock_wp_remote_get->set_return_value( array( 'body' => '[]' ) );
-        self::$mock_is_wp_error->set_return_value( false );
-        self::$mock_wp_remote_retrieve_body->set_return_value( json_encode( self::$sample_eol_data ) );
+        $this->mockCacheMiss();
+        $this->mockRemoteSuccess( self::$sample_eol_data );
 
         $remote_get_count_before  = self::$mock_wp_remote_get->get_invocation_count();
         $set_transient_count_before = self::$mock_set_transient->get_invocation_count();
@@ -101,26 +137,23 @@ final class EolStorageServiceTest extends TestCase {
         $this->assertEquals( $remote_get_count_before + 1, self::$mock_wp_remote_get->get_invocation_count() );
         $this->assertEquals( $set_transient_count_before + 1, self::$mock_set_transient->get_invocation_count() );
         $this->assertEquals( '2007-01-09', $result );
+        $this->assertLastTransientSet( 'force_refresh_eol_php', self::$sample_eol_data );
     }
 
     /**
      * Cache miss + API failure: wp_remote_get returns WP_Error → null returned and failure is cached.
      */
     public function testApiFailureReturnsNullAndCachesFailure() {
-        self::$mock_get_transient->set_return_value( false );
+        $this->mockCacheMiss();
         self::$mock_wp_remote_get->set_return_value( new \WP_Error() );
         self::$mock_is_wp_error->set_return_value( true );
 
         $set_transient_count_before = self::$mock_set_transient->get_invocation_count();
-        self::$mock_set_transient->resetInvocationIndex();
         $result                     = Eol_Storage_Service::get_eol_date_php( '7.4.33' );
 
         $this->assertNull( $result );
         $this->assertEquals( $set_transient_count_before + 1, self::$mock_set_transient->get_invocation_count() );
-        $this->assertEquals(
-            array( 'force_refresh_eol_php', array(), DAY_IN_SECONDS ),
-            self::$mock_set_transient->get_invocation_arguments()
-        );
+        $this->assertLastTransientSet( 'force_refresh_eol_php', array() );
     }
 
     /**

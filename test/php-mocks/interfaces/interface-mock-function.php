@@ -25,6 +25,13 @@ interface Mock_Function_Interface {
     public function get_invocation_arguments( int $invocation_index = 0 );
 
     /**
+     * Method to get the arguments from the latest mock invocation.
+     *
+     * @return array|null An array of arguments, or null when the mock was not called.
+     */
+    public function get_last_invocation_arguments();
+
+    /**
      * Method to get number of times a mock has been called.
      *
      * @return int The number of times a method was called.

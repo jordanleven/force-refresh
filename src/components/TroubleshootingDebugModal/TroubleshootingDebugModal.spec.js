@@ -2,6 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCheck, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { mount } from '@vue/test-utils';
+import { buildVueTestGlobals } from '../../../test/helpers/vue.js';
 import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
 import TroubleshootingDebugModal from './TroubleshootingDebugModal.vue';
 
@@ -29,18 +30,12 @@ const mockPayload = {
 
 const getWrapper = ({ isOpen = false } = {}) => mount(TroubleshootingDebugModal, {
   attachTo: document.body,
-  global: {
+  global: buildVueTestGlobals({
     components: { FontAwesomeIcon },
-    mocks: {
-      $t: (key, values = {}) => {
-        if (!Object.keys(values).length) return key;
-        return `${key}:${JSON.stringify(values)}`;
-      },
-    },
     stubs: {
       teleport: true,
     },
-  },
+  }),
   props: {
     isOpen,
   },
