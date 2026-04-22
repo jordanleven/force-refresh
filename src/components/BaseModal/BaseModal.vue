@@ -133,7 +133,7 @@ export default {
 .modal-window {
   position: fixed;
   inset: 0;
-  z-index: 5000;
+  z-index: var.$z-index-modal;
   display: flex;
   visibility: hidden;
   justify-content: center;

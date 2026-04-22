@@ -107,7 +107,7 @@ export default {
 
 .admin-notice--force-refresh {
   position: fixed;
-  z-index: 9999;
+  z-index: var.$z-index-notification;
   bottom: 0;
   display: flex;
   margin: var.$side-padding auto;

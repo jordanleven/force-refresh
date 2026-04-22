@@ -80,7 +80,7 @@ export default {
   pointer-events: none;
   opacity: 0;
   transition: opacity var.$transition-short;
-  z-index: 9999;
+  z-index: var.$z-index-tooltip;
 
   &.tooltip--visible {
     opacity: 1;
