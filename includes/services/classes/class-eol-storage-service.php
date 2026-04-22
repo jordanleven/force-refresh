@@ -63,11 +63,17 @@ class Eol_Storage_Service {
             $response = wp_remote_get( self::API_BASE . '/' . $product . '.json' );
 
             if ( is_wp_error( $response ) ) {
+                // Cache failures briefly so locked-down hosts do not retry on every admin page load.
+                set_transient( $transient_key, array(), self::TRANSIENT_TTL );
                 return null;
             }
 
             $body = wp_remote_retrieve_body( $response );
             $data = json_decode( $body, true );
+
+            if ( ! is_array( $data ) ) {
+                $data = array();
+            }
 
             set_transient( $transient_key, $data, self::TRANSIENT_TTL );
         }
