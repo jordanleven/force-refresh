@@ -132,7 +132,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      */
     public static function get_last_cron_run(): ?int {
         $value = get_option( self::OPTION_NAME_LAST_CRON_RUN, null );
-        return $value !== null ? (int) $value : null;
+        return null !== $value ? (int) $value : null;
     }
 
     /**
