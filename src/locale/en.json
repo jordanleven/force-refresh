@@ -73,6 +73,7 @@
     "TROUBLESHOOTING_VALUE_NO": "No",
     "TROUBLESHOOTING_VALUE_YES": "Yes",
     "TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION": "Your version of {label} is an unsupported development version.",
+    "TROUBLESHOOTING_VERSION_IS_EOL": "Your version of {label} has reached end of life as of {eolDate} and is no longer receiving security updates. We recommend upgrading.",
     "TROUBLESHOOTING_VERSION_IS_OUTDATED": "Your version of {label} is outdated. Please update to version {versionRequired}.",
     "TROUBLESHOOTING_VERSION_IS_UP_TO_DATE": "Your version of {label} is up-to-date."
   },

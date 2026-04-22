@@ -110,11 +110,13 @@ export default {
       const { forceRefresh, php, wordPress } = this.troubleshootingInfo.versions;
       return [
         {
+          eolDate: php.eolDate,
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_PHP'),
           version: php.version,
           versionRequired: php.required,
         },
         {
+          eolDate: wordPress.eolDate,
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_WORDPRESS'),
           version: wordPress.version,
           versionRequired: wordPress.required,

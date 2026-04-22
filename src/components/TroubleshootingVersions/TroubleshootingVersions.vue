@@ -18,13 +18,13 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faInfo, faExclamation } from '@fortawesome/free-solid-svg-icons';
+import { faCheck, faInfo, faExclamation, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
-library.add(faCheck, faInfo, faExclamation);
+library.add(faCheck, faInfo, faExclamation, faExclamationTriangle);
 
 export default {
   name: 'TroubleshootingVersions',
@@ -33,35 +33,47 @@ export default {
     BaseTooltip,
   },
   props: {
+    eolDate: VueTypes.oneOfType([String, null]).def(null),
     label: VueTypes.string.isRequired,
     version: VueTypes.string.isRequired,
     versionRequired: VueTypes.oneOfType([String, null]),
   },
   computed: {
     statusClass() {
-      if (this.versionIsDevelopmentVersion) return 'status-indicator--warning';
       if (this.versionIsOutdated) return 'status-indicator--error';
+      if (this.versionIsDevelopmentVersion || this.versionIsEol) return 'status-indicator--warning';
       return 'status-indicator--okay';
     },
     statusIcon() {
+      if (this.versionIsOutdated) return faExclamation;
       if (this.versionIsDevelopmentVersion) return faInfo;
-      return this.versionIsOutdated ? faExclamation : faCheck;
+      if (this.versionIsEol) return faExclamationTriangle;
+      return faCheck;
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
+    },
+    versionIsEol() {
+      return !!this.eolDate && new Date(this.eolDate) < new Date();
     },
     versionIsOutdated() {
       const versionSanitized = getSanitizedVersion(this.version);
       return !versionSatisfies(this.versionRequired, versionSanitized);
     },
     versionTip() {
-      if (this.versionIsDevelopmentVersion) {
-        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION', { label: this.label });
-      }
       if (this.versionIsOutdated) {
         return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED', {
           label: this.label,
           versionRequired: this.versionRequired,
+        });
+      }
+      if (this.versionIsDevelopmentVersion) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION', { label: this.label });
+      }
+      if (this.versionIsEol) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_EOL', {
+          label: this.label,
+          eolDate: this.eolDate,
         });
       }
       return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
