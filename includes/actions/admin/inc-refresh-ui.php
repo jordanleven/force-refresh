@@ -14,6 +14,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debug_Email;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Eol_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 
@@ -37,10 +38,12 @@ function get_localized_data_versions(): array {
         'php'          => array(
             'version'         => (string) phpversion(),
             'versionRequired' => (string) $force_refresh_plugin_data['RequiresPHP'],
+            'eolDate'         => Eol_Storage_Service::get_eol_date( 'php', phpversion() ),
         ),
         'wordPress'    => array(
             'version'         => (string) get_bloginfo( 'version' ),
             'versionRequired' => (string) $force_refresh_plugin_data['RequiresWP'],
+            'eolDate'         => Eol_Storage_Service::get_eol_date( 'wordpress', get_bloginfo( 'version' ) ),
         ),
         'forceRefresh' => array(
             'version'         => (string) $force_refresh_plugin_data['Version'],
