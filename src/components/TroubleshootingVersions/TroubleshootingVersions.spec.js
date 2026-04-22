@@ -1,5 +1,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faInfo, faExclamation, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faInfo,
+  faExclamation,
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
 import TroubleshootingVersions from './TroubleshootingVersions.vue';
@@ -83,13 +88,13 @@ describe('TroubleshootingVersions', () => {
 
   describe('Outdated version (below minimum)', () => {
     it('shows the exclamation icon regardless of eolDate', () => {
-      const wrapper = getWrapper({ version: '6.0.0', versionRequired: '7.2', eolDate: PAST_DATE });
+      const wrapper = getWrapper({ eolDate: PAST_DATE, version: '6.0.0', versionRequired: '7.2' });
       const icon = wrapper.findComponent(FontAwesomeIcon);
       expect(icon.props('icon').iconName).toBe('exclamation');
     });
 
     it('applies the error status class regardless of eolDate', () => {
-      const wrapper = getWrapper({ version: '6.0.0', versionRequired: '7.2', eolDate: PAST_DATE });
+      const wrapper = getWrapper({ eolDate: PAST_DATE, version: '6.0.0', versionRequired: '7.2' });
       expect(wrapper.find('.status-indicator').classes()).toContain('status-indicator--error');
     });
   });

@@ -18,7 +18,12 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faInfo, faExclamation, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faInfo,
+  faExclamation,
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
@@ -39,6 +44,10 @@ export default {
     versionRequired: VueTypes.oneOfType([String, null]),
   },
   computed: {
+    eolDateFormatted() {
+      if (!this.eolDate) return null;
+      return new Date(this.eolDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    },
     statusClass() {
       if (this.versionIsOutdated) return 'status-indicator--error';
       if (this.versionIsDevelopmentVersion || this.versionIsEol) return 'status-indicator--warning';
@@ -52,10 +61,6 @@ export default {
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
-    },
-    eolDateFormatted() {
-      if (!this.eolDate) return null;
-      return new Date(this.eolDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     },
     versionIsEol() {
       return !!this.eolDate && new Date(this.eolDate) < new Date();
@@ -76,8 +81,8 @@ export default {
       }
       if (this.versionIsEol) {
         return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_EOL', {
-          label: this.label,
           eolDate: this.eolDateFormatted,
+          label: this.label,
         });
       }
       return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });

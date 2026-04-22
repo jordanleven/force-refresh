@@ -126,7 +126,7 @@ function assign_release_note_based_on_role( string $current_plugin_version, &$cu
 
             array_push(
                 $all_notes[ $release_notes_length - 1 ]['sectionNotes'],
-                trim( $release_note )
+                trim( $release_note ),
             );
             break;
     }
