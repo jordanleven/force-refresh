@@ -16,6 +16,7 @@ require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
+require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-schedule-refresh-site.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-debug-email.php';
 
 /**
@@ -90,11 +91,25 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     private static $mock_get_option;
 
     /**
+     * Mock for `get_option` in the API namespace.
+     *
+     * @var Mocks\Mock_Function
+     */
+    private static $mock_get_option_api;
+
+    /**
      * Mock for `esc_url_raw`.
      *
      * @var Mocks\Mock_Function
      */
     private static $mock_esc_url_raw;
+
+    /**
+     * Mock for `__`.
+     *
+     * @var Mocks\Mock_Function
+     */
+    private static $mock_translate;
 
     /**
      * Mock for `wp_parse_url`.
@@ -189,6 +204,23 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
                 return $map[ $key ] ?? $default;
             }
         );
+        self::$mock_get_option_api                = new Mocks\Mock_Function(
+            __NAMESPACE__,
+            'get_option',
+            function ( string $key, $default = null ) {
+                $map = array(
+                    'force_refresh_last_cron_run' => null,
+                    'cron'                        => array(),
+                );
+
+                return $map[ $key ] ?? $default;
+            }
+        );
+        self::$mock_translate                    = new Mocks\Mock_Function(
+            __NAMESPACE__,
+            '__',
+            fn ( string $text ) => $text
+        );
         self::$mock_esc_url_raw                  = new Mocks\Mock_Function(
             __NAMESPACE__,
             'esc_url_raw',
@@ -234,6 +266,8 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         self::$mock_get_bloginfo->disable();
         self::$mock_get_force_refresh_plugin_data->disable();
         self::$mock_get_option->disable();
+        self::$mock_get_option_api->disable();
+        self::$mock_translate->disable();
         self::$mock_esc_url_raw->disable();
         self::$mock_wp_parse_url->disable();
         self::$mock_wp_remote_get->disable();

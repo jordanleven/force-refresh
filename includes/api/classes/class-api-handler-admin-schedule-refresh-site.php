@@ -96,7 +96,21 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return  void
      */
     public function register_actions(): void {
+        add_action( 'init', array( $this, 'track_cron_run' ) );
         add_action( self::ACTION_NAME_SCHEDULE_REFRESH_SITE, array( $this, 'executeSiteRefresh' ) );
+    }
+
+    /**
+     * Record the most recent WordPress cron request timestamp.
+     *
+     * @return void
+     */
+    public function track_cron_run(): void {
+        if ( ! wp_doing_cron() ) {
+            return;
+        }
+
+        self::save_last_cron_run( time() );
     }
 
     /**
@@ -109,7 +123,6 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     public function executeSiteRefresh( string $uuid ): void {
         $site_version = Versions_Storage_Service::get_new_version();
         Versions_Storage_Service::set_site_version( $site_version );
-        update_option( self::OPTION_NAME_LAST_CRON_RUN, time() );
     }
 
     /**
@@ -120,6 +133,17 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
     public static function get_last_cron_run(): ?int {
         $value = get_option( self::OPTION_NAME_LAST_CRON_RUN, null );
         return $value !== null ? (int) $value : null;
+    }
+
+    /**
+     * Persist the latest tracked cron run timestamp.
+     *
+     * @param int $timestamp The Unix timestamp for the cron run.
+     *
+     * @return void
+     */
+    private static function save_last_cron_run( int $timestamp ): void {
+        update_option( self::OPTION_NAME_LAST_CRON_RUN, $timestamp );
     }
 
     /**
