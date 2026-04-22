@@ -204,9 +204,7 @@ export default {
     payloadRows() {
       if (!this.fetchedData) return [];
       return this.fetchedData.debugData.map((row) => ({
-        label: row.index !== undefined
-          ? this.$t(row.key, { n: row.index })
-          : this.$t(row.key),
+        label: this.getPayloadRowLabel(row),
         value: row.value,
       }));
     },
@@ -245,6 +243,13 @@ export default {
     this.faCircleInfo = faCircleInfo;
   },
   methods: {
+    getPayloadRowLabel(row) {
+      if (row.index === undefined) {
+        return this.$t(row.key);
+      }
+
+      return this.$t(row.key, { n: row.index });
+    },
     onClose() {
       this.$emit('modal-was-closed');
     },

@@ -105,6 +105,13 @@ export default {
         versions: this.troubleshootingInfo.versions,
       };
     },
+    formattedLastCronRun() {
+      if (!this.troubleshootingInfo.lastCronRun) {
+        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NEVER');
+      }
+
+      return this.formatTimestamp(this.troubleshootingInfo.lastCronRun);
+    },
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');
     },
@@ -152,15 +159,7 @@ export default {
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
-          value: this.troubleshootingInfo.lastCronRun
-            ? new Intl.DateTimeFormat('en-US', {
-              day: 'numeric',
-              hour: 'numeric',
-              minute: '2-digit',
-              month: 'long',
-              year: 'numeric',
-            }).format(new Date(this.troubleshootingInfo.lastCronRun * 1000))
-            : this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NEVER'),
+          value: this.formattedLastCronRun,
         },
       ];
     },
@@ -173,6 +172,15 @@ export default {
     ...mapActions(['requestCronStatus']),
     exitTroubleshooting() {
       this.$emit('exit-troubleshooting');
+    },
+    formatTimestamp(timestamp) {
+      return new Intl.DateTimeFormat('en-US', {
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        month: 'long',
+        year: 'numeric',
+      }).format(new Date(timestamp * 1000));
     },
     toggleDebugMode(val) {
       this.$emit('debug-mode-was-updated', val);
