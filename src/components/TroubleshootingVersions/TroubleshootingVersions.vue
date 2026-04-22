@@ -53,6 +53,10 @@ export default {
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
     },
+    eolDateFormatted() {
+      if (!this.eolDate) return null;
+      return new Date(this.eolDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    },
     versionIsEol() {
       return !!this.eolDate && new Date(this.eolDate) < new Date();
     },
@@ -73,7 +77,7 @@ export default {
       if (this.versionIsEol) {
         return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_EOL', {
           label: this.label,
-          eolDate: this.eolDate,
+          eolDate: this.eolDateFormatted,
         });
       }
       return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
