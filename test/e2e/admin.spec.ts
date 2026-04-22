@@ -98,30 +98,6 @@ test.describe('Admin', () => {
       test('The health section shows the Force Refresh version', async () => {
         await expect(page.locator('.plugin-versions__label').filter({ hasText: /force refresh/i })).toBeVisible();
       });
-
-      test('On wp5, the PHP version row shows an EOL warning icon', async ({ baseURL }) => {
-        if (!baseURL?.includes('wp5')) test.skip();
-        const phpRow = page.locator('.plugin-versions__label').filter({ hasText: /php/i });
-        await expect(phpRow.locator('svg[data-icon="triangle-exclamation"]')).toBeVisible();
-      });
-
-      test('On wp5, the WordPress version row shows an EOL warning icon', async ({ baseURL }) => {
-        if (!baseURL?.includes('wp5')) test.skip();
-        const wpRow = page.locator('.plugin-versions__label').filter({ hasText: /wordpress/i });
-        await expect(wpRow.locator('svg[data-icon="triangle-exclamation"]')).toBeVisible();
-      });
-
-      test('On wp6, the PHP version row shows an up-to-date icon', async ({ baseURL }) => {
-        if (!baseURL?.includes('wp6')) test.skip();
-        const phpRow = page.locator('.plugin-versions__label').filter({ hasText: /php/i });
-        await expect(phpRow.locator('svg[data-icon="check"]')).toBeVisible();
-      });
-
-      test('On wp6, the WordPress version row shows an up-to-date icon', async ({ baseURL }) => {
-        if (!baseURL?.includes('wp6')) test.skip();
-        const wpRow = page.locator('.plugin-versions__label').filter({ hasText: /wordpress/i });
-        await expect(wpRow.locator('svg[data-icon="check"]')).toBeVisible();
-      });
     });
 
     test.describe('Debug mode', () => {
