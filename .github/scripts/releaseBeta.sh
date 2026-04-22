@@ -82,6 +82,13 @@ getBetaReleaseVersion() {
   echo "$beta_release_version"
 }
 
+runPrereleaseChecks() {
+  printf "\033[37mRunning prerelease checks before cutting a beta.\033[0m\n"
+  npm run prerelease:beta || return 1
+  composer run lint || return 1
+  composer run test || return 1
+}
+
 appendUniqueOption() {
   version=$1
   label=$2
@@ -174,6 +181,11 @@ next_version=${selection%%  *}
 
 printf "\033[37m=====================\033[0m\n"
 printf "\033[37mPreparing to release beta version %s.\033[0m\n\n" "$next_version"
+
+runPrereleaseChecks || {
+  printf "\033[1;31mPrerelease checks failed. Beta release aborted.\033[0m\n\n"
+  exit 1
+}
 
 bumpVersionPackage "$next_version"
 git push --force-with-lease --follow-tags
