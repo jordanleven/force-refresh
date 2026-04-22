@@ -12,7 +12,11 @@
           {{ group.dateLabel }}
         </h4>
         <ul class="scheduled-refreshes__list">
-          <li v-for="schedule in group.refreshes" :key="schedule.id">
+          <li
+            v-for="schedule in group.refreshes"
+            :key="schedule.id"
+            :data-test="`scheduled-refresh-${schedule.id}`"
+          >
             {{ schedule.timeLabel }}
             <span
               v-if="schedule.countdownLabel"
@@ -22,7 +26,7 @@
             </span>
             <button
               class="button-link button-link-delete"
-              data-test="btn-delete-scheduled-refresh"
+              :data-test="`btn-delete-scheduled-refresh-${schedule.id}`"
               :disabled="schedule.deleteDisabled"
               @click="deleteButtonWasClicked(schedule.id)"
             >
@@ -33,7 +37,11 @@
       </div>
     </template>
     <ul v-else class="scheduled-refreshes__list">
-      <li v-for="schedule in scheduledRefreshesWithLabel" :key="schedule.id">
+      <li
+        v-for="schedule in scheduledRefreshesWithLabel"
+        :key="schedule.id"
+        :data-test="`scheduled-refresh-${schedule.id}`"
+      >
         {{ schedule.label }}
         <span
           v-if="schedule.countdownLabel"
@@ -43,7 +51,7 @@
         </span>
         <button
           class="button-link button-link-delete"
-          data-test="btn-delete-scheduled-refresh"
+          :data-test="`btn-delete-scheduled-refresh-${schedule.id}`"
           :disabled="schedule.deleteDisabled"
           @click="deleteButtonWasClicked(schedule.id)"
         >

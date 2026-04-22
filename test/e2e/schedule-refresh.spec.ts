@@ -131,6 +131,15 @@ async function selectScheduledRefreshInUi(page: Page, scheduledDate: Date): Prom
 }
 
 test.describe('Schedule Refresh', () => {
+  test.beforeAll(async ({ browser, baseURL }) => {
+    const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
+    const page = await context.newPage();
+    await goToPluginPage(page);
+    await clearScheduledRefreshesViaApi(page);
+    await page.close();
+    await context.close();
+  });
+
   test.describe('Scheduling modal', () => {
     test.describe.configure({ mode: 'serial' });
     let page: Page;
@@ -161,20 +170,27 @@ test.describe('Schedule Refresh', () => {
 
   test.describe('Scheduling through the UI', () => {
     test('Submitting the scheduling modal creates a scheduled refresh', async ({ page }) => {
+      const scheduledDate = tomorrowAtTenThirtyPm();
+
       await goToPluginPage(page);
-      await clearScheduledRefreshesViaApi(page);
-      await page.reload();
       await page.locator('[data-test="btn-schedule-refresh"]').click();
 
-      await selectScheduledRefreshInUi(page, tomorrowAtTenThirtyPm());
-      await expect(page.locator('[data-test="btn-submit-schedule-refresh"]')).toBeEnabled();
-      await page.locator('[data-test="btn-submit-schedule-refresh"]').click({ force: true });
+      await selectScheduledRefreshInUi(page, scheduledDate);
+      const submitButton = page.locator('[data-test="btn-submit-schedule-refresh"]');
+      await expect(submitButton).toBeEnabled();
+
+      // Reuse the browser-formatted label instead of rebuilding it in Node,
+      // which avoids timezone drift between the test runner and the page.
+      const scheduledRefreshLabel = (await submitButton.innerText()).replace(/^Schedule refresh for /, '');
+      await submitButton.click({ force: true });
+
+      const scheduledRefreshItem = page.locator('.scheduled-refreshes__list li').filter({ hasText: scheduledRefreshLabel });
 
       await expect(page.locator('.notice-force-refresh.notice-success')).toBeVisible();
-      await expect(page.locator('.scheduled-refreshes__list li')).toHaveCount(1);
+      await expect(scheduledRefreshItem).toBeVisible();
 
-      await page.locator('[data-test="btn-delete-scheduled-refresh"]').click();
-      await expect(page.locator('.scheduled-refreshes__list')).not.toBeVisible();
+      await scheduledRefreshItem.getByRole('button', { name: 'Delete' }).click();
+      await expect(scheduledRefreshItem).toHaveCount(0);
     });
   });
 
@@ -202,19 +218,19 @@ test.describe('Schedule Refresh', () => {
     });
 
     test('A scheduled refresh appears in the list', async () => {
-      await expect(page.locator('.scheduled-refreshes__list li')).toHaveCount(1);
+      await expect(page.locator(`[data-test="scheduled-refresh-${scheduledId}"]`)).toBeVisible();
     });
 
     test('The scheduled refresh shows a formatted date', async () => {
-      const text = await page.locator('.scheduled-refreshes__list li').first().textContent();
+      const text = await page.locator(`[data-test="scheduled-refresh-${scheduledId}"]`).textContent();
       // Matches "Month Day, Year at H:MM AM/PM"
       expect(text).toMatch(/\w+ \d{1,2}, \d{4} at \d{1,2}:\d{2} (AM|PM)/);
     });
 
     test('Deleting a scheduled refresh removes it from the list', async () => {
-      await page.locator('[data-test="btn-delete-scheduled-refresh"]').click();
+      await page.locator(`[data-test="btn-delete-scheduled-refresh-${scheduledId}"]`).click();
+      await expect(page.locator(`[data-test="scheduled-refresh-${scheduledId}"]`)).toHaveCount(0);
       scheduledId = '';
-      await expect(page.locator('.scheduled-refreshes__list')).not.toBeVisible();
     });
   });
 
