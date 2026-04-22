@@ -43,17 +43,6 @@ export default {
     version: VueTypes.string.isRequired,
     versionRequired: VueTypes.oneOfType([String, null]),
   },
-  methods: {
-    getEolDateObject() {
-      if (!this.eolDate) return null;
-
-      const [year, month, day] = this.eolDate.split('-').map(Number);
-
-      if (!year || !month || !day) return null;
-
-      return new Date(year, month - 1, day);
-    },
-  },
   computed: {
     eolDateFormatted() {
       const eolDate = this.getEolDateObject();
@@ -82,7 +71,7 @@ export default {
       if (!eolDate) return false;
 
       const today = new Date();
-      const todayAtMidnight = new Date( today.getFullYear(), today.getMonth(), today.getDate() );
+      const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
 
       return eolDate < todayAtMidnight;
     },
@@ -107,6 +96,17 @@ export default {
         });
       }
       return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
+    },
+  },
+  methods: {
+    getEolDateObject() {
+      if (!this.eolDate) return null;
+
+      const [year, month, day] = this.eolDate.split('-').map(Number);
+
+      if (!year || !month || !day) return null;
+
+      return new Date(year, month - 1, day);
     },
   },
 };
