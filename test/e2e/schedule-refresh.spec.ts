@@ -31,6 +31,30 @@ async function scheduleRefreshApiRequest(page: Page, method: 'POST' | 'DELETE', 
 }
 
 /**
+ * Returns all scheduled refreshes via the REST API.
+ */
+async function getScheduledRefreshesViaApi(page: Page): Promise<Array<{ id: string; timestamp: number }>> {
+  const response = await page.evaluate(async () => {
+    const { nonce } = (window as any).forceRefreshMain.localData;
+    const result = await fetch('/wp-json/force-refresh/v1/schedule-site-version', {
+      credentials: 'same-origin',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-WP-Nonce': nonce,
+      },
+    });
+
+    return {
+      status: result.status,
+      json: await result.json(),
+    };
+  });
+
+  expect(response.status).toBe(200);
+  return response.json.data.scheduled_refreshes as Array<{ id: string; timestamp: number }>;
+}
+
+/**
  * Schedules a site refresh via the REST API and returns the scheduled event's id.
  */
 async function scheduleRefreshViaApi(page: Page, scheduledDate: Date): Promise<string> {
@@ -48,6 +72,17 @@ async function scheduleRefreshViaApi(page: Page, scheduledDate: Date): Promise<s
 async function deleteScheduledRefreshViaApi(page: Page, id: string): Promise<void> {
   const response = await scheduleRefreshApiRequest(page, 'DELETE', `/${id}`);
   expect(response.status).toBe(202);
+}
+
+/**
+ * Removes all scheduled refreshes so the test starts from a known state.
+ */
+async function clearScheduledRefreshesViaApi(page: Page): Promise<void> {
+  const scheduledRefreshes = await getScheduledRefreshesViaApi(page);
+
+  await Promise.all(
+    scheduledRefreshes.map(({ id }) => deleteScheduledRefreshViaApi(page, id)),
+  );
 }
 
 /**
@@ -112,7 +147,7 @@ test.describe('Schedule Refresh', () => {
     });
 
     test('Clicking "Schedule Refresh" opens the scheduling modal', async () => {
-      await expect(page.locator('.modal-window')).toBeVisible();
+      await expect(page.locator('[data-test="schedule-refresh-modal-content"]')).toBeVisible();
     });
 
     test('The modal contains a date picker', async () => {
@@ -127,6 +162,8 @@ test.describe('Schedule Refresh', () => {
   test.describe('Scheduling through the UI', () => {
     test('Submitting the scheduling modal creates a scheduled refresh', async ({ page }) => {
       await goToPluginPage(page);
+      await clearScheduledRefreshesViaApi(page);
+      await page.reload();
       await page.locator('[data-test="btn-schedule-refresh"]').click();
 
       await selectScheduledRefreshInUi(page, tomorrowAtTenThirtyPm());
@@ -150,6 +187,7 @@ test.describe('Schedule Refresh', () => {
       const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
       page = await context.newPage();
       await goToPluginPage(page);
+      await clearScheduledRefreshesViaApi(page);
       scheduledId = await scheduleRefreshViaApi(page, oneHourFromNow());
       await page.reload();
       await page.locator('.scheduled-refreshes__list').waitFor();
