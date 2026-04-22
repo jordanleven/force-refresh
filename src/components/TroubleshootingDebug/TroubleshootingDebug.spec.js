@@ -3,6 +3,7 @@ import { faBug, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
 import { createStore } from 'vuex';
+import { buildVueTestGlobals } from '../../../test/helpers/vue.js';
 import TroubleshootingDebug from './TroubleshootingDebug.vue';
 
 jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
@@ -28,13 +29,10 @@ const debugInfo = {
 };
 
 const getWrapper = ({ isDebugActive = false, isSubmitDebugEnabled = false } = {}) => shallowMount(TroubleshootingDebug, {
-  global: {
+  global: buildVueTestGlobals({
     components: { FontAwesomeIcon },
-    mocks: {
-      $t: (key) => key,
-    },
     plugins: [createVuexStore(isSubmitDebugEnabled)],
-  },
+  }),
   props: {
     debugInfo,
     isDebugActive,

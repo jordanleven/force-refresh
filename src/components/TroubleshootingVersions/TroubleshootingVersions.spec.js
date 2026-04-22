@@ -7,6 +7,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
+import { BaseDescriptiveListStub, BaseTooltipStub, buildVueTestGlobals } from '../../../test/helpers/vue.js';
 import TroubleshootingVersions from './TroubleshootingVersions.vue';
 
 library.add(faCheck, faInfo, faExclamation, faExclamationTriangle);
@@ -15,23 +16,13 @@ const PAST_DATE = '2020-01-01';
 const FUTURE_DATE = '2099-01-01';
 
 const getWrapper = (props = {}) => shallowMount(TroubleshootingVersions, {
-  global: {
+  global: buildVueTestGlobals({
     components: { FontAwesomeIcon },
-    mocks: {
-      $t: (key, params) => (params ? `${key}:${JSON.stringify(params)}` : key),
-    },
     stubs: {
-      BaseDescriptiveList: {
-        name: 'BaseDescriptiveList',
-        template: '<div><slot name="term" /><slot name="definition" /></div>',
-      },
-      BaseTooltip: {
-        name: 'BaseTooltip',
-        props: ['content'],
-        template: '<div><slot /></div>',
-      },
+      BaseDescriptiveList: BaseDescriptiveListStub,
+      BaseTooltip: BaseTooltipStub,
     },
-  },
+  }),
   props: {
     label: 'PHP',
     version: '7.4.33',
@@ -59,14 +50,12 @@ describe('TroubleshootingVersions', () => {
 
     it('passes the EOL tooltip message when eolDate is in the past', () => {
       const wrapper = getWrapper({ eolDate: PAST_DATE });
-      const tooltip = wrapper.findComponent({ name: 'BaseTooltip' });
-      expect(tooltip.props('content')).toContain('TROUBLESHOOTING_VERSION_IS_EOL');
+      expect(wrapper.find('[data-test="tooltip-content"]').text()).toContain('TROUBLESHOOTING_VERSION_IS_EOL');
     });
 
     it('formats the EOL date as a local calendar day in the tooltip', () => {
       const wrapper = getWrapper({ eolDate: '2024-01-09' });
-      const tooltip = wrapper.findComponent({ name: 'BaseTooltip' });
-      expect(tooltip.props('content')).toContain('"eolDate":"January 9, 2024"');
+      expect(wrapper.find('[data-test="tooltip-content"]').text()).toContain('eolDate=January 9, 2024');
     });
   });
 
