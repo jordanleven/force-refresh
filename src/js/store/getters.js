@@ -19,6 +19,8 @@ export default {
   troubleshootingInformationSettings: ({ site }) => ({
     currentSiteId: site.siteId,
     isMultiSite: site.isMultiSite,
+    lastCronRun: site.lastCronRun,
+    scheduledRefreshesCount: site.scheduledRefreshes.length,
     siteName: site.siteName,
     siteUrl: site.siteUrl,
   }),

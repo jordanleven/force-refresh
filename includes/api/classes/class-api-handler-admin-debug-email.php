@@ -10,6 +10,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 use JordanLeven\Plugins\ForceRefresh;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
@@ -138,6 +139,27 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_PHP_VERSION',
                 'value' => $payload['phpVersion'],
             ),
+            ...( ! empty( $payload['scheduledRefreshes'] )
+                ? array_map(
+                    fn( $date, $i ) => array(
+                        'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SCHEDULED_REFRESH',
+                        'index' => $i + 1,
+                        'value' => $date,
+                    ),
+                    $payload['scheduledRefreshes'],
+                    array_keys( $payload['scheduledRefreshes'] )
+                )
+                : array(
+                    array(
+                        'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_SCHEDULED_REFRESHES',
+                        'value' => __( 'None', 'force-refresh' ),
+                    ),
+                )
+            ),
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_LAST_CRON_RUN',
+                'value' => $payload['lastCronRun'] ?? __( 'Never', 'force-refresh' ),
+            ),
         );
     }
 
@@ -149,14 +171,21 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
     private function get_debug_data(): array {
         $plugin_data = ForceRefresh\get_force_refresh_plugin_data();
 
+        $last_cron_run = Api_Handler_Admin_Schedule_Refresh_Site::get_last_cron_run();
+
         return array(
-            'siteUrl'             => get_bloginfo( 'url' ),
-            'siteName'            => get_bloginfo( 'name' ),
-            'wordPressVersion'    => get_bloginfo( 'version' ),
-            'phpVersion'          => phpversion(),
-            'forceRefreshVersion' => $plugin_data['Version'],
-            'siteVersion'         => Versions_Storage_Service::get_site_version(),
-            'refreshInterval'     => Options_Storage_Service::get_refresh_interval(),
+            'siteUrl'                  => get_bloginfo( 'url' ),
+            'siteName'                 => get_bloginfo( 'name' ),
+            'wordPressVersion'         => get_bloginfo( 'version' ),
+            'phpVersion'               => phpversion(),
+            'forceRefreshVersion'      => $plugin_data['Version'],
+            'siteVersion'              => Versions_Storage_Service::get_site_version(),
+            'refreshInterval'          => Options_Storage_Service::get_refresh_interval(),
+            'scheduledRefreshes'       => array_map(
+                fn( $r ) => gmdate( 'F j, Y \a\t g:i:s A', $r['timestamp'] ) . ' UTC',
+                Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes()
+            ),
+            'lastCronRun'              => $last_cron_run ? gmdate( 'F j, Y \a\t g:i:s A', $last_cron_run ) . ' UTC' : null,
         );
     }
 
@@ -263,6 +292,15 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 sprintf( 'Refresh Interval:       %ss', $payload['refreshInterval'] ),
                 sprintf( 'WordPress Version:      %s', $payload['wordPressVersion'] ),
                 sprintf( 'PHP Version:            %s', $payload['phpVersion'] ),
+                ...( ! empty( $payload['scheduledRefreshes'] )
+                    ? array_map(
+                        fn( $date, $i ) => sprintf( 'Scheduled Refresh %d:    %s', $i + 1, $date ),
+                        $payload['scheduledRefreshes'],
+                        array_keys( $payload['scheduledRefreshes'] )
+                    )
+                    : array( 'Scheduled Refreshes:    None' )
+                ),
+                sprintf( 'Last Cron Run:          %s', $payload['lastCronRun'] ?? 'Never' ),
                 '',
                 sprintf( 'Submitted: %s', gmdate( 'Y-m-d H:i:s T' ) ),
             )

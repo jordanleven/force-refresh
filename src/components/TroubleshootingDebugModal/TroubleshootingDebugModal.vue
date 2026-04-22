@@ -5,7 +5,7 @@
     max-width="40rem"
     :show-default-footer="false"
     :show-divider="!isStatusSent"
-    :scroll-inner="false"
+    :scroll-inner="!isStatusSent"
     @modal-was-closed="onClose"
   >
     <template
@@ -204,7 +204,9 @@ export default {
     payloadRows() {
       if (!this.fetchedData) return [];
       return this.fetchedData.debugData.map((row) => ({
-        label: this.$t(row.key),
+        label: row.index !== undefined
+          ? this.$t(row.key, { n: row.index })
+          : this.$t(row.key),
         value: row.value,
       }));
     },
@@ -305,8 +307,6 @@ export default {
   }
 
   &__body {
-    flex: 1;
-    overflow-y: auto;
     padding: 1rem 1.375rem;
   }
 

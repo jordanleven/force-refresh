@@ -1,5 +1,6 @@
 import {
   deleteScheduledRefresh,
+  getCronStatus,
   getScheduledRefreshes,
   requestPostRefreshByPostID,
   requestSiteRefresh,
@@ -27,6 +28,12 @@ export default {
     }
 
     return success;
+  },
+  requestCronStatus: async ({ commit }) => {
+    const response = await getCronStatus();
+    if (isSuccess(response)) {
+      commit('SET_LAST_CRON_RUN', response.data.last_cron_run ?? null);
+    }
   },
   requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
   requestRefreshSite: requestSiteRefresh,

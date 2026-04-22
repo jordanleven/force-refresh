@@ -56,7 +56,7 @@
 
 <script>
 import VueTypes from 'vue-types';
-import { mapGetters } from 'vuex';
+import { mapActions, mapGetters } from 'vuex';
 import TroubleshootingConsole from '@/components/TroubleshootingConsole/TroubleshootingConsole.vue';
 import TroubleshootingDebug from '@/components/TroubleshootingDebug/TroubleshootingDebug.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
@@ -75,6 +75,8 @@ export default {
     troubleshootingInfo: VueTypes.shape({
       currentSiteId: VueTypes.number.isRequired,
       isMultiSite: VueTypes.bool.isRequired,
+      lastCronRun: VueTypes.number,
+      scheduledRefreshesCount: VueTypes.number.isRequired,
       siteName: VueTypes.string.isRequired,
       siteUrl: VueTypes.string.isRequired,
       versions: VueTypes.shape({
@@ -85,6 +87,9 @@ export default {
     }),
   },
   emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
+  async created() {
+    await this.requestCronStatus();
+  },
   computed: {
     classesContentColumn() {
       return [
@@ -144,11 +149,22 @@ export default {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_CURRENT_SITE_ID'),
           value: this.troubleshootingInfo.currentSiteId,
         },
+        {
+          label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_SCHEDULED_REFRESHES'),
+          value: this.troubleshootingInfo.scheduledRefreshesCount,
+        },
+        {
+          label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
+          value: this.troubleshootingInfo.lastCronRun
+            ? new Intl.DateTimeFormat('en-US', { year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' }).format(new Date(this.troubleshootingInfo.lastCronRun * 1000))
+            : this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NEVER'),
+        },
       ];
     },
     ...mapGetters(['isFeatureEnabled']),
   },
   methods: {
+    ...mapActions(['requestCronStatus']),
     exitTroubleshooting() {
       this.$emit('exit-troubleshooting');
     },
@@ -185,6 +201,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: var.$space-medium;
+    align-items: start;
 
     &--stacked {
       grid-template-columns: 1fr;
