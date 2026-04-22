@@ -159,15 +159,15 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         $last_cron_run       = Api_Handler_Admin_Schedule_Refresh_Site::get_last_cron_run();
 
         return array(
-            'siteUrl'                  => get_bloginfo( 'url' ),
-            'siteName'                 => get_bloginfo( 'name' ),
-            'wordPressVersion'         => get_bloginfo( 'version' ),
-            'phpVersion'               => phpversion(),
-            'forceRefreshVersion'      => $plugin_data['Version'],
-            'siteVersion'              => Versions_Storage_Service::get_site_version(),
-            'refreshInterval'          => Options_Storage_Service::get_refresh_interval(),
-            'scheduledRefreshes'       => $this->format_scheduled_refreshes( $scheduled_refreshes ),
-            'lastCronRun'              => $this->format_timestamp_utc( $last_cron_run ),
+            'siteUrl'             => get_bloginfo( 'url' ),
+            'siteName'            => get_bloginfo( 'name' ),
+            'wordPressVersion'    => get_bloginfo( 'version' ),
+            'phpVersion'          => phpversion(),
+            'forceRefreshVersion' => $plugin_data['Version'],
+            'siteVersion'         => Versions_Storage_Service::get_site_version(),
+            'refreshInterval'     => Options_Storage_Service::get_refresh_interval(),
+            'scheduledRefreshes'  => $this->format_scheduled_refreshes( $scheduled_refreshes ),
+            'lastCronRun'         => $this->format_timestamp_utc( $last_cron_run ),
         );
     }
 
