@@ -34,16 +34,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 function get_localized_data_versions(): array {
     $force_refresh_plugin_data = get_force_refresh_plugin_data();
 
+    $version_php = phpversion();
+    $version_wp  = get_bloginfo( 'version' );
+
     return array(
         'php'          => array(
-            'version'         => (string) phpversion(),
+            'version'         => (string) $version_php,
             'versionRequired' => (string) $force_refresh_plugin_data['RequiresPHP'],
-            'eolDate'         => Eol_Storage_Service::get_eol_date( 'php', phpversion() ),
+            'eolDate'         => Eol_Storage_Service::get_eol_date( 'php', $version_php ),
         ),
         'wordPress'    => array(
-            'version'         => (string) get_bloginfo( 'version' ),
+            'version'         => (string) $version_wp,
             'versionRequired' => (string) $force_refresh_plugin_data['RequiresWP'],
-            'eolDate'         => Eol_Storage_Service::get_eol_date( 'wordpress', get_bloginfo( 'version' ) ),
+            'eolDate'         => Eol_Storage_Service::get_eol_date( 'wordpress', $version_wp ),
         ),
         'forceRefresh' => array(
             'version'         => (string) $force_refresh_plugin_data['Version'],
