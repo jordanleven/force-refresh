@@ -2,7 +2,7 @@
   <BaseDescriptiveList>
     <template #term>
       <div class="plugin-versions__label">
-        <BaseTooltip :content="versionTip">
+        <BaseTooltip :content="versionTooltipContent">
           <span class="status-indicator" :class="statusClass">
             <font-awesome-icon :icon="statusIcon" />
           </span>
@@ -18,13 +18,18 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faInfo, faExclamation } from '@fortawesome/free-solid-svg-icons';
+import {
+  faCheck,
+  faInfo,
+  faExclamation,
+  faExclamationTriangle,
+} from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
 
-library.add(faCheck, faInfo, faExclamation);
+library.add(faCheck, faInfo, faExclamation, faExclamationTriangle);
 
 export default {
   name: 'TroubleshootingVersions',
@@ -33,38 +38,75 @@ export default {
     BaseTooltip,
   },
   props: {
+    eolDate: VueTypes.oneOfType([String, null]).def(null),
     label: VueTypes.string.isRequired,
     version: VueTypes.string.isRequired,
     versionRequired: VueTypes.oneOfType([String, null]),
   },
   computed: {
+    eolDateFormatted() {
+      const eolDate = this.getEolDate();
+
+      if (!eolDate) return null;
+
+      return eolDate.toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' });
+    },
     statusClass() {
-      if (this.versionIsDevelopmentVersion) return 'status-indicator--warning';
       if (this.versionIsOutdated) return 'status-indicator--error';
+      if (this.versionIsDevelopmentVersion || this.versionIsEol) return 'status-indicator--warning';
       return 'status-indicator--okay';
     },
     statusIcon() {
+      if (this.versionIsOutdated) return faExclamation;
       if (this.versionIsDevelopmentVersion) return faInfo;
-      return this.versionIsOutdated ? faExclamation : faCheck;
+      if (this.versionIsEol) return faExclamationTriangle;
+      return faCheck;
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);
+    },
+    versionIsEol() {
+      const eolDate = this.getEolDate();
+
+      if (!eolDate) return false;
+
+      const today = new Date();
+      const todayAtMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+      return eolDate < todayAtMidnight;
     },
     versionIsOutdated() {
       const versionSanitized = getSanitizedVersion(this.version);
       return !versionSatisfies(this.versionRequired, versionSanitized);
     },
-    versionTip() {
-      if (this.versionIsDevelopmentVersion) {
-        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION', { label: this.label });
+    versionTooltipContent() {
+      switch (true) {
+        case this.versionIsOutdated:
+          return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UNSUPPORTED', {
+            label: this.label,
+            versionRequired: this.versionRequired,
+          });
+        case this.versionIsDevelopmentVersion:
+          return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION', { label: this.label });
+        case this.versionIsEol:
+          return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_EOL', {
+            eolDate: this.eolDateFormatted,
+            label: this.label,
+          });
+        default:
+          return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
       }
-      if (this.versionIsOutdated) {
-        return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_OUTDATED', {
-          label: this.label,
-          versionRequired: this.versionRequired,
-        });
-      }
-      return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VERSION_IS_UP_TO_DATE', { label: this.label });
+    },
+  },
+  methods: {
+    getEolDate() {
+      if (!this.eolDate) return null;
+
+      const [year, month, day] = this.eolDate.split('-').map(Number);
+
+      if (!year || !month || !day) return null;
+
+      return new Date(year, month - 1, day);
     },
   },
 };

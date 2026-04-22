@@ -14,6 +14,17 @@ if ( ! defined( 'WP_FORCE_REFRESH_CAPABILITY' ) ) {
     define( 'WP_FORCE_REFRESH_CAPABILITY', 'manage_options' );
 }
 
+if ( ! defined( 'DAY_IN_SECONDS' ) ) {
+    define( 'DAY_IN_SECONDS', 86400 );
+}
+
+if ( ! class_exists( 'WP_Error' ) ) {
+    /**
+     * Stub for WP_Error.
+     */
+    class WP_Error {}
+}
+
 if ( ! defined( 'ABSPATH' ) ) {
     define( 'ABSPATH', __DIR__ . '/wp-root/' );
 }

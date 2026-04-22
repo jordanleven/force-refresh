@@ -29,10 +29,12 @@ export default {
         version: site.versionForceRefreshInstalled,
       },
       php: {
+        eolDate: site.versionPhpEolDate,
         required: site.versionPhpRequired,
         version: site.versionPhpInstalled,
       },
       wordPress: {
+        eolDate: site.versionWordPressEolDate,
         required: site.versionWordPressRequired,
         version: site.versionWordPressInstalled,
       },
