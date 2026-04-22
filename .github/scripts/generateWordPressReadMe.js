@@ -139,6 +139,33 @@ const getReleaseCategoryLines = ({ raw }, releaseCategory) =>
     : raw.split('\n').filter((v) => !!v).map((v) => `${v.trim()}\n`);
 
 /**
+ * Function to parse a changelog release heading into version and date parts.
+ * @param   {string}  releaseVersion  The release version heading
+ * @return  {object|null}             Parsed version/date information
+ */
+const parseReleaseVersionHeading = (releaseVersion) => {
+  const changieMatch = releaseVersion.match(/^([\d.]+) - (\d{4}-\d{2}-\d{2})$/);
+
+  if (changieMatch) {
+    return {
+      version: changieMatch[1],
+      date: changieMatch[2],
+    };
+  }
+
+  const legacyMatch = releaseVersion.match(/^([\d.]+) \((\d{4}-\d{2}-\d{2})\)$/);
+
+  if (legacyMatch) {
+    return {
+      version: legacyMatch[1],
+      date: legacyMatch[2],
+    };
+  }
+
+  return null;
+};
+
+/**
  * Function to get a formatted release note for a specific release.
  * @param   {object}  release         The parsed node for a specific release
  * @param   {string}  releaseVersion  The release version string
@@ -168,20 +195,19 @@ const getFormattedReleaseNote = async (release, releaseVersion, pluginVersion) =
       .replace(/ \(.*\)\)/g, '') ||
     `${MESSAGE_NOTES_HEADERS.BUG} * ${MESSAGE_NOTES_FOR_RELEASE_UNAVAILABLE}`;
 
-  // Changie format: "2.17.0 - 2026-04-07" — date is embedded in the heading
-  const changieMatch = releaseVersion.match(/^([\d.]+) - (\d{4}-\d{2}-\d{2})$/);
+  const parsedRelease = parseReleaseVersionHeading(releaseVersion);
   let displayVersion;
   let formattedReleaseDate;
 
-  if (changieMatch) {
-    const baseVersion = changieMatch[1];
+  if (parsedRelease) {
+    const baseVersion = parsedRelease.version;
     displayVersion = pluginVersion.startsWith(baseVersion) ? pluginVersion : baseVersion;
     formattedReleaseDate = new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
       timeZone: 'America/New_York',
-    }).format(new Date(`${changieMatch[2]}T12:00:00Z`));
+    }).format(new Date(`${parsedRelease.date}T12:00:00Z`));
   } else {
     displayVersion = releaseVersion;
     const releaseDate = await git.log([`v${releaseVersion}`]);
@@ -251,7 +277,7 @@ const parseReadMe = (readmeMd) => {
  */
 const parseChangeLog = (changelogMd) => {
   const cleaned = normalizeMarkdownHeadingSpacing(
-    convertHeadingThreeToHeadingTwo(removeMdFormattingLinks(changelogMd).replace(/\(.*?\)/g, ''))
+    convertHeadingThreeToHeadingTwo(removeMdFormattingLinks(changelogMd))
   );
   return md2json.parse(cleaned);
 };

@@ -1,5 +1,35 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`generateWordPressReadMe formats releases with parenthesized changelog dates without git lookup 1`] = `
+"=== Test Plugin ===
+Stable tag: 2.16.1
+Contributors: testauthor
+Tags: test, sample
+Requires PHP: 8.0
+Requires at least: 6.0
+Tested up to: 6.9
+License: GPLv2 or later
+A simple test plugin for unit testing purposes.
+
+
+== Description ==
+Full description of the test plugin.
+
+== Features ==
+- Feature one.
+- Feature two.
+
+== Installation ==
+Install and activate the plugin.
+
+== Changelog ==
+#### 2.16.1
+_Released on March 10, 2026_
+
+##### **Changes**
+* Performance enhancements and bug fixes."
+`;
+
 exports[`generateWordPressReadMe generates correctly formatted README content from markdown inputs 1`] = `
 "=== Test Plugin ===
 Stable tag: 2.1.0
@@ -40,6 +70,38 @@ _Released on January 24, 1984_
 
 ##### **Changes**
 * Performance enhancements and bug fixes."
+`;
+
+exports[`generateWordPressReadMe keeps both major and minor feature notes in the merged feature section 1`] = `
+"=== Test Plugin ===
+Stable tag: 3.0.0
+Contributors: testauthor
+Tags: test, sample
+Requires PHP: 8.0
+Requires at least: 6.0
+Tested up to: 6.9
+License: GPLv2 or later
+A simple test plugin for unit testing purposes.
+
+
+== Description ==
+Full description of the test plugin.
+
+== Features ==
+- Feature one.
+- Feature two.
+
+== Installation ==
+Install and activate the plugin.
+
+== Changelog ==
+#### 3.0.0
+_Released on April 22, 2026_
+
+##### **New Features**
+* Introducing scheduled refreshes.
+* Add support for older WordPress and PHP versions.
+* Redesign the troubleshooting section."
 `;
 
 exports[`generateWordPressReadMe merges multiple categories that share the same section header into one section 1`] = `

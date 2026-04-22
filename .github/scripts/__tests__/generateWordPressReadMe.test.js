@@ -62,6 +62,26 @@ const CHANGELOG_FIXTURE_MERGED_SECTIONS = `\
 * Performance enhancements and bug fixes.
 `;
 
+const CHANGELOG_FIXTURE_MAJOR_MINOR_FEATURES = `\
+# Changelog
+
+## 3.0.0 - 2026-04-22
+### Feature (major)
+* Introducing scheduled refreshes.
+* Add support for older WordPress and PHP versions.
+
+### Feature (minor)
+* Redesign the troubleshooting section.
+`;
+
+const CHANGELOG_FIXTURE_PARENTHESES_DATE = `\
+# Changelog
+
+## 2.16.1 (2026-03-10)
+### Changed
+* Performance enhancements and bug fixes.
+`;
+
 describe('generateWordPressReadMe', () => {
   it('generates correctly formatted README content from markdown inputs', async () => {
     const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE, '2.1.0');
@@ -70,6 +90,16 @@ describe('generateWordPressReadMe', () => {
 
   it('merges multiple categories that share the same section header into one section', async () => {
     const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE_MERGED_SECTIONS, '2.1.0');
+    expect(result).toMatchSnapshot();
+  });
+
+  it('keeps both major and minor feature notes in the merged feature section', async () => {
+    const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE_MAJOR_MINOR_FEATURES, '3.0.0');
+    expect(result).toMatchSnapshot();
+  });
+
+  it('formats releases with parenthesized changelog dates without git lookup', async () => {
+    const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE_PARENTHESES_DATE, '2.16.1');
     expect(result).toMatchSnapshot();
   });
 });
