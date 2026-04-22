@@ -2,7 +2,7 @@
   "name"        : "jordanleven/force-refresh",
   "description" : "Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.",
   "scripts": {
-    "lint": "phpcs filter-force-refresh.php ./includes",
+    "lint": "phpcs --runtime-set installed_paths vendor/wp-coding-standards/wpcs,vendor/phpcsstandards/phpcsutils,vendor/phpcsstandards/phpcsextra filter-force-refresh.php ./includes",
     "test": "phpunit",
     "test:coverage": "phpunit --coverage-clover coverage/coverage.xml --coverage-html coverage/html"
   },
@@ -10,6 +10,7 @@
     "php": ">=8.2"
   },
   "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.1",
     "wp-coding-standards/wpcs": "^3.3",
     "phpcsstandards/php_codesniffer": "^4.0",
     "phpunit/phpunit": "^11",
