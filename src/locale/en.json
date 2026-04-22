@@ -73,8 +73,9 @@
     "TROUBLESHOOTING_VALUE_NO": "No",
     "TROUBLESHOOTING_VALUE_YES": "Yes",
     "TROUBLESHOOTING_VERSION_IS_DEVELOPMENT_VERSION": "Your version of {label} is an unsupported development version.",
-    "TROUBLESHOOTING_VERSION_IS_OUTDATED": "Your version of {label} is outdated. Please update to version {versionRequired}.",
-    "TROUBLESHOOTING_VERSION_IS_UP_TO_DATE": "Your version of {label} is up-to-date."
+    "TROUBLESHOOTING_VERSION_IS_EOL": "Your version of {label} reached end-of-life on {eolDate}. Although Force Refresh is compatible, updating is recommended.",
+    "TROUBLESHOOTING_VERSION_IS_UNSUPPORTED": "Your version of {label} is unsupported. Please update to version {versionRequired}.",
+    "TROUBLESHOOTING_VERSION_IS_UP_TO_DATE": "Your version of {label} is supported."
   },
   "ADMIN_REFRESH_MAIN": {
     "PLUGIN_BADGE_DEBUG_MODE": "Debug mode active",

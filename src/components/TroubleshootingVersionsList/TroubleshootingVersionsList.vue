@@ -1,8 +1,9 @@
 <template>
   <div>
     <TroubleshootingVersions
-      v-for="({ label, version, versionRequired }, index) in versions"
+      v-for="({ eolDate, label, version, versionRequired }, index) in versions"
       :key="index"
+      :eol-date="eolDate"
       :label="label"
       :version="version"
       :version-required="versionRequired"
