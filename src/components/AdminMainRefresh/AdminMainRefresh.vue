@@ -120,9 +120,7 @@ export default {
   width: 100%;
   padding: 20px 10px 30px;
   text-align: center;
-  border: 2px solid var.$light-grey;
-  border-radius: 10px;
-  background-color: white;
+  @include utils.card-surface;
 }
 
 .admin__refresh-logo {

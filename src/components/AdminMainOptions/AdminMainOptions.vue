@@ -268,9 +268,7 @@ export default {
 
 .force-refresh-admin__options-inner {
   padding: 0 20px 10px;
-  background-color: white;
-  border: 2px solid var.$light-grey;
-  border-radius: 10px;
+  @include utils.card-surface;
 
   @include utils.small {
     margin-left: 10px;
