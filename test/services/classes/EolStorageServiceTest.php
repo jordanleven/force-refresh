@@ -76,7 +76,7 @@ final class EolStorageServiceTest extends TestCase {
         self::$mock_get_transient->set_return_value( self::$sample_eol_data );
 
         $remote_get_count_before = self::$mock_wp_remote_get->get_invocation_count();
-        $result                  = Eol_Storage_Service::get_eol_date( 'php', '7.4.33' );
+        $result                  = Eol_Storage_Service::get_eol_date_php( '7.4.33' );
 
         $this->assertEquals( $remote_get_count_before, self::$mock_wp_remote_get->get_invocation_count() );
         $this->assertEquals( '2022-11-28', $result );
@@ -93,7 +93,7 @@ final class EolStorageServiceTest extends TestCase {
 
         $remote_get_count_before  = self::$mock_wp_remote_get->get_invocation_count();
         $set_transient_count_before = self::$mock_set_transient->get_invocation_count();
-        $result                   = Eol_Storage_Service::get_eol_date( 'php', '8.0.1' );
+        $result                   = Eol_Storage_Service::get_eol_date_php( '8.0.1' );
 
         $this->assertEquals( $remote_get_count_before + 1, self::$mock_wp_remote_get->get_invocation_count() );
         $this->assertEquals( $set_transient_count_before + 1, self::$mock_set_transient->get_invocation_count() );
@@ -109,7 +109,7 @@ final class EolStorageServiceTest extends TestCase {
         self::$mock_is_wp_error->set_return_value( true );
 
         $set_transient_count_before = self::$mock_set_transient->get_invocation_count();
-        $result                     = Eol_Storage_Service::get_eol_date( 'php', '7.4.33' );
+        $result                     = Eol_Storage_Service::get_eol_date_php( '7.4.33' );
 
         $this->assertNull( $result );
         $this->assertEquals( $set_transient_count_before, self::$mock_set_transient->get_invocation_count() );
@@ -121,9 +121,24 @@ final class EolStorageServiceTest extends TestCase {
     public function testVersionMatchingExtractsMajorMinorCycle() {
         self::$mock_get_transient->set_return_value( self::$sample_eol_data );
 
-        $result = Eol_Storage_Service::get_eol_date( 'php', '7.4.33' );
+        $result = Eol_Storage_Service::get_eol_date_php( '7.4.33' );
 
         $this->assertEquals( '2022-11-28', $result );
+    }
+
+    /**
+     * WordPress versions are resolved through the public WordPress-specific helper.
+     */
+    public function testWordPressVersionLookupUsesPublicHelper() {
+        self::$mock_get_transient->set_return_value(
+            array(
+                array( 'cycle' => '6.8', 'eol' => '2026-12-31' ),
+            )
+        );
+
+        $result = Eol_Storage_Service::get_eol_date_wordpress( '6.8.1' );
+
+        $this->assertEquals( '2026-12-31', $result );
     }
 
     /**
@@ -132,7 +147,7 @@ final class EolStorageServiceTest extends TestCase {
     public function testUnknownVersionReturnsNull() {
         self::$mock_get_transient->set_return_value( self::$sample_eol_data );
 
-        $result = Eol_Storage_Service::get_eol_date( 'php', '5.6.40' );
+        $result = Eol_Storage_Service::get_eol_date_php( '5.6.40' );
 
         $this->assertNull( $result );
     }

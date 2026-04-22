@@ -34,6 +34,7 @@ class Eol_Storage_Service {
      * @return string|null The EOL date (e.g. '2022-11-28'), or null if not found.
      */
     public static function get_eol_date_wordpress( string $version ): ?string {
+        // phpcs:ignore WordPress.WP.CapitalPDangit.MisspelledInText -- endoflife.date expects the lowercase product slug.
         return self::get_eol_date( 'wordpress', $version );
     }
 
