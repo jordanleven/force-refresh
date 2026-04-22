@@ -1,7 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
-import { getAuthFile } from './test/e2e/helpers/constants';
+import { WP_INSTANCES, getAuthFile } from './test/e2e/helpers/constants';
 
-const QA_INSTANCE = { name: 'QA', baseURL: 'http://qa.force-refresh.localhost' };
+const QA_INSTANCES = [
+  { name: 'WordPress 4', baseURL: 'http://wp4.force-refresh.localhost' },
+  { name: 'WordPress 5', baseURL: 'http://wp5.force-refresh.localhost' },
+  { name: 'WordPress 6', baseURL: 'http://wp6.force-refresh.localhost' },
+  { name: 'WordPress 7', baseURL: 'http://wp7.force-refresh.localhost' },
+];
 
 export default defineConfig({
   testDir: './test/e2e',
@@ -14,21 +19,21 @@ export default defineConfig({
       slowMo: 800,
     },
   },
-  projects: [
+  projects: QA_INSTANCES.flatMap((instance) => [
     {
-      name: `setup-${QA_INSTANCE.name}`,
+      name: `setup-${instance.name}`,
       testMatch: '**/helpers/auth.setup.ts',
-      use: { baseURL: QA_INSTANCE.baseURL },
+      use: { baseURL: instance.baseURL },
     },
     {
-      name: QA_INSTANCE.name,
+      name: instance.name,
       use: {
         ...devices['Desktop Chrome'],
-        baseURL: QA_INSTANCE.baseURL,
-        storageState: getAuthFile(QA_INSTANCE.baseURL),
+        baseURL: instance.baseURL,
+        storageState: getAuthFile(instance.baseURL),
         headless: false,
       },
-      dependencies: [`setup-${QA_INSTANCE.name}`],
+      dependencies: [`setup-${instance.name}`],
     },
-  ],
+  ]),
 });
