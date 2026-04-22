@@ -2,5 +2,6 @@ $z-index-base: 1;
 $z-index-sticky: 2;
 $z-index-notification: 1000;
 $z-index-tooltip: 1100;
-$z-index-modal: 2000;
-$z-index-datepicker: 2100;
+// The WP Admin bar has a z-index of 99999
+$z-index-modal: 100000;
+$z-index-datepicker: $z-index-modal + 1;
