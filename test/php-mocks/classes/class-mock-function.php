@@ -7,7 +7,6 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Mocks;
 
-use phpmock\MockBuilder;
 use phpmock\spy\Spy;
 
 /**
@@ -84,6 +83,21 @@ class Mock_Function implements Mock_Function_Interface {
         }
 
         return $invocations[ $index ]->getArguments();
+    }
+
+    /**
+     * Method to get the arguments from the latest mock invocation.
+     *
+     * @return array|null An array of arguments, or null when the mock was not called.
+     */
+    public function get_last_invocation_arguments() {
+        $invocations = $this->mock_instance->getInvocations();
+
+        if ( empty( $invocations ) ) {
+            return null;
+        }
+
+        return end( $invocations )->getArguments();
     }
 
     /**
