@@ -20,7 +20,7 @@ class Api_Handler_Admin_Health_Websocket extends Api_Handler_Admin implements Ap
      *
      * @var string
      */
-    const ENDPOINT_PATH = '/health/websocket';
+    const ENDPOINT_PATH = '/websocket/health';
 
     /**
      * The version for this endpoint.
