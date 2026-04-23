@@ -27,7 +27,7 @@
           </div>
           <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
           <TroubleshootingHealthCheck
-            v-if="isWebSocketHealthEnabled"
+            v-if="isWebSocketEnabled"
             :label="$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_WEBSOCKET_SUPPORT')"
             :supported="troubleshootingInfo.webSocketSupported"
             :tooltip-supported="$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_TOOLTIP_WEBSOCKET_SUPPORTED')"
@@ -126,8 +126,8 @@ export default {
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');
     },
-    isWebSocketHealthEnabled() {
-      return this.isFeatureEnabled('webSocketHealth');
+    isWebSocketEnabled() {
+      return this.isFeatureEnabled('websockets');
     },
     versionsTroubleshootingInformation() {
       const { forceRefresh, php, wordPress } = this.troubleshootingInfo.versions;
@@ -181,7 +181,7 @@ export default {
   },
   async created() {
     const requests = [this.requestCronStatus()];
-    if (this.isWebSocketHealthEnabled) {
+    if (this.isWebSocketEnabled) {
       requests.push(this.requestWebSocketHealth());
     }
     await Promise.all(requests);
