@@ -2,6 +2,7 @@ import {
   deleteScheduledRefresh,
   getCronStatus,
   getScheduledRefreshes,
+  getWebSocketHealth,
   requestPostRefreshByPostID,
   requestSiteRefresh,
   scheduleRequestSiteRefresh,
@@ -23,6 +24,12 @@ export default {
     const response = await getCronStatus();
     if (isSuccess(response)) {
       commit('SET_LAST_CRON_RUN', response.data.last_cron_run ?? null);
+    }
+  },
+  requestWebSocketHealth: async ({ commit }) => {
+    const response = await getWebSocketHealth();
+    if (isSuccess(response)) {
+      commit('SET_WEBSOCKET_HEALTH', response.data.websocket_supported ?? false);
     }
   },
   requestDeleteScheduledRefresh: async ({ commit }, id) => {
