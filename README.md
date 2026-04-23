@@ -5,8 +5,8 @@
 ![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** page refresh, live reload, site refresh, scheduled refresh, browser refresh\
-**Requires PHP:** 8.2\
-**Requires at least:** 6.3\
+**Requires PHP:** 7.4\
+**Requires at least:** 5.9\
 **Tested up to:** 6.9\
 **License:** GPLv2 or later
 
