@@ -4,13 +4,13 @@
 
 ![CI](https://github.com/jordanleven/force-refresh/workflows/CI/badge.svg)\
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
-**Tags:** page refresh, live reload, site refresh, scheduled refresh, browser refresh, cache busting\
+**Tags:** page refresh, live reload, site refresh, scheduled refresh, browser refresh\
 **Requires PHP:** 8.2\
 **Requires at least:** 6.3\
 **Tested up to:** 6.9\
 **License:** GPLv2 or later
 
-Force Refresh gives you a simple way to request page refreshes for visitors currently viewing your site, whether you want to refresh the entire site or a single page.
+Force Refresh lets you request page refreshes for visitors viewing your site, whether you want to refresh the whole site or a single page.
 
 ## Description
 
