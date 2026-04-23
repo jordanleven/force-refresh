@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.0.0 - 2026-04-22
+### Feature (major)
+* Introducing scheduled refreshes. Plan site-wide refreshes in advance so they happen exactly when you need them.
+* Force Refresh now supports a wider range of older WordPress and PHP versions, including WordPress 5.9 and PHP 7.4.
+### Feature (minor)
+* Redesigned the troubleshooting section with a clearer layout for debug controls, site details, health checks, and added an easier way to submit debugging information when you need help.
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 2.17.0 - 2026-04-12
 ### Feature (minor)
 * Release notes are now grouped by minor version for easier browsing. You can also click any release to view the full details on the official GitHub repository.
