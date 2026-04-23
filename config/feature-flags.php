@@ -12,4 +12,5 @@ return array(
     'scheduledRefresh'           => true,
     'troubleshootingTerminal'    => false,
     'troubleshootingSubmitDebug' => true,
+    'webSocketHealth'            => true,
 );
