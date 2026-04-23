@@ -14,6 +14,7 @@ export default (localizedData) => ({
   site: {
     isMultiSite: localizedData.isMultiSite,
     lastCronRun: localizedData.lastCronRun ?? null,
+    webSocketSupported: null,
     scheduledRefreshes: localizedData.scheduledRefreshes,
     siteId: localizedData.siteId,
     siteName: localizedData.siteName,
