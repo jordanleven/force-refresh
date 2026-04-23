@@ -34,6 +34,9 @@ function register_admin_endpoints(): void {
 
     $controller = new Api_Handler_Admin_Debug_Email();
     $controller->register_routes();
+
+    $controller = new Api_Handler_Admin_Health_Websocket();
+    $controller->register_routes();
 }
 
 add_action( 'rest_api_init', __NAMESPACE__ . '\\register_admin_endpoints' );
