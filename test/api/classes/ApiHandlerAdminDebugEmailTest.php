@@ -185,7 +185,6 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
                 $map = array(
                     'url'     => 'https://example.com/1984',
                     'name'    => 'Force Refresh Test Site',
-                    'version' => '6.9.0',
                 );
 
                 return $map[ $key ] ?? null;
@@ -428,6 +427,19 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
             ),
             $rows,
         );
+    }
+
+    /**
+     * Test that get_debug_data includes the WordPress version row from the shared wrapper.
+     *
+     * @return void
+     */
+    public function testGetDebugDataIncludesWordPressVersionRow(): void {
+        $rows = $this->get_debug_data_payload()['data']['debugData'];
+
+        $keys = array_column( $rows, 'key' );
+
+        $this->assertContains( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION', $keys );
     }
 
     /**

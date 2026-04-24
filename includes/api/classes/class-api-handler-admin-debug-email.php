@@ -161,7 +161,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         return array(
             'siteUrl'             => get_bloginfo( 'url' ),
             'siteName'            => get_bloginfo( 'name' ),
-            'wordPressVersion'    => get_bloginfo( 'version' ),
+            'wordPressVersion'    => ForceRefresh\get_wordpress_version(),
             'phpVersion'          => phpversion(),
             'forceRefreshVersion' => $plugin_data['Version'],
             'siteVersion'         => Versions_Storage_Service::get_site_version(),

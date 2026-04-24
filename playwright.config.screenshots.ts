@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import { getAuthFile } from './test/e2e/helpers/constants';
 
-const INSTANCE = { name: 'WordPress 6.9', baseURL: 'http://wp6.force-refresh.localhost' };
+const INSTANCE = { name: 'WordPress 7.0', baseURL: 'http://wp7.force-refresh.localhost' };
 
 export default defineConfig({
   testDir: './screenshots',
