@@ -35,7 +35,7 @@ function get_localized_data_versions(): array {
     $force_refresh_plugin_data = get_force_refresh_plugin_data();
 
     $version_php = phpversion();
-    $version_wp  = get_bloginfo( 'version' );
+    $version_wp  = get_wordpress_version();
 
     return array(
         'php'          => array(

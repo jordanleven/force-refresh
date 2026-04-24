@@ -131,6 +131,15 @@ function get_force_refresh_plugin_data(): array {
 }
 
 /**
+ * Get the current WordPress version.
+ *
+ * @return string
+ */
+function get_wordpress_version(): string {
+    return (string) get_bloginfo( 'version' );
+}
+
+/**
  * Function to conditionally log data if WP_DEBUG is set.
  *
  * @param mixed $log The data to log.
