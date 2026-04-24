@@ -138,6 +138,7 @@ export default {
 .admin__refresh-buttons {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
 }
 

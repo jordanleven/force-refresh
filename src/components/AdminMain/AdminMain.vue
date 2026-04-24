@@ -51,6 +51,7 @@ $options-max-width: 30rem;
 
 .force-refresh__main,
 .force-refresh-admin__options {
+  box-sizing: border-box;
   width: 100%;
   margin-bottom: 1rem;
 }
