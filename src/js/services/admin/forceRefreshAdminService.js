@@ -30,6 +30,8 @@ export const deleteScheduledRefresh = async (uuid) => {
 
 export const getCronStatus = async () => apiClient.get(adminEndpoints.cronStatus);
 
+export const getWebSocketHealth = async () => apiClient.get(adminEndpoints.webSocketHealth);
+
 export const getScheduledRefreshes = async () => apiClient.get(adminEndpoints.scheduleRefreshSite);
 
 export const requestSiteRefresh = async () => {

@@ -23,6 +23,7 @@ export default {
     scheduledRefreshesCount: site.scheduledRefreshes.length,
     siteName: site.siteName,
     siteUrl: site.siteUrl,
+    webSocketSupported: site.webSocketSupported,
   }),
   troubleshootingInformationVersions: ({ site }) => ({
     versions: {

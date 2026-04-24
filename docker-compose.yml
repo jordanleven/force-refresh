@@ -49,7 +49,9 @@ services:
       - db-qa
       - mailpit
       - traefik
-    image: 'wordpress:6.9.4-php8.3-apache'
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.qa
     ports:
       - '8086:80'
     healthcheck:
@@ -143,7 +145,9 @@ services:
       - db-wp6
       - mailpit
       - traefik
-    image: 'wordpress:6.9-php8.3-apache'
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.wp6
     ports:
       - '8084:80'
     healthcheck:
