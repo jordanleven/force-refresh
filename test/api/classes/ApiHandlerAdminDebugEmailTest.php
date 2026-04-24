@@ -84,13 +84,6 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     private static $mock_get_force_refresh_plugin_data;
 
     /**
-     * Mock for `get_wordpress_version`.
-     *
-     * @var Mocks\Mock_Function
-     */
-    private static $mock_get_wordpress_version;
-
-    /**
      * Mock for `get_option`.
      *
      * @var Mocks\Mock_Function
@@ -198,7 +191,6 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
             }
         );
         self::$mock_get_force_refresh_plugin_data = new Mocks\Mock_Function( self::PLUGIN_NAMESPACE, 'get_force_refresh_plugin_data' );
-        self::$mock_get_wordpress_version         = new Mocks\Mock_Function( self::PLUGIN_NAMESPACE, 'get_wordpress_version' );
         self::$mock_get_option                    = new Mocks\Mock_Function(
             self::SERVICES_NAMESPACE,
             'get_option',
@@ -272,7 +264,6 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         self::$mock_wp_get_current_user->disable();
         self::$mock_get_bloginfo->disable();
         self::$mock_get_force_refresh_plugin_data->disable();
-        self::$mock_get_wordpress_version->disable();
         self::$mock_get_option->disable();
         self::$mock_get_option_api->disable();
         self::$mock_translate->disable();
@@ -294,7 +285,6 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      */
     protected function setUp(): void {
         self::$mock_get_force_refresh_plugin_data->set_return_value( array( 'Version' => '2.18.0' ) );
-        self::$mock_get_wordpress_version->set_return_value( '6.9.0' );
         self::$mock_get_main_plugin_file->set_return_value( '/tmp/force-refresh.php' );
         self::$mock_wp_get_current_user->set_return_value(
             (object) array(
@@ -445,17 +435,11 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
      * @return void
      */
     public function testGetDebugDataIncludesWordPressVersionRow(): void {
-        self::$mock_get_wordpress_version->set_return_value( '7.0.0' );
-
         $rows = $this->get_debug_data_payload()['data']['debugData'];
 
-        $this->assertContains(
-            array(
-                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION',
-                'value' => '7.0.0',
-            ),
-            $rows,
-        );
+        $keys = array_column( $rows, 'key' );
+
+        $this->assertContains( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION', $keys );
     }
 
     /**

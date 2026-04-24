@@ -46,7 +46,17 @@ function get_bloginfo( string $show = '' ): string {
     return '';
 }
 
-require_once __DIR__ . '/../../../includes/functions.php';
+/**
+ * Inline stub for get_wordpress_version so functions.php is not loaded
+ * (loading it would define get_force_refresh_plugin_data and break phpmock
+ * spies in other test files that run after this one).
+ *
+ * @return string
+ */
+function get_wordpress_version(): string {
+    return get_bloginfo( 'version' );
+}
+
 require_once __DIR__ . '/../../../includes/actions/admin/inc-refresh-ui.php';
 
 /**
