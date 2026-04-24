@@ -1,0 +1,7 @@
+@mixin wp7 {
+  $selector: &;
+
+  @at-root :global(body.force-refresh-wp7 #{$selector}) {
+    @content;
+  }
+}

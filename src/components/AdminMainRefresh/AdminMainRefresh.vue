@@ -147,5 +147,9 @@ export default {
   margin: 0.5rem;
   position: relative;
   cursor: pointer;
+
+  @include utils.wp7 {
+    font-size: 0.875rem;
+  }
 }
 </style>

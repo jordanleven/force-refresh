@@ -7,7 +7,7 @@
 **Tags:** page refresh, live reload, site refresh, scheduled refresh, browser refresh\
 **Requires PHP:** 7.4\
 **Requires at least:** 5.9\
-**Tested up to:** 6.9\
+**Tested up to:** 7.0\
 **License:** GPLv2 or later
 
 Force Refresh lets you request page refreshes for visitors viewing your site, whether you want to refresh the whole site or a single page.
