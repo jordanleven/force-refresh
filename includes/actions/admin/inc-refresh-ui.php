@@ -56,6 +56,19 @@ function get_localized_data_versions(): array {
 }
 
 /**
+ * Add plugin-owned admin body classes for WordPress-version-specific styling.
+ *
+ * @param string $classes Space-separated admin body classes.
+ * @return string
+ */
+function add_force_refresh_admin_body_classes( string $classes ): string {
+    $major_version = (int) explode( '.', get_wordpress_version() )[0];
+    $classes      .= " force-refresh-wp{$major_version} ";
+
+    return $classes;
+}
+
+/**
  * Function to get the refresh options.
  *
  * @return  array  An array of refresh options.
@@ -144,4 +157,9 @@ function enqueue_force_refresh_scripts(): void {
 add_action(
     'admin_enqueue_scripts',
     __NAMESPACE__ . '\\enqueue_force_refresh_scripts'
+);
+
+add_filter(
+    'admin_body_class',
+    __NAMESPACE__ . '\\add_force_refresh_admin_body_classes'
 );
