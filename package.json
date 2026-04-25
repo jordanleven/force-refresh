@@ -82,7 +82,7 @@
     "sass-loader": "^16.0.7",
     "simple-git": "^3.36.0",
     "style-loader": "^4.0.0",
-    "stylelint": "^17.8.0",
+    "stylelint": "^17.9.0",
     "stylelint-config-recommended-scss": "^17.0.1",
     "stylelint-config-recommended-vue": "^1.6.1",
     "stylelint-config-standard": "^40.0.0",
