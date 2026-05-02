@@ -18,6 +18,7 @@ fi
 NEXT_VERSION=$(npx changie next auto)
 printf "\033[37mPreviewing release notes for v%s...\033[0m\n\n" "$NEXT_VERSION"
 
+node .github/scripts/dedupeUnreleasedDependencyFragments.js
 cp CHANGELOG.md CHANGELOG.md.bak
 npx changie batch --keep "$NEXT_VERSION"
 {
