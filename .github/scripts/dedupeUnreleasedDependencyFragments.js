@@ -2,38 +2,54 @@
 const fs = require('fs');
 const path = require('path');
 
-const unreleasedDir = path.resolve('.changes/unreleased');
-const targetKind = 'Dependencies & security';
-const listOnly = process.argv.includes('--list-only');
+const TARGET_KIND = 'Dependencies & security';
 
-if (!fs.existsSync(unreleasedDir)) {
-  process.exit(0);
+function getFragmentsToRemove(fragments) {
+  const hasOtherFragments = fragments.some(({ kind }) => kind !== TARGET_KIND);
+  let keptDependencyFragment = false;
+
+  return fragments
+    .filter(({ kind }) => kind === TARGET_KIND)
+    .filter(() => {
+      // When other change types exist, omit the dependency section entirely
+      if (hasOtherFragments || keptDependencyFragment) {
+        return true;
+      }
+      keptDependencyFragment = true;
+      return false;
+    })
+    .map(({ name }) => name);
 }
 
-const fragments = fs.readdirSync(unreleasedDir)
-  .filter((file) => file.endsWith('.yaml'))
-  .sort((a, b) => b.localeCompare(a));
-
-let keptTargetFragment = false;
-
-fragments.forEach((fragment) => {
-  const filePath = path.join(unreleasedDir, fragment);
-  const contents = fs.readFileSync(filePath, 'utf8');
-  const match = contents.match(/^kind:\s*(.+)$/m);
-  const kind = match ? match[1].trim() : '';
-
-  if (kind !== targetKind) {
+function dedupeUnreleasedDependencyFragments(unreleasedDir, { listOnly = false } = {}) {
+  if (!fs.existsSync(unreleasedDir)) {
     return;
   }
 
-  if (!keptTargetFragment) {
-    keptTargetFragment = true;
-    return;
-  }
+  const fragments = fs.readdirSync(unreleasedDir)
+    .filter((file) => file.endsWith('.yaml'))
+    .sort((a, b) => b.localeCompare(a))
+    .map((name) => {
+      const filePath = path.join(unreleasedDir, name);
+      const contents = fs.readFileSync(filePath, 'utf8');
+      const match = contents.match(/^kind:\s*(.+)$/m);
+      return { kind: match ? match[1].trim() : '', name };
+    });
 
-  console.log(filePath);
+  getFragmentsToRemove(fragments).forEach((name) => {
+    const filePath = path.join(unreleasedDir, name);
+    console.log(filePath);
+    if (!listOnly) {
+      fs.unlinkSync(filePath);
+    }
+  });
+}
 
-  if (!listOnly) {
-    fs.unlinkSync(filePath);
-  }
-});
+module.exports = { dedupeUnreleasedDependencyFragments, getFragmentsToRemove };
+
+if (require.main === module) {
+  dedupeUnreleasedDependencyFragments(
+    path.resolve('.changes/unreleased'),
+    { listOnly: process.argv.includes('--list-only') },
+  );
+}
