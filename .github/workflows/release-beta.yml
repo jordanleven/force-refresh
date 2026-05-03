@@ -186,6 +186,7 @@ jobs:
 
     - name: Create release notes
       run: |
+        node .github/scripts/dedupeUnreleasedDependencyFragments.js
         NEXT_VERSION=$(npx changie next auto 2>/dev/null || echo "unreleased")
         cp CHANGELOG.md CHANGELOG.md.bak
         npx changie batch "$NEXT_VERSION" 2>/dev/null || true
