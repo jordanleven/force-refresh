@@ -3,16 +3,17 @@ const fs = require('fs');
 const path = require('path');
 
 const TARGET_KIND = 'Dependencies & security';
+const SIGNIFICANT_KINDS = ['Feature (major)', 'Feature (minor)'];
 
 function getFragmentsToRemove(fragments) {
-  const hasOtherFragments = fragments.some(({ kind }) => kind !== TARGET_KIND);
+  const hasSignificantFragments = fragments.some(({ kind }) => SIGNIFICANT_KINDS.includes(kind));
   let keptDependencyFragment = false;
 
   return fragments
     .filter(({ kind }) => kind === TARGET_KIND)
     .filter(() => {
       // When other change types exist, omit the dependency section entirely
-      if (hasOtherFragments || keptDependencyFragment) {
+      if (hasSignificantFragments || keptDependencyFragment) {
         return true;
       }
       keptDependencyFragment = true;
