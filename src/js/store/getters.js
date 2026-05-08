@@ -1,4 +1,5 @@
 export default {
+  detectedCdn: ({ network }) => network.detectedCdn,
   featureFlags: ({ featureFlags }) => featureFlags,
   isDebugActive: ({ settings }) => settings.isDebugActive,
   isFeatureEnabled: ({ featureFlags }) => (flag) => Boolean(featureFlags?.[flag]),
@@ -9,6 +10,7 @@ export default {
     customRefreshIntervalMinimumInMinutes: settings.customRefreshIntervalMinimumInMinutes,
     refreshInterval: getters.refreshInterval,
     showRefreshInMenuBar: getters.refreshFromAdminBar,
+    useStaticFilePolling: getters.useStaticFilePolling,
   }),
   scheduledRefreshes: ({ site }) => site.scheduledRefreshes,
   siteName: ({ site }) => site.siteName,
@@ -16,13 +18,15 @@ export default {
     ...getters.troubleshootingInformationSettings,
     ...getters.troubleshootingInformationVersions,
   }),
-  troubleshootingInformationSettings: ({ site }) => ({
+  troubleshootingInformationSettings: ({ site, network, settings }) => ({
     currentSiteId: site.siteId,
+    detectedCdn: network.detectedCdn,
     isMultiSite: site.isMultiSite,
     lastCronRun: site.lastCronRun,
     scheduledRefreshesCount: site.scheduledRefreshes.length,
     siteName: site.siteName,
     siteUrl: site.siteUrl,
+    useStaticFilePolling: settings.useStaticFilePolling,
   }),
   troubleshootingInformationVersions: ({ site }) => ({
     versions: {
@@ -42,5 +46,6 @@ export default {
       },
     },
   }),
+  useStaticFilePolling: ({ settings }) => settings.useStaticFilePolling,
   wordPressNonce: ({ nonce }) => nonce,
 };

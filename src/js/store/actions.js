@@ -77,6 +77,7 @@ export default {
     const response = await updateForceRefreshOptions({
       refreshInterval: updatedOptions?.refreshInterval,
       showRefreshInMenuBar: updatedOptions?.showRefreshInMenuBar,
+      useStaticFilePolling: updatedOptions?.useStaticFilePolling,
     });
 
     const success = isSuccess(response);
@@ -84,6 +85,7 @@ export default {
     if (success) {
       commit('SET_REFRESH_INTERVAL', updatedOptions?.refreshInterval);
       commit('SET_SHOW_REFRESH_IN_MENU_BAR', updatedOptions?.showRefreshInMenuBar);
+      commit('SET_USE_STATIC_FILE_POLLING', updatedOptions?.useStaticFilePolling);
     }
 
     return success;

@@ -14,8 +14,9 @@ require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler.
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
-require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-refresh-page.php';
 
 /**
@@ -57,18 +58,11 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
     private static $mock_wp_hash;
 
     /**
-     * Mock for `delete_post_meta` in the services namespace.
+     * Mock for `update_option` in the services namespace.
      *
-     * @var Mocks\Mock_Delete_Post_Meta
+     * @var Mocks\Mock_Update_Option
      */
-    private static $mock_delete_post_meta;
-
-    /**
-     * Mock for `update_post_meta` in the services namespace.
-     *
-     * @var Mocks\Mock_Update_Post_Meta
-     */
-    private static $mock_update_post_meta;
+    private static $mock_update_option_services;
 
     /**
      * Mock for `get_option` in the services namespace.
@@ -106,22 +100,54 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
     private static $mock_current_user_can;
 
     /**
+     * Mock for `wp_upload_dir` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Upload_Dir
+     */
+    private static $mock_wp_upload_dir_services;
+
+    /**
+     * Mock for `wp_mkdir_p` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Mkdir_P
+     */
+    private static $mock_wp_mkdir_p_services;
+
+    /**
+     * Mock for `wp_json_encode` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Json_Encode
+     */
+    private static $mock_wp_json_encode_services;
+
+    /**
      * Initial test setup.
      *
      * @return void
      */
     public static function setUpBeforeClass(): void {
-        self::$mock_status_header        = new Mocks\Mock_Status_Header( __NAMESPACE__ );
-        self::$mock_wp_json_encode       = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
-        self::$mock_current_time         = new Mocks\Mock_Current_Time( self::SERVICES_NAMESPACE );
-        self::$mock_wp_hash              = new Mocks\Mock_WP_Hash( self::SERVICES_NAMESPACE );
-        self::$mock_delete_post_meta     = new Mocks\Mock_Delete_Post_Meta( self::SERVICES_NAMESPACE );
-        self::$mock_update_post_meta     = new Mocks\Mock_Update_Post_Meta( self::SERVICES_NAMESPACE );
-        self::$mock_get_option_services  = new Mocks\Mock_Get_Option( self::SERVICES_NAMESPACE );
-        self::$mock_register_rest_route  = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
-        self::$mock_get_current_blog_id  = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
-        self::$mock_get_rest_url         = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
-        self::$mock_current_user_can     = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
+        self::$mock_status_header             = new Mocks\Mock_Status_Header( __NAMESPACE__ );
+        self::$mock_wp_json_encode            = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
+        self::$mock_current_time              = new Mocks\Mock_Current_Time( self::SERVICES_NAMESPACE );
+        self::$mock_wp_hash                   = new Mocks\Mock_WP_Hash( self::SERVICES_NAMESPACE );
+        self::$mock_update_option_services    = new Mocks\Mock_Update_Option( self::SERVICES_NAMESPACE );
+        self::$mock_get_option_services       = new Mocks\Mock_Get_Option( self::SERVICES_NAMESPACE );
+        self::$mock_register_rest_route       = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
+        self::$mock_get_current_blog_id       = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
+        self::$mock_get_rest_url              = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
+        self::$mock_current_user_can          = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
+        self::$mock_wp_upload_dir_services    = new Mocks\Mock_Wp_Upload_Dir( self::SERVICES_NAMESPACE );
+        self::$mock_wp_mkdir_p_services       = new Mocks\Mock_Wp_Mkdir_P( self::SERVICES_NAMESPACE );
+        self::$mock_wp_json_encode_services   = new Mocks\Mock_Wp_Json_Encode( self::SERVICES_NAMESPACE );
+
+        // Static file polling disabled by default so no file I/O occurs in these tests.
+        self::$mock_get_option_services->set_return_value( false );
+        self::$mock_wp_upload_dir_services->set_return_value(
+            array(
+                'basedir' => sys_get_temp_dir(),
+                'baseurl' => 'http://example.com/wp-content/uploads',
+            )
+        );
     }
 
     /**
@@ -134,13 +160,15 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
         self::$mock_wp_json_encode->disable();
         self::$mock_current_time->disable();
         self::$mock_wp_hash->disable();
-        self::$mock_delete_post_meta->disable();
-        self::$mock_update_post_meta->disable();
+        self::$mock_update_option_services->disable();
         self::$mock_get_option_services->disable();
         self::$mock_register_rest_route->disable();
         self::$mock_get_current_blog_id->disable();
         self::$mock_get_rest_url->disable();
         self::$mock_current_user_can->disable();
+        self::$mock_wp_upload_dir_services->disable();
+        self::$mock_wp_mkdir_p_services->disable();
+        self::$mock_wp_json_encode_services->disable();
     }
 
     /**
@@ -160,8 +188,7 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
     public function testRefreshPageSavesPageVersion() {
         $post_id = 42;
         self::$mock_current_time->set_return_value( '2007-06-29 18:00:00' );
-        self::$mock_delete_post_meta->resetInvocationIndex();
-        self::$mock_update_post_meta->resetInvocationIndex();
+        self::$mock_update_option_services->resetInvocationIndex();
         self::$mock_get_option_services->set_return_value( 120 );
 
         $request = new \WP_REST_Request();
@@ -171,10 +198,9 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
         ( new Api_Handler_Admin_Refresh_Page() )->refresh_page( $request );
         ob_get_clean();
 
-        $this->assertEquals( $post_id, self::$mock_delete_post_meta->get_invocation_arguments( 0 )[0] );
-        $this->assertEquals( 'force_refresh_current_page_version', self::$mock_delete_post_meta->get_invocation_arguments( 0 )[1] );
-        $this->assertEquals( $post_id, self::$mock_update_post_meta->get_invocation_arguments( 0 )[0] );
-        $this->assertEquals( 'force_refresh_current_page_version', self::$mock_update_post_meta->get_invocation_arguments( 0 )[1] );
+        $args = self::$mock_update_option_services->get_last_invocation_arguments();
+        $this->assertSame( 'force_refresh_page_versions', $args[0] );
+        $this->assertArrayHasKey( (string) $post_id, $args[1] );
     }
 
     /**

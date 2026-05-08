@@ -47,6 +47,28 @@
             :min="refreshOptions.customRefreshIntervalMinimumInMinutes"
           >
         </div>
+        <div class="option-group">
+          <label for="use-static-file-polling">
+            {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD') }}
+            <BaseTooltip :content="staticFilePollingTooltip">
+              <font-awesome-icon class="option-group__info-icon" :icon="infoIcon" />
+            </BaseTooltip>
+          </label>
+          <select
+            id="use-static-file-polling"
+            v-model="optionSelectedUseStaticFilePolling"
+            name="use-static-file-polling"
+            data-test="select-static-file-polling"
+            :disabled="isUsingCdn"
+          >
+            <option :value="true">
+              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE') }}
+            </option>
+            <option :value="false">
+              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API') }}
+            </option>
+          </select>
+        </div>
         <div class="force-refresh-admin-options-footer">
           <hr>
           <button
@@ -94,10 +116,11 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faInfo } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 
-library.add([faHeart]);
+library.add([faHeart, faInfo]);
 
 const OPTIONS_REFRESH_FROM_ADMIN_BAR = [
   {
@@ -122,22 +145,29 @@ const OPTIONS_REFRESH_INTERVALS_IN_SECONDS = [
 
 export default {
   name: 'AdminMainOptions',
+  components: {
+    BaseTooltip,
+  },
   props: {
+    detectedCdn: VueTypes.string.def(null),
     refreshOptions: VueTypes.shape({
       customRefreshIntervalMaximumInMinutes: VueTypes.isRequired,
       customRefreshIntervalMinimumInMinutes: VueTypes.isRequired,
       refreshInterval: VueTypes.number.isRequired,
       showRefreshInMenuBar: VueTypes.bool.isRequired,
+      useStaticFilePolling: VueTypes.bool.isRequired,
     }),
   },
   emits: ['notify-user-of-error', 'options-were-updated', 'release-notes-page-clicked', 'troubleshooting-page-clicked'],
   data() {
     return {
+      infoIcon: faInfo,
       isCustomIntervalWithinBounds: true,
       leaveReviewLogo: faHeart,
       optionSelectedRefreshInterval: null,
       optionSelectedRefreshIntervalCustom: null,
       optionSelectedShowRefreshInMenuBar: null,
+      optionSelectedUseStaticFilePolling: false,
       optionsForceRefreshInMenuBar: OPTIONS_REFRESH_FROM_ADMIN_BAR,
     };
   },
@@ -155,6 +185,9 @@ export default {
     },
     isSelectedRefreshIntervalCustom() {
       return this.optionSelectedRefreshInterval === OPTIONS_REFRESH_INTERVAL_CUSTOM;
+    },
+    isUsingCdn() {
+      return this.detectedCdn !== null;
     },
     optionsRefreshIntervals() {
       const coreOptions = OPTIONS_REFRESH_INTERVALS_IN_SECONDS.map((value) => {
@@ -182,6 +215,11 @@ export default {
         },
       ];
     },
+    staticFilePollingTooltip() {
+      return this.isUsingCdn
+        ? this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_DISABLED_CDN')
+        : this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_DESCRIPTION');
+    },
   },
   created() {
     const existingRefreshInterval = this.refreshOptions?.refreshInterval;
@@ -189,6 +227,7 @@ export default {
 
     this.optionSelectedShowRefreshInMenuBar = this.refreshOptions?.showRefreshInMenuBar;
     this.optionSelectedRefreshIntervalCustom = this.getMinutesFromSeconds(existingRefreshInterval);
+    this.optionSelectedUseStaticFilePolling = this.refreshOptions?.useStaticFilePolling ?? false;
 
     // If the currently-selected option isn't one of our selections, then we can assume it's a custom
     // value.
@@ -237,6 +276,7 @@ export default {
       this.$emit('options-were-updated', {
         refreshInterval,
         showRefreshInMenuBar: this.optionSelectedShowRefreshInMenuBar,
+        useStaticFilePolling: this.optionSelectedUseStaticFilePolling,
       });
     },
   },
@@ -292,6 +332,13 @@ export default {
     > input,
     > select {
       flex: 1;
+    }
+
+    &__info-icon {
+      font-size: 0.65rem;
+      opacity: 0.5;
+      margin-left: 0.25rem;
+      vertical-align: middle;
     }
 
     &--error {

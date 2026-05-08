@@ -1,10 +1,18 @@
 import getters from './getters.js';
 
-const makeSiteState = (overrides = {}) => ({
+const makeSiteState = (siteOverrides = {}, networkOverrides = {}, settingsOverrides = {}) => ({
   featureFlags: {},
-  settings: {},
+  network: {
+    detectedCdn: null,
+    ...networkOverrides,
+  },
+  settings: {
+    useStaticFilePolling: false,
+    ...settingsOverrides,
+  },
   site: {
     isMultiSite: false,
+    lastCronRun: null,
     scheduledRefreshes: [],
     siteId: 1,
     siteName: 'Test Site',
@@ -17,11 +25,37 @@ const makeSiteState = (overrides = {}) => ({
     versionWordPressEolDate: '2024-01-09',
     versionWordPressInstalled: '4.9',
     versionWordPressRequired: '4.9',
-    ...overrides,
+    ...siteOverrides,
   },
 });
 
 describe('Getters', () => {
+  describe('detectedCdn', () => {
+    it('returns null when no CDN is detected', () => {
+      const state = makeSiteState();
+      expect(getters.detectedCdn(state)).toBeNull();
+    });
+
+    it('returns the CDN name when one is detected', () => {
+      const state = makeSiteState({}, { detectedCdn: 'Cloudflare' });
+      expect(getters.detectedCdn(state)).toBe('Cloudflare');
+    });
+  });
+
+  describe('troubleshootingInformationSettings', () => {
+    it('includes detectedCdn when null', () => {
+      const state = makeSiteState();
+      const result = getters.troubleshootingInformationSettings(state);
+      expect(result.detectedCdn).toBeNull();
+    });
+
+    it('includes detectedCdn when a CDN is detected', () => {
+      const state = makeSiteState({}, { detectedCdn: 'Cloudflare' });
+      const result = getters.troubleshootingInformationSettings(state);
+      expect(result.detectedCdn).toBe('Cloudflare');
+    });
+  });
+
   describe('troubleshootingInformationVersions', () => {
     it('includes eolDate for PHP', () => {
       const state = makeSiteState();
@@ -40,6 +74,18 @@ describe('Getters', () => {
       const result = getters.troubleshootingInformationVersions(state);
       expect(result.versions.php.eolDate).toBeNull();
       expect(result.versions.wordPress.eolDate).toBeNull();
+    });
+  });
+
+  describe('useStaticFilePolling', () => {
+    it('returns false by default', () => {
+      const state = makeSiteState();
+      expect(getters.useStaticFilePolling(state)).toBe(false);
+    });
+
+    it('returns true when the option is enabled', () => {
+      const state = makeSiteState({}, {}, { useStaticFilePolling: true });
+      expect(getters.useStaticFilePolling(state)).toBe(true);
     });
   });
 
