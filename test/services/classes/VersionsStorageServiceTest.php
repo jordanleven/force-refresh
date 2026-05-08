@@ -10,6 +10,8 @@ namespace JordanLeven\Plugins\ForceRefresh\Services;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
 require_once __DIR__ . '/class-mocked-service-test-case.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
 
 /**
@@ -67,11 +69,42 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
     private static $mock_wp_hash;
 
     /**
+     * Mock for `wp_upload_dir`.
+     *
+     * @var Mocks\Mock_Wp_Upload_Dir
+     */
+    private static $mock_wp_upload_dir;
+
+    /**
+     * Mock for `wp_mkdir_p`.
+     *
+     * @var Mocks\Mock_Wp_Mkdir_P
+     */
+    private static $mock_wp_mkdir_p;
+
+    /**
+     * Mock for `wp_json_encode`.
+     *
+     * @var Mocks\Mock_Wp_Json_Encode
+     */
+    private static $mock_wp_json_encode;
+
+    /**
+     * Absolute path to the temporary uploads directory.
+     *
+     * @var string
+     */
+    private static string $temp_dir;
+
+    /**
      * Initial test setup.
      *
      * @return  void
      */
     public static function setUpBeforeClass(): void {
+        self::$temp_dir = sys_get_temp_dir() . '/force-refresh-versions-test-' . uniqid();
+        mkdir( self::$temp_dir, 0755, true );
+
         self::$mock_get_option       = new Mocks\Mock_Get_Option( __NAMESPACE__ );
         self::$mock_add_option       = new Mocks\Mock_Add_Option( __NAMESPACE__ );
         self::$mock_delete_option    = new Mocks\Mock_Delete_Option( __NAMESPACE__ );
@@ -79,6 +112,32 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
         self::$mock_delete_post_meta = new Mocks\Mock_Delete_Post_Meta( __NAMESPACE__ );
         self::$mock_current_time     = new Mocks\Mock_Current_Time( __NAMESPACE__ );
         self::$mock_wp_hash          = new Mocks\Mock_WP_Hash( __NAMESPACE__ );
+        self::$mock_wp_upload_dir    = new Mocks\Mock_Wp_Upload_Dir( __NAMESPACE__ );
+        self::$mock_wp_mkdir_p       = new Mocks\Mock_Wp_Mkdir_P( __NAMESPACE__ );
+        self::$mock_wp_json_encode   = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
+
+        self::$mock_wp_upload_dir->set_return_value(
+            array(
+                'basedir' => self::$temp_dir,
+                'baseurl' => 'http://example.com/wp-content/uploads',
+            )
+        );
+    }
+
+    /**
+     * Reset the get_option mock and clean the version file before each test.
+     *
+     * @return void
+     */
+    public function setUp(): void {
+        // Default to static file polling disabled so existing tests are unaffected.
+        self::$mock_get_option->set_return_value( false );
+
+        $file = self::$temp_dir . '/force-refresh/version.json';
+
+        if ( file_exists( $file ) ) {
+            unlink( $file );
+        }
     }
 
     /**
@@ -96,8 +155,44 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
                 self::$mock_delete_post_meta,
                 self::$mock_current_time,
                 self::$mock_wp_hash,
+                self::$mock_wp_upload_dir,
+                self::$mock_wp_mkdir_p,
+                self::$mock_wp_json_encode,
             )
         );
+
+        self::remove_temp_dir( self::$temp_dir );
+    }
+
+    /**
+     * Recursively remove a directory and all its contents.
+     *
+     * @param string $path The directory to remove.
+     *
+     * @return void
+     */
+    private static function remove_temp_dir( string $path ): void {
+        if ( ! is_dir( $path ) ) {
+            return;
+        }
+
+        $entries = array_diff( scandir( $path ), array( '.', '..' ) );
+
+        foreach ( $entries as $entry ) {
+            $full_path = $path . '/' . $entry;
+            is_dir( $full_path ) ? self::remove_temp_dir( $full_path ) : unlink( $full_path );
+        }
+
+        rmdir( $path );
+    }
+
+    /**
+     * Return the path to the expected version file in the temp dir.
+     *
+     * @return string
+     */
+    private function get_version_file_path(): string {
+        return self::$temp_dir . '/force-refresh/version.json';
     }
 
     /**
@@ -171,5 +266,81 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
         $new_version = Versions_Storage_Service::get_new_version();
 
         $this->assertEquals( 'hash-198', $new_version );
+    }
+
+    // -------------------------------------------------------------------------
+    // Static file sync
+    // -------------------------------------------------------------------------
+
+    /**
+     * Version file is NOT written when static file polling is disabled.
+     */
+    public function testSetSiteVersionDoesNotWriteFileWhenOptionIsOff(): void {
+        self::$mock_get_option->set_return_value( false );
+
+        Versions_Storage_Service::set_site_version( 'abc12345' );
+
+        $this->assertFileDoesNotExist( $this->get_version_file_path() );
+    }
+
+    /**
+     * Version file is written when static file polling is enabled.
+     */
+    public function testSetSiteVersionWritesFileWhenOptionIsOn(): void {
+        self::$mock_get_option->set_return_value( true );
+
+        Versions_Storage_Service::set_site_version( 'abc12345' );
+
+        $this->assertFileExists( $this->get_version_file_path() );
+        $content = json_decode( file_get_contents( $this->get_version_file_path() ), true );
+        $this->assertSame( 'abc12345', $content['site'] );
+    }
+
+    /**
+     * Existing page entries are preserved when the site version is updated.
+     */
+    public function testSetSiteVersionPreservesExistingPageEntries(): void {
+        self::$mock_get_option->set_return_value( true );
+
+        $dir = self::$temp_dir . '/force-refresh';
+
+        if ( ! is_dir( $dir ) ) {
+            mkdir( $dir, 0755, true );
+        }
+
+        file_put_contents(
+            $this->get_version_file_path(),
+            json_encode( array( 'site' => 'old', 'pages' => array( '42' => 'xyz' ) ) )
+        );
+
+        Versions_Storage_Service::set_site_version( 'newversion' );
+
+        $content = json_decode( file_get_contents( $this->get_version_file_path() ), true );
+        $this->assertSame( 'newversion', $content['site'] );
+        $this->assertSame( 'xyz', $content['pages']['42'] );
+    }
+
+    /**
+     * Page-specific refresh updates the pages key in the version file.
+     */
+    public function testSetPageVersionWritesPageEntryWhenOptionIsOn(): void {
+        self::$mock_get_option->set_return_value( true );
+
+        Versions_Storage_Service::set_page_version( 42, 'pageversion' );
+
+        $this->assertFileExists( $this->get_version_file_path() );
+        $content = json_decode( file_get_contents( $this->get_version_file_path() ), true );
+        $this->assertSame( 'pageversion', $content['pages']['42'] );
+    }
+
+    /**
+     * Page-specific refresh does NOT write a file when the option is off.
+     */
+    public function testSetPageVersionDoesNotWriteFileWhenOptionIsOff(): void {
+        self::$mock_get_option->set_return_value( false );
+
+        Versions_Storage_Service::set_page_version( 42, 'pageversion' );
+
+        $this->assertFileDoesNotExist( $this->get_version_file_path() );
     }
 }
