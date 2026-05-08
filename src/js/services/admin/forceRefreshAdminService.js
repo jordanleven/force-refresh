@@ -11,6 +11,7 @@ export const updateForceRefreshOptions = async (data) => {
   const payload = {
     refresh_interval: data?.refreshInterval,
     show_refresh_in_admin_bar: data?.showRefreshInMenuBar,
+    use_static_file_polling: data?.useStaticFilePolling,
   };
 
   debug('Requesting admin options update');

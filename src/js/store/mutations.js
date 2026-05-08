@@ -22,4 +22,7 @@ export default {
   SET_SHOW_REFRESH_IN_MENU_BAR: (state, updatedShowRefreshInMenuBar) => {
     state.settings.refreshFromAdminBar = updatedShowRefreshInMenuBar;
   },
+  SET_USE_STATIC_FILE_POLLING: (state, updatedUseStaticFilePolling) => {
+    state.settings.useStaticFilePolling = updatedUseStaticFilePolling;
+  },
 };

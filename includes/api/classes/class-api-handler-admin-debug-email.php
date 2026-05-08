@@ -11,6 +11,7 @@ use JordanLeven\Plugins\ForceRefresh;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Services\Cdn_Detection_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
@@ -144,6 +145,14 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_LAST_CRON_RUN',
                 'value' => $payload['lastCronRun'] ?? __( 'Never', 'force-refresh' ),
             ),
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_STATIC_FILE_POLLING',
+                'value' => $payload['staticFilePollingEnabled'] ? __( 'Enabled', 'force-refresh' ) : __( 'Disabled', 'force-refresh' ),
+            ),
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_DETECTED_CDN',
+                'value' => $payload['detectedCdn'] ?? __( 'None detected', 'force-refresh' ),
+            ),
         );
     }
 
@@ -159,15 +168,17 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         $last_cron_run       = Api_Handler_Admin_Schedule_Refresh_Site::get_last_cron_run();
 
         return array(
-            'siteUrl'             => get_bloginfo( 'url' ),
-            'siteName'            => get_bloginfo( 'name' ),
-            'wordPressVersion'    => ForceRefresh\get_wordpress_version(),
-            'phpVersion'          => phpversion(),
-            'forceRefreshVersion' => $plugin_data['Version'],
-            'siteVersion'         => Versions_Storage_Service::get_site_version(),
-            'refreshInterval'     => Options_Storage_Service::get_refresh_interval(),
-            'scheduledRefreshes'  => $this->format_scheduled_refreshes( $scheduled_refreshes ),
-            'lastCronRun'         => $this->format_timestamp_utc( $last_cron_run ),
+            'siteUrl'                  => get_bloginfo( 'url' ),
+            'siteName'                 => get_bloginfo( 'name' ),
+            'wordPressVersion'         => ForceRefresh\get_wordpress_version(),
+            'phpVersion'               => phpversion(),
+            'forceRefreshVersion'      => $plugin_data['Version'],
+            'siteVersion'              => Versions_Storage_Service::get_site_version(),
+            'refreshInterval'          => Options_Storage_Service::get_refresh_interval(),
+            'scheduledRefreshes'       => $this->format_scheduled_refreshes( $scheduled_refreshes ),
+            'lastCronRun'              => $this->format_timestamp_utc( $last_cron_run ),
+            'staticFilePollingEnabled' => Options_Storage_Service::get_use_static_file_polling(),
+            'detectedCdn'              => Cdn_Detection_Service::get_detected_cdn(),
         );
     }
 
@@ -333,6 +344,8 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 sprintf( 'PHP Version:            %s', $payload['phpVersion'] ),
                 ...$this->get_scheduled_refresh_email_lines( $payload['scheduledRefreshes'] ),
                 sprintf( 'Last Cron Run:          %s', $payload['lastCronRun'] ?? 'Never' ),
+                sprintf( 'Static File Polling:    %s', $payload['staticFilePollingEnabled'] ? 'Enabled' : 'Disabled' ),
+                sprintf( 'Detected CDN:           %s', $payload['detectedCdn'] ?? 'None detected' ),
                 '',
                 sprintf( 'Submitted: %s', gmdate( 'Y-m-d H:i:s T' ) ),
             )

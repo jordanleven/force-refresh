@@ -47,6 +47,19 @@
             :min="refreshOptions.customRefreshIntervalMinimumInMinutes"
           >
         </div>
+        <div class="option-group">
+          <label>{{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING') }}</label>
+          <div class="option-group__toggle-wrap">
+            <BaseToggle
+              data-test="toggle-static-file-polling"
+              :is-checked="optionSelectedUseStaticFilePolling"
+              @toggled="optionSelectedUseStaticFilePolling = $event"
+            />
+            <span class="option-group__toggle-description">
+              {{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION') }}
+            </span>
+          </div>
+        </div>
         <div class="force-refresh-admin-options-footer">
           <hr>
           <button
@@ -96,6 +109,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
 
 library.add([faHeart]);
 
@@ -122,12 +136,16 @@ const OPTIONS_REFRESH_INTERVALS_IN_SECONDS = [
 
 export default {
   name: 'AdminMainOptions',
+  components: {
+    BaseToggle,
+  },
   props: {
     refreshOptions: VueTypes.shape({
       customRefreshIntervalMaximumInMinutes: VueTypes.isRequired,
       customRefreshIntervalMinimumInMinutes: VueTypes.isRequired,
       refreshInterval: VueTypes.number.isRequired,
       showRefreshInMenuBar: VueTypes.bool.isRequired,
+      useStaticFilePolling: VueTypes.bool.isRequired,
     }),
   },
   emits: ['notify-user-of-error', 'options-were-updated', 'release-notes-page-clicked', 'troubleshooting-page-clicked'],
@@ -138,6 +156,7 @@ export default {
       optionSelectedRefreshInterval: null,
       optionSelectedRefreshIntervalCustom: null,
       optionSelectedShowRefreshInMenuBar: null,
+      optionSelectedUseStaticFilePolling: false,
       optionsForceRefreshInMenuBar: OPTIONS_REFRESH_FROM_ADMIN_BAR,
     };
   },
@@ -189,6 +208,7 @@ export default {
 
     this.optionSelectedShowRefreshInMenuBar = this.refreshOptions?.showRefreshInMenuBar;
     this.optionSelectedRefreshIntervalCustom = this.getMinutesFromSeconds(existingRefreshInterval);
+    this.optionSelectedUseStaticFilePolling = this.refreshOptions?.useStaticFilePolling ?? false;
 
     // If the currently-selected option isn't one of our selections, then we can assume it's a custom
     // value.
@@ -237,6 +257,7 @@ export default {
       this.$emit('options-were-updated', {
         refreshInterval,
         showRefreshInMenuBar: this.optionSelectedShowRefreshInMenuBar,
+        useStaticFilePolling: this.optionSelectedUseStaticFilePolling,
       });
     },
   },
@@ -292,6 +313,19 @@ export default {
     > input,
     > select {
       flex: 1;
+    }
+
+    &__toggle-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.375rem;
+      flex: 1;
+    }
+
+    &__toggle-description {
+      font-size: 0.75rem;
+      color: #666;
     }
 
     &--error {

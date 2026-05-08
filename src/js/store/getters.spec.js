@@ -1,12 +1,15 @@
 import getters from './getters.js';
 
-const makeSiteState = (siteOverrides = {}, networkOverrides = {}) => ({
+const makeSiteState = (siteOverrides = {}, networkOverrides = {}, settingsOverrides = {}) => ({
   featureFlags: {},
   network: {
     detectedCdn: null,
     ...networkOverrides,
   },
-  settings: {},
+  settings: {
+    useStaticFilePolling: false,
+    ...settingsOverrides,
+  },
   site: {
     isMultiSite: false,
     lastCronRun: null,
@@ -71,6 +74,18 @@ describe('Getters', () => {
       const result = getters.troubleshootingInformationVersions(state);
       expect(result.versions.php.eolDate).toBeNull();
       expect(result.versions.wordPress.eolDate).toBeNull();
+    });
+  });
+
+  describe('useStaticFilePolling', () => {
+    it('returns false by default', () => {
+      const state = makeSiteState();
+      expect(getters.useStaticFilePolling(state)).toBe(false);
+    });
+
+    it('returns true when the option is enabled', () => {
+      const state = makeSiteState({}, {}, { useStaticFilePolling: true });
+      expect(getters.useStaticFilePolling(state)).toBe(true);
     });
   });
 

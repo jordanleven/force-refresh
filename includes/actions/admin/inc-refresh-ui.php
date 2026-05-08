@@ -83,6 +83,7 @@ function get_refresh_options(): array {
         'customRefreshIntervalMinimumInMinutes' => (float) $interval_minimum_minutes,
         'refreshInterval'                       => Options_Storage_Service::get_refresh_interval(),
         'showRefreshInMenuBar'                  => Options_Storage_Service::get_show_in_admin_bar(),
+        'useStaticFilePolling'                  => Options_Storage_Service::get_use_static_file_polling(),
     );
 }
 

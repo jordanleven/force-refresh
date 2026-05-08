@@ -57,6 +57,7 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
     public function save_options( \WP_REST_Request $request ): \WP_REST_Response {
         $show_refresh_in_admin_bar = $request->get_param( 'show_refresh_in_admin_bar' ) ?? null;
         $refresh_interval          = $request->get_param( 'refresh_interval' ) ?? null;
+        $use_static_file_polling   = $request->get_param( 'use_static_file_polling' ) ?? null;
 
         if ( null !== $show_refresh_in_admin_bar ) {
             Options_Storage_Service::set_option_show_in_admin_bar( $show_refresh_in_admin_bar );
@@ -64,6 +65,10 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
 
         if ( null !== $refresh_interval ) {
             Options_Storage_Service::set_option_refresh_interval( $refresh_interval );
+        }
+
+        if ( null !== $use_static_file_polling ) {
+            Options_Storage_Service::set_use_static_file_polling( (bool) $use_static_file_polling );
         }
 
         return $this->return_api_response(

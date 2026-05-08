@@ -110,6 +110,20 @@ describe('Store Mutations', () => {
     });
   });
 
+  describe('SET_USE_STATIC_FILE_POLLING', () => {
+    it('sets useStaticFilePolling to true', () => {
+      const state = { settings: { useStaticFilePolling: false } };
+      mutations.SET_USE_STATIC_FILE_POLLING(state, true);
+      expect(state.settings.useStaticFilePolling).toBe(true);
+    });
+
+    it('sets useStaticFilePolling to false', () => {
+      const state = { settings: { useStaticFilePolling: true } };
+      mutations.SET_USE_STATIC_FILE_POLLING(state, false);
+      expect(state.settings.useStaticFilePolling).toBe(false);
+    });
+  });
+
   describe('SET_SCHEDULED_REFRESHES', () => {
     it('replaces the scheduled refreshes in state', () => {
       const state = {
