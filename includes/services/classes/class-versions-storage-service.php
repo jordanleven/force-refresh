@@ -7,6 +7,9 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
+use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Version_File_Service;
+
 /**
  * Class for versions storage services.
  */
@@ -28,6 +31,7 @@ class Versions_Storage_Service {
         delete_option( self::OPTION_SITE_VERSION );
         // Add the new option.
         add_option( self::OPTION_SITE_VERSION, $new_version );
+        self::maybe_sync_version_file( array( 'site' => $new_version ) );
     }
 
     /**
@@ -60,6 +64,35 @@ class Versions_Storage_Service {
             null,
             'no'
         );
+
+        self::maybe_sync_version_file( array( 'pages' => array( (string) $page_id => $page_version ) ) );
+    }
+
+    /**
+     * Merge updates into the version file when static file polling is enabled.
+     *
+     * Merges page entries at the top level so existing page versions are preserved.
+     *
+     * @param array $updates The fields to merge into the version file.
+     *
+     * @return void
+     */
+    private static function maybe_sync_version_file( array $updates ): void {
+        if ( ! Options_Storage_Service::get_use_static_file_polling() ) {
+            return;
+        }
+
+        $current = Version_File_Service::read();
+        $merged  = array_merge( $current, $updates );
+
+        // array_replace preserves integer keys (post IDs) unlike array_merge.
+        $merged_pages = array_replace( $current['pages'] ?? array(), $updates['pages'] ?? array() );
+
+        if ( ! empty( $merged_pages ) ) {
+            $merged['pages'] = $merged_pages;
+        }
+
+        Version_File_Service::write( $merged );
     }
 
     /**
