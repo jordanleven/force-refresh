@@ -13,6 +13,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debug_Email;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Services\Cdn_Detection_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Eol_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
@@ -123,6 +124,7 @@ function get_localized_data(): array {
             'targetAdminBar'              => '#' . HTML_ID_REFRESH_FROM_MENUBAR,
             'targetAdminMetaBox'          => '#' . HTML_ID_META_BOX,
             'targetNotificationContainer' => '#' . HTML_ID_REFRESH_NOTIFICATION_CONTAINER,
+            'detectedCdn'                 => Cdn_Detection_Service::get_detected_cdn(),
             'isDebugActive'               => Debug_Storage_Service::debug_mode_is_active(),
             'refreshOptions'              => get_refresh_options(),
             'releaseNotes'                => get_release_notes( $versions['forceRefresh']['version'] ),
