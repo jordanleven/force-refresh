@@ -14,6 +14,8 @@ require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler.
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-schedule-refresh-site.php';
 
@@ -133,6 +135,27 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
     private static $mock_wp_generate_uuid4;
 
     /**
+     * Mock for `get_option` in the services namespace.
+     *
+     * @var Mocks\Mock_Get_Option
+     */
+    private static $mock_get_option_services;
+
+    /**
+     * Mock for `wp_upload_dir` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Upload_Dir
+     */
+    private static $mock_wp_upload_dir_services;
+
+    /**
+     * Mock for `wp_mkdir_p` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Mkdir_P
+     */
+    private static $mock_wp_mkdir_p_services;
+
+    /**
      * Initial test setup.
      *
      * @return void
@@ -153,6 +176,18 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_rest_url             = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
         self::$mock_current_user_can         = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
         self::$mock_wp_generate_uuid4        = new Mocks\Mock_Wp_Generate_Uuid4( __NAMESPACE__ );
+        self::$mock_get_option_services      = new Mocks\Mock_Get_Option( self::SERVICES_NAMESPACE );
+        self::$mock_wp_upload_dir_services   = new Mocks\Mock_Wp_Upload_Dir( self::SERVICES_NAMESPACE );
+        self::$mock_wp_mkdir_p_services      = new Mocks\Mock_Wp_Mkdir_P( self::SERVICES_NAMESPACE );
+
+        // Static file polling disabled by default so no file I/O occurs in these tests.
+        self::$mock_get_option_services->set_return_value( false );
+        self::$mock_wp_upload_dir_services->set_return_value(
+            array(
+                'basedir' => sys_get_temp_dir(),
+                'baseurl' => 'http://example.com/wp-content/uploads',
+            )
+        );
     }
 
     /**
@@ -176,6 +211,9 @@ final class ApiHandlerAdminScheduleRefreshSiteTest extends TestCase {
         self::$mock_get_rest_url->disable();
         self::$mock_current_user_can->disable();
         self::$mock_wp_generate_uuid4->disable();
+        self::$mock_get_option_services->disable();
+        self::$mock_wp_upload_dir_services->disable();
+        self::$mock_wp_mkdir_p_services->disable();
     }
 
     /**

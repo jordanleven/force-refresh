@@ -7,10 +7,19 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
+use JordanLeven\Plugins\ForceRefresh\Services\Version_File_Service;
+
 /**
  * Class for debug storage services.
  */
 class Options_Storage_Service {
+
+    /**
+     * The option for enabling static file polling.
+     *
+     * @var string
+     */
+    const OPTION_STATIC_FILE_POLLING = 'force_refresh_use_static_file_polling';
 
     /**
      * The option for showing the Force Refresh button in the WordPress Admin Bar.
@@ -39,12 +48,10 @@ class Options_Storage_Service {
      * @return int The refresh interval in seconds.
      */
     public static function get_refresh_interval(): int {
-        $refresh_interval = (string) get_option(
+        return (int) get_option(
             self::OPTION_REFRESH_INTERVAL_IN_SECONDS,
             self::OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT
         );
-
-        return $refresh_interval;
     }
 
     /**
@@ -92,5 +99,31 @@ class Options_Storage_Service {
             self::OPTION_REFRESH_INTERVAL_IN_SECONDS,
             $refresh_interval_in_seconds
         );
+    }
+
+    /**
+     * Method for getting whether static file polling is enabled.
+     *
+     * @return bool True if the option is active.
+     */
+    public static function get_use_static_file_polling(): bool {
+        return (bool) get_option( self::OPTION_STATIC_FILE_POLLING, false );
+    }
+
+    /**
+     * Method for setting whether static file polling is enabled.
+     *
+     * When disabling the option, the version file is deleted so that clients fall back to REST.
+     *
+     * @param bool $enabled Whether static file polling should be enabled.
+     *
+     * @return void
+     */
+    public static function set_use_static_file_polling( bool $enabled ): void {
+        update_option( self::OPTION_STATIC_FILE_POLLING, $enabled );
+
+        if ( ! $enabled ) {
+            Version_File_Service::delete();
+        }
     }
 }
