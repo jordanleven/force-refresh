@@ -1,4 +1,5 @@
 export default {
+  detectedCdn: ({ network }) => network.detectedCdn,
   featureFlags: ({ featureFlags }) => featureFlags,
   isDebugActive: ({ settings }) => settings.isDebugActive,
   isFeatureEnabled: ({ featureFlags }) => (flag) => Boolean(featureFlags?.[flag]),
@@ -16,8 +17,9 @@ export default {
     ...getters.troubleshootingInformationSettings,
     ...getters.troubleshootingInformationVersions,
   }),
-  troubleshootingInformationSettings: ({ site }) => ({
+  troubleshootingInformationSettings: ({ site, network }) => ({
     currentSiteId: site.siteId,
+    detectedCdn: network.detectedCdn,
     isMultiSite: site.isMultiSite,
     lastCronRun: site.lastCronRun,
     scheduledRefreshesCount: site.scheduledRefreshes.length,

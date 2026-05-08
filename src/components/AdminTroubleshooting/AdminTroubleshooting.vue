@@ -74,6 +74,7 @@ export default {
     isDebugActive: VueTypes.bool.isRequired,
     troubleshootingInfo: VueTypes.shape({
       currentSiteId: VueTypes.number.isRequired,
+      detectedCdn: VueTypes.string,
       isMultiSite: VueTypes.bool.isRequired,
       lastCronRun: VueTypes.number,
       scheduledRefreshesCount: VueTypes.number.isRequired,
@@ -160,6 +161,11 @@ export default {
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
           value: this.formattedLastCronRun,
+        },
+        {
+          label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_DETECTED_CDN'),
+          value: this.troubleshootingInfo.detectedCdn
+            ?? this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_CDN_NONE_DETECTED'),
         },
       ];
     },
