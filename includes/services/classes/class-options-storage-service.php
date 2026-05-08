@@ -48,12 +48,10 @@ class Options_Storage_Service {
      * @return int The refresh interval in seconds.
      */
     public static function get_refresh_interval(): int {
-        $refresh_interval = (string) get_option(
+        return (int) get_option(
             self::OPTION_REFRESH_INTERVAL_IN_SECONDS,
             self::OPTION_REFRESH_INTERVAL_IN_SECONDS_DEFAULT
         );
-
-        return $refresh_interval;
     }
 
     /**

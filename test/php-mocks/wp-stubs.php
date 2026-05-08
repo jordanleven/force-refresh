@@ -41,3 +41,9 @@ if ( ! function_exists( 'wp_strip_all_tags' ) ) {
         return strip_tags( $text );
     }
 }
+
+if ( ! function_exists( 'add_action' ) ) {
+    function add_action( $hook, $callback, $priority = 10, $accepted_args = 1 ): bool {
+        return true;
+    }
+}
