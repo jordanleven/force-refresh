@@ -10,6 +10,7 @@ export default {
     customRefreshIntervalMinimumInMinutes: settings.customRefreshIntervalMinimumInMinutes,
     refreshInterval: getters.refreshInterval,
     showRefreshInMenuBar: getters.refreshFromAdminBar,
+    useStaticFilePolling: getters.useStaticFilePolling,
   }),
   scheduledRefreshes: ({ site }) => site.scheduledRefreshes,
   siteName: ({ site }) => site.siteName,
@@ -44,5 +45,6 @@ export default {
       },
     },
   }),
+  useStaticFilePolling: ({ settings }) => settings.useStaticFilePolling,
   wordPressNonce: ({ nonce }) => nonce,
 };

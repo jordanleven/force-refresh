@@ -14,6 +14,7 @@ require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler.
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-options.php';
 
@@ -58,16 +59,41 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
     private static $mock_current_user_can;
 
     /**
+     * Mock for `wp_upload_dir` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Upload_Dir
+     */
+    private static $mock_wp_upload_dir;
+
+    /**
+     * Mock for `wp_mkdir_p` in the services namespace.
+     *
+     * @var Mocks\Mock_Wp_Mkdir_P
+     */
+    private static $mock_wp_mkdir_p;
+
+    /**
      * Initial test setup.
      *
      * @return void
      */
     public static function setUpBeforeClass(): void {
-        self::$mock_update_option       = new Mocks\Mock_Update_Option( 'JordanLeven\\Plugins\\ForceRefresh\\Services' );
+        $services_ns = 'JordanLeven\\Plugins\\ForceRefresh\\Services';
+
+        self::$mock_update_option       = new Mocks\Mock_Update_Option( $services_ns );
         self::$mock_register_rest_route = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
         self::$mock_get_current_blog_id = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
         self::$mock_get_rest_url        = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
         self::$mock_current_user_can    = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
+        self::$mock_wp_upload_dir       = new Mocks\Mock_Wp_Upload_Dir( $services_ns );
+        self::$mock_wp_mkdir_p          = new Mocks\Mock_Wp_Mkdir_P( $services_ns );
+
+        self::$mock_wp_upload_dir->set_return_value(
+            array(
+                'basedir' => sys_get_temp_dir(),
+                'baseurl' => 'http://example.com/wp-content/uploads',
+            )
+        );
     }
 
     /**
@@ -81,6 +107,8 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         self::$mock_get_current_blog_id->disable();
         self::$mock_get_rest_url->disable();
         self::$mock_current_user_can->disable();
+        self::$mock_wp_upload_dir->disable();
+        self::$mock_wp_mkdir_p->disable();
     }
 
     /**
@@ -191,5 +219,37 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
 
         $args = self::$mock_get_rest_url->get_invocation_arguments( 0 );
         $this->assertEquals( 'force-refresh/v1/options', $args[1] );
+    }
+
+    /**
+     * Test that save_options sets use_static_file_polling when provided.
+     */
+    public function testSaveOptionsSetsUseStaticFilePolling() {
+        self::$mock_update_option->resetInvocationIndex();
+
+        $request = new \WP_REST_Request();
+        $request->set_param( 'use_static_file_polling', true );
+
+        ( new Api_Handler_Admin_Options() )->save_options( $request );
+
+        $this->assertEquals( 'force_refresh_use_static_file_polling', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( true, self::$mock_update_option->get_invocation_arguments( 0 )[1] );
+    }
+
+    /**
+     * Test that save_options skips use_static_file_polling when not provided.
+     */
+    public function testSaveOptionsSkipsUseStaticFilePollingWhenNotProvided() {
+        self::$mock_update_option->resetInvocationIndex();
+        $invocation_count_before = self::$mock_update_option->get_invocation_count();
+
+        $request = new \WP_REST_Request();
+        $request->set_param( 'refresh_interval', '60' );
+
+        ( new Api_Handler_Admin_Options() )->save_options( $request );
+
+        $invocation_count_after = self::$mock_update_option->get_invocation_count();
+        $this->assertEquals( 1, $invocation_count_after - $invocation_count_before );
+        $this->assertEquals( 'force_refresh_refresh_interval', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
     }
 }

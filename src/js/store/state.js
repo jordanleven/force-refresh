@@ -9,6 +9,7 @@ export default (localizedData) => ({
     isDebugActive: localizedData.isDebugActive,
     refreshFromAdminBar: localizedData.refreshOptions.showRefreshInMenuBar,
     refreshInterval: localizedData.refreshOptions.refreshInterval,
+    useStaticFilePolling: localizedData.refreshOptions.useStaticFilePolling ?? false,
   },
   site: {
     isMultiSite: localizedData.isMultiSite,
