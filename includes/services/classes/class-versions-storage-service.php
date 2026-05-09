@@ -98,8 +98,13 @@ class Versions_Storage_Service {
                 'post_type'      => 'any',
                 'post_status'    => 'any',
                 'posts_per_page' => -1,
-                'meta_key'       => self::OPTION_PAGE_VERSION,
                 'fields'         => 'ids',
+                'meta_query'     => array(
+                    array(
+                        'key'     => self::OPTION_PAGE_VERSION,
+                        'compare' => 'EXISTS',
+                    ),
+                ),
             )
         );
 
