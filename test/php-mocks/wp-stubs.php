@@ -18,6 +18,10 @@ if ( ! defined( 'DAY_IN_SECONDS' ) ) {
     define( 'DAY_IN_SECONDS', 86400 );
 }
 
+if ( ! defined( 'FS_CHMOD_FILE' ) ) {
+    define( 'FS_CHMOD_FILE', 0644 );
+}
+
 if ( ! class_exists( 'WP_Error' ) ) {
     /**
      * Stub for WP_Error.

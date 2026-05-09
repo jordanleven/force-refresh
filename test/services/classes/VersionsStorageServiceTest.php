@@ -90,6 +90,20 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
     private static $mock_wp_json_encode;
 
     /**
+     * Mock for `get_posts`.
+     *
+     * @var Mocks\Mock_Get_Posts
+     */
+    private static $mock_get_posts;
+
+    /**
+     * Mock for `get_post_meta`.
+     *
+     * @var Mocks\Mock_Get_Post_Meta
+     */
+    private static $mock_get_post_meta;
+
+    /**
      * Absolute path to the temporary uploads directory.
      *
      * @var string
@@ -115,6 +129,10 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
         self::$mock_wp_upload_dir    = new Mocks\Mock_Wp_Upload_Dir( __NAMESPACE__ );
         self::$mock_wp_mkdir_p       = new Mocks\Mock_Wp_Mkdir_P( __NAMESPACE__ );
         self::$mock_wp_json_encode   = new Mocks\Mock_Wp_Json_Encode( __NAMESPACE__ );
+        self::$mock_get_posts        = new Mocks\Mock_Get_Posts( __NAMESPACE__ );
+        self::$mock_get_post_meta    = new Mocks\Mock_Get_Post_Meta( __NAMESPACE__ );
+
+        self::$mock_get_posts->set_return_value( array() );
 
         self::$mock_wp_upload_dir->set_return_value(
             array(
@@ -158,6 +176,8 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
                 self::$mock_wp_upload_dir,
                 self::$mock_wp_mkdir_p,
                 self::$mock_wp_json_encode,
+                self::$mock_get_posts,
+                self::$mock_get_post_meta,
             )
         );
 
@@ -342,5 +362,52 @@ final class VersionsStorageServiceTest extends Mocked_Service_Test_Case {
         Versions_Storage_Service::set_page_version( 42, 'pageversion' );
 
         $this->assertFileDoesNotExist( $this->get_version_file_path() );
+    }
+
+    // -------------------------------------------------------------------------
+    // sync_version_file
+    // -------------------------------------------------------------------------
+
+    /**
+     * sync_version_file writes the current site version to the file.
+     */
+    public function testSyncVersionFileWritesSiteVersion(): void {
+        self::$mock_get_option->set_return_value( 'abc12345' );
+        self::$mock_get_posts->set_return_value( array() );
+
+        Versions_Storage_Service::sync_version_file();
+
+        $this->assertFileExists( $this->get_version_file_path() );
+        $content = json_decode( file_get_contents( $this->get_version_file_path() ), true );
+        $this->assertSame( 'abc12345', $content['site'] );
+    }
+
+    /**
+     * sync_version_file includes page versions when posts have the meta set.
+     */
+    public function testSyncVersionFileWritesPageVersions(): void {
+        self::$mock_get_option->set_return_value( 'siteversion' );
+        self::$mock_get_posts->set_return_value( array( 10, 20 ) );
+        self::$mock_get_post_meta->set_return_value( 'pv1' );
+
+        Versions_Storage_Service::sync_version_file();
+
+        $content = json_decode( file_get_contents( $this->get_version_file_path() ), true );
+        $this->assertArrayHasKey( 'pages', $content );
+        $this->assertSame( 'pv1', $content['pages']['10'] );
+        $this->assertSame( 'pv1', $content['pages']['20'] );
+    }
+
+    /**
+     * sync_version_file omits the pages key when no posts have the meta set.
+     */
+    public function testSyncVersionFileOmitsPagesKeyWhenNoPagesExist(): void {
+        self::$mock_get_option->set_return_value( 'siteversion' );
+        self::$mock_get_posts->set_return_value( array() );
+
+        Versions_Storage_Service::sync_version_file();
+
+        $content = json_decode( file_get_contents( $this->get_version_file_path() ), true );
+        $this->assertArrayNotHasKey( 'pages', $content );
     }
 }
