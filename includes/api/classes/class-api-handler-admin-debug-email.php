@@ -345,7 +345,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 ...$this->get_scheduled_refresh_email_lines( $payload['scheduledRefreshes'] ),
                 sprintf( 'Last Cron Run:          %s', $payload['lastCronRun'] ?? 'Never' ),
                 sprintf( 'Static File Polling:    %s', $payload['staticFilePollingEnabled'] ? 'Enabled' : 'Disabled' ),
-                sprintf( 'Detected CDN:           %s', $payload['detectedCdn'] ?? 'None detected' ),
+                sprintf( 'CDN:                    %s', $payload['detectedCdn'] ?? 'None detected' ),
                 '',
                 sprintf( 'Submitted: %s', gmdate( 'Y-m-d H:i:s T' ) ),
             )
