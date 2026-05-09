@@ -8,6 +8,7 @@
 namespace JordanLeven\Plugins\ForceRefresh\Api;
 
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler;
+use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
  * Main class controller.
@@ -88,12 +89,7 @@ class Api_Handler_Client extends Api_Handler {
      * @return  string The version of the provided post
      */
     private static function get_current_version_post( int $post_id ): string {
-        $current_page_version = get_post_meta(
-            $post_id,
-            'force_refresh_current_page_version',
-            true
-        );
-        return (bool) $current_page_version ? $current_page_version : '0';
+        return Versions_Storage_Service::get_page_version( $post_id );
     }
 
     /**

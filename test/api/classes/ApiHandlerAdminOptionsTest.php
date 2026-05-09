@@ -67,13 +67,6 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
     private static $mock_get_option;
 
     /**
-     * Mock for `get_posts` in the services namespace.
-     *
-     * @var Mocks\Mock_Get_Posts
-     */
-    private static $mock_get_posts;
-
-    /**
      * Mock for `wp_json_encode` in the services namespace.
      *
      * @var Mocks\Mock_Wp_Json_Encode
@@ -107,14 +100,13 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         self::$mock_get_current_blog_id = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
         self::$mock_get_rest_url        = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
         self::$mock_current_user_can    = new Mocks\Mock_Current_User_Can( __NAMESPACE__ );
-        self::$mock_get_option          = new Mocks\Mock_Get_Option( $services_ns );
-        self::$mock_get_posts           = new Mocks\Mock_Get_Posts( $services_ns );
-        self::$mock_wp_json_encode      = new Mocks\Mock_Wp_Json_Encode( $services_ns );
-        self::$mock_wp_upload_dir       = new Mocks\Mock_Wp_Upload_Dir( $services_ns );
-        self::$mock_wp_mkdir_p          = new Mocks\Mock_Wp_Mkdir_P( $services_ns );
+        self::$mock_get_option     = new Mocks\Mock_Get_Option( $services_ns );
+        self::$mock_wp_json_encode = new Mocks\Mock_Wp_Json_Encode( $services_ns );
+        self::$mock_wp_upload_dir  = new Mocks\Mock_Wp_Upload_Dir( $services_ns );
+        self::$mock_wp_mkdir_p     = new Mocks\Mock_Wp_Mkdir_P( $services_ns );
 
         self::$mock_get_option->set_return_value( false );
-        self::$mock_get_posts->set_return_value( array() );
+        self::$mock_get_option->set_option_value( 'force_refresh_page_versions', array() );
 
         self::$mock_wp_upload_dir->set_return_value(
             array(
@@ -136,7 +128,6 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         self::$mock_get_rest_url->disable();
         self::$mock_current_user_can->disable();
         self::$mock_get_option->disable();
-        self::$mock_get_posts->disable();
         self::$mock_wp_json_encode->disable();
         self::$mock_wp_upload_dir->disable();
         self::$mock_wp_mkdir_p->disable();

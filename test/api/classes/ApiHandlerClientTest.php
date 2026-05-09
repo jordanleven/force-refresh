@@ -12,6 +12,7 @@ use JordanLeven\Plugins\ForceRefresh\Mocks;
 
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-client.php';
 
 /**
@@ -27,11 +28,11 @@ final class ApiHandlerClientTest extends TestCase {
     private static $mock_get_option;
 
     /**
-     * Mock for `get_post_meta`.
+     * Mock for `get_option` in the services namespace.
      *
-     * @var Mocks\Mock_Get_Post_Meta
+     * @var Mocks\Mock_Get_Option
      */
-    private static $mock_get_post_meta;
+    private static $mock_get_option_services;
 
     /**
      * Mock for `register_rest_route`.
@@ -60,11 +61,15 @@ final class ApiHandlerClientTest extends TestCase {
      * @return void
      */
     public static function setUpBeforeClass(): void {
+        $services_ns = 'JordanLeven\\Plugins\\ForceRefresh\\Services';
+
         self::$mock_get_option          = new Mocks\Mock_Get_Option( __NAMESPACE__ );
-        self::$mock_get_post_meta       = new Mocks\Mock_Get_Post_Meta( __NAMESPACE__ );
+        self::$mock_get_option_services = new Mocks\Mock_Get_Option( $services_ns );
         self::$mock_register_rest_route = new Mocks\Mock_Register_Rest_Route( __NAMESPACE__ );
         self::$mock_get_current_blog_id = new Mocks\Mock_Get_Current_Blog_Id( __NAMESPACE__ );
         self::$mock_get_rest_url        = new Mocks\Mock_Get_Rest_Url( __NAMESPACE__ );
+
+        self::$mock_get_option_services->set_return_value( array() );
     }
 
     /**
@@ -74,7 +79,7 @@ final class ApiHandlerClientTest extends TestCase {
      */
     public static function tearDownAfterClass(): void {
         self::$mock_get_option->disable();
-        self::$mock_get_post_meta->disable();
+        self::$mock_get_option_services->disable();
         self::$mock_register_rest_route->disable();
         self::$mock_get_current_blog_id->disable();
         self::$mock_get_rest_url->disable();
@@ -126,7 +131,10 @@ final class ApiHandlerClientTest extends TestCase {
         $site_version = 'site-v1';
         $page_version = 'page-v1';
         self::$mock_get_option->set_return_value( $site_version );
-        self::$mock_get_post_meta->set_return_value( $page_version );
+        self::$mock_get_option_services->set_option_value(
+            'force_refresh_page_versions',
+            array( '42' => $page_version )
+        );
 
         $request = new \WP_REST_Request();
         $request->set_param( 'postId', 42 );
@@ -143,7 +151,7 @@ final class ApiHandlerClientTest extends TestCase {
      */
     public function testGetVersionReturnsZeroForPageVersionWhenNotSet() {
         self::$mock_get_option->set_return_value( 'site-v1' );
-        self::$mock_get_post_meta->set_return_value( null );
+        self::$mock_get_option_services->set_option_value( 'force_refresh_page_versions', array() );
 
         $request = new \WP_REST_Request();
         $request->set_param( 'postId', 99 );
