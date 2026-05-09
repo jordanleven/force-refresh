@@ -10,6 +10,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
  * Main class controller.
@@ -68,7 +69,12 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
         }
 
         if ( null !== $use_static_file_polling ) {
-            Options_Storage_Service::set_use_static_file_polling( (bool) $use_static_file_polling );
+            $enabled = (bool) $use_static_file_polling;
+            Options_Storage_Service::set_use_static_file_polling( $enabled );
+
+            if ( $enabled ) {
+                Versions_Storage_Service::sync_version_file();
+            }
         }
 
         return $this->return_api_response(

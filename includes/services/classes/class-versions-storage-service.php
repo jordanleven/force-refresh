@@ -69,6 +69,54 @@ class Versions_Storage_Service {
     }
 
     /**
+     * Write a fresh snapshot of all current versions to the version file.
+     *
+     * Called when static file polling is first enabled so the file exists
+     * immediately without waiting for the next refresh.
+     *
+     * @return void
+     */
+    public static function sync_version_file(): void {
+        $data = array( 'site' => self::get_site_version() );
+
+        $page_versions = self::get_all_page_versions();
+        if ( ! empty( $page_versions ) ) {
+            $data['pages'] = $page_versions;
+        }
+
+        Version_File_Service::write( $data );
+    }
+
+    /**
+     * Return all per-page versions keyed by post ID string.
+     *
+     * @return array<string, string>
+     */
+    private static function get_all_page_versions(): array {
+        $posts = get_posts(
+            array(
+                'post_type'      => 'any',
+                'post_status'    => 'any',
+                'posts_per_page' => -1,
+                'fields'         => 'ids',
+                'meta_query'     => array(
+                    array(
+                        'key'     => self::OPTION_PAGE_VERSION,
+                        'compare' => 'EXISTS',
+                    ),
+                ),
+            )
+        );
+
+        $versions = array();
+        foreach ( $posts as $post_id ) {
+            $versions[ (string) $post_id ] = get_post_meta( $post_id, self::OPTION_PAGE_VERSION, true );
+        }
+
+        return $versions;
+    }
+
+    /**
      * Merge updates into the version file when static file polling is enabled.
      *
      * Merges page entries at the top level so existing page versions are preserved.
