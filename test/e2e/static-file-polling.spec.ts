@@ -122,18 +122,18 @@ test.describe('Static file polling', () => {
     const page = await context.newPage();
 
     await enableStaticFilePolling(page);
-    const after_enable = await page.request.get(VERSION_FILE_PATH);
-    expect(after_enable.status()).toBe(200);
+    const afterEnable = await page.request.get(VERSION_FILE_PATH);
+    expect(afterEnable.status()).toBe(200);
 
     await disableStaticFilePolling(page);
-    const after_disable = await page.request.get(VERSION_FILE_PATH);
-    expect(after_disable.status()).toBe(404);
+    const afterDisable = await page.request.get(VERSION_FILE_PATH);
+    expect(afterDisable.status()).toBe(404);
 
     await enableStaticFilePolling(page);
-    const after_reenable = await page.request.get(VERSION_FILE_PATH);
-    expect(after_reenable.status()).toBe(200);
+    const afterReenable = await page.request.get(VERSION_FILE_PATH);
+    expect(afterReenable.status()).toBe(200);
 
-    const body = await after_reenable.json();
+    const body = await afterReenable.json();
     expect(body).toHaveProperty('site');
 
     await context.close();
