@@ -79,7 +79,7 @@ class Migration_Service {
 
         update_option( Versions_Storage_Service::OPTION_PAGE_VERSIONS, $versions );
 
-        // phpcs:ignore WordPress.DB.DirectDatabaseQuery
+        // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
         $wpdb->delete( $wpdb->postmeta, array( 'meta_key' => $legacy_key ) );
     }
 }
