@@ -51,3 +51,23 @@ if ( ! function_exists( 'add_action' ) ) {
         return true;
     }
 }
+
+if ( ! function_exists( 'wp_unslash' ) ) {
+    function wp_unslash( string $value ): string {
+        return stripslashes( $value );
+    }
+}
+
+if ( ! function_exists( 'sanitize_text_field' ) ) {
+    function sanitize_text_field( string $str ): string {
+        return trim( strip_tags( $str ) );
+    }
+}
+
+if ( ! function_exists( 'wp_delete_file' ) ) {
+    function wp_delete_file( string $file ): void {
+        if ( file_exists( $file ) ) {
+            unlink( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+        }
+    }
+}
