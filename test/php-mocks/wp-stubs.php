@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/wp-stub-wp-http.php';
+require_once __DIR__ . '/wp-stub-wpdb.php';
 require_once __DIR__ . '/wp-stub-wp-rest-server.php';
 require_once __DIR__ . '/wp-stub-wp-rest-request.php';
 require_once __DIR__ . '/wp-stub-wp-rest-response.php';

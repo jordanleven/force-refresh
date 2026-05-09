@@ -17,7 +17,13 @@ class Versions_Storage_Service {
 
     const OPTION_SITE_VERSION = 'force_refresh_current_site_version';
 
-    const OPTION_PAGE_VERSION = 'force_refresh_current_page_version';
+    const OPTION_PAGE_VERSIONS = 'force_refresh_page_versions';
+
+    /**
+     * The legacy post meta key used before page versions were stored as a single option.
+     * Retained for use in the migration.
+     */
+    const OPTION_PAGE_VERSION_LEGACY = 'force_refresh_current_page_version';
 
     /**
      * Method for setting a site version.
@@ -53,19 +59,24 @@ class Versions_Storage_Service {
      * @return void
      */
     public static function set_page_version( int $page_id, string $page_version ): void {
-        // Remove the old.
-        delete_post_meta( $page_id, self::OPTION_PAGE_VERSION );
-
-        // Add the new.
-        update_post_meta(
-            $page_id,
-            self::OPTION_PAGE_VERSION,
-            $page_version,
-            null,
-            'no'
-        );
+        $versions                      = self::get_all_page_versions();
+        $versions[ (string) $page_id ] = $page_version;
+        update_option( self::OPTION_PAGE_VERSIONS, $versions );
 
         self::maybe_sync_version_file( array( 'pages' => array( (string) $page_id => $page_version ) ) );
+    }
+
+    /**
+     * Return the version for a specific page.
+     *
+     * @param int $page_id The post ID to look up.
+     *
+     * @return string The page version, or '0' when not set.
+     */
+    public static function get_page_version( int $page_id ): string {
+        $versions = self::get_all_page_versions();
+        $version  = $versions[ (string) $page_id ] ?? null;
+        return $version ? $version : '0';
     }
 
     /**
@@ -93,27 +104,8 @@ class Versions_Storage_Service {
      * @return array<string, string>
      */
     private static function get_all_page_versions(): array {
-        $posts = get_posts(
-            array(
-                'post_type'      => 'any',
-                'post_status'    => 'any',
-                'posts_per_page' => -1,
-                'fields'         => 'ids',
-                'meta_query'     => array(
-                    array(
-                        'key'     => self::OPTION_PAGE_VERSION,
-                        'compare' => 'EXISTS',
-                    ),
-                ),
-            )
-        );
-
-        $versions = array();
-        foreach ( $posts as $post_id ) {
-            $versions[ (string) $post_id ] = get_post_meta( $post_id, self::OPTION_PAGE_VERSION, true );
-        }
-
-        return $versions;
+        $versions = get_option( self::OPTION_PAGE_VERSIONS, array() );
+        return is_array( $versions ) ? $versions : array();
     }
 
     /**
