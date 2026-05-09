@@ -48,17 +48,25 @@
           >
         </div>
         <div class="option-group">
-          <label>{{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING') }}</label>
-          <div class="option-group__toggle-wrap">
-            <BaseToggle
-              data-test="toggle-static-file-polling"
-              :is-checked="optionSelectedUseStaticFilePolling"
-              @toggled="optionSelectedUseStaticFilePolling = $event"
-            />
-            <span class="option-group__toggle-description">
-              {{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION') }}
-            </span>
-          </div>
+          <label for="use-static-file-polling">
+            {{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING') }}
+            <BaseTooltip :content="$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION')">
+              <font-awesome-icon class="option-group__info-icon" :icon="infoIcon" />
+            </BaseTooltip>
+          </label>
+          <select
+            id="use-static-file-polling"
+            v-model="optionSelectedUseStaticFilePolling"
+            name="use-static-file-polling"
+            data-test="select-static-file-polling"
+          >
+            <option :value="true">
+              Enabled
+            </option>
+            <option :value="false">
+              Disabled
+            </option>
+          </select>
         </div>
         <div class="force-refresh-admin-options-footer">
           <hr>
@@ -107,11 +115,11 @@
 
 <script>
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faHeart, faInfo } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
-import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
+import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 
-library.add([faHeart]);
+library.add([faHeart, faInfo]);
 
 const OPTIONS_REFRESH_FROM_ADMIN_BAR = [
   {
@@ -137,7 +145,7 @@ const OPTIONS_REFRESH_INTERVALS_IN_SECONDS = [
 export default {
   name: 'AdminMainOptions',
   components: {
-    BaseToggle,
+    BaseTooltip,
   },
   props: {
     refreshOptions: VueTypes.shape({
@@ -151,6 +159,7 @@ export default {
   emits: ['notify-user-of-error', 'options-were-updated', 'release-notes-page-clicked', 'troubleshooting-page-clicked'],
   data() {
     return {
+      infoIcon: faInfo,
       isCustomIntervalWithinBounds: true,
       leaveReviewLogo: faHeart,
       optionSelectedRefreshInterval: null,
@@ -315,17 +324,11 @@ export default {
       flex: 1;
     }
 
-    &__toggle-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.375rem;
-      flex: 1;
-    }
-
-    &__toggle-description {
-      font-size: 0.75rem;
-      color: #666;
+    &__info-icon {
+      font-size: 0.65rem;
+      opacity: 0.5;
+      margin-left: 0.25rem;
+      vertical-align: middle;
     }
 
     &--error {
