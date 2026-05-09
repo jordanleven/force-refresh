@@ -79,7 +79,7 @@
     "postcss": "^8.5.13",
     "postcss-html": "^1.8.1",
     "sass": "^1.99.0",
-    "sass-loader": "^16.0.7",
+    "sass-loader": "^16.0.8",
     "simple-git": "^3.36.0",
     "style-loader": "^4.0.0",
     "stylelint": "^17.9.1",
