@@ -27,5 +27,17 @@ if ( ! class_exists( 'WP_Filesystem_Direct' ) ) {
         public function get_contents( string $file ): string {
             return file_get_contents( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
         }
+
+        /**
+         * Write data to a file.
+         *
+         * @param string $file    The file path.
+         * @param string $content The data to write.
+         * @param int    $mode    File permissions (unused in stub).
+         * @return bool
+         */
+        public function put_contents( string $file, string $content, int $mode = 0 ): bool { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+            return (bool) file_put_contents( $file, $content ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+        }
     }
 }
