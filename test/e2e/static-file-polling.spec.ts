@@ -28,7 +28,7 @@ test.describe('Static file polling', () => {
     await context.close();
   });
 
-  test('version.json is created after enabling the option and triggering a refresh', async ({
+  test('version.json is created immediately after enabling the option', async ({
     browser,
     baseURL,
   }) => {
@@ -36,10 +36,6 @@ test.describe('Static file polling', () => {
     const page = await context.newPage();
 
     await enableStaticFilePolling(page);
-
-    // Trigger a site refresh so the file gets written
-    await page.locator('[data-test="btn-force-refresh"]').click();
-    await page.waitForLoadState('networkidle');
 
     const response = await page.request.get(VERSION_FILE_PATH);
     expect(response.status()).toBe(200);
@@ -57,10 +53,6 @@ test.describe('Static file polling', () => {
     const adminContext = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
     const adminPage = await adminContext.newPage();
     await enableStaticFilePolling(adminPage);
-
-    // Trigger a refresh so version.json is created before the visitor polls
-    await adminPage.locator('[data-test="btn-force-refresh"]').click();
-    await adminPage.waitForLoadState('networkidle');
 
     const visitorContext = await browser.newContext({ baseURL });
     const visitorPage = await visitorContext.newPage();
@@ -93,10 +85,6 @@ test.describe('Static file polling', () => {
     const adminPage = await adminContext.newPage();
     await enableStaticFilePolling(adminPage);
 
-    // Trigger an initial refresh so version.json exists before the visitor loads
-    await adminPage.locator('[data-test="btn-force-refresh"]').click();
-    await adminPage.waitForLoadState('networkidle');
-
     const visitorContext = await browser.newContext({ baseURL });
     const visitorPage = await visitorContext.newPage();
     await visitorPage.goto('/');
@@ -107,16 +95,57 @@ test.describe('Static file polling', () => {
     await adminContext.close();
   });
 
+  test('visitor page reloads when admin enables static file polling and triggers a refresh mid-session', async ({
+    browser,
+    baseURL,
+  }) => {
+    const visitorContext = await browser.newContext({ baseURL });
+    const visitorPage = await visitorContext.newPage();
+    await visitorPage.goto('/');
+
+    // Visitor is now polling via REST. Switch the admin to static file polling mid-session.
+    const adminContext = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
+    const adminPage = await adminContext.newPage();
+    await enableStaticFilePolling(adminPage);
+
+    await triggerRefreshAndWaitForReload(adminPage, visitorPage, '[data-test="btn-force-refresh"]');
+
+    await visitorContext.close();
+    await adminContext.close();
+  });
+
+  test('version.json is recreated when the option is re-enabled after being disabled', async ({
+    browser,
+    baseURL,
+  }) => {
+    const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
+    const page = await context.newPage();
+
+    await enableStaticFilePolling(page);
+    const after_enable = await page.request.get(VERSION_FILE_PATH);
+    expect(after_enable.status()).toBe(200);
+
+    await disableStaticFilePolling(page);
+    const after_disable = await page.request.get(VERSION_FILE_PATH);
+    expect(after_disable.status()).toBe(404);
+
+    await enableStaticFilePolling(page);
+    const after_reenable = await page.request.get(VERSION_FILE_PATH);
+    expect(after_reenable.status()).toBe(200);
+
+    const body = await after_reenable.json();
+    expect(body).toHaveProperty('site');
+
+    await context.close();
+  });
+
   test('version.json returns 404 after the option is disabled', async ({ browser, baseURL }) => {
     const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
     const page = await context.newPage();
 
     await enableStaticFilePolling(page);
 
-    await page.locator('[data-test="btn-force-refresh"]').click();
-    await page.waitForLoadState('networkidle');
-
-    // Confirm file exists first
+    // Confirm file exists immediately after enabling
     const before = await page.request.get(VERSION_FILE_PATH);
     expect(before.status()).toBe(200);
 
