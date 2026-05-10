@@ -49,7 +49,7 @@
         </div>
         <div class="option-group">
           <label for="use-static-file-polling">
-            {{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING') }}
+            {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD') }}
             <BaseTooltip :content="staticFilePollingTooltip">
               <font-awesome-icon class="option-group__info-icon" :icon="infoIcon" />
             </BaseTooltip>
@@ -62,10 +62,10 @@
             :disabled="isUsingCdn"
           >
             <option :value="true">
-              Enabled
+              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE') }}
             </option>
             <option :value="false">
-              Disabled
+              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API') }}
             </option>
           </select>
         </div>
@@ -217,8 +217,8 @@ export default {
     },
     staticFilePollingTooltip() {
       return this.isUsingCdn
-        ? this.$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DISABLED_CDN')
-        : this.$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION');
+        ? this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_DISABLED_CDN')
+        : this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_DESCRIPTION');
     },
   },
   created() {
