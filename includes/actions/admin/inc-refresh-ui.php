@@ -83,7 +83,9 @@ function get_refresh_options(): array {
         'customRefreshIntervalMinimumInMinutes' => (float) $interval_minimum_minutes,
         'refreshInterval'                       => Options_Storage_Service::get_refresh_interval(),
         'showRefreshInMenuBar'                  => Options_Storage_Service::get_show_in_admin_bar(),
-        'useStaticFilePolling'                  => Options_Storage_Service::get_use_static_file_polling(),
+        'useStaticFilePolling'                  => Feature_Flag_Service::is_enabled( 'staticFilePolling' )
+            ? Options_Storage_Service::get_use_static_file_polling()
+            : false,
     );
 }
 
@@ -125,7 +127,9 @@ function get_localized_data(): array {
             'targetAdminBar'              => '#' . HTML_ID_REFRESH_FROM_MENUBAR,
             'targetAdminMetaBox'          => '#' . HTML_ID_META_BOX,
             'targetNotificationContainer' => '#' . HTML_ID_REFRESH_NOTIFICATION_CONTAINER,
-            'detectedCdn'                 => Cdn_Detection_Service::get_detected_cdn(),
+            'detectedCdn'                 => Feature_Flag_Service::is_enabled( 'staticFilePolling' )
+                ? Cdn_Detection_Service::get_detected_cdn()
+                : null,
             'isDebugActive'               => Debug_Storage_Service::debug_mode_is_active(),
             'refreshOptions'              => get_refresh_options(),
             'releaseNotes'                => get_release_notes( $versions['forceRefresh']['version'] ),

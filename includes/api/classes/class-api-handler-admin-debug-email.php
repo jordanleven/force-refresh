@@ -12,6 +12,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Cdn_Detection_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
@@ -178,7 +179,9 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
             'scheduledRefreshes'       => $this->format_scheduled_refreshes( $scheduled_refreshes ),
             'lastCronRun'              => $this->format_timestamp_utc( $last_cron_run ),
             'staticFilePollingEnabled' => Options_Storage_Service::get_use_static_file_polling(),
-            'detectedCdn'              => Cdn_Detection_Service::get_detected_cdn(),
+            'detectedCdn'              => Feature_Flag_Service::is_enabled( 'staticFilePolling' )
+                ? Cdn_Detection_Service::get_detected_cdn()
+                : null,
         );
     }
 

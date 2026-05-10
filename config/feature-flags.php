@@ -10,6 +10,7 @@
 
 return array(
     'scheduledRefresh'           => true,
+    'staticFilePolling'          => false,
     'troubleshootingTerminal'    => false,
     'troubleshootingSubmitDebug' => true,
 );

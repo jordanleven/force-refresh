@@ -162,11 +162,11 @@ export default {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
           value: this.formattedLastCronRun,
         },
-        {
+        ...(this.isFeatureEnabled('staticFilePolling') ? [{
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_DETECTED_CDN'),
           value: this.troubleshootingInfo.detectedCdn
             ?? this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_CDN_NONE_DETECTED'),
-        },
+        }] : []),
       ];
     },
     ...mapGetters(['isFeatureEnabled']),
