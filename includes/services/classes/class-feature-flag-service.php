@@ -54,4 +54,15 @@ class Feature_Flag_Service {
     public static function get_all(): array {
         return self::get_flags();
     }
+
+    /**
+     * Override the cached flags. For use in tests only.
+     *
+     * @param array $flags The flags to set.
+     *
+     * @return void
+     */
+    public static function set_flags_for_testing( array $flags ): void {
+        self::$flags = $flags;
+    }
 }

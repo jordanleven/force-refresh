@@ -7,6 +7,7 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use PHPUnit\Framework\TestCase;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
@@ -133,9 +134,12 @@ final class ActionsClientTest extends TestCase {
      * Test that versionFileUrl is present and contains the expected path when static file polling is enabled.
      */
     public function testVersionFileUrlIsNonNullWhenOptionIsEnabled(): void {
+        Feature_Flag_Service::set_flags_for_testing( array( 'staticFilePolling' => true ) );
         self::$mock_get_option_services->set_return_value( true );
 
         $data = get_client_localized_data();
+
+        Feature_Flag_Service::set_flags_for_testing( array() );
 
         $this->assertNotNull( $data['versionFileUrl'] );
         $this->assertStringContainsString( 'version.json', $data['versionFileUrl'] );
