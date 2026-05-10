@@ -7,6 +7,7 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Api;
 
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use PHPUnit\Framework\TestCase;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
 
@@ -16,6 +17,7 @@ require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-feature-flag-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-options.php';
 
@@ -247,12 +249,15 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
      * Test that save_options sets use_static_file_polling when provided.
      */
     public function testSaveOptionsSetsUseStaticFilePolling() {
+        Feature_Flag_Service::set_flags_for_testing( array( 'staticFilePolling' => true ) );
         self::$mock_update_option->resetInvocationIndex();
 
         $request = new \WP_REST_Request();
         $request->set_param( 'use_static_file_polling', true );
 
         ( new Api_Handler_Admin_Options() )->save_options( $request );
+
+        Feature_Flag_Service::set_flags_for_testing( array() );
 
         $this->assertEquals( 'force_refresh_use_static_file_polling', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
         $this->assertEquals( true, self::$mock_update_option->get_invocation_arguments( 0 )[1] );
