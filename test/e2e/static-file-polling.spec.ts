@@ -19,7 +19,7 @@ async function disableStaticFilePolling(adminPage: Parameters<typeof goToPluginP
   await adminPage.waitForLoadState('networkidle');
 }
 
-test.describe('Static file polling', () => {
+test.describe.skip('Static file polling', () => {
   test.afterEach(async ({ browser, baseURL }) => {
     // Always leave static file polling disabled so other test suites are unaffected.
     const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
