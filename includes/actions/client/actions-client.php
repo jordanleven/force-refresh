@@ -20,7 +20,8 @@ use JordanLeven\Plugins\ForceRefresh\Services\Version_File_Service;
  * @return array
  */
 function get_client_localized_data(): array {
-    $use_static_file_polling = Options_Storage_Service::get_use_static_file_polling();
+    $use_static_file_polling = Feature_Flag_Service::is_enabled( 'staticFilePolling' )
+        && Options_Storage_Service::get_use_static_file_polling();
 
     return array(
         'apiEndpoint'     => Api_Handler_Client::get_rest_endpoint(),

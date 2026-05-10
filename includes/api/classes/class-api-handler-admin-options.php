@@ -9,6 +9,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
@@ -68,7 +69,7 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
             Options_Storage_Service::set_option_refresh_interval( $refresh_interval );
         }
 
-        if ( null !== $use_static_file_polling ) {
+        if ( null !== $use_static_file_polling && Feature_Flag_Service::is_enabled( 'staticFilePolling' ) ) {
             $enabled = (bool) $use_static_file_polling;
             Options_Storage_Service::set_use_static_file_polling( $enabled );
 

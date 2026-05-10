@@ -47,7 +47,7 @@
             :min="refreshOptions.customRefreshIntervalMinimumInMinutes"
           >
         </div>
-        <div class="option-group">
+        <div v-if="isFeatureEnabled('staticFilePolling')" class="option-group">
           <label for="use-static-file-polling">
             {{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING') }}
             <BaseTooltip :content="$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION')">
@@ -117,6 +117,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faHeart, faInfo } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import { mapGetters } from 'vuex';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
 
 library.add([faHeart, faInfo]);
@@ -170,6 +171,7 @@ export default {
     };
   },
   computed: {
+    ...mapGetters(['isFeatureEnabled']),
     classCustomRefreshInterval() {
       return [
         !this.isCustomIntervalWithinBounds && 'option-group--error',
