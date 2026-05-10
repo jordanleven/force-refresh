@@ -50,7 +50,7 @@
         <div class="option-group">
           <label for="use-static-file-polling">
             {{ $t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING') }}
-            <BaseTooltip :content="$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION')">
+            <BaseTooltip :content="staticFilePollingTooltip">
               <font-awesome-icon class="option-group__info-icon" :icon="infoIcon" />
             </BaseTooltip>
           </label>
@@ -59,6 +59,7 @@
             v-model="optionSelectedUseStaticFilePolling"
             name="use-static-file-polling"
             data-test="select-static-file-polling"
+            :disabled="isUsingCdn"
           >
             <option :value="true">
               Enabled
@@ -148,6 +149,7 @@ export default {
     BaseTooltip,
   },
   props: {
+    detectedCdn: VueTypes.string.def(null),
     refreshOptions: VueTypes.shape({
       customRefreshIntervalMaximumInMinutes: VueTypes.isRequired,
       customRefreshIntervalMinimumInMinutes: VueTypes.isRequired,
@@ -184,6 +186,9 @@ export default {
     isSelectedRefreshIntervalCustom() {
       return this.optionSelectedRefreshInterval === OPTIONS_REFRESH_INTERVAL_CUSTOM;
     },
+    isUsingCdn() {
+      return this.detectedCdn !== null;
+    },
     optionsRefreshIntervals() {
       const coreOptions = OPTIONS_REFRESH_INTERVALS_IN_SECONDS.map((value) => {
         const valueInMinutes = this.getMinutesFromSeconds(value, 10);
@@ -209,6 +214,11 @@ export default {
           value: 'custom',
         },
       ];
+    },
+    staticFilePollingTooltip() {
+      return this.isUsingCdn
+        ? this.$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DISABLED_CDN')
+        : this.$t('ADMIN_SETTINGS.OPTION_STATIC_FILE_POLLING_DESCRIPTION');
     },
   },
   created() {

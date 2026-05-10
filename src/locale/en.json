@@ -23,6 +23,7 @@
     "OPTION_REFRESH_INTERVAL": "Refresh interval",
     "OPTION_STATIC_FILE_POLLING": "Static file polling",
     "OPTION_STATIC_FILE_POLLING_DESCRIPTION": "When enabled, browsers check for updates using a static file rather than calling your server directly. This is faster and puts less strain on your server, which is a good fit for busy or high-traffic sites.",
+    "OPTION_STATIC_FILE_POLLING_DISABLED_CDN": "Static file polling is unavailable when a CDN is detected. CDNs cache static files, which can prevent browsers from seeing the latest updates.",
     "OPTION_REFRESH_INTERVAL_CUSTOM": "Custom interval (minutes)",
     "OPTION_REFRESH_INTERVAL_UNIT_MINUTE_SINGULAR": "minute",
     "OPTION_REFRESH_INTERVAL_UNIT_MODIFIER_PLURAL": "s",

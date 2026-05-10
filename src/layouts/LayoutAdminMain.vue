@@ -57,6 +57,7 @@
         <AdminMain
           v-if="!troubleshootingActive"
           class="admin-section__main"
+          :detected-cdn="detectedCdn"
           :is-scheduled-refresh-enabled="isScheduledRefreshEnabled"
           :refresh-options="refreshOptions"
           :scheduled-refreshes="scheduledRefreshes"
@@ -157,6 +158,7 @@ export default {
       return this.troubleshootingPageIsActive;
     },
     ...mapGetters([
+      'detectedCdn',
       'isDebugActive',
       'isFeatureEnabled',
       'refreshFromAdminBar',
