@@ -47,12 +47,14 @@ class Cdn_Detection_Service {
     }
 
     /**
-     * Detect Sucuri via the X-Sucuri-Cache header.
+     * Detect Sucuri via the X-Sucuri-ID header, which Sucuri sends on every
+     * proxied request to the origin — unlike X-Sucuri-Cache, which is only
+     * present on cache hits.
      *
      * @return bool
      */
     private static function is_sucuri(): bool {
-        return isset( $_SERVER['HTTP_X_SUCURI_CACHE'] );
+        return isset( $_SERVER['HTTP_X_SUCURI_ID'] );
     }
 
     /**

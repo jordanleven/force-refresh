@@ -24,13 +24,13 @@ class Version_File_Service {
      * @return array The decoded version data, or [] when the file is absent.
      */
     public static function read(): array {
-        $path = self::get_file_path();
+        $filesystem = self::get_filesystem();
 
-        if ( ! file_exists( $path ) ) {
+        if ( null === $filesystem || ! $filesystem->exists( self::get_file_path() ) ) {
             return array();
         }
 
-        return self::decode_file( $path );
+        return self::decode_file( self::get_file_path() );
     }
 
     /**
@@ -43,9 +43,15 @@ class Version_File_Service {
      * @return void
      */
     public static function write( array $data ): void {
+        $filesystem = self::get_filesystem();
+
+        if ( null === $filesystem ) {
+            return;
+        }
+
         $dir = self::get_upload_dir();
         self::ensure_directory_exists( $dir );
-        self::get_filesystem()->put_contents( self::get_file_path(), wp_json_encode( $data ), FS_CHMOD_FILE );
+        $filesystem->put_contents( self::get_file_path(), wp_json_encode( $data ), FS_CHMOD_FILE );
     }
 
     /**
@@ -56,13 +62,14 @@ class Version_File_Service {
      * @return void
      */
     public static function delete(): void {
-        $path = self::get_file_path();
+        $filesystem = self::get_filesystem();
+        $path       = self::get_file_path();
 
-        if ( ! file_exists( $path ) ) {
+        if ( null === $filesystem || ! $filesystem->exists( $path ) ) {
             return;
         }
 
-        wp_delete_file( $path );
+        $filesystem->delete( $path );
     }
 
     /**
@@ -100,7 +107,9 @@ class Version_File_Service {
      * @return void
      */
     private static function ensure_directory_exists( string $path ): void {
-        if ( file_exists( $path ) ) {
+        $filesystem = self::get_filesystem();
+
+        if ( null === $filesystem || $filesystem->is_dir( $path ) ) {
             return;
         }
 
@@ -117,7 +126,13 @@ class Version_File_Service {
      * @return array The decoded content, or [] on parse failure.
      */
     private static function decode_file( string $path ): array {
-        $contents = self::get_filesystem()->get_contents( $path );
+        $filesystem = self::get_filesystem();
+
+        if ( null === $filesystem ) {
+            return array();
+        }
+
+        $contents = $filesystem->get_contents( $path );
         $decoded  = json_decode( $contents, true );
 
         return is_array( $decoded ) ? $decoded : array();
@@ -128,7 +143,7 @@ class Version_File_Service {
      *
      * @return \WP_Filesystem_Base
      */
-    private static function get_filesystem(): \WP_Filesystem_Base {
+    private static function get_filesystem(): ?\WP_Filesystem_Base {
         global $wp_filesystem;
 
         if ( empty( $wp_filesystem ) ) {
@@ -136,6 +151,6 @@ class Version_File_Service {
             WP_Filesystem();
         }
 
-        return $wp_filesystem;
+        return $wp_filesystem ?? null;
     }
 }

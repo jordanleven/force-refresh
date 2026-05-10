@@ -74,7 +74,7 @@ export default {
     isDebugActive: VueTypes.bool.isRequired,
     troubleshootingInfo: VueTypes.shape({
       currentSiteId: VueTypes.number.isRequired,
-      detectedCdn: VueTypes.string,
+      detectedCdn: VueTypes.string.def(null),
       isMultiSite: VueTypes.bool.isRequired,
       lastCronRun: VueTypes.number,
       scheduledRefreshesCount: VueTypes.number.isRequired,

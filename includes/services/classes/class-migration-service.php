@@ -26,6 +26,8 @@ class Migration_Service {
             $ran = array();
         }
 
+        $ran_before = $ran;
+
         foreach ( self::get_migrations() as $id => $migration ) {
             if ( ! in_array( $id, $ran, true ) ) {
                 $migration();
@@ -33,7 +35,9 @@ class Migration_Service {
             }
         }
 
-        update_option( self::OPTION_MIGRATIONS_RAN, $ran );
+        if ( $ran !== $ran_before ) {
+            update_option( self::OPTION_MIGRATIONS_RAN, $ran );
+        }
     }
 
     /**
