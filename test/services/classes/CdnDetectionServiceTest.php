@@ -65,10 +65,10 @@ final class CdnDetectionServiceTest extends TestCase {
     // -------------------------------------------------------------------------
 
     /**
-     * Detects Sucuri from the X-Sucuri-Cache header.
+     * Detects Sucuri from the X-Sucuri-ID header.
      */
     public function testDetectsSucuri(): void {
-        $this->set_server_key( 'HTTP_X_SUCURI_CACHE', 'HIT' );
+        $this->set_server_key( 'HTTP_X_SUCURI_ID', 'abc123' );
 
         $this->assertSame( 'Sucuri', Cdn_Detection_Service::get_detected_cdn() );
     }
@@ -104,7 +104,7 @@ final class CdnDetectionServiceTest extends TestCase {
      */
     public function testReturnsCloudflareFirstWhenMultipleHeadersArePresent(): void {
         $this->set_server_key( 'HTTP_CF_RAY', '7f3d2a1b4e5c6d7e-EWR' );
-        $this->set_server_key( 'HTTP_X_SUCURI_CACHE', 'HIT' );
+        $this->set_server_key( 'HTTP_X_SUCURI_ID', 'abc123' );
 
         $this->assertSame( 'Cloudflare', Cdn_Detection_Service::get_detected_cdn() );
     }
