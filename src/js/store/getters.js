@@ -18,7 +18,7 @@ export default {
     ...getters.troubleshootingInformationSettings,
     ...getters.troubleshootingInformationVersions,
   }),
-  troubleshootingInformationSettings: ({ site, network }) => ({
+  troubleshootingInformationSettings: ({ site, network, settings }) => ({
     currentSiteId: site.siteId,
     detectedCdn: network.detectedCdn,
     isMultiSite: site.isMultiSite,
@@ -26,6 +26,7 @@ export default {
     scheduledRefreshesCount: site.scheduledRefreshes.length,
     siteName: site.siteName,
     siteUrl: site.siteUrl,
+    useStaticFilePolling: settings.useStaticFilePolling,
   }),
   troubleshootingInformationVersions: ({ site }) => ({
     versions: {

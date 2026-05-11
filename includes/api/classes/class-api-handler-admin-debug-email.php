@@ -146,8 +146,8 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 'value' => $payload['lastCronRun'] ?? __( 'Never', 'force-refresh' ),
             ),
             array(
-                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_STATIC_FILE_POLLING',
-                'value' => $payload['staticFilePollingEnabled'] ? __( 'Enabled', 'force-refresh' ) : __( 'Disabled', 'force-refresh' ),
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD',
+                'value' => $payload['staticFilePollingEnabled'] ? __( 'Static file', 'force-refresh' ) : __( 'WordPress API', 'force-refresh' ),
             ),
             array(
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_DETECTED_CDN',
@@ -344,7 +344,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 sprintf( 'PHP Version:            %s', $payload['phpVersion'] ),
                 ...$this->get_scheduled_refresh_email_lines( $payload['scheduledRefreshes'] ),
                 sprintf( 'Last Cron Run:          %s', $payload['lastCronRun'] ?? 'Never' ),
-                sprintf( 'Static File Polling:    %s', $payload['staticFilePollingEnabled'] ? 'Enabled' : 'Disabled' ),
+                sprintf( 'Update Method:          %s', $payload['staticFilePollingEnabled'] ? 'Static file' : 'WordPress API' ),
                 sprintf( 'CDN:                    %s', $payload['detectedCdn'] ?? 'None detected' ),
                 '',
                 sprintf( 'Submitted: %s', gmdate( 'Y-m-d H:i:s T' ) ),

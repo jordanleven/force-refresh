@@ -80,6 +80,7 @@ export default {
       scheduledRefreshesCount: VueTypes.number.isRequired,
       siteName: VueTypes.string.isRequired,
       siteUrl: VueTypes.string.isRequired,
+      useStaticFilePolling: VueTypes.bool.isRequired,
       versions: VueTypes.shape({
         forceRefresh: VueTypes.object.isRequired,
         php: VueTypes.object.isRequired,
@@ -161,6 +162,12 @@ export default {
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_LAST_CRON_RUN'),
           value: this.formattedLastCronRun,
+        },
+        {
+          label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_UPDATE_METHOD'),
+          value: this.troubleshootingInfo.useStaticFilePolling
+            ? this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE')
+            : this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API'),
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_DETECTED_CDN'),
