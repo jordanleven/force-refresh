@@ -4,9 +4,10 @@ If you're encountering errors with Force Refresh, I may ask for you to download 
 
 ## Installing Beta Versions
 
-1. Download the beta release directly from GitHub using the provided link.
+1. Download the beta release `.zip` from GitHub using the provided link.
 1. Under "Plugins", [deactivate][help_deactivate_plugin] the existing Force Refresh plugin.
-1. Upload the beta release of Force Refresh using your preferred method, like FTP or uploading through the UI as a .zip file.
+1. In WordPress admin, go to **Plugins > Add New Plugin > Upload Plugin**.
+1. Choose the downloaded `.zip` file and click **Install Now**.
 1. Activate the beta release of Force Refresh under Plugins.
 
 ## Uninstalling Beta Versions
