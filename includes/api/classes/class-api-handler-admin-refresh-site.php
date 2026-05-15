@@ -9,7 +9,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
-use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Refresh_Service;
 
 /**
  * Main class controller.
@@ -53,9 +53,7 @@ class Api_Handler_Admin_Refresh_Site extends Api_Handler_Admin implements Api_Ha
      * @return \WP_REST_Response
      */
     public function refresh_site(): \WP_REST_Response {
-        $site_version = Versions_Storage_Service::get_new_version();
-
-        Versions_Storage_Service::set_site_version( $site_version );
+        $site_version = Refresh_Service::update_version_site();
 
         return $this->return_api_response(
             \WP_Http::CREATED,

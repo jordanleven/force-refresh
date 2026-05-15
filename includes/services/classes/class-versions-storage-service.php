@@ -95,7 +95,7 @@ class Versions_Storage_Service {
             $data['pages'] = $page_versions;
         }
 
-        Version_File_Service::write( $data );
+        self::write_version_file( $data );
     }
 
     /**
@@ -132,7 +132,16 @@ class Versions_Storage_Service {
             $merged['pages'] = $merged_pages;
         }
 
-        Version_File_Service::write( $merged );
+        self::write_version_file( $merged );
+    }
+
+    /**
+     * Write data to the version file.
+     *
+     * @param array $data The data to write.
+     */
+    private static function write_version_file( array $data ): void {
+        Version_File_Service::write( $data );
     }
 
     /**
