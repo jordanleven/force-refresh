@@ -9,7 +9,6 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
-use JordanLeven\Plugins\ForceRefresh\Services\Refresh_Counter_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
@@ -122,9 +121,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return  void
      */
     public function executeSiteRefresh( string $uuid ): void {
-        $site_version = Versions_Storage_Service::get_new_version();
-        Versions_Storage_Service::set_site_version( $site_version );
-        Refresh_Counter_Service::increment_site_refresh_count();
+        Versions_Storage_Service::set_new_site_version();
     }
 
     /**

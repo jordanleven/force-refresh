@@ -8,6 +8,7 @@
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Refresh_Counter_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Version_File_Service;
 
 /**
@@ -24,6 +25,18 @@ class Versions_Storage_Service {
      * Retained for use in the migration.
      */
     const OPTION_PAGE_VERSION_LEGACY = 'force_refresh_current_page_version';
+
+    /**
+     * Generate a new version, persist it as the site version, and return it.
+     *
+     * @return string The new site version.
+     */
+    public static function set_new_site_version(): string {
+        $version = self::get_new_version();
+        self::set_site_version( $version );
+        Refresh_Counter_Service::increment_site_refresh_count();
+        return $version;
+    }
 
     /**
      * Method for setting a site version.
