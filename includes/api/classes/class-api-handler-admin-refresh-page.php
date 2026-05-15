@@ -10,6 +10,7 @@ namespace JordanLeven\Plugins\ForceRefresh\Api;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Refresh_Counter_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
 /**
@@ -60,6 +61,7 @@ class Api_Handler_Admin_Refresh_Page extends Api_Handler_Admin implements Api_Ha
         $page_version = Versions_Storage_Service::get_new_version();
 
         Versions_Storage_Service::set_page_version( $page_id, $page_version );
+        Refresh_Counter_Service::increment_page_refresh_count( $page_id );
 
         return $this->return_api_response(
             \WP_Http::CREATED,
