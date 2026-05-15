@@ -33,7 +33,8 @@ class Refresh_Counter_Service {
      * @return int
      */
     public static function get_refresh_count_page( int $page_id ): int {
-        $counts = get_option( self::OPTION_PAGE_REFRESH_COUNTS, array() );
+        $raw    = get_option( self::OPTION_PAGE_REFRESH_COUNTS, array() );
+        $counts = is_array( $raw ) ? $raw : array();
         $key    = (string) $page_id;
         $count  = $counts[ $key ] ?? 0;
         return (int) $count;
@@ -56,7 +57,8 @@ class Refresh_Counter_Service {
      * @return void
      */
     public static function increment_page_refresh_count( int $page_id ): void {
-        $counts         = get_option( self::OPTION_PAGE_REFRESH_COUNTS, array() );
+        $raw            = get_option( self::OPTION_PAGE_REFRESH_COUNTS, array() );
+        $counts         = is_array( $raw ) ? $raw : array();
         $key            = (string) $page_id;
         $current        = self::get_refresh_count_page( $page_id );
         $counts[ $key ] = $current + 1;
