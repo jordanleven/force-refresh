@@ -17,6 +17,7 @@ require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.p
 require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-refresh-counter-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-refresh-page.php';
 
 /**
@@ -198,7 +199,7 @@ final class ApiHandlerAdminRefreshPageTest extends TestCase {
         ( new Api_Handler_Admin_Refresh_Page() )->refresh_page( $request );
         ob_get_clean();
 
-        $args = self::$mock_update_option_services->get_last_invocation_arguments();
+        $args = self::$mock_update_option_services->get_invocation_arguments( 0 );
         $this->assertSame( 'force_refresh_page_versions', $args[0] );
         $this->assertArrayHasKey( (string) $post_id, $args[1] );
     }
