@@ -117,7 +117,7 @@ final class RefreshServiceTest extends Mocked_Service_Test_Case {
         self::$mock_current_time->set_return_value( '2024-01-01 00:00:00' );
         self::$mock_get_option->set_option_value( 'force_refresh_refresh_count_site', 0 );
 
-        $version = Refresh_Service::set_new_site_version();
+        $version = Refresh_Service::update_version_site();
 
         $this->assertNotEmpty( $version );
     }
@@ -131,7 +131,7 @@ final class RefreshServiceTest extends Mocked_Service_Test_Case {
         self::$mock_current_time->set_return_value( '2024-01-01 00:00:00' );
         self::$mock_get_option->set_option_value( 'force_refresh_refresh_count_site', 3 );
 
-        Refresh_Service::set_new_site_version();
+        Refresh_Service::update_version_site();
 
         $args = self::$mock_update_option->get_last_invocation_arguments();
         $this->assertSame( 'force_refresh_refresh_count_site', $args[0] );
@@ -146,7 +146,7 @@ final class RefreshServiceTest extends Mocked_Service_Test_Case {
         self::$mock_get_option->set_option_value( 'force_refresh_page_versions', array() );
         self::$mock_get_option->set_option_value( 'force_refresh_refresh_count_page', array() );
 
-        $version = Refresh_Service::set_new_page_version( 42 );
+        $version = Refresh_Service::update_version_page( 42 );
 
         $this->assertNotEmpty( $version );
     }
@@ -164,7 +164,7 @@ final class RefreshServiceTest extends Mocked_Service_Test_Case {
             array( '42' => 5 )
         );
 
-        Refresh_Service::set_new_page_version( 42 );
+        Refresh_Service::update_version_page( 42 );
 
         $args = self::$mock_update_option->get_last_invocation_arguments();
         $this->assertSame( 'force_refresh_refresh_count_page', $args[0] );

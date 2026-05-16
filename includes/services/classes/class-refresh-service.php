@@ -21,7 +21,7 @@ class Refresh_Service {
      *
      * @return string The new site version.
      */
-    public static function set_new_site_version(): string {
+    public static function update_version_site(): string {
         $version = Versions_Storage_Service::set_new_site_version();
         Refresh_Counter_Service::increment_site_refresh_count();
         return $version;
@@ -35,7 +35,7 @@ class Refresh_Service {
      *
      * @return string The new page version.
      */
-    public static function set_new_page_version( int $page_id ): string {
+    public static function update_version_page( int $page_id ): string {
         $version = Versions_Storage_Service::get_new_version();
         Versions_Storage_Service::set_page_version( $page_id, $version );
         Refresh_Counter_Service::increment_page_refresh_count( $page_id );

@@ -53,7 +53,7 @@ class Api_Handler_Admin_Refresh_Site extends Api_Handler_Admin implements Api_Ha
      * @return \WP_REST_Response
      */
     public function refresh_site(): \WP_REST_Response {
-        $site_version = Refresh_Service::set_new_site_version();
+        $site_version = Refresh_Service::update_version_site();
 
         return $this->return_api_response(
             \WP_Http::CREATED,
