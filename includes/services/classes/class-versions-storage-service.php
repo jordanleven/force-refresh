@@ -26,17 +26,6 @@ class Versions_Storage_Service {
     const OPTION_PAGE_VERSION_LEGACY = 'force_refresh_current_page_version';
 
     /**
-     * Generate a new version, persist it as the site version, and return it.
-     *
-     * @return string The new site version.
-     */
-    public static function set_new_site_version(): string {
-        $version = self::get_new_version();
-        self::set_site_version( $version );
-        return $version;
-    }
-
-    /**
      * Method for setting a site version.
      *
      * @param string $new_version The new site version.
