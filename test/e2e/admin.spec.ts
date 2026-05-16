@@ -10,7 +10,10 @@ test.describe('Admin', () => {
       const beforeVersion = await page.locator('html').getAttribute('force-refresh-version-site');
 
       await goToPluginPage(page);
-      await page.locator('[data-test="btn-force-refresh"]').click();
+      await Promise.all([
+        page.waitForResponse((r) => r.url().includes('/site-version') && r.status() === 201),
+        page.locator('[data-test="btn-force-refresh"]').click(),
+      ]);
 
       await page.goto('/');
       await page.locator('html[force-refresh-version-site]').waitFor();
