@@ -1,3 +1,0 @@
-kind: Feature (minor)
-body: Static file polling is now available as an opt-in setting. Enable it to reduce server load on high-traffic sites by serving version checks from a static file instead of a live API request.
-time: 2026-05-08T20:29:29.356154-04:00

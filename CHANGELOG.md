@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.1.0 - 2026-05-16
+### Feature (minor)
+* Static file polling is now available as an opt-in setting. Enable it to reduce server load on high-traffic sites by serving version checks from a static file instead of a live API request.
+### Changed (minor)
+* Add support for WordPress 7.0.
 ## 3.0.0 - 2026-04-22
 ### Feature (major)
 * Introducing scheduled refreshes. Plan site-wide refreshes in advance so they happen exactly when you need them.
