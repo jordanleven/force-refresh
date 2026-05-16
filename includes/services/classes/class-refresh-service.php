@@ -22,7 +22,8 @@ class Refresh_Service {
      * @return string The new site version.
      */
     public static function update_version_site(): string {
-        $version = Versions_Storage_Service::set_new_site_version();
+        $version = Versions_Storage_Service::get_new_version();
+        Versions_Storage_Service::set_site_version( $version );
         Refresh_Counter_Service::increment_site_refresh_count();
         return $version;
     }
