@@ -44,6 +44,8 @@ class Refresh_Service {
     }
 
     /**
+     * Generate a new unique version string.
+     *
      * @return string
      */
     private static function get_new_version(): string {

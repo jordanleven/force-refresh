@@ -136,7 +136,9 @@ class Versions_Storage_Service {
     }
 
     /**
-     * @param array $data
+     * Write data to the version file.
+     *
+     * @param array $data The data to write.
      */
     private static function write_version_file( array $data ): void {
         Version_File_Service::write( $data );
