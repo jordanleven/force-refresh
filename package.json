@@ -73,7 +73,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-vue": "^10.9.1",
     "globals": "^17.6.0",
-    "jest": "^30.3.0",
+    "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "md-2-json": "^2.0.0",
     "postcss": "^8.5.14",
