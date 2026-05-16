@@ -121,7 +121,7 @@ class Api_Handler_Admin_Schedule_Refresh_Site extends Api_Handler_Admin implemen
      * @return  void
      */
     public function executeSiteRefresh( string $uuid ): void {
-        Refresh_Service::set_new_site_version();
+        Refresh_Service::update_version_site();
     }
 
     /**

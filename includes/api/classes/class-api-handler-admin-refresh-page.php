@@ -57,7 +57,7 @@ class Api_Handler_Admin_Refresh_Page extends Api_Handler_Admin implements Api_Ha
      */
     public function refresh_page( \WP_REST_Request $request ): \WP_REST_Response {
         $page_id      = $request->get_param( 'postId' ) ?? null;
-        $page_version = Refresh_Service::set_new_page_version( $page_id );
+        $page_version = Refresh_Service::update_version_page( $page_id );
 
         return $this->return_api_response(
             \WP_Http::CREATED,
