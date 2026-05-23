@@ -8,7 +8,8 @@
       "Bash(composer show:*)",
       "Bash(npm install:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(gh api repos/jordanleven/force-refresh/pulls/975 --method PATCH --field 'title=chore: Bump sass-loader from 16.0.8 to 17.0.0' --field 'body=Bumps sass-loader from 16.0.8 to 17.0.0. *)"
     ]
   }
 }
