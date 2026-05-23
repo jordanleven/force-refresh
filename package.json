@@ -76,7 +76,7 @@
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "md-2-json": "^2.0.0",
-    "postcss": "^8.5.14",
+    "postcss": "^8.5.15",
     "postcss-html": "^1.8.1",
     "sass": "^1.99.0",
     "sass-loader": "^17.0.0",
