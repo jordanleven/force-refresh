@@ -94,7 +94,7 @@
     "vue-loader": "^17.4.2",
     "vue3-jest": "^27.0.0-alpha.1",
     "webpack": "^5.107.1",
-    "webpack-cli": "^7.0.2",
+    "webpack-cli": "^7.0.3",
     "webpack-livereload-plugin": "^3.0.2"
   },
   "overrides": {
