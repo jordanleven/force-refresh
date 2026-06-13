@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.1.1 - 2026-06-13
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 3.1.0 - 2026-05-16
 ### Feature (minor)
 * Static file polling is now available as an opt-in setting. Enable it to reduce server load on high-traffic sites by serving version checks from a static file instead of a live API request.
