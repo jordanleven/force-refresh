@@ -49,7 +49,7 @@ services:
       - db-qa
       - mailpit
       - traefik
-    image: 'wordpress:6.9.4-php8.3-apache'
+    image: 'wordpress:7-php8.3-apache'
     ports:
       - '8086:80'
     healthcheck:
@@ -190,7 +190,7 @@ services:
       - db-wp7
       - mailpit
       - traefik
-    image: 'wordpress:beta-php8.3-apache'
+    image: 'wordpress:7-php8.3-apache'
     ports:
       - '8085:80'
     healthcheck:
