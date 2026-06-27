@@ -57,7 +57,7 @@
     "@babel/preset-env": "^7.29.7",
     "@eslint/compat": "^2.1.0",
     "@eslint/eslintrc": "^3.3.5",
-    "@playwright/test": "^1.60.0",
+    "@playwright/test": "^1.61.1",
     "@typescript-eslint/eslint-plugin": "^8.62.0",
     "@typescript-eslint/parser": "^8.62.0",
     "@vue/compiler-sfc": "^3.5.38",
