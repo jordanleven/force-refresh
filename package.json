@@ -40,7 +40,7 @@
     "@fortawesome/vue-fontawesome": "^3.0.6",
     "compare-versions": "^6.1.1",
     "html-entities": "^2.5.2",
-    "qs": "^6.15.2",
+    "qs": "^6.15.3",
     "ramda": "^0.32.0",
     "regenerator-runtime": "^0.14.1",
     "sprintf-js": "^1.1.3",
