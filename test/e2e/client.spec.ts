@@ -14,8 +14,11 @@ test.describe('Client', () => {
     await goToPluginPage(page);
 
     // Set the refresh interval to 30 seconds so the reload tests don't
-    // have to wait the default 2 minutes
+    // have to wait the default 2 minutes, and enable the admin bar button
+    // up front so the admin bar test isn't racing a settings save against
+    // the visitor's tight reload-detection window.
     await page.selectOption('select[name="refresh-interval"]', { value: '30' });
+    await page.selectOption('select[name="show-in-wp-admin-bar"]', { label: 'Show' });
     await page.locator('[data-test="btn-update-options"]').click();
     await page.waitForLoadState('networkidle');
     await context.close();
@@ -116,12 +119,6 @@ test.describe('Client', () => {
     const adminContext = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
     const adminPage = await adminContext.newPage();
     await goToPluginPage(adminPage);
-
-    // Changing the admin bar option triggers a full page reload
-    await adminPage.selectOption('select[name="show-in-wp-admin-bar"]', { label: 'Show' });
-    await adminPage.locator('[data-test="btn-update-options"]').click();
-    await adminPage.waitForLoadState('networkidle');
-    await adminPage.waitForLoadState('networkidle');
     await adminPage.waitForSelector('[data-test="btn-admin-bar-refresh"]');
 
     const visitorContext = await browser.newContext({ baseURL });
