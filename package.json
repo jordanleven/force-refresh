@@ -63,7 +63,7 @@
     "@vue/compiler-sfc": "^3.5.38",
     "@vue/test-utils": "^2.4.11",
     "babel-loader": "^10.1.1",
-    "changie": "^1.24.2",
+    "changie": "^1.25.0",
     "check-node-version": "^4.2.1",
     "css-loader": "^7.1.4",
     "dedent": "^1.7.2",
