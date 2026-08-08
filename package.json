@@ -60,7 +60,7 @@
     "@playwright/test": "^1.62.0",
     "@typescript-eslint/eslint-plugin": "^8.65.0",
     "@typescript-eslint/parser": "^8.65.0",
-    "@vue/compiler-sfc": "^3.5.40",
+    "@vue/compiler-sfc": "^3.5.41",
     "@vue/test-utils": "^2.4.11",
     "babel-loader": "^10.1.1",
     "changie": "^1.25.0",
