@@ -190,7 +190,7 @@ services:
       - db-wp7
       - mailpit
       - traefik
-    image: 'wordpress:7-php8.3-apache'
+    image: 'wordpress:beta-7.1-php8.3-apache'
     ports:
       - '8085:80'
     healthcheck:
