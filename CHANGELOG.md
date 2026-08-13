@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.2.0 - 2026-08-13
+### Changed (minor)
+* Add support for WordPress 7.1.
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 3.1.2 - 2026-08-01
 ### Dependencies & security
 * Performance enhancements and bug fixes.
