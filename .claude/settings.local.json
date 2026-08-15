@@ -4,7 +4,16 @@
       "Bash(gh api:*)",
       "Bash(node:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git remote *)",
+      "Bash(git fetch *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(grep -v '^\\\\* \\\\|^  master$')",
+      "Bash(gh pr *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git -c commit.gpgsign=false cherry-pick --continue --no-edit)",
+      "Bash(git push *)"
     ]
   }
 }
