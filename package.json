@@ -94,7 +94,7 @@
     "vue-eslint-parser": "^10.4.1",
     "vue-loader": "^17.4.2",
     "vue3-jest": "^27.0.0-alpha.1",
-    "webpack": "^5.109.2",
+    "webpack": "^5.110.3",
     "webpack-cli": "^7.2.3",
     "webpack-livereload-plugin": "^3.0.2"
   },
