@@ -61,7 +61,7 @@
     "@typescript-eslint/eslint-plugin": "^8.69.0",
     "@typescript-eslint/parser": "^8.69.0",
     "@vue/compiler-sfc": "^3.5.42",
-    "@vue/test-utils": "^2.4.11",
+    "@vue/test-utils": "^2.5.0",
     "babel-loader": "^10.1.1",
     "changie": "^1.26.0",
     "check-node-version": "^4.2.1",
