@@ -27,6 +27,7 @@ export default {
     siteName: site.siteName,
     siteUrl: site.siteUrl,
     useStaticFilePolling: settings.useStaticFilePolling,
+    webSocketSupported: site.webSocketSupported,
   }),
   troubleshootingInformationVersions: ({ site }) => ({
     versions: {
