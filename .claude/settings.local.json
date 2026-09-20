@@ -13,7 +13,10 @@
       "Bash(gh pr *)",
       "Bash(git cherry-pick *)",
       "Bash(git -c commit.gpgsign=false cherry-pick --continue --no-edit)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(/Users/jordanleven/.claude/skills/update-deps/cherry-pick-pr.sh:*)",
+      "Bash(/Users/jordanleven/.claude/skills/update-deps/sync-lockfile.sh:*)",
+      "Bash(cat:*)"
     ]
   }
 }
