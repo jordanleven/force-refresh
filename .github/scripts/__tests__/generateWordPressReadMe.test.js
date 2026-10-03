@@ -4,7 +4,7 @@
 /* eslint-disable */
 const { generateWordPressReadMe } = require('../generateWordPressReadMe');
 
-jest.mock('simple-git', () => () => ({ log: jest.fn() }));
+jest.mock('simple-git', () => ({ simpleGit: () => ({ log: jest.fn() }) }));
 
 const README_FIXTURE = `\
 ![banner](/assets/banner.png)
