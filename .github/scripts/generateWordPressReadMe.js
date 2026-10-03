@@ -1,5 +1,5 @@
 /* eslint-disable */
-const simpleGit = require('simple-git');
+const { simpleGit } = require('simple-git');
 const git = simpleGit();
 const dedent = require('dedent');
 const md2json = require('md-2-json');
