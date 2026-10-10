@@ -12,7 +12,6 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Options;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debug_Email;
-use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Health_Websocket;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Cdn_Detection_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
@@ -102,7 +101,6 @@ function get_admin_api_endpoints(): array {
         'cronStatus'          => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint_cron_status(),
         'scheduleRefreshSite' => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint(),
         'debugEmail'          => Api_Handler_Admin_Debug_Email::get_rest_endpoint(),
-        'webSocketHealth'     => Api_Handler_Admin_Health_Websocket::get_rest_endpoint(),
     );
 }
 
@@ -139,6 +137,7 @@ function get_localized_data(): array {
             'siteUrl'                     => get_bloginfo( 'url' ),
             'versions'                    => $versions,
             'featureFlags'                => Feature_Flag_Service::get_all(),
+            'webSocketSupported'          => extension_loaded( 'sockets' ),
         ),
     );
 }
