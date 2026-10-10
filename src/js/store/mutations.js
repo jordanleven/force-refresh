@@ -13,9 +13,6 @@ export default {
   SET_LAST_CRON_RUN: (state, lastCronRun) => {
     state.site.lastCronRun = lastCronRun;
   },
-  SET_WEBSOCKET_HEALTH: (state, supported) => {
-    state.site.webSocketSupported = supported;
-  },
   SET_REFRESH_INTERVAL: (state, updatedRefreshInterval) => {
     state.settings.refreshInterval = updatedRefreshInterval;
   },

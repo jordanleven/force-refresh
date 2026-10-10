@@ -14,7 +14,6 @@ export default (localizedData) => ({
   site: {
     isMultiSite: localizedData.isMultiSite,
     lastCronRun: localizedData.lastCronRun ?? null,
-    webSocketSupported: null,
     scheduledRefreshes: localizedData.scheduledRefreshes,
     siteId: localizedData.siteId,
     siteName: localizedData.siteName,
@@ -27,5 +26,6 @@ export default (localizedData) => ({
     versionWordPressEolDate: localizedData.versions.wordPress.eolDate ?? null,
     versionWordPressInstalled: localizedData.versions.wordPress.version,
     versionWordPressRequired: localizedData.versions.wordPress.versionRequired,
+    webSocketSupported: localizedData.webSocketSupported ?? false,
   },
 });

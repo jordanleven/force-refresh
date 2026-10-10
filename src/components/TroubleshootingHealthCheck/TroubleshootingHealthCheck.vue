@@ -33,30 +33,26 @@ export default {
   },
   props: {
     label: VueTypes.string.isRequired,
-    supported: VueTypes.oneOfType([Boolean, null]).def(null),
+    supported: VueTypes.bool.isRequired,
     tooltipNotSupported: VueTypes.string.def(''),
     tooltipSupported: VueTypes.string.def(''),
     unsupportedVariant: VueTypes.oneOf(['error', 'neutral']).def('error'),
   },
   computed: {
     statusClass() {
-      if (this.supported === null) return 'status-indicator--loading';
       if (this.supported) return 'status-indicator--okay';
       return this.unsupportedVariant === 'neutral'
         ? 'status-indicator--neutral'
         : 'status-indicator--error';
     },
     statusIcon() {
-      if (this.supported === null) return faMinus;
       if (this.supported) return faCheck;
       return this.unsupportedVariant === 'neutral' ? faMinus : faExclamation;
     },
     tooltipContent() {
-      if (this.supported === null) return '';
       return this.supported ? this.tooltipSupported : this.tooltipNotSupported;
     },
     valueLabel() {
-      if (this.supported === null) return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_CHECKING');
       return this.supported
         ? this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_SUPPORTED')
         : this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_NOT_SUPPORTED');
@@ -109,11 +105,6 @@ export default {
       70%  { box-shadow: 0 0 0 0.375rem rgba(var.$red, 0); }
       100% { box-shadow: 0 0 0 0 rgba(var.$red, 0); }
     }
-  }
-
-  &--loading {
-    background: var.$dark-grey;
-    opacity: 0.4;
   }
 
   &--neutral {
