@@ -96,7 +96,7 @@ export default {
         php: VueTypes.object.isRequired,
         wordPress: VueTypes.object.isRequired,
       }),
-      webSocketSupported: VueTypes.oneOfType([Boolean, null]),
+      webSocketSupported: VueTypes.bool,
     }),
   },
   emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
@@ -193,14 +193,10 @@ export default {
     ...mapGetters(['isFeatureEnabled']),
   },
   async created() {
-    const requests = [this.requestCronStatus()];
-    if (this.isWebSocketEnabled) {
-      requests.push(this.requestWebSocketHealth());
-    }
-    await Promise.all(requests);
+    await this.requestCronStatus();
   },
   methods: {
-    ...mapActions(['requestCronStatus', 'requestWebSocketHealth']),
+    ...mapActions(['requestCronStatus']),
     exitTroubleshooting() {
       this.$emit('exit-troubleshooting');
     },
