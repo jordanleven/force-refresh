@@ -61,6 +61,7 @@ import TroubleshootingConsole from '@/components/TroubleshootingConsole/Troubles
 import TroubleshootingDebug from '@/components/TroubleshootingDebug/TroubleshootingDebug.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
 import TroubleshootingVersionsList from '@/components/TroubleshootingVersionsList/TroubleshootingVersionsList.vue';
+import { UPDATE_METHODS, getUpdateMethodLabelKey } from '@/js/admin/updateMethods.js';
 
 export default {
   name: 'AdminTroubleshooting',
@@ -75,12 +76,13 @@ export default {
     troubleshootingInfo: VueTypes.shape({
       currentSiteId: VueTypes.number.isRequired,
       detectedCdn: VueTypes.string.def(null),
+      effectiveUpdateMethod: VueTypes.oneOf(UPDATE_METHODS).isRequired,
       isMultiSite: VueTypes.bool.isRequired,
       lastCronRun: VueTypes.number,
       scheduledRefreshesCount: VueTypes.number.isRequired,
       siteName: VueTypes.string.isRequired,
       siteUrl: VueTypes.string.isRequired,
-      useStaticFilePolling: VueTypes.bool.isRequired,
+      updateMethod: VueTypes.oneOf(UPDATE_METHODS).isRequired,
       versions: VueTypes.shape({
         forceRefresh: VueTypes.object.isRequired,
         php: VueTypes.object.isRequired,
@@ -116,6 +118,19 @@ export default {
     },
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');
+    },
+    updateMethodValue() {
+      const { effectiveUpdateMethod, updateMethod } = this.troubleshootingInfo;
+      const selected = this.$t(getUpdateMethodLabelKey(updateMethod));
+
+      if (effectiveUpdateMethod === updateMethod) {
+        return selected;
+      }
+
+      return this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_VALUE_UPDATE_METHOD_FALLBACK', {
+        effective: this.$t(getUpdateMethodLabelKey(effectiveUpdateMethod)),
+        selected,
+      });
     },
     versionsTroubleshootingInformation() {
       const { forceRefresh, php, wordPress } = this.troubleshootingInfo.versions;
@@ -165,9 +180,7 @@ export default {
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_UPDATE_METHOD'),
-          value: this.troubleshootingInfo.useStaticFilePolling
-            ? this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE')
-            : this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API'),
+          value: this.updateMethodValue,
         },
         {
           label: this.$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_DETECTED_CDN'),
