@@ -26,14 +26,6 @@
             <span class="troubleshooting__card-title">{{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_HEADER_HEALTH') }}</span>
           </div>
           <TroubleshootingVersionsList :versions="versionsTroubleshootingInformation" />
-          <TroubleshootingHealthCheck
-            v-if="isWebSocketEnabled"
-            :label="$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_WEBSOCKET_SUPPORT')"
-            :supported="troubleshootingInfo.webSocketSupported"
-            :tooltip-supported="$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_TOOLTIP_WEBSOCKET_SUPPORTED')"
-            :tooltip-not-supported="$t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_TOOLTIP_WEBSOCKET_NOT_SUPPORTED')"
-            unsupported-variant="neutral"
-          />
         </div>
       </div>
 
@@ -67,7 +59,6 @@ import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import TroubleshootingConsole from '@/components/TroubleshootingConsole/TroubleshootingConsole.vue';
 import TroubleshootingDebug from '@/components/TroubleshootingDebug/TroubleshootingDebug.vue';
-import TroubleshootingHealthCheck from '@/components/TroubleshootingHealthCheck/TroubleshootingHealthCheck.vue';
 import TroubleshootingSettings from '@/components/TroubleshootingSettings/TroubleshootingSettings.vue';
 import TroubleshootingVersionsList from '@/components/TroubleshootingVersionsList/TroubleshootingVersionsList.vue';
 
@@ -76,7 +67,6 @@ export default {
   components: {
     TroubleshootingConsole,
     TroubleshootingDebug,
-    TroubleshootingHealthCheck,
     TroubleshootingSettings,
     TroubleshootingVersionsList,
   },
@@ -96,7 +86,6 @@ export default {
         php: VueTypes.object.isRequired,
         wordPress: VueTypes.object.isRequired,
       }),
-      webSocketSupported: VueTypes.bool,
     }),
   },
   emits: ['debug-mode-was-updated', 'exit-troubleshooting'],
@@ -127,9 +116,6 @@ export default {
     },
     isTerminalEnabled() {
       return this.isFeatureEnabled('troubleshootingTerminal');
-    },
-    isWebSocketEnabled() {
-      return this.isFeatureEnabled('websockets');
     },
     versionsTroubleshootingInformation() {
       const { forceRefresh, php, wordPress } = this.troubleshootingInfo.versions;

@@ -137,7 +137,6 @@ function get_localized_data(): array {
             'siteUrl'                     => get_bloginfo( 'url' ),
             'versions'                    => $versions,
             'featureFlags'                => Feature_Flag_Service::get_all(),
-            'webSocketSupported'          => extension_loaded( 'sockets' ),
         ),
     );
 }
