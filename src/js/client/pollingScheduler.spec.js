@@ -2,6 +2,8 @@ import { setDebugMode } from '@/js/services/debugService.js';
 import { FAILURE_KINDS, checkFailed, checkSucceeded } from './checkResult.js';
 import {
   CHECK_TIMEOUT_MS,
+  NUDGE_MAX_DELAY_MS,
+  NUDGE_MIN_GAP_MS,
   RETRY_AFTER_MAX_MS,
   RETRY_BASE_DELAY_MS,
   RETRY_MAX_DELAY_MS,
@@ -117,8 +119,8 @@ describe('createPollingScheduler', () => {
   let check;
   let scheduler;
 
-  const startScheduler = async () => {
-    scheduler = createPollingScheduler({ check, intervalMs: INTERVAL_MS, random: noJitter });
+  const startScheduler = async (random = noJitter) => {
+    scheduler = createPollingScheduler({ check, intervalMs: INTERVAL_MS, random });
     scheduler.start();
     await advance(0);
   };
@@ -597,6 +599,152 @@ describe('createPollingScheduler', () => {
         runningCheck.resolve(NETWORK_FAILURE);
         await advance(0);
         expect(console.warn).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
+
+  describe('Nudges', () => {
+    const halfDelay = () => 0.5;
+    const noDelay = () => 0;
+
+    it('does not check at the moment of the nudge', async () => {
+      await startScheduler(halfDelay);
+      scheduler.nudge();
+      await advance(NUDGE_MAX_DELAY_MS / 2 - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    it('checks after a random delay', async () => {
+      await startScheduler(halfDelay);
+      scheduler.nudge();
+      await advance(NUDGE_MAX_DELAY_MS / 2);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('never delays the check by more than the maximum', async () => {
+      await startScheduler(() => 1);
+      scheduler.nudge();
+      await advance(NUDGE_MAX_DELAY_MS);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('treats the check as triggered', async () => {
+      await startScheduler(noDelay);
+      scheduler.nudge();
+      await advance(0);
+      expect(check.mock.calls[1][0].isTriggered).toBe(true);
+    });
+
+    it('checks once for nudges that arrive during the delay', async () => {
+      await startScheduler(halfDelay);
+      scheduler.nudge();
+      await advance(500);
+      scheduler.nudge();
+      scheduler.nudge();
+      await advance(NUDGE_MIN_GAP_MS - 500 - 1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('acts on a nudge that arrives just after a routine poll succeeded', async () => {
+      await startScheduler(halfDelay);
+      await advance(INTERVAL_MS + 2000);
+      scheduler.nudge();
+      await advance(NUDGE_MAX_DELAY_MS / 2);
+      expect(check).toHaveBeenCalledTimes(3);
+    });
+
+    it('times the next poll from the end of the nudged check', async () => {
+      await startScheduler(noDelay);
+      await advance(INTERVAL_MS / 2);
+      scheduler.nudge();
+      await advance(INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(2);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(3);
+    });
+
+    it('reports the time until a nudged check', async () => {
+      await startScheduler(halfDelay);
+      scheduler.nudge();
+      expect(scheduler.getMsUntilNextCheck()).toBe(NUDGE_MAX_DELAY_MS / 2);
+    });
+
+    it('ignores a nudge before it is started', async () => {
+      scheduler = createPollingScheduler({ check, intervalMs: INTERVAL_MS, random: noDelay });
+      scheduler.nudge();
+      await advance(NUDGE_MAX_DELAY_MS);
+      expect(check).not.toHaveBeenCalled();
+    });
+
+    it('ignores a nudge once stopped', async () => {
+      await startScheduler(noDelay);
+      scheduler.stop();
+      scheduler.nudge();
+      await advance(NUDGE_MAX_DELAY_MS);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    it('cancels a waiting nudged check when stopped', async () => {
+      await startScheduler(halfDelay);
+      scheduler.nudge();
+      scheduler.stop();
+      await advance(NUDGE_MAX_DELAY_MS);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    describe('within the minimum gap of the last nudged check', () => {
+      beforeEach(async () => {
+        await startScheduler(noDelay);
+        scheduler.nudge();
+        await advance(1000);
+        check.mockClear();
+        scheduler.nudge();
+      });
+
+      it('does not check before the gap has passed', async () => {
+        await advance(NUDGE_MIN_GAP_MS - 1000 - 1);
+        expect(check).not.toHaveBeenCalled();
+      });
+
+      it('checks once the gap has passed instead of dropping the nudge', async () => {
+        await advance(NUDGE_MIN_GAP_MS - 1000);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    it('checks at most once per minimum gap however many nudges arrive', async () => {
+      await startScheduler(noDelay);
+      check.mockClear();
+
+      for (let i = 0; i < 300; i += 1) {
+        scheduler.nudge();
+        // eslint-disable-next-line no-await-in-loop
+        await advance(100);
+      }
+
+      // One at the start of the 30 seconds and one for each gap that fits in them.
+      expect(check).toHaveBeenCalledTimes(1 + (30 * 1000) / NUDGE_MIN_GAP_MS);
+    });
+
+    describe('while a check is running', () => {
+      let runningCheck;
+
+      beforeEach(async () => {
+        runningCheck = createDeferred();
+        check.mockReturnValueOnce(runningCheck.promise);
+        await startScheduler(noDelay);
+        scheduler.nudge();
+        await advance(0);
+      });
+
+      it('does not start a second check alongside the running one', () => {
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('checks again once the running check settles', async () => {
+        runningCheck.resolve(SUCCEEDED);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
       });
     });
   });

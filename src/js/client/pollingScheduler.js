@@ -7,6 +7,8 @@ export const RETRY_MAX_DELAY_MS = 5 * 60 * 1000;
 export const RETRY_AFTER_MAX_MS = 60 * 60 * 1000;
 export const CHECK_TIMEOUT_MS = 30 * 1000;
 export const TRIGGER_MIN_GAP_MS = 5 * 1000;
+export const NUDGE_MAX_DELAY_MS = 3 * 1000;
+export const NUDGE_MIN_GAP_MS = 5 * 1000;
 
 /**
  * The delay before retrying after consecutive failed checks. Doubles with
@@ -79,7 +81,8 @@ const runCheckWithTimeout = (check, isTriggered) => new Promise((resolve) => {
 
 /**
  * Decides when to run the version check: on a fixed interval, sooner after a
- * network failure, and as soon as the page resumes having missed a check.
+ * network failure, as soon as the page resumes having missed a check, and
+ * shortly after being nudged that a refresh was announced.
  * It knows nothing about versions; `check` owns the decision to reload.
  * @param     {object}      options
  * @param     {Function}    options.check         Called with `{ isTriggered, signal }`. `isTriggered`
@@ -108,6 +111,9 @@ export const createPollingScheduler = ({
   let isTrailingCheckQueued = false;
   let lastCheckEndedAt = null;
   let lastFailureKind = null;
+  let lastNudgeCheckAt = null;
+  let nudgeCheckAt = null;
+  let nudgeTimeout = null;
   let nextCheckAt = null;
   let nextCheckTimeout = null;
 
@@ -206,6 +212,41 @@ export const createPollingScheduler = ({
     isTrailingCheckQueued = true;
   };
 
+  const clearNudge = () => {
+    clearTimeout(nudgeTimeout);
+    nudgeTimeout = null;
+    nudgeCheckAt = null;
+  };
+
+  const getMsUntilNudgeGapEnds = () => (
+    lastNudgeCheckAt === null ? 0 : Math.max(lastNudgeCheckAt + NUDGE_MIN_GAP_MS - Date.now(), 0)
+  );
+
+  /**
+   * Schedules a check because a refresh was announced, over a WebSocket for
+   * example. Every visitor is nudged at the same moment, so each waits a
+   * random delay to spread the requests. Nudges cannot be trusted either:
+   * however many arrive, they lead to at most one check per `NUDGE_MIN_GAP_MS`,
+   * measured from the last check a nudge caused and not from the last check
+   * of any kind, so a real refresh announced just after a routine poll is
+   * still acted on. A nudge inside that gap is deferred to its end rather
+   * than dropped, and the check always starts after the nudge arrived.
+   * @return    {void}
+   */
+  const nudge = () => {
+    if (!isStarted || nudgeTimeout !== null) return;
+
+    const delay = getMsUntilNudgeGapEnds() + Math.round(random() * NUDGE_MAX_DELAY_MS);
+
+    nudgeCheckAt = Date.now() + delay;
+    nudgeTimeout = setTimeout(() => {
+      clearNudge();
+      lastNudgeCheckAt = Date.now();
+      debug('Checking now because a refresh was announced.');
+      requestCheck();
+    }, delay);
+  };
+
   /**
    * Changes the polling interval without checking and without disturbing a
    * retry. A waiting poll is re-timed from the end of the last check. When
@@ -279,17 +320,24 @@ export const createPollingScheduler = ({
     isStarted = false;
     isTrailingCheckQueued = false;
     clearNextCheck();
+    clearNudge();
 
     document.removeEventListener('visibilitychange', onVisibilityChange);
     window.removeEventListener('online', onOnline);
     window.removeEventListener('pageshow', onPageShow);
   };
 
-  const getMsUntilNextCheck = () => (nextCheckAt === null ? null : Math.max(nextCheckAt - Date.now(), 0));
+  const getMsUntilNextCheck = () => {
+    const checkTimes = [nextCheckAt, nudgeCheckAt].filter((checkAt) => checkAt !== null);
+    if (!checkTimes.length) return null;
+
+    return Math.max(Math.min(...checkTimes) - Date.now(), 0);
+  };
 
   return {
     checkNow,
     getMsUntilNextCheck,
+    nudge,
     requestCheck,
     setIntervalMs,
     start,
