@@ -177,6 +177,26 @@ describe('createPollingScheduler', () => {
       expect(check).toHaveBeenCalledTimes(1);
     });
 
+    it('does not check again when stopped while a check is running', async () => {
+      const runningCheck = createDeferred();
+      check.mockReturnValueOnce(runningCheck.promise);
+      await startScheduler();
+      scheduler.stop();
+      runningCheck.resolve(SUCCEEDED);
+      await advance(INTERVAL_MS * 3);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not retry when stopped while a check that then fails is running', async () => {
+      const runningCheck = createDeferred();
+      check.mockReturnValueOnce(runningCheck.promise);
+      await startScheduler();
+      scheduler.stop();
+      runningCheck.resolve(NETWORK_FAILURE);
+      await advance(INTERVAL_MS * 3);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
     it('only starts once', async () => {
       await startScheduler();
       scheduler.start();
