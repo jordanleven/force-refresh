@@ -1,13 +1,20 @@
+import { FAILURE_KINDS, checkFailed, checkSucceeded } from './checkResult.js';
 import {
   CHECK_TIMEOUT_MS,
+  RETRY_AFTER_MAX_MS,
   RETRY_BASE_DELAY_MS,
   RETRY_MAX_DELAY_MS,
   TRIGGER_MIN_GAP_MS,
   createPollingScheduler,
+  getDelayAfterFailure,
   getRetryDelay,
 } from './pollingScheduler.js';
 
 const INTERVAL_MS = 60 * 1000;
+
+const SUCCEEDED = checkSucceeded();
+const NETWORK_FAILURE = checkFailed(FAILURE_KINDS.NETWORK);
+const SERVER_FAILURE = checkFailed(FAILURE_KINDS.SERVER);
 
 // With `random` pinned to 1 the jitter is removed and delays are exact.
 const noJitter = () => 1;
@@ -62,6 +69,49 @@ describe('getRetryDelay', () => {
   });
 });
 
+describe('getDelayAfterFailure', () => {
+  const getDelay = (options) => getDelayAfterFailure({
+    failures: 1,
+    intervalMs: INTERVAL_MS,
+    random: noJitter,
+    retryAfterMs: null,
+    ...options,
+  });
+
+  it('retries a network failure after the short retry delay', () => {
+    expect(getDelay({ failureKind: FAILURE_KINDS.NETWORK })).toBe(RETRY_BASE_DELAY_MS);
+  });
+
+  it.each([
+    FAILURE_KINDS.SERVER,
+    FAILURE_KINDS.TIMEOUT,
+  ])('does not retry a %s failure sooner than the polling interval', (failureKind) => {
+    expect(getDelay({ failureKind })).toBe(INTERVAL_MS);
+  });
+
+  it('keeps to the polling interval for a server failure whatever the jitter', () => {
+    expect(getDelay({ failureKind: FAILURE_KINDS.SERVER, random: () => 0 })).toBe(INTERVAL_MS);
+  });
+
+  it('backs off beyond the polling interval once the retry delay is longer', () => {
+    expect(getDelay({ failureKind: FAILURE_KINDS.SERVER, failures: 6 })).toBe(RETRY_BASE_DELAY_MS * 32);
+  });
+
+  it('waits as long as the server asked when that is longer than the polling interval', () => {
+    const retryAfterMs = INTERVAL_MS * 5;
+    expect(getDelay({ failureKind: FAILURE_KINDS.SERVER, retryAfterMs })).toBe(retryAfterMs);
+  });
+
+  it('does not retry sooner than the polling interval when the server asked for less', () => {
+    expect(getDelay({ failureKind: FAILURE_KINDS.SERVER, retryAfterMs: 1000 })).toBe(INTERVAL_MS);
+  });
+
+  it('caps the wait a server can ask for', () => {
+    const retryAfterMs = RETRY_AFTER_MAX_MS * 24;
+    expect(getDelay({ failureKind: FAILURE_KINDS.SERVER, retryAfterMs })).toBe(RETRY_AFTER_MAX_MS);
+  });
+});
+
 describe('createPollingScheduler', () => {
   let check;
   let scheduler;
@@ -76,7 +126,7 @@ describe('createPollingScheduler', () => {
     jest.useFakeTimers();
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     setVisibilityState('visible');
-    check = jest.fn().mockResolvedValue(true);
+    check = jest.fn().mockResolvedValue(SUCCEEDED);
   });
 
   afterEach(() => {
@@ -132,21 +182,21 @@ describe('createPollingScheduler', () => {
 
   describe('Failed checks', () => {
     it('retries after the base delay instead of stopping', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();
       await advance(RETRY_BASE_DELAY_MS);
       expect(check).toHaveBeenCalledTimes(2);
     });
 
     it('does not retry before the base delay has passed', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();
       await advance(RETRY_BASE_DELAY_MS - 1);
       expect(check).toHaveBeenCalledTimes(1);
     });
 
     it('backs off further with each consecutive failure', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();
       await advance(RETRY_BASE_DELAY_MS);
       await advance(RETRY_BASE_DELAY_MS * 2 - 1);
@@ -156,7 +206,7 @@ describe('createPollingScheduler', () => {
     });
 
     it('keeps retrying at the maximum delay during a long outage', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();
       await advance(RETRY_MAX_DELAY_MS * 10);
       const checksBefore = check.mock.calls.length;
@@ -181,12 +231,53 @@ describe('createPollingScheduler', () => {
     it('gives up on a check that never settles and retries', async () => {
       check.mockReturnValue(createDeferred().promise);
       await startScheduler();
-      await advance(CHECK_TIMEOUT_MS + RETRY_BASE_DELAY_MS);
+      await advance(CHECK_TIMEOUT_MS + INTERVAL_MS);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('treats a check that resolves to something other than a result as a failure', async () => {
+      check.mockResolvedValue(undefined);
+      await startScheduler();
+      await advance(RETRY_BASE_DELAY_MS);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not retry a server failure sooner than the polling interval', async () => {
+      check.mockResolvedValue(SERVER_FAILURE);
+      await startScheduler();
+      await advance(INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not check a failing server more often than normal polling would', async () => {
+      check.mockResolvedValue(SERVER_FAILURE);
+      await startScheduler();
+      await advance(INTERVAL_MS * 5);
+      expect(check.mock.calls.length).toBeLessThanOrEqual(6);
+    });
+
+    it('waits as long as a failing server asked', async () => {
+      check.mockResolvedValue(checkFailed(FAILURE_KINDS.SERVER, INTERVAL_MS * 3));
+      await startScheduler();
+      await advance(INTERVAL_MS * 3 - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not retry a check that timed out sooner than the polling interval', async () => {
+      check.mockReturnValue(createDeferred().promise);
+      await startScheduler();
+      await advance(CHECK_TIMEOUT_MS + INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
       expect(check).toHaveBeenCalledTimes(2);
     });
 
     it('warns with the retry delay', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();
       expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Retrying in 5 seconds.'));
     });
@@ -194,7 +285,7 @@ describe('createPollingScheduler', () => {
 
   describe('Recovery', () => {
     beforeEach(async () => {
-      check.mockResolvedValueOnce(false).mockResolvedValueOnce(false).mockResolvedValue(true);
+      check.mockResolvedValueOnce(NETWORK_FAILURE).mockResolvedValueOnce(NETWORK_FAILURE).mockResolvedValue(SUCCEEDED);
       await startScheduler();
       // Second failure, then the first success.
       await advance(RETRY_BASE_DELAY_MS);
@@ -213,7 +304,7 @@ describe('createPollingScheduler', () => {
     });
 
     it('starts the backoff over on the next failure', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await advance(INTERVAL_MS);
       await advance(RETRY_BASE_DELAY_MS);
       expect(check).toHaveBeenCalledTimes(5);
@@ -241,8 +332,8 @@ describe('createPollingScheduler', () => {
       check.mockReturnValue(deferred.promise);
       await startScheduler();
       const results = Promise.all([scheduler.checkNow(), scheduler.checkNow()]);
-      deferred.resolve(true);
-      expect(await results).toEqual([true, true]);
+      deferred.resolve(SUCCEEDED);
+      expect(await results).toEqual([SUCCEEDED, SUCCEEDED]);
     });
 
     it('ignores page events while a check is running', async () => {
@@ -322,7 +413,7 @@ describe('createPollingScheduler', () => {
     });
 
     it('checks immediately on an event while backing off after a failure', async () => {
-      check.mockResolvedValue(false);
+      check.mockResolvedValue(NETWORK_FAILURE);
       await advance(INTERVAL_MS);
       await advance(RETRY_BASE_DELAY_MS);
       const checksBefore = check.mock.calls.length;

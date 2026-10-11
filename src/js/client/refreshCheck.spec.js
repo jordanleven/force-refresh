@@ -1,4 +1,5 @@
 import { setDebugMode } from '@/js/services/debugService.js';
+import { FAILURE_KINDS, checkFailed } from './checkResult.js';
 import { getCurrentVersion } from './currentVersions.js';
 import { checkForRefresh } from './refreshCheck.js';
 import { reloadPage } from './reloadPage.js';
@@ -9,9 +10,11 @@ jest.mock('./reloadPage.js', () => ({ reloadPage: jest.fn() }));
 const ATTRIBUTE_VERSION_SITE = 'force-refresh-version-site';
 const ATTRIBUTE_VERSION_PAGE = 'force-refresh-version-page';
 
+const NETWORK_FAILURE = checkFailed(FAILURE_KINDS.NETWORK);
+
 const html = () => document.querySelector('html');
 
-const mockVersions = (data) => getCurrentVersion.mockResolvedValue({ code: 200, data });
+const mockVersions = (versions) => getCurrentVersion.mockResolvedValue({ succeeded: true, versions });
 
 describe('checkForRefresh', () => {
   beforeEach(() => {
@@ -27,9 +30,9 @@ describe('checkForRefresh', () => {
   });
 
   describe('when the versions are retrieved', () => {
-    it('resolves to true', async () => {
+    it('resolves to a successful result', async () => {
       mockVersions({ currentVersionSite: 'site-1' });
-      expect(await checkForRefresh()).toBe(true);
+      expect(await checkForRefresh()).toEqual({ succeeded: true });
     });
 
     it('stores the site version on the first check without reloading', async () => {
@@ -94,30 +97,35 @@ describe('checkForRefresh', () => {
   });
 
   describe('when the versions cannot be retrieved', () => {
-    it('resolves to false when the request resolves to undefined after a network error', async () => {
-      getCurrentVersion.mockResolvedValue(undefined);
-      expect(await checkForRefresh()).toBe(false);
+    it('reports the kind of failure and the wait the server asked for', async () => {
+      getCurrentVersion.mockResolvedValue(checkFailed(FAILURE_KINDS.SERVER, 30000));
+      expect(await checkForRefresh()).toEqual(checkFailed(FAILURE_KINDS.SERVER, 30000));
     });
 
-    it('resolves to false when the request rejects', async () => {
+    it('reports a network failure', async () => {
+      getCurrentVersion.mockResolvedValue(NETWORK_FAILURE);
+      expect(await checkForRefresh()).toEqual(NETWORK_FAILURE);
+    });
+
+    it('reports a network failure when the request rejects', async () => {
       getCurrentVersion.mockRejectedValue(new Error('Network error'));
-      expect(await checkForRefresh()).toBe(false);
+      expect(await checkForRefresh()).toEqual(NETWORK_FAILURE);
     });
 
-    it('resolves to false when the response is not a 200', async () => {
-      getCurrentVersion.mockResolvedValue({ code: 500, data: undefined });
-      expect(await checkForRefresh()).toBe(false);
+    it('reports a network failure when the request resolves to nothing', async () => {
+      getCurrentVersion.mockResolvedValue(undefined);
+      expect(await checkForRefresh()).toEqual(NETWORK_FAILURE);
     });
 
-    it('resolves to false when a 200 response has no data', async () => {
-      getCurrentVersion.mockResolvedValue({ code: 200, data: undefined });
-      expect(await checkForRefresh()).toBe(false);
+    it('reports a failure when a successful result has no versions', async () => {
+      getCurrentVersion.mockResolvedValue({ succeeded: true, versions: undefined });
+      expect((await checkForRefresh()).succeeded).toBe(false);
     });
 
     it('does not reload', async () => {
       mockVersions({ currentVersionSite: 'site-1' });
       await checkForRefresh();
-      getCurrentVersion.mockResolvedValue(undefined);
+      getCurrentVersion.mockResolvedValue(NETWORK_FAILURE);
       await checkForRefresh();
       expect(reloadPage).not.toHaveBeenCalled();
     });
@@ -125,7 +133,7 @@ describe('checkForRefresh', () => {
     it('still reloads on a later successful check with a new version', async () => {
       mockVersions({ currentVersionSite: 'site-1' });
       await checkForRefresh();
-      getCurrentVersion.mockResolvedValue(undefined);
+      getCurrentVersion.mockResolvedValue(NETWORK_FAILURE);
       await checkForRefresh();
       mockVersions({ currentVersionSite: 'site-2' });
       await checkForRefresh();

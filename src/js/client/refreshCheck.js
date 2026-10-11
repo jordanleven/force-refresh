@@ -8,6 +8,7 @@ import {
   pipe,
   tap,
 } from 'ramda';
+import { FAILURE_KINDS, checkFailed, checkSucceeded } from '@/js/client/checkResult.js';
 import { getCurrentVersion } from '@/js/client/currentVersions.js';
 import { reloadPage } from '@/js/client/reloadPage.js';
 import {
@@ -103,20 +104,22 @@ const compareRetrievedVersions = (versions) => pipe(
   ),
 )(versions);
 
-const isSuccessfulResponse = (response) => response?.code === 200 && !!response.data;
+const isSuccessfulResult = (result) => result?.succeeded === true && !!result.versions;
 
 /**
  * Fetches the current versions and reloads the page when they are newer than
  * the versions this page loaded with. This is the single "should this page
  * reload?" decision, independent of what prompted the check.
- * @return    {Promise<boolean>}    Whether the versions could be retrieved. A
- *                                  failed check resolves to false and never throws.
+ * @return    {Promise<object>}    A check result: `{ succeeded: true }`, or a failed
+ *                                 result with the kind of failure. It never throws.
  */
 export const checkForRefresh = async () => {
-  const response = await getCurrentVersion().catch(() => undefined);
+  const result = await getCurrentVersion().catch(() => undefined);
 
-  if (!isSuccessfulResponse(response)) return false;
+  if (!isSuccessfulResult(result)) {
+    return checkFailed(result?.failureKind ?? FAILURE_KINDS.NETWORK, result?.retryAfterMs ?? null);
+  }
 
-  compareRetrievedVersions(response.data);
-  return true;
+  compareRetrievedVersions(result.versions);
+  return checkSucceeded();
 };
