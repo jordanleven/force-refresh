@@ -89,14 +89,21 @@ const runCheckWithTimeout = (check, isTriggered) => new Promise((resolve) => {
  *                                                from a cache. `signal` is an `AbortSignal` that
  *                                                aborts when the check is given up on. Resolves
  *                                                to a check result (see `checkResult.js`)
- * @param     {number}      options.intervalMs    The normal polling interval
+ * @param     {number}      options.intervalMs    The normal polling interval, which can be
+ *                                                changed later with `setIntervalMs`
  * @param     {Function}    options.random        Returns a number between 0 and 1
  * @return    {object}                            The scheduler
  */
-export const createPollingScheduler = ({ check, intervalMs, random = Math.random }) => {
+export const createPollingScheduler = ({
+  check,
+  intervalMs: initialIntervalMs,
+  random = Math.random,
+}) => {
   let consecutiveFailures = 0;
   let checkInFlight = null;
   let hasWarnedOfOutage = false;
+  let intervalMs = initialIntervalMs;
+  let isRetryScheduled = false;
   let isStarted = false;
   let isTrailingCheckQueued = false;
   let lastCheckEndedAt = null;
@@ -158,7 +165,8 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
 
     if (!result.succeeded) logRetry(delay);
     // A retry is prompted by the failure before it; only a poll is routine.
-    scheduleNextCheck(delay, () => runCheck(!result.succeeded));
+    isRetryScheduled = !result.succeeded;
+    scheduleNextCheck(delay, () => runCheck(isRetryScheduled));
   };
 
   const runCheck = (isTriggered) => {
@@ -196,6 +204,26 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     }
 
     isTrailingCheckQueued = true;
+  };
+
+  /**
+   * Changes the polling interval without checking and without disturbing a
+   * retry. A waiting poll is re-timed from the end of the last check. When
+   * that makes it overdue it is spread across one new interval instead of run
+   * at once, because every open tab is told to speed up at the same moment
+   * (when a WebSocket relay goes away, for example).
+   * @param     {number}    newIntervalMs    The new polling interval
+   * @return    {void}
+   */
+  const setIntervalMs = (newIntervalMs) => {
+    intervalMs = newIntervalMs;
+
+    // A running check or a retry picks the new interval up when it next schedules a poll.
+    if (nextCheckTimeout === null || isRetryScheduled) return;
+
+    const msUntilDue = lastCheckEndedAt + intervalMs - Date.now();
+    const delay = msUntilDue > 0 ? msUntilDue : Math.round(random() * intervalMs);
+    scheduleNextCheck(delay, () => runCheck(false));
   };
 
   // A frozen, sleeping or cached page does not run its timers, so the check
@@ -263,6 +291,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     checkNow,
     getMsUntilNextCheck,
     requestCheck,
+    setIntervalMs,
     start,
     stop,
   };

@@ -601,6 +601,145 @@ describe('createPollingScheduler', () => {
     });
   });
 
+  describe('Changing the interval', () => {
+    const LONG_INTERVAL_MS = INTERVAL_MS * 5;
+
+    it('does not check when the interval changes', async () => {
+      await startScheduler();
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      scheduler.setIntervalMs(INTERVAL_MS);
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    it('times the waiting poll from the last check when the interval gets longer', async () => {
+      await startScheduler();
+      await advance(10000);
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      await advance(LONG_INTERVAL_MS - 10000 - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('times the waiting poll from the last check when the interval gets shorter', async () => {
+      await startScheduler();
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      await advance(10000);
+      scheduler.setIntervalMs(INTERVAL_MS);
+      await advance(INTERVAL_MS - 10000 - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('keeps polling at the new interval', async () => {
+      await startScheduler();
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      await advance(LONG_INTERVAL_MS * 3);
+      expect(check).toHaveBeenCalledTimes(4);
+    });
+
+    it('reports the time until the re-timed check', async () => {
+      await startScheduler();
+      await advance(10000);
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      expect(scheduler.getMsUntilNextCheck()).toBe(LONG_INTERVAL_MS - 10000);
+    });
+
+    it('treats the re-timed check as a routine poll', async () => {
+      await startScheduler();
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      await advance(LONG_INTERVAL_MS);
+      expect(check.mock.calls[1][0].isTriggered).toBe(false);
+    });
+
+    it('applies an interval set before starting', async () => {
+      scheduler = createPollingScheduler({ check, intervalMs: INTERVAL_MS, random: noJitter });
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      scheduler.start();
+      await advance(LONG_INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('applies an interval set during a check to the poll that follows it', async () => {
+      const runningCheck = createDeferred();
+      check.mockReturnValueOnce(runningCheck.promise);
+      await startScheduler();
+      scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      runningCheck.resolve(SUCCEEDED);
+      await advance(LONG_INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(1);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    describe('when a shorter interval makes the waiting poll overdue', () => {
+      const startOverdue = async (random) => {
+        scheduler = createPollingScheduler({ check, intervalMs: LONG_INTERVAL_MS, random });
+        scheduler.start();
+        await advance(INTERVAL_MS * 3);
+        scheduler.setIntervalMs(INTERVAL_MS);
+      };
+
+      it('does not check at once', async () => {
+        await startOverdue(() => 0.5);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('spreads the check across one new interval', async () => {
+        await startOverdue(() => 0.5);
+        await advance(INTERVAL_MS / 2 - 1);
+        expect(check).toHaveBeenCalledTimes(1);
+        await advance(1);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('never waits longer than the new interval', async () => {
+        await startOverdue(() => 1);
+        await advance(INTERVAL_MS);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+    });
+
+    describe('while retrying after failed checks', () => {
+      beforeEach(async () => {
+        check.mockResolvedValue(NETWORK_FAILURE);
+        // Two failures: the next retry is 10 seconds after the second.
+        await startScheduler();
+        await advance(RETRY_BASE_DELAY_MS);
+        scheduler.setIntervalMs(LONG_INTERVAL_MS);
+      });
+
+      it('leaves the waiting retry where it was', async () => {
+        await advance(RETRY_BASE_DELAY_MS * 2 - 1);
+        expect(check).toHaveBeenCalledTimes(2);
+        await advance(1);
+        expect(check).toHaveBeenCalledTimes(3);
+      });
+
+      it('keeps backing off from where it had got to', async () => {
+        await advance(RETRY_BASE_DELAY_MS * 2);
+        await advance(RETRY_BASE_DELAY_MS * 4 - 1);
+        expect(check).toHaveBeenCalledTimes(3);
+        await advance(1);
+        expect(check).toHaveBeenCalledTimes(4);
+      });
+
+      it('uses the new interval once a check succeeds', async () => {
+        check.mockResolvedValue(SUCCEEDED);
+        await advance(RETRY_BASE_DELAY_MS * 2);
+        await advance(LONG_INTERVAL_MS - 1);
+        expect(check).toHaveBeenCalledTimes(3);
+        await advance(1);
+        expect(check).toHaveBeenCalledTimes(4);
+      });
+    });
+  });
+
   describe('Page events', () => {
     // Moves the clock without running timers, as when a page is frozen.
     const freezePageFor = (ms) => jest.setSystemTime(Date.now() + ms);
