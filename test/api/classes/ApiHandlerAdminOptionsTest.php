@@ -7,13 +7,16 @@
 
 namespace JordanLeven\Plugins\ForceRefresh\Api;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-feature-flag-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
@@ -88,11 +91,21 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
     private static $mock_wp_mkdir_p;
 
     /**
+     * Absolute path to the temporary uploads directory used across all tests.
+     *
+     * @var string
+     */
+    private static string $temp_dir;
+
+    /**
      * Initial test setup.
      *
      * @return void
      */
     public static function setUpBeforeClass(): void {
+        self::$temp_dir = sys_get_temp_dir() . '/force-refresh-options-api-test-' . uniqid();
+        mkdir( self::$temp_dir, 0755, true );
+
         $services_ns = 'JordanLeven\\Plugins\\ForceRefresh\\Services';
 
         self::$mock_update_option       = new Mocks\Mock_Update_Option( $services_ns );
@@ -110,10 +123,126 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
 
         self::$mock_wp_upload_dir->set_return_value(
             array(
-                'basedir' => sys_get_temp_dir(),
+                'basedir' => self::$temp_dir,
                 'baseurl' => 'http://example.com/wp-content/uploads',
             )
         );
+    }
+
+    /**
+     * Reset per-test state.
+     *
+     * @return void
+     */
+    protected function setUp(): void {
+        self::$mock_update_option->resetInvocationIndex();
+        $this->set_websockets_flag( false );
+        $this->delete_version_file();
+    }
+
+    /**
+     * Leave no feature flags or version file behind for other tests.
+     *
+     * @return void
+     */
+    protected function tearDown(): void {
+        $this->set_flags( null );
+        $this->delete_version_file();
+    }
+
+    /**
+     * Inject feature flags into the flag service's cache.
+     *
+     * @param array|null $flags The flags to set, or null to clear the cache.
+     *
+     * @return void
+     */
+    private function set_flags( ?array $flags ): void {
+        $flags_prop = ( new \ReflectionClass( Feature_Flag_Service::class ) )->getProperty( 'flags' );
+        $flags_prop->setAccessible( true );
+        $flags_prop->setValue( null, $flags );
+    }
+
+    /**
+     * Turn the WebSockets feature flag on or off.
+     *
+     * @param bool $is_enabled Whether the flag is on.
+     *
+     * @return void
+     */
+    private function set_websockets_flag( bool $is_enabled ): void {
+        $this->set_flags( array( 'websockets' => $is_enabled ) );
+    }
+
+    /**
+     * The path of the version file inside the temporary uploads directory.
+     *
+     * @return string
+     */
+    private function get_version_file_path(): string {
+        return self::$temp_dir . '/force-refresh/version.json';
+    }
+
+    /**
+     * Write a version file, as if static file polling had been in use.
+     *
+     * @return void
+     */
+    private function write_version_file(): void {
+        if ( ! is_dir( dirname( $this->get_version_file_path() ) ) ) {
+            mkdir( dirname( $this->get_version_file_path() ), 0755, true );
+        }
+
+        file_put_contents( $this->get_version_file_path(), '{"site":"abc"}' );
+    }
+
+    /**
+     * Remove the version file if a test left one behind.
+     *
+     * @return void
+     */
+    private function delete_version_file(): void {
+        if ( file_exists( $this->get_version_file_path() ) ) {
+            unlink( $this->get_version_file_path() );
+        }
+    }
+
+    /**
+     * Collect the options written since the test started.
+     *
+     * @return array<string, mixed> The written values keyed by option name.
+     */
+    private function get_written_options(): array {
+        $written = array();
+        $offset  = 0;
+
+        while ( true ) {
+            $arguments = self::$mock_update_option->get_invocation_arguments( $offset );
+
+            if ( null === $arguments ) {
+                return $written;
+            }
+
+            $written[ $arguments[0] ] = $arguments[1];
+            --$offset;
+        }
+    }
+
+    /**
+     * Save options with the given request parameters.
+     *
+     * @param array $params The request parameters.
+     *
+     * @return \WP_REST_Response
+     */
+    private function save_options( array $params ): \WP_REST_Response {
+        $request = new \WP_REST_Request();
+
+        foreach ( $params as $key => $value ) {
+            $request->set_param( $key, $value );
+        }
+
+        return ( new Api_Handler_Admin_Options() )->save_options( $request );
     }
 
     /**
@@ -131,6 +260,12 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
         self::$mock_wp_json_encode->disable();
         self::$mock_wp_upload_dir->disable();
         self::$mock_wp_mkdir_p->disable();
+
+        if ( is_dir( self::$temp_dir . '/force-refresh' ) ) {
+            rmdir( self::$temp_dir . '/force-refresh' );
+        }
+
+        rmdir( self::$temp_dir );
     }
 
     /**
@@ -244,24 +379,168 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
     }
 
     /**
-     * Test that save_options sets use_static_file_polling when provided.
+     * Each polling method is saved along with the legacy option.
+     *
+     * @param string $update_method          The requested update method.
+     * @param bool   $is_static_file_polling The expected legacy option.
      */
-    public function testSaveOptionsSetsUseStaticFilePolling() {
-        self::$mock_update_option->resetInvocationIndex();
+    #[TestWith( array( 'rest', false ) )]
+    #[TestWith( array( 'static_file', true ) )]
+    public function testSaveOptionsSavesUpdateMethod( string $update_method, bool $is_static_file_polling ) {
+        $response = $this->save_options( array( 'update_method' => $update_method ) );
 
-        $request = new \WP_REST_Request();
-        $request->set_param( 'use_static_file_polling', true );
-
-        ( new Api_Handler_Admin_Options() )->save_options( $request );
-
-        $this->assertEquals( 'force_refresh_update_method', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
-        $this->assertEquals( 'static_file', self::$mock_update_option->get_invocation_arguments( 0 )[1] );
+        $this->assertEquals( 201, $response->get_status() );
+        $this->assertSame(
+            array(
+                'force_refresh_update_method'           => $update_method,
+                'force_refresh_use_static_file_polling' => $is_static_file_polling,
+            ),
+            $this->get_written_options()
+        );
     }
 
     /**
-     * Test that save_options skips use_static_file_polling when not provided.
+     * The legacy parameter is still understood.
+     *
+     * @param bool   $use_static_file_polling The legacy request parameter.
+     * @param string $update_method           The expected update method.
      */
-    public function testSaveOptionsSkipsUseStaticFilePollingWhenNotProvided() {
+    #[TestWith( array( true, 'static_file' ) )]
+    #[TestWith( array( false, 'rest' ) )]
+    public function testSaveOptionsAcceptsLegacyStaticFilePollingParam( bool $use_static_file_polling, string $update_method ) {
+        $response = $this->save_options( array( 'use_static_file_polling' => $use_static_file_polling ) );
+
+        $this->assertEquals( 201, $response->get_status() );
+        $this->assertSame(
+            array(
+                'force_refresh_update_method'           => $update_method,
+                'force_refresh_use_static_file_polling' => $use_static_file_polling,
+            ),
+            $this->get_written_options()
+        );
+    }
+
+    /**
+     * The new parameter wins when a request carries both.
+     */
+    public function testSaveOptionsPrefersUpdateMethodOverLegacyParam() {
+        $this->save_options(
+            array(
+                'update_method'           => 'rest',
+                'use_static_file_polling' => true,
+            )
+        );
+
+        $this->assertSame( 'rest', $this->get_written_options()['force_refresh_update_method'] );
+    }
+
+    /**
+     * Switching to static file writes the version file straight away.
+     *
+     * @param array $params The request parameters.
+     */
+    #[TestWith( array( array( 'update_method' => 'static_file' ) ) )]
+    #[TestWith( array( array( 'use_static_file_polling' => true ) ) )]
+    public function testSaveOptionsSyncsVersionFileWhenSwitchingToStaticFile( array $params ) {
+        $this->assertFileDoesNotExist( $this->get_version_file_path() );
+
+        $this->save_options( $params );
+
+        $this->assertFileExists( $this->get_version_file_path() );
+        $this->assertArrayHasKey( 'site', json_decode( file_get_contents( $this->get_version_file_path() ), true ) );
+    }
+
+    /**
+     * Switching away from static file deletes the version file.
+     *
+     * @param array $params The request parameters.
+     */
+    #[TestWith( array( array( 'update_method' => 'rest' ) ) )]
+    #[TestWith( array( array( 'use_static_file_polling' => false ) ) )]
+    public function testSaveOptionsDeletesVersionFileWhenSwitchingAwayFromStaticFile( array $params ) {
+        $this->write_version_file();
+
+        $this->save_options( $params );
+
+        $this->assertFileDoesNotExist( $this->get_version_file_path() );
+    }
+
+    /**
+     * A request that does not mention the update method leaves the version file alone.
+     */
+    public function testSaveOptionsKeepsVersionFileWhenUpdateMethodIsNotProvided() {
+        $this->write_version_file();
+
+        $this->save_options( array( 'refresh_interval' => '60' ) );
+
+        $this->assertFileExists( $this->get_version_file_path() );
+    }
+
+    /**
+     * Unknown update methods are rejected.
+     *
+     * @param mixed $update_method The requested update method.
+     */
+    #[TestWith( array( 'carrier_pigeon' ) )]
+    #[TestWith( array( '' ) )]
+    #[TestWith( array( 'REST' ) )]
+    #[TestWith( array( true ) )]
+    #[TestWith( array( array( 'rest' ) ) )]
+    public function testSaveOptionsRejectsUnknownUpdateMethod( $update_method ) {
+        $response = $this->save_options( array( 'update_method' => $update_method ) );
+
+        $this->assertEquals( 400, $response->get_status() );
+        $this->assertSame( 'The update method is not recognized.', $response->get_data()['message'] );
+    }
+
+    /**
+     * Nothing at all is saved when the update method is rejected.
+     */
+    public function testSaveOptionsSavesNothingWhenUpdateMethodIsRejected() {
+        $this->write_version_file();
+
+        $this->save_options(
+            array(
+                'update_method'             => 'carrier_pigeon',
+                'refresh_interval'          => '60',
+                'show_refresh_in_admin_bar' => 'true',
+            )
+        );
+
+        $this->assertSame( array(), $this->get_written_options() );
+        $this->assertFileExists( $this->get_version_file_path() );
+    }
+
+    /**
+     * WebSockets looks like any other unknown method while its flag is off.
+     */
+    public function testSaveOptionsRejectsWebsocketsAsUnknownWhenFlagIsOff() {
+        $this->set_websockets_flag( false );
+
+        $response = $this->save_options( array( 'update_method' => 'websockets' ) );
+
+        $this->assertEquals( 400, $response->get_status() );
+        $this->assertSame( 'The update method is not recognized.', $response->get_data()['message'] );
+        $this->assertSame( array(), $this->get_written_options() );
+    }
+
+    /**
+     * WebSockets is rejected with the reason when no relay is configured.
+     */
+    public function testSaveOptionsRejectsWebsocketsWhenNoRelayIsConfigured() {
+        $this->set_websockets_flag( true );
+
+        $response = $this->save_options( array( 'update_method' => 'websockets' ) );
+
+        $this->assertEquals( 400, $response->get_status() );
+        $this->assertSame( 'WebSockets cannot be used until a relay is configured.', $response->get_data()['message'] );
+        $this->assertSame( array(), $this->get_written_options() );
+    }
+
+    /**
+     * Test that save_options skips the update method when not provided.
+     */
+    public function testSaveOptionsSkipsUpdateMethodWhenNotProvided() {
         self::$mock_update_option->resetInvocationIndex();
         $invocation_count_before = self::$mock_update_option->get_invocation_count();
 
