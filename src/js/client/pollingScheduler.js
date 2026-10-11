@@ -1,8 +1,9 @@
-import { warn } from '@/js/services/loggingService.js';
+import { debug, warn } from '@/js/services/loggingService.js';
 
 export const RETRY_BASE_DELAY_MS = 5 * 1000;
 export const RETRY_MAX_DELAY_MS = 5 * 60 * 1000;
 export const CHECK_TIMEOUT_MS = 30 * 1000;
+export const TRIGGER_MIN_GAP_MS = 5 * 1000;
 
 /**
  * The delay before retrying after consecutive failed checks. Doubles with
@@ -32,8 +33,8 @@ const runCheckWithTimeout = (check) => new Promise((resolve) => {
 });
 
 /**
- * Decides when to run the version check: on a fixed interval, and sooner
- * after a failure so that one bad check never stops the page from polling.
+ * Decides when to run the version check: on a fixed interval, sooner after a
+ * failure, and promptly when the page is likely to have missed a check.
  * It knows nothing about versions; `check` owns the decision to reload.
  * @param     {object}      options
  * @param     {Function}    options.check         Resolves to true when the check succeeded
@@ -45,6 +46,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
   let consecutiveFailures = 0;
   let checkInFlight = null;
   let isStarted = false;
+  let lastSuccessAt = null;
   let nextCheckAt = null;
   let nextCheckTimeout = null;
 
@@ -65,6 +67,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
   const getDelayAfterCheck = (succeeded) => {
     if (succeeded) {
       consecutiveFailures = 0;
+      lastSuccessAt = Date.now();
       return intervalMs;
     }
 
@@ -93,9 +96,35 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     return checkInFlight;
   };
 
+  const hasRecentlySucceeded = () => lastSuccessAt !== null
+    && Date.now() - lastSuccessAt < TRIGGER_MIN_GAP_MS;
+
+  // Several of these events fire together (a restored page also becomes
+  // visible), so anything arriving just after a good check is ignored.
+  const checkBecause = (reason) => {
+    if (checkInFlight || hasRecentlySucceeded()) return;
+
+    debug(`Checking now because ${reason}.`);
+    checkNow();
+  };
+
+  const onVisibilityChange = () => {
+    if (document.visibilityState === 'visible') checkBecause('the page became visible');
+  };
+
+  const onOnline = () => checkBecause('the browser is back online');
+
+  const onPageShow = ({ persisted }) => {
+    if (persisted) checkBecause('the page was restored from the back/forward cache');
+  };
+
   const start = () => {
     if (isStarted) return;
     isStarted = true;
+
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    window.addEventListener('online', onOnline);
+    window.addEventListener('pageshow', onPageShow);
 
     checkNow();
   };
@@ -103,6 +132,10 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
   const stop = () => {
     isStarted = false;
     clearNextCheck();
+
+    document.removeEventListener('visibilitychange', onVisibilityChange);
+    window.removeEventListener('online', onOnline);
+    window.removeEventListener('pageshow', onPageShow);
   };
 
   const getMsUntilNextCheck = () => (nextCheckAt === null ? null : Math.max(nextCheckAt - Date.now(), 0));

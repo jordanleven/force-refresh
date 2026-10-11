@@ -2,6 +2,7 @@ import {
   CHECK_TIMEOUT_MS,
   RETRY_BASE_DELAY_MS,
   RETRY_MAX_DELAY_MS,
+  TRIGGER_MIN_GAP_MS,
   createPollingScheduler,
   getRetryDelay,
 } from './pollingScheduler.js';
@@ -18,6 +19,21 @@ const createDeferred = () => {
   const promise = new Promise((_resolve) => { resolve = _resolve; });
   return { promise, resolve };
 };
+
+const setVisibilityState = (visibilityState) => {
+  Object.defineProperty(document, 'visibilityState', { configurable: true, value: visibilityState });
+};
+
+const dispatchVisibilityChange = (visibilityState) => {
+  setVisibilityState(visibilityState);
+  document.dispatchEvent(new Event('visibilitychange'));
+};
+
+const dispatchOnline = () => window.dispatchEvent(new Event('online'));
+
+const dispatchPageShow = (persisted) => window.dispatchEvent(
+  Object.assign(new Event('pageshow'), { persisted }),
+);
 
 describe('getRetryDelay', () => {
   it('starts at the base delay', () => {
@@ -59,6 +75,7 @@ describe('createPollingScheduler', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     jest.spyOn(console, 'warn').mockImplementation(() => {});
+    setVisibilityState('visible');
     check = jest.fn().mockResolvedValue(true);
   });
 
@@ -228,6 +245,16 @@ describe('createPollingScheduler', () => {
       expect(await results).toEqual([true, true]);
     });
 
+    it('ignores page events while a check is running', async () => {
+      check.mockReturnValue(createDeferred().promise);
+      await startScheduler();
+      dispatchVisibilityChange('visible');
+      dispatchOnline();
+      dispatchPageShow(true);
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
     it('times the next check from the end of a manual check', async () => {
       await startScheduler();
       await advance(INTERVAL_MS / 2);
@@ -236,6 +263,89 @@ describe('createPollingScheduler', () => {
       expect(check).toHaveBeenCalledTimes(2);
       await advance(1);
       expect(check).toHaveBeenCalledTimes(3);
+    });
+  });
+
+  describe('Page events', () => {
+    beforeEach(async () => {
+      await startScheduler();
+      await advance(TRIGGER_MIN_GAP_MS);
+    });
+
+    it('checks when a hidden page becomes visible', async () => {
+      dispatchVisibilityChange('hidden');
+      dispatchVisibilityChange('visible');
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not check when the page becomes hidden', async () => {
+      dispatchVisibilityChange('hidden');
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    it('checks when the browser comes back online', async () => {
+      dispatchOnline();
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('checks when the page is restored from the back/forward cache', async () => {
+      dispatchPageShow(true);
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('does not check on a normal page show', async () => {
+      dispatchPageShow(false);
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(1);
+    });
+
+    it('checks only once when several events fire together', async () => {
+      dispatchPageShow(true);
+      dispatchVisibilityChange('visible');
+      dispatchOnline();
+      await advance(0);
+      dispatchVisibilityChange('visible');
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('checks again for an event once the last success is no longer recent', async () => {
+      dispatchOnline();
+      await advance(TRIGGER_MIN_GAP_MS);
+      dispatchOnline();
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(3);
+    });
+
+    it('checks immediately on an event while backing off after a failure', async () => {
+      check.mockResolvedValue(false);
+      await advance(INTERVAL_MS);
+      await advance(RETRY_BASE_DELAY_MS);
+      const checksBefore = check.mock.calls.length;
+      dispatchOnline();
+      await advance(0);
+      expect(check.mock.calls.length - checksBefore).toBe(1);
+    });
+
+    it('times the next check from the end of an event check', async () => {
+      dispatchOnline();
+      await advance(INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(2);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(3);
+    });
+
+    it('ignores events once stopped', async () => {
+      scheduler.stop();
+      dispatchVisibilityChange('visible');
+      dispatchOnline();
+      dispatchPageShow(true);
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(1);
     });
   });
 });
