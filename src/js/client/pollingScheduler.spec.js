@@ -389,79 +389,163 @@ describe('createPollingScheduler', () => {
   });
 
   describe('Page events', () => {
+    // Moves the clock without running timers, as when a page is frozen.
+    const freezePageFor = (ms) => jest.setSystemTime(Date.now() + ms);
+
     beforeEach(async () => {
       await startScheduler();
       await advance(TRIGGER_MIN_GAP_MS);
     });
 
-    it('checks when a hidden page becomes visible', async () => {
-      dispatchVisibilityChange('hidden');
-      dispatchVisibilityChange('visible');
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(2);
+    describe('before the next check is due', () => {
+      it('does not check when a hidden page becomes visible', async () => {
+        dispatchVisibilityChange('hidden');
+        dispatchVisibilityChange('visible');
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not check when the browser comes back online', async () => {
+        dispatchOnline();
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('does not check when the page is restored from the back/forward cache', async () => {
+        dispatchPageShow(true);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('keeps to the interval however often the visitor switches tabs', async () => {
+        scheduler.stop();
+        check.mockClear();
+        scheduler = createPollingScheduler({ check, intervalMs: 4 * 60 * 60 * 1000, random: noJitter });
+        scheduler.start();
+        await advance(0);
+
+        for (let i = 0; i < 60; i += 1) {
+          // eslint-disable-next-line no-await-in-loop
+          await advance(10 * 1000);
+          dispatchVisibilityChange('hidden');
+          dispatchVisibilityChange('visible');
+        }
+
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('leaves the scheduled check where it was', async () => {
+        dispatchVisibilityChange('visible');
+        await advance(INTERVAL_MS - TRIGGER_MIN_GAP_MS);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
     });
 
-    it('does not check when the page becomes hidden', async () => {
-      dispatchVisibilityChange('hidden');
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(1);
+    describe('when the scheduled check is overdue', () => {
+      beforeEach(() => {
+        freezePageFor(INTERVAL_MS);
+      });
+
+      it('checks when a hidden page becomes visible', async () => {
+        dispatchVisibilityChange('hidden');
+        dispatchVisibilityChange('visible');
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('does not check when the page becomes hidden', async () => {
+        dispatchVisibilityChange('hidden');
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('checks when the browser comes back online', async () => {
+        dispatchOnline();
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('checks when the page is restored from the back/forward cache', async () => {
+        dispatchPageShow(true);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('does not check on a normal page show', async () => {
+        dispatchPageShow(false);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('checks only once when several events fire together', async () => {
+        dispatchPageShow(true);
+        dispatchVisibilityChange('visible');
+        dispatchOnline();
+        await advance(0);
+        dispatchVisibilityChange('visible');
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('times the next check from the end of an event check', async () => {
+        dispatchOnline();
+        await advance(INTERVAL_MS - 1);
+        expect(check).toHaveBeenCalledTimes(2);
+        await advance(1);
+        expect(check).toHaveBeenCalledTimes(3);
+      });
     });
 
-    it('checks when the browser comes back online', async () => {
-      dispatchOnline();
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(2);
+    describe('while retrying after a network failure', () => {
+      beforeEach(async () => {
+        check.mockResolvedValue(NETWORK_FAILURE);
+        // The poll fails, then the first retry fails; the next retry is 10 seconds away.
+        await advance(INTERVAL_MS - TRIGGER_MIN_GAP_MS);
+        await advance(RETRY_BASE_DELAY_MS);
+        check.mockClear();
+      });
+
+      it('checks on an event without waiting for the retry', async () => {
+        await advance(TRIGGER_MIN_GAP_MS);
+        dispatchOnline();
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('ignores an event that follows a check too closely', async () => {
+        await advance(TRIGGER_MIN_GAP_MS - 1);
+        dispatchOnline();
+        await advance(0);
+        expect(check).not.toHaveBeenCalled();
+      });
     });
 
-    it('checks when the page is restored from the back/forward cache', async () => {
-      dispatchPageShow(true);
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(2);
-    });
+    describe('while waiting after a server failure', () => {
+      beforeEach(async () => {
+        check.mockResolvedValue(SERVER_FAILURE);
+        await advance(INTERVAL_MS - TRIGGER_MIN_GAP_MS);
+        check.mockClear();
+      });
 
-    it('does not check on a normal page show', async () => {
-      dispatchPageShow(false);
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(1);
-    });
+      it('does not check on an event before the retry is due', async () => {
+        await advance(TRIGGER_MIN_GAP_MS);
+        dispatchVisibilityChange('visible');
+        dispatchOnline();
+        dispatchPageShow(true);
+        await advance(0);
+        expect(check).not.toHaveBeenCalled();
+      });
 
-    it('checks only once when several events fire together', async () => {
-      dispatchPageShow(true);
-      dispatchVisibilityChange('visible');
-      dispatchOnline();
-      await advance(0);
-      dispatchVisibilityChange('visible');
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(2);
-    });
-
-    it('checks again for an event once the last success is no longer recent', async () => {
-      dispatchOnline();
-      await advance(TRIGGER_MIN_GAP_MS);
-      dispatchOnline();
-      await advance(0);
-      expect(check).toHaveBeenCalledTimes(3);
-    });
-
-    it('checks immediately on an event while backing off after a failure', async () => {
-      check.mockResolvedValue(NETWORK_FAILURE);
-      await advance(INTERVAL_MS);
-      await advance(RETRY_BASE_DELAY_MS);
-      const checksBefore = check.mock.calls.length;
-      dispatchOnline();
-      await advance(0);
-      expect(check.mock.calls.length - checksBefore).toBe(1);
-    });
-
-    it('times the next check from the end of an event check', async () => {
-      dispatchOnline();
-      await advance(INTERVAL_MS - 1);
-      expect(check).toHaveBeenCalledTimes(2);
-      await advance(1);
-      expect(check).toHaveBeenCalledTimes(3);
+      it('checks on an event once the retry is overdue', async () => {
+        freezePageFor(INTERVAL_MS);
+        dispatchVisibilityChange('visible');
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
     });
 
     it('ignores events once stopped', async () => {
+      freezePageFor(INTERVAL_MS);
       scheduler.stop();
       dispatchVisibilityChange('visible');
       dispatchOnline();

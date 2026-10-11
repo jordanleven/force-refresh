@@ -79,7 +79,7 @@ const runCheckWithTimeout = (check) => new Promise((resolve) => {
 
 /**
  * Decides when to run the version check: on a fixed interval, sooner after a
- * failure, and promptly when the page is likely to have missed a check.
+ * network failure, and as soon as the page resumes having missed a check.
  * It knows nothing about versions; `check` owns the decision to reload.
  * @param     {object}      options
  * @param     {Function}    options.check         Called with `{ signal }`, an `AbortSignal` that
@@ -93,7 +93,8 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
   let consecutiveFailures = 0;
   let checkInFlight = null;
   let isStarted = false;
-  let lastSuccessAt = null;
+  let lastCheckEndedAt = null;
+  let lastFailureKind = null;
   let nextCheckAt = null;
   let nextCheckTimeout = null;
 
@@ -112,9 +113,11 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
   };
 
   const getDelayAfterCheck = ({ failureKind, retryAfterMs, succeeded }) => {
+    lastCheckEndedAt = Date.now();
+    lastFailureKind = succeeded ? null : failureKind;
+
     if (succeeded) {
       consecutiveFailures = 0;
-      lastSuccessAt = Date.now();
       return intervalMs;
     }
 
@@ -149,26 +152,42 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     return checkInFlight;
   };
 
-  const hasRecentlySucceeded = () => lastSuccessAt !== null
-    && Date.now() - lastSuccessAt < TRIGGER_MIN_GAP_MS;
+  // A frozen, sleeping or cached page does not run its timers, so the check
+  // it had scheduled can be long past due by the time the page resumes.
+  const isCheckOverdue = () => nextCheckAt !== null && Date.now() >= nextCheckAt;
 
-  // Several of these events fire together (a restored page also becomes
-  // visible), so anything arriving just after a good check is ignored.
-  const checkBecause = (reason) => {
-    if (checkInFlight || hasRecentlySucceeded()) return;
+  const isRetryingNetworkFailure = () => consecutiveFailures > 0
+    && lastFailureKind === FAILURE_KINDS.NETWORK;
+
+  const hasJustChecked = () => lastCheckEndedAt !== null
+    && Date.now() - lastCheckEndedAt < TRIGGER_MIN_GAP_MS;
+
+  // Resuming is a reason to check only when a check was missed or the network
+  // may be back. Anything else would let switching tabs request more often
+  // than the interval the site owner chose. Several of these events fire
+  // together (a restored page also becomes visible), so retries are spaced.
+  const shouldCheckOnResume = () => {
+    if (checkInFlight) return false;
+    if (isCheckOverdue()) return true;
+
+    return isRetryingNetworkFailure() && !hasJustChecked();
+  };
+
+  const checkOnResume = (reason) => {
+    if (!shouldCheckOnResume()) return;
 
     debug(`Checking now because ${reason}.`);
     checkNow();
   };
 
   const onVisibilityChange = () => {
-    if (document.visibilityState === 'visible') checkBecause('the page became visible');
+    if (document.visibilityState === 'visible') checkOnResume('the page became visible');
   };
 
-  const onOnline = () => checkBecause('the browser is back online');
+  const onOnline = () => checkOnResume('the browser is back online');
 
   const onPageShow = ({ persisted }) => {
-    if (persisted) checkBecause('the page was restored from the back/forward cache');
+    if (persisted) checkOnResume('the page was restored from the back/forward cache');
   };
 
   const start = () => {
