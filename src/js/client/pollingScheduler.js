@@ -1,5 +1,5 @@
 import { FAILURE_KINDS, checkFailed } from '@/js/client/checkResult.js';
-import { debug, warn } from '@/js/services/loggingService.js';
+import { debug, info, warn } from '@/js/services/loggingService.js';
 
 export const RETRY_BASE_DELAY_MS = 5 * 1000;
 export const RETRY_MAX_DELAY_MS = 5 * 60 * 1000;
@@ -121,6 +121,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     lastFailureKind = succeeded ? null : failureKind;
 
     if (succeeded) {
+      if (consecutiveFailures > 0) info('Checking for a refresh is working again.');
       consecutiveFailures = 0;
       return intervalMs;
     }
@@ -133,7 +134,10 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
       random,
       retryAfterMs,
     });
-    warn(`Unable to check for a refresh. Retrying in ${Math.round(retryDelay / 1000)} seconds.`);
+    // An outage is reported to visitors once; the retries that follow are
+    // only of interest to someone debugging.
+    const log = consecutiveFailures === 1 ? warn : debug;
+    log(`Unable to check for a refresh. Retrying in ${Math.round(retryDelay / 1000)} seconds.`);
     return retryDelay;
   };
 

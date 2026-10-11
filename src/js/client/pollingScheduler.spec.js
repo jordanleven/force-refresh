@@ -1,3 +1,4 @@
+import { setDebugMode } from '@/js/services/debugService.js';
 import { FAILURE_KINDS, checkFailed, checkSucceeded } from './checkResult.js';
 import {
   CHECK_TIMEOUT_MS,
@@ -124,6 +125,8 @@ describe('createPollingScheduler', () => {
 
   beforeEach(() => {
     jest.useFakeTimers();
+    jest.spyOn(console, 'debug').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
     setVisibilityState('visible');
     check = jest.fn().mockResolvedValue(SUCCEEDED);
@@ -349,6 +352,62 @@ describe('createPollingScheduler', () => {
       check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();
       expect(console.warn).toHaveBeenCalledWith(expect.stringContaining('Retrying in 5 seconds.'));
+    });
+  });
+
+  describe('Console output during an outage', () => {
+    const startOutage = async () => {
+      check.mockResolvedValue(NETWORK_FAILURE);
+      await startScheduler();
+      await advance(RETRY_MAX_DELAY_MS);
+    };
+
+    const recover = async () => {
+      check.mockResolvedValue(SUCCEEDED);
+      await advance(RETRY_MAX_DELAY_MS);
+    };
+
+    afterEach(() => {
+      setDebugMode(false);
+    });
+
+    it('warns only once however many checks fail', async () => {
+      await startOutage();
+      expect(check.mock.calls.length).toBeGreaterThan(3);
+      expect(console.warn).toHaveBeenCalledTimes(1);
+    });
+
+    it('reports later retries through the debug log', async () => {
+      setDebugMode(true);
+      await startOutage();
+      expect(console.debug).toHaveBeenCalledWith(expect.stringContaining('Retrying in 10 seconds.'));
+    });
+
+    it('says nothing about later retries unless debugging', async () => {
+      await startOutage();
+      expect(console.debug).not.toHaveBeenCalled();
+    });
+
+    it('logs once when checks start working again', async () => {
+      await startOutage();
+      await recover();
+      await advance(INTERVAL_MS * 3);
+      expect(console.info).toHaveBeenCalledTimes(1);
+      expect(console.info).toHaveBeenCalledWith(expect.stringContaining('working again'));
+    });
+
+    it('does not log a recovery when nothing had failed', async () => {
+      await startScheduler();
+      await advance(INTERVAL_MS * 3);
+      expect(console.info).not.toHaveBeenCalled();
+    });
+
+    it('warns again for a later outage', async () => {
+      await startOutage();
+      await recover();
+      check.mockResolvedValue(NETWORK_FAILURE);
+      await advance(INTERVAL_MS + RETRY_BASE_DELAY_MS);
+      expect(console.warn).toHaveBeenCalledTimes(2);
     });
   });
 
