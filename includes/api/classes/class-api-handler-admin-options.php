@@ -70,7 +70,11 @@ class Api_Handler_Admin_Options extends Api_Handler_Admin implements Api_Handler
 
         if ( null !== $use_static_file_polling ) {
             $enabled = (bool) $use_static_file_polling;
-            Options_Storage_Service::set_use_static_file_polling( $enabled );
+            Options_Storage_Service::set_update_method(
+                $enabled
+                    ? Options_Storage_Service::UPDATE_METHOD_STATIC_FILE
+                    : Options_Storage_Service::UPDATE_METHOD_REST
+            );
 
             if ( $enabled ) {
                 Versions_Storage_Service::sync_version_file();

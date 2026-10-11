@@ -254,8 +254,8 @@ final class ApiHandlerAdminOptionsTest extends TestCase {
 
         ( new Api_Handler_Admin_Options() )->save_options( $request );
 
-        $this->assertEquals( 'force_refresh_use_static_file_polling', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
-        $this->assertEquals( true, self::$mock_update_option->get_invocation_arguments( 0 )[1] );
+        $this->assertEquals( 'force_refresh_update_method', self::$mock_update_option->get_invocation_arguments( 0 )[0] );
+        $this->assertEquals( 'static_file', self::$mock_update_option->get_invocation_arguments( 0 )[1] );
     }
 
     /**

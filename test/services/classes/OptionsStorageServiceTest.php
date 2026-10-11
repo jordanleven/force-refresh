@@ -1,6 +1,6 @@
 <?php
 /**
- * Our test for debug storage services.
+ * Our test for options storage services.
  *
  * @package ForceRefresh
  */
@@ -8,13 +8,15 @@
 namespace JordanLeven\Plugins\ForceRefresh\Services;
 
 use JordanLeven\Plugins\ForceRefresh\Mocks;
+use PHPUnit\Framework\Attributes\TestWith;
 
 require_once __DIR__ . '/class-mocked-service-test-case.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-feature-flag-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-version-file-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 
 /**
- * Test for Debug Storage Service
+ * Test for Options Storage Service
  */
 final class OptionsStorageServiceTest extends Mocked_Service_Test_Case {
 
@@ -134,6 +136,85 @@ final class OptionsStorageServiceTest extends Mocked_Service_Test_Case {
     }
 
     /**
+     * Reset per-test mock state.
+     *
+     * @return void
+     */
+    protected function setUp(): void {
+        self::$mock_get_option->clear_option_map();
+        self::$mock_get_option->set_return_value( false );
+        self::$mock_update_option->resetInvocationIndex();
+        $this->set_websockets_flag( false );
+    }
+
+    /**
+     * Leave the feature flag cache empty for other test classes.
+     *
+     * @return void
+     */
+    protected function tearDown(): void {
+        $this->set_flags( null );
+    }
+
+    /**
+     * Inject feature flags into the flag service's cache.
+     *
+     * @param array|null $flags The flags to set, or null to clear the cache.
+     *
+     * @return void
+     */
+    private function set_flags( ?array $flags ): void {
+        $flags_prop = ( new \ReflectionClass( Feature_Flag_Service::class ) )->getProperty( 'flags' );
+        $flags_prop->setAccessible( true );
+        $flags_prop->setValue( null, $flags );
+    }
+
+    /**
+     * Turn the WebSockets feature flag on or off.
+     *
+     * @param bool $is_enabled Whether the flag is on.
+     *
+     * @return void
+     */
+    private function set_websockets_flag( bool $is_enabled ): void {
+        $this->set_flags( array( 'websockets' => $is_enabled ) );
+    }
+
+    /**
+     * Set what is stored for the update method and the legacy static file option.
+     *
+     * @param mixed $update_method          The stored update method.
+     * @param mixed $is_static_file_polling The stored legacy option.
+     *
+     * @return void
+     */
+    private function set_stored_update_method( $update_method, $is_static_file_polling ): void {
+        self::$mock_get_option->set_option_value( 'force_refresh_update_method', $update_method );
+        self::$mock_get_option->set_option_value( 'force_refresh_use_static_file_polling', $is_static_file_polling );
+    }
+
+    /**
+     * Collect the options written since the last invocation reset.
+     *
+     * @return array<string, mixed> The written values keyed by option name.
+     */
+    private function get_written_options(): array {
+        $written = array();
+        $offset  = 0;
+
+        while ( true ) {
+            $arguments = self::$mock_update_option->get_invocation_arguments( $offset );
+
+            if ( null === $arguments ) {
+                return $written;
+            }
+
+            $written[ $arguments[0] ] = $arguments[1];
+            --$offset;
+        }
+    }
+
+    /**
      * Test getting refresh interval from options.
      */
     public function testGetRefreshIntervalCallingOptionWithCorrectParams() {
@@ -212,51 +293,207 @@ final class OptionsStorageServiceTest extends Mocked_Service_Test_Case {
     }
 
     /**
-     * Test getting static file polling option when disabled by default.
+     * The update method defaults to REST when nothing is stored.
      */
-    public function testGetUseStaticFilePollingReturnsFalseByDefault() {
-        self::$mock_get_option->set_return_value( false );
-        $this->assertFalse( Options_Storage_Service::get_use_static_file_polling() );
+    public function testGetUpdateMethodDefaultsToRest() {
+        $this->set_stored_update_method( null, false );
+        $this->assertSame( 'rest', Options_Storage_Service::get_update_method() );
     }
 
     /**
-     * Test getting static file polling option when enabled.
+     * A site that has not been migrated yet gets static file from the legacy option.
      */
-    public function testGetUseStaticFilePollingReturnsTrueWhenEnabled() {
-        self::$mock_get_option->set_return_value( true );
-        $this->assertTrue( Options_Storage_Service::get_use_static_file_polling() );
+    public function testGetUpdateMethodFallsBackToLegacyStaticFileOption() {
+        $this->set_stored_update_method( null, true );
+        $this->assertSame( 'static_file', Options_Storage_Service::get_update_method() );
     }
 
     /**
-     * Test that setting the option calls update_option with the correct key.
+     * Each stored method is returned when the legacy option agrees with it.
+     *
+     * @param string $update_method          The stored update method.
+     * @param bool   $is_static_file_polling The stored legacy option.
      */
-    public function testSetUseStaticFilePollingCallsUpdateOptionWithCorrectKey() {
-        self::$mock_update_option->resetInvocationIndex();
-        Options_Storage_Service::set_use_static_file_polling( true );
-        $this->assert_last_mock_argument_equals( self::$mock_update_option, 0, 'force_refresh_use_static_file_polling' );
+    #[TestWith( array( 'rest', false ) )]
+    #[TestWith( array( 'static_file', true ) )]
+    #[TestWith( array( 'websockets', false ) )]
+    public function testGetUpdateMethodReturnsStoredMethod( string $update_method, bool $is_static_file_polling ) {
+        $this->set_stored_update_method( $update_method, $is_static_file_polling );
+        $this->assertSame( $update_method, Options_Storage_Service::get_update_method() );
     }
 
     /**
-     * Test that enabling static file polling does NOT delete the version file.
+     * The legacy option is read the way WordPress stores booleans.
      */
-    public function testSetUseStaticFilePollingTrueDoesNotDeleteVersionFile() {
+    public function testGetUpdateMethodAcceptsLegacyOptionAsStoredByWordPress() {
+        $this->set_stored_update_method( 'static_file', '1' );
+        $this->assertSame( 'static_file', Options_Storage_Service::get_update_method() );
+
+        $this->set_stored_update_method( 'websockets', '' );
+        $this->assertSame( 'websockets', Options_Storage_Service::get_update_method() );
+    }
+
+    /**
+     * An unknown stored value is ignored in favor of the legacy option.
+     */
+    public function testGetUpdateMethodIgnoresUnknownStoredValue() {
+        $this->set_stored_update_method( 'carrier_pigeon', false );
+        $this->assertSame( 'rest', Options_Storage_Service::get_update_method() );
+
+        $this->set_stored_update_method( 'carrier_pigeon', true );
+        $this->assertSame( 'static_file', Options_Storage_Service::get_update_method() );
+    }
+
+    /**
+     * Static file polling that an older version turned off after a downgrade stays off.
+     */
+    public function testGetUpdateMethodFollowsLegacyOptionTurnedOffByOlderVersion() {
+        $this->set_stored_update_method( 'static_file', false );
+        $this->assertSame( 'rest', Options_Storage_Service::get_update_method() );
+    }
+
+    /**
+     * Static file polling that an older version turned on after a downgrade stays on.
+     *
+     * @param string $update_method The stored update method.
+     */
+    #[TestWith( array( 'rest' ) )]
+    #[TestWith( array( 'websockets' ) )]
+    public function testGetUpdateMethodFollowsLegacyOptionTurnedOnByOlderVersion( string $update_method ) {
+        $this->set_stored_update_method( $update_method, true );
+        $this->assertSame( 'static_file', Options_Storage_Service::get_update_method() );
+    }
+
+    /**
+     * Setting a method stores it and keeps the legacy option in step.
+     *
+     * @param string $update_method          The update method to set.
+     * @param bool   $is_static_file_polling The expected legacy option.
+     */
+    #[TestWith( array( 'rest', false ) )]
+    #[TestWith( array( 'static_file', true ) )]
+    #[TestWith( array( 'websockets', false ) )]
+    public function testSetUpdateMethodKeepsLegacyOptionInStep( string $update_method, bool $is_static_file_polling ) {
+        Options_Storage_Service::set_update_method( $update_method );
+
+        $this->assertSame(
+            array(
+                'force_refresh_update_method'           => $update_method,
+                'force_refresh_use_static_file_polling' => $is_static_file_polling,
+            ),
+            $this->get_written_options()
+        );
+    }
+
+    /**
+     * Test that selecting static file polling does NOT delete the version file.
+     */
+    public function testSetUpdateMethodStaticFileDoesNotDeleteVersionFile() {
         $file = $this->write_version_file();
 
-        Options_Storage_Service::set_use_static_file_polling( true );
+        Options_Storage_Service::set_update_method( 'static_file' );
 
         $this->assertFileExists( $file );
         unlink( $file );
     }
 
     /**
-     * Test that disabling static file polling deletes the version file.
+     * Test that selecting any other method deletes the version file.
+     *
+     * @param string $update_method The update method to set.
      */
-    public function testSetUseStaticFilePollingFalseDeletesVersionFile() {
+    #[TestWith( array( 'rest' ) )]
+    #[TestWith( array( 'websockets' ) )]
+    public function testSetUpdateMethodOtherThanStaticFileDeletesVersionFile( string $update_method ) {
         $file = $this->write_version_file();
         $this->assertFileExists( $file );
 
-        Options_Storage_Service::set_use_static_file_polling( false );
+        Options_Storage_Service::set_update_method( $update_method );
 
         $this->assertFileDoesNotExist( $file );
+    }
+
+    /**
+     * Static file polling is reported only for the static file method.
+     *
+     * @param string $update_method          The stored update method.
+     * @param bool   $is_static_file_polling The stored legacy option and expected result.
+     */
+    #[TestWith( array( 'rest', false ) )]
+    #[TestWith( array( 'static_file', true ) )]
+    #[TestWith( array( 'websockets', false ) )]
+    public function testGetUseStaticFilePollingIsDerivedFromUpdateMethod( string $update_method, bool $is_static_file_polling ) {
+        $this->set_stored_update_method( $update_method, $is_static_file_polling );
+        $this->assertSame( $is_static_file_polling, Options_Storage_Service::get_use_static_file_polling() );
+    }
+
+    /**
+     * Static file polling still works for a site that has not been migrated yet.
+     */
+    public function testGetUseStaticFilePollingWorksBeforeMigration() {
+        $this->set_stored_update_method( null, true );
+        $this->assertTrue( Options_Storage_Service::get_use_static_file_polling() );
+    }
+
+    /**
+     * No relay can be configured yet.
+     */
+    public function testIsRelayConfiguredIsFalse() {
+        $this->assertFalse( Options_Storage_Service::is_relay_configured() );
+    }
+
+    /**
+     * WebSockets is unavailable because of the feature flag when the flag is off.
+     */
+    public function testWebsocketsIsUnavailableWhenFlagIsOff() {
+        $this->set_websockets_flag( false );
+
+        $this->assertSame( 'feature_disabled', Options_Storage_Service::get_websockets_unavailable_reason() );
+        $this->assertFalse( Options_Storage_Service::is_websockets_available() );
+    }
+
+    /**
+     * WebSockets is unavailable because of the relay when the flag is on.
+     */
+    public function testWebsocketsIsUnavailableWhenNoRelayIsConfigured() {
+        $this->set_websockets_flag( true );
+
+        $this->assertSame( 'relay_not_configured', Options_Storage_Service::get_websockets_unavailable_reason() );
+        $this->assertFalse( Options_Storage_Service::is_websockets_available() );
+    }
+
+    /**
+     * A selected WebSockets method falls back to REST when the flag is off.
+     */
+    public function testEffectiveUpdateMethodFallsBackToRestWhenFlagIsOff() {
+        $this->set_websockets_flag( false );
+        $this->set_stored_update_method( 'websockets', false );
+
+        $this->assertSame( 'rest', Options_Storage_Service::get_effective_update_method() );
+        $this->assertSame( 'websockets', Options_Storage_Service::get_update_method() );
+    }
+
+    /**
+     * A selected WebSockets method falls back to REST when no relay is configured.
+     */
+    public function testEffectiveUpdateMethodFallsBackToRestWhenNoRelayIsConfigured() {
+        $this->set_websockets_flag( true );
+        $this->set_stored_update_method( 'websockets', false );
+
+        $this->assertSame( 'rest', Options_Storage_Service::get_effective_update_method() );
+        $this->assertSame( 'websockets', Options_Storage_Service::get_update_method() );
+    }
+
+    /**
+     * The polling methods are always effective as selected.
+     *
+     * @param string $update_method          The stored update method.
+     * @param bool   $is_static_file_polling The stored legacy option.
+     */
+    #[TestWith( array( 'rest', false ) )]
+    #[TestWith( array( 'static_file', true ) )]
+    public function testEffectiveUpdateMethodMatchesSelectedPollingMethod( string $update_method, bool $is_static_file_polling ) {
+        $this->set_stored_update_method( $update_method, $is_static_file_polling );
+        $this->assertSame( $update_method, Options_Storage_Service::get_effective_update_method() );
     }
 }
