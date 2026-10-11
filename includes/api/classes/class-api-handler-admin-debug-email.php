@@ -12,6 +12,7 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin;
 use JordanLeven\Plugins\ForceRefresh\Api\Interfaces\Api_Handler_Admin_Interface;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Services\Cdn_Detection_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Versions_Storage_Service;
 
@@ -145,10 +146,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_LAST_CRON_RUN',
                 'value' => $payload['lastCronRun'] ?? __( 'Never', 'force-refresh' ),
             ),
-            array(
-                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD',
-                'value' => $payload['staticFilePollingEnabled'] ? __( 'Static file', 'force-refresh' ) : __( 'WordPress API', 'force-refresh' ),
-            ),
+            ...$this->get_update_method_debug_rows( $payload ),
             array(
                 'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_DETECTED_CDN',
                 'value' => $payload['detectedCdn'] ?? __( 'None detected', 'force-refresh' ),
@@ -167,19 +165,172 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
         $scheduled_refreshes = Api_Handler_Admin_Schedule_Refresh_Site::get_scheduled_refreshes();
         $last_cron_run       = Api_Handler_Admin_Schedule_Refresh_Site::get_last_cron_run();
 
-        return array(
-            'siteUrl'                  => get_bloginfo( 'url' ),
-            'siteName'                 => get_bloginfo( 'name' ),
-            'wordPressVersion'         => ForceRefresh\get_wordpress_version(),
-            'phpVersion'               => phpversion(),
-            'forceRefreshVersion'      => $plugin_data['Version'],
-            'siteVersion'              => Versions_Storage_Service::get_site_version(),
-            'refreshInterval'          => Options_Storage_Service::get_refresh_interval(),
-            'scheduledRefreshes'       => $this->format_scheduled_refreshes( $scheduled_refreshes ),
-            'lastCronRun'              => $this->format_timestamp_utc( $last_cron_run ),
-            'staticFilePollingEnabled' => Options_Storage_Service::get_use_static_file_polling(),
-            'detectedCdn'              => Cdn_Detection_Service::get_detected_cdn(),
+        return array_merge(
+            array(
+                'siteUrl'             => get_bloginfo( 'url' ),
+                'siteName'            => get_bloginfo( 'name' ),
+                'wordPressVersion'    => ForceRefresh\get_wordpress_version(),
+                'phpVersion'          => phpversion(),
+                'forceRefreshVersion' => $plugin_data['Version'],
+                'siteVersion'         => Versions_Storage_Service::get_site_version(),
+                'refreshInterval'     => Options_Storage_Service::get_refresh_interval(),
+                'scheduledRefreshes'  => $this->format_scheduled_refreshes( $scheduled_refreshes ),
+                'lastCronRun'         => $this->format_timestamp_utc( $last_cron_run ),
+                'detectedCdn'         => Cdn_Detection_Service::get_detected_cdn(),
+            ),
+            $this->get_update_method_debug_data()
         );
+    }
+
+    /**
+     * Builds the update method part of the debug payload.
+     *
+     * While the WebSockets feature flag is off the report only names the
+     * method that is really in use, so it says nothing about WebSockets.
+     *
+     * @return array The update method debug payload.
+     */
+    private function get_update_method_debug_data(): array {
+        $effective_update_method = Options_Storage_Service::get_effective_update_method();
+
+        if ( ! Feature_Flag_Service::is_enabled( Options_Storage_Service::FEATURE_FLAG_WEBSOCKETS ) ) {
+            return array(
+                'updateMethod'                => $effective_update_method,
+                'effectiveUpdateMethod'       => $effective_update_method,
+                'isWebSocketsEnabled'         => false,
+                'webSocketsUnavailableReason' => null,
+            );
+        }
+
+        return array(
+            'updateMethod'                => Options_Storage_Service::get_update_method(),
+            'effectiveUpdateMethod'       => $effective_update_method,
+            'isWebSocketsEnabled'         => true,
+            'webSocketsUnavailableReason' => Options_Storage_Service::get_websockets_unavailable_reason(),
+        );
+    }
+
+    /**
+     * Build the update method rows for the debug modal payload.
+     *
+     * @param array $payload The debug payload.
+     *
+     * @return array
+     */
+    private function get_update_method_debug_rows( array $payload ): array {
+        $rows = array(
+            array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD',
+                'value' => $this->get_translated_update_method_label( $payload['updateMethod'] ),
+            ),
+        );
+
+        if ( $payload['effectiveUpdateMethod'] !== $payload['updateMethod'] ) {
+            $rows[] = array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_EFFECTIVE_UPDATE_METHOD',
+                'value' => $this->get_translated_update_method_label( $payload['effectiveUpdateMethod'] ),
+            );
+        }
+
+        if ( $payload['isWebSocketsEnabled'] ) {
+            $rows[] = array(
+                'key'   => 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WEBSOCKETS',
+                'value' => $this->get_translated_websockets_status( $payload['webSocketsUnavailableReason'] ),
+            );
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Build the update method lines for the plain-text debug email body.
+     *
+     * @param array $payload The debug payload.
+     *
+     * @return array
+     */
+    private function get_update_method_email_lines( array $payload ): array {
+        $lines = array(
+            sprintf( 'Update Method:          %s', $this->get_update_method_label( $payload['updateMethod'] ) ),
+        );
+
+        if ( $payload['effectiveUpdateMethod'] !== $payload['updateMethod'] ) {
+            $lines[] = sprintf( 'Effective Method:       %s', $this->get_update_method_label( $payload['effectiveUpdateMethod'] ) );
+        }
+
+        if ( $payload['isWebSocketsEnabled'] ) {
+            $lines[] = sprintf( 'WebSockets:             %s', $this->get_websockets_status( $payload['webSocketsUnavailableReason'] ) );
+        }
+
+        return $lines;
+    }
+
+    /**
+     * Get the name of an update method for the plain-text debug email body.
+     *
+     * @param string $update_method One of the update methods.
+     *
+     * @return string
+     */
+    private function get_update_method_label( string $update_method ): string {
+        if ( Options_Storage_Service::UPDATE_METHOD_STATIC_FILE === $update_method ) {
+            return 'Static file';
+        }
+
+        if ( Options_Storage_Service::UPDATE_METHOD_WEBSOCKETS === $update_method ) {
+            return 'WebSockets';
+        }
+
+        return 'WordPress API';
+    }
+
+    /**
+     * Get the translated name of an update method for the debug modal payload.
+     *
+     * @param string $update_method One of the update methods.
+     *
+     * @return string
+     */
+    private function get_translated_update_method_label( string $update_method ): string {
+        if ( Options_Storage_Service::UPDATE_METHOD_STATIC_FILE === $update_method ) {
+            return __( 'Static file', 'force-refresh' );
+        }
+
+        if ( Options_Storage_Service::UPDATE_METHOD_WEBSOCKETS === $update_method ) {
+            return __( 'WebSockets', 'force-refresh' );
+        }
+
+        return __( 'WordPress API', 'force-refresh' );
+    }
+
+    /**
+     * Describe whether WebSockets can be used for the plain-text debug email body.
+     *
+     * @param string|null $unavailable_reason Why WebSockets is unavailable, or null when it is available.
+     *
+     * @return string
+     */
+    private function get_websockets_status( ?string $unavailable_reason ): string {
+        if ( Options_Storage_Service::WEBSOCKETS_UNAVAILABLE_RELAY_NOT_CONFIGURED === $unavailable_reason ) {
+            return 'Unavailable (no relay is configured)';
+        }
+
+        return null === $unavailable_reason ? 'Available' : 'Unavailable';
+    }
+
+    /**
+     * Describe whether WebSockets can be used for the debug modal payload.
+     *
+     * @param string|null $unavailable_reason Why WebSockets is unavailable, or null when it is available.
+     *
+     * @return string
+     */
+    private function get_translated_websockets_status( ?string $unavailable_reason ): string {
+        if ( Options_Storage_Service::WEBSOCKETS_UNAVAILABLE_RELAY_NOT_CONFIGURED === $unavailable_reason ) {
+            return __( 'Unavailable (no relay is configured)', 'force-refresh' );
+        }
+
+        return null === $unavailable_reason ? __( 'Available', 'force-refresh' ) : __( 'Unavailable', 'force-refresh' );
     }
 
     /**
@@ -344,7 +495,7 @@ class Api_Handler_Admin_Debug_Email extends Api_Handler_Admin implements Api_Han
                 sprintf( 'PHP Version:            %s', $payload['phpVersion'] ),
                 ...$this->get_scheduled_refresh_email_lines( $payload['scheduledRefreshes'] ),
                 sprintf( 'Last Cron Run:          %s', $payload['lastCronRun'] ?? 'Never' ),
-                sprintf( 'Update Method:          %s', $payload['staticFilePollingEnabled'] ? 'Static file' : 'WordPress API' ),
+                ...$this->get_update_method_email_lines( $payload ),
                 sprintf( 'CDN:                    %s', $payload['detectedCdn'] ?? 'None detected' ),
                 '',
                 sprintf( 'Submitted: %s', gmdate( 'Y-m-d H:i:s T' ) ),

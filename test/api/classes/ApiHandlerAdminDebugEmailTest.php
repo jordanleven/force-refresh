@@ -8,12 +8,15 @@
 namespace JordanLeven\Plugins\ForceRefresh\Api;
 
 use JordanLeven\Plugins\ForceRefresh\Mocks;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/interfaces/interface-api-handler-admin.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin.php';
+require_once __DIR__ . '/../../../includes/services/classes/class-feature-flag-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-options-storage-service.php';
 require_once __DIR__ . '/../../../includes/services/classes/class-versions-storage-service.php';
 require_once __DIR__ . '/../../../includes/api/classes/class-api-handler-admin-schedule-refresh-site.php';
@@ -168,6 +171,13 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
     private static $mock_get_main_plugin_file;
 
     /**
+     * The update method options that `get_option` returns for the current test.
+     *
+     * @var array<string, mixed>
+     */
+    private static array $stored_update_method_options = array();
+
+    /**
      * Initial test setup.
      *
      * @return void
@@ -198,7 +208,7 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
                 $map = array(
                     'force_refresh_current_site_version' => '20070629',
                     'force_refresh_refresh_interval'     => '1984',
-                );
+                ) + self::$stored_update_method_options;
 
                 return $map[ $key ] ?? $default;
             }
@@ -300,6 +310,68 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
             )
         );
         self::$mock_wp_mail->set_return_value( true );
+        $this->set_update_method( 'rest', false );
+    }
+
+    /**
+     * Leave the feature flag cache empty for other test classes.
+     *
+     * @return void
+     */
+    protected function tearDown(): void {
+        $this->set_flags( null );
+    }
+
+    /**
+     * Inject feature flags into the flag service's cache.
+     *
+     * @param array|null $flags The flags to set, or null to clear the cache.
+     *
+     * @return void
+     */
+    private function set_flags( ?array $flags ): void {
+        $flags_prop = ( new \ReflectionClass( Feature_Flag_Service::class ) )->getProperty( 'flags' );
+        $flags_prop->setAccessible( true );
+        $flags_prop->setValue( null, $flags );
+    }
+
+    /**
+     * Set the stored update method and whether the WebSockets flag is on.
+     *
+     * @param string $update_method         The stored update method.
+     * @param bool   $is_websockets_enabled Whether the WebSockets flag is on.
+     *
+     * @return void
+     */
+    private function set_update_method( string $update_method, bool $is_websockets_enabled ): void {
+        $this->set_flags( array( 'websockets' => $is_websockets_enabled ) );
+
+        self::$stored_update_method_options = array(
+            'force_refresh_update_method'           => $update_method,
+            'force_refresh_use_static_file_polling' => 'static_file' === $update_method,
+        );
+    }
+
+    /**
+     * Get the debug modal rows as a map of translation key to value.
+     *
+     * @return array<string, string>
+     */
+    private function get_debug_rows_by_key(): array {
+        $rows = $this->get_debug_data_payload()['data']['debugData'];
+
+        return array_column( $rows, 'value', 'key' );
+    }
+
+    /**
+     * Send a debug email and return its body.
+     *
+     * @return string
+     */
+    private function get_sent_email_body(): string {
+        $this->send_debug_email_for_topic( 'https://wordpress.org/support/topic/test-topic/' );
+
+        return self::$mock_wp_mail->get_last_invocation_arguments()[2];
     }
 
     /**
@@ -440,6 +512,202 @@ final class ApiHandlerAdminDebugEmailTest extends TestCase {
         $keys = array_column( $rows, 'key' );
 
         $this->assertContains( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WP_VERSION', $keys );
+    }
+
+    /**
+     * The debug modal names the polling method in use, with or without the flag.
+     *
+     * @param string $update_method         The stored update method.
+     * @param string $expected              The expected row value.
+     * @param bool   $is_websockets_enabled Whether the WebSockets flag is on.
+     *
+     * @return void
+     */
+    #[TestWith( array( 'rest', 'WordPress API', false ) )]
+    #[TestWith( array( 'static_file', 'Static file', false ) )]
+    #[TestWith( array( 'rest', 'WordPress API', true ) )]
+    #[TestWith( array( 'static_file', 'Static file', true ) )]
+    public function testGetDebugDataIncludesUpdateMethodRow( string $update_method, string $expected, bool $is_websockets_enabled ): void {
+        $this->set_update_method( $update_method, $is_websockets_enabled );
+
+        $rows = $this->get_debug_rows_by_key();
+
+        $this->assertSame( $expected, $rows['ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD'] );
+        $this->assertArrayNotHasKey( 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_EFFECTIVE_UPDATE_METHOD', $rows );
+    }
+
+    /**
+     * The debug modal says nothing about WebSockets while the flag is off.
+     *
+     * @param string $update_method The stored update method.
+     *
+     * @return void
+     */
+    #[TestWith( array( 'rest' ) )]
+    #[TestWith( array( 'static_file' ) )]
+    #[TestWith( array( 'websockets' ) )]
+    public function testGetDebugDataRevealsNothingAboutWebsocketsWhenFlagIsOff( string $update_method ): void {
+        $this->set_update_method( $update_method, false );
+
+        $payload = $this->get_debug_data_payload();
+
+        $this->assertStringNotContainsStringIgnoringCase( 'websocket', json_encode( $payload ) );
+        $this->assertStringNotContainsStringIgnoringCase( 'relay', json_encode( $payload ) );
+        $this->assertStringNotContainsStringIgnoringCase( 'effective', json_encode( $payload ) );
+    }
+
+    /**
+     * A stored WebSockets method is reported as the method in use while the flag is off.
+     *
+     * @return void
+     */
+    public function testGetDebugDataReportsMethodInUseWhenFlagIsOff(): void {
+        $this->set_update_method( 'websockets', false );
+
+        $rows = $this->get_debug_rows_by_key();
+
+        $this->assertSame( 'WordPress API', $rows['ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD'] );
+    }
+
+    /**
+     * The debug modal explains why WebSockets cannot be selected when the flag is on.
+     *
+     * @param string $update_method The stored update method.
+     *
+     * @return void
+     */
+    #[TestWith( array( 'rest' ) )]
+    #[TestWith( array( 'static_file' ) )]
+    #[TestWith( array( 'websockets' ) )]
+    public function testGetDebugDataExplainsWhyWebsocketsIsUnavailableWhenFlagIsOn( string $update_method ): void {
+        $this->set_update_method( $update_method, true );
+
+        $rows = $this->get_debug_rows_by_key();
+
+        $this->assertSame(
+            'Unavailable (no relay is configured)',
+            $rows['ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WEBSOCKETS']
+        );
+    }
+
+    /**
+     * The debug modal shows both the selected and the effective method when they differ.
+     *
+     * @return void
+     */
+    public function testGetDebugDataIncludesEffectiveMethodWhenWebsocketsFallsBack(): void {
+        $this->set_update_method( 'websockets', true );
+
+        $rows = $this->get_debug_rows_by_key();
+
+        $this->assertSame( 'WebSockets', $rows['ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD'] );
+        $this->assertSame( 'WordPress API', $rows['ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_EFFECTIVE_UPDATE_METHOD'] );
+    }
+
+    /**
+     * The update method rows stay between the cron row and the CDN row.
+     *
+     * @return void
+     */
+    public function testGetDebugDataKeepsUpdateMethodRowsTogether(): void {
+        $this->set_update_method( 'websockets', true );
+
+        $keys = array_keys( $this->get_debug_rows_by_key() );
+
+        $this->assertSame(
+            array(
+                'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_LAST_CRON_RUN',
+                'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD',
+                'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_EFFECTIVE_UPDATE_METHOD',
+                'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WEBSOCKETS',
+                'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_DETECTED_CDN',
+            ),
+            array_slice( $keys, -5 )
+        );
+    }
+
+    /**
+     * The email names the polling method in use, with or without the flag.
+     *
+     * @param string $update_method         The stored update method.
+     * @param string $expected              The expected method name.
+     * @param bool   $is_websockets_enabled Whether the WebSockets flag is on.
+     *
+     * @return void
+     */
+    #[TestWith( array( 'rest', 'WordPress API', false ) )]
+    #[TestWith( array( 'static_file', 'Static file', false ) )]
+    #[TestWith( array( 'rest', 'WordPress API', true ) )]
+    #[TestWith( array( 'static_file', 'Static file', true ) )]
+    public function testSendDebugEmailIncludesUpdateMethodInEmailBody( string $update_method, string $expected, bool $is_websockets_enabled ): void {
+        $this->set_update_method( $update_method, $is_websockets_enabled );
+
+        $body = $this->get_sent_email_body();
+
+        $this->assertStringContainsString( 'Update Method:          ' . $expected . "\n", $body );
+        $this->assertStringNotContainsString( 'Effective Method:', $body );
+    }
+
+    /**
+     * The email says nothing about WebSockets while the flag is off.
+     *
+     * @param string $update_method The stored update method.
+     *
+     * @return void
+     */
+    #[TestWith( array( 'rest' ) )]
+    #[TestWith( array( 'static_file' ) )]
+    #[TestWith( array( 'websockets' ) )]
+    public function testSendDebugEmailRevealsNothingAboutWebsocketsWhenFlagIsOff( string $update_method ): void {
+        $this->set_update_method( $update_method, false );
+
+        $body = $this->get_sent_email_body();
+
+        $this->assertStringNotContainsStringIgnoringCase( 'websocket', $body );
+        $this->assertStringNotContainsStringIgnoringCase( 'relay', $body );
+        $this->assertStringNotContainsStringIgnoringCase( 'effective', $body );
+    }
+
+    /**
+     * A stored WebSockets method is reported as the method in use while the flag is off.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailReportsMethodInUseWhenFlagIsOff(): void {
+        $this->set_update_method( 'websockets', false );
+
+        $this->assertStringContainsString( "Update Method:          WordPress API\n", $this->get_sent_email_body() );
+    }
+
+    /**
+     * The email explains why WebSockets cannot be selected when the flag is on.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailExplainsWhyWebsocketsIsUnavailableWhenFlagIsOn(): void {
+        $this->set_update_method( 'rest', true );
+
+        $this->assertStringContainsString(
+            "WebSockets:             Unavailable (no relay is configured)\n",
+            $this->get_sent_email_body()
+        );
+    }
+
+    /**
+     * The email shows both the selected and the effective method when they differ.
+     *
+     * @return void
+     */
+    public function testSendDebugEmailIncludesEffectiveMethodWhenWebsocketsFallsBack(): void {
+        $this->set_update_method( 'websockets', true );
+
+        $this->assertStringContainsString(
+            "Update Method:          WebSockets\n"
+            . "Effective Method:       WordPress API\n"
+            . "WebSockets:             Unavailable (no relay is configured)\n"
+            . 'CDN:',
+            $this->get_sent_email_body()
+        );
     }
 
     /**
