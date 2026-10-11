@@ -65,7 +65,7 @@ services:
       WORDPRESS_DEBUG: 1
       WP_DEBUG_DISPLAY: 1
       WP_DEBUG_LOG: 1
-      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local');"
+      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('FORCE_REFRESH_FEATURE_FLAGS', array('websockets' => true));"
     volumes:
       - "./.docker-build/wordpress_qa:/var/www/html"
       - "./qa:/var/www/html/wp-content/plugins/force-refresh"
@@ -119,7 +119,7 @@ services:
       WORDPRESS_DEBUG: 1
       WP_DEBUG_DISPLAY: 1
       WP_DEBUG_LOG: 1
-      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('AUTOMATIC_UPDATER_DISABLED', true);"
+      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('AUTOMATIC_UPDATER_DISABLED', true); define('FORCE_REFRESH_FEATURE_FLAGS', array('websockets' => true));"
     volumes:
       - "./.docker-build/wordpress_wp5:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
@@ -173,7 +173,7 @@ services:
       WORDPRESS_DEBUG: 1
       WP_DEBUG_DISPLAY: 1
       WP_DEBUG_LOG: 1
-      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('AUTOMATIC_UPDATER_DISABLED', true);"
+      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('AUTOMATIC_UPDATER_DISABLED', true); define('FORCE_REFRESH_FEATURE_FLAGS', array('websockets' => true));"
     volumes:
       - "./.docker-build/wordpress_wp6:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
@@ -220,7 +220,7 @@ services:
       WORDPRESS_DEBUG: 1
       WP_DEBUG_DISPLAY: 1
       WP_DEBUG_LOG: 1
-      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('AUTOMATIC_UPDATER_DISABLED', true);"
+      WORDPRESS_CONFIG_EXTRA: "define('WP_ENVIRONMENT_TYPE', 'local'); define('AUTOMATIC_UPDATER_DISABLED', true); define('FORCE_REFRESH_FEATURE_FLAGS', array('websockets' => true));"
     volumes:
       - "./.docker-build/wordpress_wp7:/var/www/html"
       - "./:/var/www/html/wp-content/plugins/force-refresh"
