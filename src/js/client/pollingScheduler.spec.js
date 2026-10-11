@@ -485,6 +485,122 @@ describe('createPollingScheduler', () => {
     });
   });
 
+  describe('Requested checks', () => {
+    it('checks immediately when no check is running', async () => {
+      await startScheduler();
+      scheduler.requestCheck();
+      await advance(0);
+      expect(check).toHaveBeenCalledTimes(2);
+    });
+
+    it('treats the check as triggered', async () => {
+      await startScheduler();
+      scheduler.requestCheck();
+      await advance(0);
+      expect(check.mock.calls[1][0].isTriggered).toBe(true);
+    });
+
+    it('times the next poll from the end of the requested check', async () => {
+      await startScheduler();
+      await advance(INTERVAL_MS / 2);
+      scheduler.requestCheck();
+      await advance(INTERVAL_MS - 1);
+      expect(check).toHaveBeenCalledTimes(2);
+      await advance(1);
+      expect(check).toHaveBeenCalledTimes(3);
+    });
+
+    describe('while a check is running', () => {
+      let runningCheck;
+
+      beforeEach(async () => {
+        runningCheck = createDeferred();
+        check.mockReturnValueOnce(runningCheck.promise);
+        await startScheduler();
+      });
+
+      it('does not start a second check alongside the running one', async () => {
+        scheduler.requestCheck();
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('checks again as soon as the running check settles', async () => {
+        scheduler.requestCheck();
+        runningCheck.resolve(SUCCEEDED);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('treats the trailing check as triggered', async () => {
+        scheduler.requestCheck();
+        runningCheck.resolve(SUCCEEDED);
+        await advance(0);
+        expect(check.mock.calls[1][0].isTriggered).toBe(true);
+      });
+
+      it('queues only one trailing check however many requests arrive', async () => {
+        scheduler.requestCheck();
+        scheduler.requestCheck();
+        scheduler.requestCheck();
+        runningCheck.resolve(SUCCEEDED);
+        await advance(INTERVAL_MS - 1);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('checks again when the running check fails', async () => {
+        scheduler.requestCheck();
+        runningCheck.resolve(SERVER_FAILURE);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('checks again when the running check times out', async () => {
+        scheduler.requestCheck();
+        await advance(CHECK_TIMEOUT_MS);
+        expect(check).toHaveBeenCalledTimes(2);
+      });
+
+      it('resumes polling from the end of the trailing check', async () => {
+        scheduler.requestCheck();
+        await advance(1000);
+        runningCheck.resolve(SUCCEEDED);
+        await advance(INTERVAL_MS - 1);
+        expect(check).toHaveBeenCalledTimes(2);
+        await advance(1);
+        expect(check).toHaveBeenCalledTimes(3);
+      });
+
+      it('queues a later request again once the trailing check is running', async () => {
+        const trailingCheck = createDeferred();
+        check.mockReturnValueOnce(trailingCheck.promise);
+        scheduler.requestCheck();
+        runningCheck.resolve(SUCCEEDED);
+        await advance(0);
+        scheduler.requestCheck();
+        trailingCheck.resolve(SUCCEEDED);
+        await advance(0);
+        expect(check).toHaveBeenCalledTimes(3);
+      });
+
+      it('drops the trailing check when stopped', async () => {
+        scheduler.requestCheck();
+        scheduler.stop();
+        runningCheck.resolve(SUCCEEDED);
+        await advance(INTERVAL_MS);
+        expect(check).toHaveBeenCalledTimes(1);
+      });
+
+      it('still warns of an outage when the trailing check fails too', async () => {
+        check.mockResolvedValue(NETWORK_FAILURE);
+        scheduler.requestCheck();
+        runningCheck.resolve(NETWORK_FAILURE);
+        await advance(0);
+        expect(console.warn).toHaveBeenCalledTimes(1);
+      });
+    });
+  });
+
   describe('Page events', () => {
     // Moves the clock without running timers, as when a page is frozen.
     const freezePageFor = (ms) => jest.setSystemTime(Date.now() + ms);

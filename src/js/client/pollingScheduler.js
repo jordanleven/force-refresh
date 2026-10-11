@@ -96,7 +96,9 @@ const runCheckWithTimeout = (check, isTriggered) => new Promise((resolve) => {
 export const createPollingScheduler = ({ check, intervalMs, random = Math.random }) => {
   let consecutiveFailures = 0;
   let checkInFlight = null;
+  let hasWarnedOfOutage = false;
   let isStarted = false;
+  let isTrailingCheckQueued = false;
   let lastCheckEndedAt = null;
   let lastFailureKind = null;
   let nextCheckAt = null;
@@ -121,24 +123,42 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     lastFailureKind = succeeded ? null : failureKind;
 
     if (succeeded) {
-      if (consecutiveFailures > 0) info('Checking for a refresh is working again.');
+      if (hasWarnedOfOutage) info('Checking for a refresh is working again.');
       consecutiveFailures = 0;
+      hasWarnedOfOutage = false;
       return intervalMs;
     }
 
     consecutiveFailures += 1;
-    const retryDelay = getDelayAfterFailure({
+    return getDelayAfterFailure({
       failureKind,
       failures: consecutiveFailures,
       intervalMs,
       random,
       retryAfterMs,
     });
-    // An outage is reported to visitors once; the retries that follow are
-    // only of interest to someone debugging.
-    const log = consecutiveFailures === 1 ? warn : debug;
+  };
+
+  // An outage is reported to visitors once; the retries that follow are only
+  // of interest to someone debugging.
+  const logRetry = (retryDelay) => {
+    const log = hasWarnedOfOutage ? debug : warn;
+    hasWarnedOfOutage = true;
     log(`Unable to check for a refresh. Retrying in ${Math.round(retryDelay / 1000)} seconds.`);
-    return retryDelay;
+  };
+
+  const scheduleCheckAfter = (result, runCheck) => {
+    const delay = getDelayAfterCheck(result);
+
+    if (isTrailingCheckQueued) {
+      isTrailingCheckQueued = false;
+      runCheck(true);
+      return;
+    }
+
+    if (!result.succeeded) logRetry(delay);
+    // A retry is prompted by the failure before it; only a poll is routine.
+    scheduleNextCheck(delay, () => runCheck(!result.succeeded));
   };
 
   const runCheck = (isTriggered) => {
@@ -147,8 +167,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     clearNextCheck();
     checkInFlight = runCheckWithTimeout(check, isTriggered).then((result) => {
       checkInFlight = null;
-      // A retry is prompted by the failure before it; only a poll is routine.
-      scheduleNextCheck(getDelayAfterCheck(result), () => runCheck(!result.succeeded));
+      scheduleCheckAfter(result, runCheck);
       return result;
     });
 
@@ -162,6 +181,22 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
    * @return    {Promise<object>}    The check result
    */
   const checkNow = () => runCheck(true);
+
+  /**
+   * Asks for a check that starts no earlier than now. A check that is already
+   * running may have read the versions before whatever prompted this request,
+   * so instead of being relied on it is followed by exactly one more check,
+   * however many requests arrive while it runs.
+   * @return    {void}
+   */
+  const requestCheck = () => {
+    if (!checkInFlight) {
+      runCheck(true);
+      return;
+    }
+
+    isTrailingCheckQueued = true;
+  };
 
   // A frozen, sleeping or cached page does not run its timers, so the check
   // it had scheduled can be long past due by the time the page resumes.
@@ -214,6 +249,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
 
   const stop = () => {
     isStarted = false;
+    isTrailingCheckQueued = false;
     clearNextCheck();
 
     document.removeEventListener('visibilitychange', onVisibilityChange);
@@ -226,6 +262,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
   return {
     checkNow,
     getMsUntilNextCheck,
+    requestCheck,
     start,
     stop,
   };
