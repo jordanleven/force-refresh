@@ -58,12 +58,18 @@ const toCheckResult = (result) => (
   typeof result?.succeeded === 'boolean' ? result : checkFailed(FAILURE_KINDS.NETWORK)
 );
 
-// A check that never settles would otherwise block every later check.
+// A check that never settles would otherwise block every later check. Its
+// request is aborted when it is given up on, so that a server too busy to
+// answer is not left holding one more connection for every retry.
 const runCheckWithTimeout = (check) => new Promise((resolve) => {
-  const timeout = setTimeout(() => resolve(checkFailed(FAILURE_KINDS.TIMEOUT)), CHECK_TIMEOUT_MS);
+  const abortController = new AbortController();
+  const timeout = setTimeout(() => {
+    abortController.abort();
+    resolve(checkFailed(FAILURE_KINDS.TIMEOUT));
+  }, CHECK_TIMEOUT_MS);
 
   Promise.resolve()
-    .then(check)
+    .then(() => check({ signal: abortController.signal }))
     .then(
       (result) => resolve(toCheckResult(result)),
       () => resolve(checkFailed(FAILURE_KINDS.NETWORK)),
@@ -76,7 +82,9 @@ const runCheckWithTimeout = (check) => new Promise((resolve) => {
  * failure, and promptly when the page is likely to have missed a check.
  * It knows nothing about versions; `check` owns the decision to reload.
  * @param     {object}      options
- * @param     {Function}    options.check         Resolves to a check result (see `checkResult.js`)
+ * @param     {Function}    options.check         Called with `{ signal }`, an `AbortSignal` that
+ *                                                aborts when the check is given up on. Resolves
+ *                                                to a check result (see `checkResult.js`)
  * @param     {number}      options.intervalMs    The normal polling interval
  * @param     {Function}    options.random        Returns a number between 0 and 1
  * @return    {object}                            The scheduler

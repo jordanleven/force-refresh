@@ -276,6 +276,37 @@ describe('createPollingScheduler', () => {
       expect(check).toHaveBeenCalledTimes(2);
     });
 
+    it('aborts the request of a check that timed out', async () => {
+      check.mockReturnValue(createDeferred().promise);
+      await startScheduler();
+      const [{ signal }] = check.mock.calls[0];
+      expect(signal.aborted).toBe(false);
+      await advance(CHECK_TIMEOUT_MS);
+      expect(signal.aborted).toBe(true);
+    });
+
+    it('does not abort a check that settled in time', async () => {
+      await startScheduler();
+      await advance(CHECK_TIMEOUT_MS);
+      expect(check.mock.calls[0][0].signal.aborted).toBe(false);
+    });
+
+    it('gives every check its own abort signal', async () => {
+      await startScheduler();
+      await advance(INTERVAL_MS);
+      const [[first], [second]] = check.mock.calls;
+      expect(first.signal).not.toBe(second.signal);
+    });
+
+    it('never leaves more than one request open while the server hangs', async () => {
+      check.mockImplementation(() => createDeferred().promise);
+      await startScheduler();
+      await advance(INTERVAL_MS * 10);
+      const openRequests = check.mock.calls.filter(([{ signal }]) => !signal.aborted);
+      expect(check.mock.calls.length).toBeGreaterThan(2);
+      expect(openRequests.length).toBeLessThanOrEqual(1);
+    });
+
     it('warns with the retry delay', async () => {
       check.mockResolvedValue(NETWORK_FAILURE);
       await startScheduler();

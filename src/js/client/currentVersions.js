@@ -27,14 +27,15 @@ export const getRetryAfterMs = (response) => {
 /**
  * Requests JSON without throwing, so the caller can tell a request that never
  * reached the server from a server that answered with something unusable.
- * @param     {string}    url    The URL to request
- * @return    {Promise<object>}  `{ body }` on success, otherwise a failed check result
+ * @param     {string}    url             The URL to request
+ * @param     {object}    fetchOptions    The options to pass to `fetch`
+ * @return    {Promise<object>}           `{ body }` on success, otherwise a failed check result
  */
-const requestJson = async (url) => {
+const requestJson = async (url, fetchOptions) => {
   let response;
 
   try {
-    response = await fetch(url);
+    response = await fetch(url, fetchOptions);
   } catch {
     return checkFailed(FAILURE_KINDS.NETWORK);
   }
@@ -48,9 +49,9 @@ const requestJson = async (url) => {
   }
 };
 
-const fetchStaticVersion = async (versionFileUrl, refreshInterval, postId) => {
+const fetchStaticVersion = async (versionFileUrl, refreshInterval, postId, fetchOptions) => {
   const url = `${versionFileUrl}?t=${getCacheBustParam(refreshInterval)}`;
-  const { body } = await requestJson(url);
+  const { body } = await requestJson(url, fetchOptions);
 
   if (!body) return null;
 
@@ -58,12 +59,12 @@ const fetchStaticVersion = async (versionFileUrl, refreshInterval, postId) => {
   return { succeeded: true, versions: toVersionShape(site, pages, postId) };
 };
 
-const fetchRestVersion = async (apiEndpoint, postId) => {
+const fetchRestVersion = async (apiEndpoint, postId, fetchOptions) => {
   const message = postId ? ` and post ${postId}` : '';
   debug(`Requesting refresh data for site${message}.`);
 
   const url = postId ? `${apiEndpoint}?${new URLSearchParams({ postId })}` : apiEndpoint;
-  const { body, ...failure } = await requestJson(url);
+  const { body, ...failure } = await requestJson(url, fetchOptions);
 
   if (!body) return failure;
   if (!body.data) return checkFailed(FAILURE_KINDS.SERVER);
@@ -74,10 +75,12 @@ const fetchRestVersion = async (apiEndpoint, postId) => {
 /**
  * Retrieves the current versions from the static version file when the site
  * uses one, and from the REST API otherwise or when the file is unavailable.
- * @return    {Promise<object>}    `{ succeeded: true, versions }`, or a failed check
- *                                 result saying why the versions could not be retrieved
+ * @param     {object}         options
+ * @param     {AbortSignal}    options.signal    Aborts the request when the check is given up on
+ * @return    {Promise<object>}                  `{ succeeded: true, versions }`, or a failed check
+ *                                               result saying why the versions were not retrieved
  */
-export const getCurrentVersion = async () => {
+export const getCurrentVersion = async ({ signal } = {}) => {
   const {
     apiEndpoint,
     postId,
@@ -86,8 +89,10 @@ export const getCurrentVersion = async () => {
   // eslint-disable-next-line no-undef
   } = forceRefreshLocalizedData;
 
-  if (!versionFileUrl) return fetchRestVersion(apiEndpoint, postId);
+  const fetchOptions = { signal };
 
-  const staticResult = await fetchStaticVersion(versionFileUrl, refreshInterval, postId);
-  return staticResult ?? fetchRestVersion(apiEndpoint, postId);
+  if (!versionFileUrl) return fetchRestVersion(apiEndpoint, postId, fetchOptions);
+
+  const staticResult = await fetchStaticVersion(versionFileUrl, refreshInterval, postId, fetchOptions);
+  return staticResult ?? fetchRestVersion(apiEndpoint, postId, fetchOptions);
 };

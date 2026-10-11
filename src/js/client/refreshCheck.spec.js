@@ -29,6 +29,13 @@ describe('checkForRefresh', () => {
     html().removeAttribute(ATTRIBUTE_VERSION_PAGE);
   });
 
+  it('passes its options on to the version request', async () => {
+    const options = { signal: new AbortController().signal };
+    mockVersions({ currentVersionSite: 'site-1' });
+    await checkForRefresh(options);
+    expect(getCurrentVersion).toHaveBeenCalledWith(options);
+  });
+
   describe('when the versions are retrieved', () => {
     it('resolves to a successful result', async () => {
       mockVersions({ currentVersionSite: 'site-1' });

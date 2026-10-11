@@ -107,6 +107,16 @@ describe('getCurrentVersion', () => {
       });
     });
 
+    it('passes the abort signal to the request', async () => {
+      const { signal } = new AbortController();
+      global.forceRefreshLocalizedData = makeLocalizedData();
+      global.fetch = jest.fn().mockReturnValue(mockRestFetch({ currentVersionSite: 'abc' }));
+
+      await getCurrentVersion({ signal });
+
+      expect(global.fetch.mock.calls[0][1].signal).toBe(signal);
+    });
+
     it('reports a network failure when the request never reaches the server', async () => {
       global.forceRefreshLocalizedData = makeLocalizedData();
       global.fetch = jest.fn().mockRejectedValue(new TypeError('Failed to fetch'));
@@ -164,6 +174,19 @@ describe('getCurrentVersion', () => {
       await getCurrentVersion();
 
       expect(global.fetch.mock.calls[0][0]).toContain(VERSION_FILE_URL);
+    });
+
+    it('passes the abort signal to the static file request and the REST fallback', async () => {
+      const { signal } = new AbortController();
+      global.forceRefreshLocalizedData = makeLocalizedData({ versionFileUrl: VERSION_FILE_URL });
+      global.fetch = jest
+        .fn()
+        .mockReturnValueOnce(mockFailFetch(404))
+        .mockReturnValue(mockRestFetch({ currentVersionSite: 'abc' }));
+
+      await getCurrentVersion({ signal });
+
+      expect(global.fetch.mock.calls.map(([, options]) => options.signal)).toEqual([signal, signal]);
     });
 
     it('appends a cache-bust query parameter', async () => {

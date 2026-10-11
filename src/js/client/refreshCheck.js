@@ -110,11 +110,12 @@ const isSuccessfulResult = (result) => result?.succeeded === true && !!result.ve
  * Fetches the current versions and reloads the page when they are newer than
  * the versions this page loaded with. This is the single "should this page
  * reload?" decision, independent of what prompted the check.
- * @return    {Promise<object>}    A check result: `{ succeeded: true }`, or a failed
- *                                 result with the kind of failure. It never throws.
+ * @param     {object}    options      Passed to `getCurrentVersion`
+ * @return    {Promise<object>}        A check result: `{ succeeded: true }`, or a failed
+ *                                     result with the kind of failure. It never throws.
  */
-export const checkForRefresh = async () => {
-  const result = await getCurrentVersion().catch(() => undefined);
+export const checkForRefresh = async (options) => {
+  const result = await getCurrentVersion(options).catch(() => undefined);
 
   if (!isSuccessfulResult(result)) {
     return checkFailed(result?.failureKind ?? FAILURE_KINDS.NETWORK, result?.retryAfterMs ?? null);
