@@ -21,7 +21,7 @@ debug(`Debug mode is ${isDebugActive ? 'active' : 'inactive'}.`);
 debug(`Refreshing every ${refreshIntervalMessage}.`);
 
 const pollingScheduler = createPollingScheduler({
-  check: checkForRefresh,
+  check: ({ isTriggered, signal }) => checkForRefresh({ bypassCache: isTriggered, signal }),
   intervalMs: refreshInterval * 1000,
 });
 

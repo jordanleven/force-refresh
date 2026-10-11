@@ -61,7 +61,7 @@ const toCheckResult = (result) => (
 // A check that never settles would otherwise block every later check. Its
 // request is aborted when it is given up on, so that a server too busy to
 // answer is not left holding one more connection for every retry.
-const runCheckWithTimeout = (check) => new Promise((resolve) => {
+const runCheckWithTimeout = (check, isTriggered) => new Promise((resolve) => {
   const abortController = new AbortController();
   const timeout = setTimeout(() => {
     abortController.abort();
@@ -69,7 +69,7 @@ const runCheckWithTimeout = (check) => new Promise((resolve) => {
   }, CHECK_TIMEOUT_MS);
 
   Promise.resolve()
-    .then(() => check({ signal: abortController.signal }))
+    .then(() => check({ isTriggered, signal: abortController.signal }))
     .then(
       (result) => resolve(toCheckResult(result)),
       () => resolve(checkFailed(FAILURE_KINDS.NETWORK)),
@@ -82,7 +82,11 @@ const runCheckWithTimeout = (check) => new Promise((resolve) => {
  * network failure, and as soon as the page resumes having missed a check.
  * It knows nothing about versions; `check` owns the decision to reload.
  * @param     {object}      options
- * @param     {Function}    options.check         Called with `{ signal }`, an `AbortSignal` that
+ * @param     {Function}    options.check         Called with `{ isTriggered, signal }`. `isTriggered`
+ *                                                is false for a routine poll and true when
+ *                                                something prompted the check, such as a retry
+ *                                                or a resumed page, so it must not be answered
+ *                                                from a cache. `signal` is an `AbortSignal` that
  *                                                aborts when the check is given up on. Resolves
  *                                                to a check result (see `checkResult.js`)
  * @param     {number}      options.intervalMs    The normal polling interval
@@ -133,24 +137,27 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     return retryDelay;
   };
 
+  const runCheck = (isTriggered) => {
+    if (checkInFlight) return checkInFlight;
+
+    clearNextCheck();
+    checkInFlight = runCheckWithTimeout(check, isTriggered).then((result) => {
+      checkInFlight = null;
+      // A retry is prompted by the failure before it; only a poll is routine.
+      scheduleNextCheck(getDelayAfterCheck(result), () => runCheck(!result.succeeded));
+      return result;
+    });
+
+    return checkInFlight;
+  };
+
   /**
    * Runs a check immediately unless one is already running, in which case the
    * running check is returned. The next scheduled check is always timed from
    * the end of this one.
    * @return    {Promise<object>}    The check result
    */
-  const checkNow = () => {
-    if (checkInFlight) return checkInFlight;
-
-    clearNextCheck();
-    checkInFlight = runCheckWithTimeout(check).then((result) => {
-      checkInFlight = null;
-      scheduleNextCheck(getDelayAfterCheck(result), checkNow);
-      return result;
-    });
-
-    return checkInFlight;
-  };
+  const checkNow = () => runCheck(true);
 
   // A frozen, sleeping or cached page does not run its timers, so the check
   // it had scheduled can be long past due by the time the page resumes.
@@ -198,7 +205,7 @@ export const createPollingScheduler = ({ check, intervalMs, random = Math.random
     window.addEventListener('online', onOnline);
     window.addEventListener('pageshow', onPageShow);
 
-    checkNow();
+    runCheck(false);
   };
 
   const stop = () => {

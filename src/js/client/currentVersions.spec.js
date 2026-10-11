@@ -189,6 +189,46 @@ describe('getCurrentVersion', () => {
       expect(global.fetch.mock.calls.map(([, options]) => options.signal)).toEqual([signal, signal]);
     });
 
+    it('lets the browser cache answer a routine poll', async () => {
+      global.forceRefreshLocalizedData = makeLocalizedData({ versionFileUrl: VERSION_FILE_URL });
+      global.fetch = jest.fn().mockResolvedValue(mockOkFetch({ pages: {}, site: 'abc123' }));
+
+      await getCurrentVersion();
+
+      expect(global.fetch.mock.calls[0][1]).not.toHaveProperty('cache');
+    });
+
+    it('does not let the browser cache answer when asked to bypass it', async () => {
+      global.forceRefreshLocalizedData = makeLocalizedData({ versionFileUrl: VERSION_FILE_URL });
+      global.fetch = jest.fn().mockResolvedValue(mockOkFetch({ pages: {}, site: 'abc123' }));
+
+      await getCurrentVersion({ bypassCache: true });
+
+      expect(global.fetch.mock.calls[0][1].cache).toBe('no-cache');
+    });
+
+    it('keeps the interval cache-bust parameter when bypassing the browser cache', async () => {
+      global.forceRefreshLocalizedData = makeLocalizedData({ versionFileUrl: VERSION_FILE_URL });
+      global.fetch = jest.fn().mockResolvedValue(mockOkFetch({ pages: {}, site: 'abc123' }));
+
+      await getCurrentVersion();
+      await getCurrentVersion({ bypassCache: true });
+
+      expect(global.fetch.mock.calls[1][0]).toBe(global.fetch.mock.calls[0][0]);
+    });
+
+    it('bypasses the browser cache for the REST fallback too', async () => {
+      global.forceRefreshLocalizedData = makeLocalizedData({ versionFileUrl: VERSION_FILE_URL });
+      global.fetch = jest
+        .fn()
+        .mockReturnValueOnce(mockFailFetch(404))
+        .mockReturnValue(mockRestFetch({ currentVersionSite: 'abc' }));
+
+      await getCurrentVersion({ bypassCache: true });
+
+      expect(global.fetch.mock.calls[1][1].cache).toBe('no-cache');
+    });
+
     it('appends a cache-bust query parameter', async () => {
       global.forceRefreshLocalizedData = makeLocalizedData({
         refreshInterval: 60,

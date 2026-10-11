@@ -76,11 +76,15 @@ const fetchRestVersion = async (apiEndpoint, postId, fetchOptions) => {
  * Retrieves the current versions from the static version file when the site
  * uses one, and from the REST API otherwise or when the file is unavailable.
  * @param     {object}         options
- * @param     {AbortSignal}    options.signal    Aborts the request when the check is given up on
- * @return    {Promise<object>}                  `{ succeeded: true, versions }`, or a failed check
- *                                               result saying why the versions were not retrieved
+ * @param     {boolean}        options.bypassCache    Whether the browser must not answer from its
+ *                                                    cache. The static file URL only changes once
+ *                                                    per interval, so a check made between polls
+ *                                                    could otherwise be given the previous answer
+ * @param     {AbortSignal}    options.signal         Aborts the request when the check is given up on
+ * @return    {Promise<object>}                       `{ succeeded: true, versions }`, or a failed
+ *                                                    check result saying why they were not retrieved
  */
-export const getCurrentVersion = async ({ signal } = {}) => {
+export const getCurrentVersion = async ({ bypassCache = false, signal } = {}) => {
   const {
     apiEndpoint,
     postId,
@@ -89,7 +93,7 @@ export const getCurrentVersion = async ({ signal } = {}) => {
   // eslint-disable-next-line no-undef
   } = forceRefreshLocalizedData;
 
-  const fetchOptions = { signal };
+  const fetchOptions = { signal, ...(bypassCache && { cache: 'no-cache' }) };
 
   if (!versionFileUrl) return fetchRestVersion(apiEndpoint, postId, fetchOptions);
 

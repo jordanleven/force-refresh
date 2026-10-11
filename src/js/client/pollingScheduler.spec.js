@@ -180,6 +180,44 @@ describe('createPollingScheduler', () => {
     });
   });
 
+  describe('Routine and triggered checks', () => {
+    const wasTriggered = () => check.mock.calls.map(([{ isTriggered }]) => isTriggered);
+
+    it('treats the first check and every poll as routine', async () => {
+      await startScheduler();
+      await advance(INTERVAL_MS * 2);
+      expect(wasTriggered()).toEqual([false, false, false]);
+    });
+
+    it('treats a retry after a failed check as triggered', async () => {
+      check.mockResolvedValueOnce(NETWORK_FAILURE);
+      await startScheduler();
+      await advance(RETRY_BASE_DELAY_MS);
+      expect(wasTriggered()).toEqual([false, true]);
+    });
+
+    it('treats the poll after a successful retry as routine again', async () => {
+      check.mockResolvedValueOnce(NETWORK_FAILURE);
+      await startScheduler();
+      await advance(RETRY_BASE_DELAY_MS + INTERVAL_MS);
+      expect(wasTriggered()).toEqual([false, true, false]);
+    });
+
+    it('treats a check on resume as triggered', async () => {
+      await startScheduler();
+      jest.setSystemTime(Date.now() + INTERVAL_MS);
+      dispatchVisibilityChange('visible');
+      await advance(0);
+      expect(wasTriggered()).toEqual([false, true]);
+    });
+
+    it('treats a check asked for directly as triggered', async () => {
+      await startScheduler();
+      await scheduler.checkNow();
+      expect(wasTriggered()).toEqual([false, true]);
+    });
+  });
+
   describe('Failed checks', () => {
     it('retries after the base delay instead of stopping', async () => {
       check.mockResolvedValue(NETWORK_FAILURE);
