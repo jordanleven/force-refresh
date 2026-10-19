@@ -2,16 +2,23 @@
 
 $card-blur-default: blur(28px) saturate(1.8);
 $card-shadow-default: 0 8px 32px rgba(var.$black, 0.06), 0 2px 8px rgba(var.$black, 0.03), inset 0 1px 0 rgba(var.$white, 0.8);
+$card-shadow-raised: 0 8px 32px rgba(var.$black, 0.1), 0 2px 8px rgba(var.$black, 0.06), inset 0 1px 0 rgba(var.$white, 0.8);
 $card-radius-default: 0.75rem;
+$card-radius-large: 1.25rem;
 
-@mixin card-surface($bg: var.$card-surface) {
+@mixin card-surface($bg: var.$card-surface, $radius: $card-radius-default, $shadow: $card-shadow-default) {
   background: $bg;
   backdrop-filter: $card-blur-default;
-  border-radius: $card-radius-default;
-  box-shadow: $card-shadow-default;
+  border-radius: $radius;
+  box-shadow: $shadow;
   border: 1px solid var.$card-border;
   border-bottom-color: var.$card-border-bottom;
   overflow: hidden;
+}
+
+// The larger, more elevated card used for the main admin panels.
+@mixin card-surface-raised {
+  @include card-surface($radius: $card-radius-large, $shadow: $card-shadow-raised);
 }
 
 @mixin card-radius-top($radius: $card-radius-default) {
