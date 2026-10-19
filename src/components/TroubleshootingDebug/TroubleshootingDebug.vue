@@ -8,10 +8,10 @@
         class="debug-panel__icon-wrap"
         :class="classesIconWrap"
       >
-        <font-awesome-icon
+        <Icon
           class="debug-panel__icon"
           :class="classesIcon"
-          :icon="faBug"
+          name="bug"
         />
       </div>
       <div class="debug-panel__body">
@@ -43,7 +43,7 @@
         data-test="btn-submit-debug-info"
         @click="onSubmitDebugInfo"
       >
-        <font-awesome-icon :icon="faPaperPlane" />
+        <Icon name="paper-plane" />
         {{ $t('ADMIN_TROUBLESHOOTING.BUTTON_SUBMIT_DEBUG_INFO') }}
       </button>
     </div>
@@ -56,21 +56,16 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug, faPaperPlane } from '@fortawesome/free-solid-svg-icons';
+
 import VueTypes from 'vue-types';
 import { mapGetters } from 'vuex';
 import BaseToggle from '@/components/BaseToggle/BaseToggle.vue';
+import Icon from '@/components/Icon/Icon.vue';
 import TroubleshootingDebugModal from '@/components/TroubleshootingDebugModal/TroubleshootingDebugModal.vue';
-
-library.add(faBug, faPaperPlane);
 
 export default {
   name: 'TroubleshootingDebug',
-  components: {
-    BaseToggle,
-    TroubleshootingDebugModal,
-  },
+  components: { BaseToggle, Icon, TroubleshootingDebugModal },
   props: {
     debugInfo: VueTypes.shape({
       siteName: VueTypes.string.isRequired,
@@ -113,10 +108,6 @@ export default {
       return this.isDebugActive && this.isSubmitDebugEnabled;
     },
     ...mapGetters(['isFeatureEnabled']),
-  },
-  created() {
-    this.faBug = faBug;
-    this.faPaperPlane = faPaperPlane;
   },
   methods: {
     onModalClose() {

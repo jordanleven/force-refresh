@@ -29,6 +29,14 @@ describe('AdminScheduleRefreshUtils', () => {
     it('allows a date well in the future', () => {
       expect(filterAvailableDates(new Date('2099-12-31'))).toBe(false);
     });
+
+    it('disables the previous day relative to the given time', () => {
+      expect(filterAvailableDates(new Date(2026, 9, 18, 23, 59), new Date(2026, 9, 19, 0, 0))).toBe(true);
+    });
+
+    it('allows the day of the given time', () => {
+      expect(filterAvailableDates(new Date(2026, 9, 19), new Date(2026, 9, 19, 23, 59))).toBe(false);
+    });
   });
 
   describe('filterAvailableTimes', () => {

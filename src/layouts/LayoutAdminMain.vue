@@ -1,5 +1,5 @@
 <template>
-  <div class="wrap">
+  <div class="wrap force-refresh-redesign">
     <div class="header-row">
       <h1 class="header">
         {{ $t("PLUGIN_NAME_FORCE_REFRESH") }}
@@ -9,7 +9,7 @@
           v-if="isDebugActive"
           key="debug"
           variant="debug"
-          :icon="faBug"
+          icon="bug"
           :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_DEBUG_MODE')"
           :tooltip="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_DEBUG_MODE_TOOLTIP')"
         />
@@ -17,7 +17,7 @@
           v-if="isVersionOutdated"
           key="update"
           variant="update"
-          :icon="faArrowCircleUp"
+          icon="arrow-up"
           :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_OUTDATED', { latestVersion: troubleshootingInformation.versions.forceRefresh.required })"
           href="/wp-admin/plugins.php"
         />
@@ -25,7 +25,7 @@
           v-if="isVersionPreRelease"
           key="prerelease"
           variant="prerelease"
-          :icon="faTriangleExclamation"
+          icon="flask"
           :label="$t('ADMIN_REFRESH_MAIN.PLUGIN_BADGE_PRE_RELEASE')"
           :tooltip="$t(
             'ADMIN_REFRESH_MAIN.PLUGIN_BADGE_PRE_RELEASE_TOOLTIP',
@@ -34,7 +34,7 @@
         />
       </transition-group>
     </div>
-    <div class="admin-section__notifications">
+    <div v-if="isAdminNotificationSet" class="admin-section__notifications">
       <AdminNotification
         v-if="isAdminNotificationSet"
         :message="notificationMessage.message"
@@ -62,13 +62,19 @@
           :refresh-options="refreshOptions"
           :scheduled-refreshes="scheduledRefreshes"
           :site-name="siteName"
+          :last-refresh-at="lastRefreshAt"
+          :refresh-interval="refreshInterval"
+          :initial-tab="mainActiveTab"
+          :is-refreshing="isRefreshing"
+          @tab-changed="mainTabWasChanged"
           @refresh-requested="refreshSite"
           @schedule-refresh-requested="scheduleRefresh"
           @scheduled-refreshes-sync-requested="syncScheduledRefreshes"
           @delete-scheduled-refresh="deleteScheduledRefresh"
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
-          @release-notes-page-clicked="activateReleaseNotesPage"
+          @release-notes-page-clicked="activateReleaseHistoryPage"
+          @whats-new-page-clicked="activateReleaseNotesPage"
           @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
@@ -76,11 +82,14 @@
         v-if="!troubleshootingActive"
         :is-open="releaseNotesPageActive"
         :release-notes="releaseNotes"
+        :history-only="releaseHistoryActive"
         @modal-was-closed="exitAdminWindow"
       />
       <AdminScheduleRefresh
-        v-if="isScheduledRefreshEnabled && !troubleshootingActive && scheduleRefreshPageActive"
+        v-if="isScheduledRefreshEnabled && !troubleshootingActive"
         :is-open="scheduleRefreshPageActive"
+        :is-submitting="scheduleRefreshSubmitting"
+        :error-message="scheduleRefreshError"
         @modal-was-closed="exitAdminWindow"
         @schedule-refresh="refreshWasScheduled"
       />
@@ -89,20 +98,16 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faArrowCircleUp, faBug, faTriangleExclamation } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminHeaderBadge from '@/components/AdminHeaderBadge/AdminHeaderBadge.vue';
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
+import { shouldAnnounceWhatsNew } from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
 import AdminScheduleRefresh from '@/components/AdminScheduleRefresh/AdminScheduleRefresh.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
-import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
-
-library.add([faArrowCircleUp, faBug, faTriangleExclamation]);
 
 const isTroubleshootingViewActiveOnLoad = () => (
   typeof window !== 'undefined' && window.location.hash === '#troubleshooting'
@@ -123,13 +128,17 @@ export default {
   },
   data() {
     return {
-      faArrowCircleUp,
-      faBug,
-      faTriangleExclamation,
+      announcingVersion: false,
+      isRefreshing: false,
+      lastRefreshAt: null,
+      mainActiveTab: ['#settings', '#troubleshooting'].includes(window.location.hash) ? 'settings' : 'refresh',
       notificationMessage: {},
       pageTransitionName: null,
+      releaseHistoryActive: false,
       releaseNotesPageActive: false,
+      scheduleRefreshError: null,
       scheduleRefreshPageActive: false,
+      scheduleRefreshSubmitting: false,
       troubleshootingPageIsActive: isTroubleshootingViewActiveOnLoad(),
     };
   },
@@ -139,6 +148,7 @@ export default {
         this.troubleshootingPageIsActive && 'header--troubleshooting-active',
       ];
     },
+
     isAdminNotificationSet() {
       return !!this.notificationMessage?.message;
     },
@@ -172,12 +182,29 @@ export default {
   },
   mounted() {
     this.checkForOptionsUpdated();
+    if (!this.troubleshootingActive) {
+      try {
+        const { version } = this.troubleshootingInformation.versions.forceRefresh;
+        if (shouldAnnounceWhatsNew(version, window.localStorage.getItem('force-refresh-whats-new-version'))) {
+          this.announcingVersion = true;
+          this.releaseNotesPageActive = true;
+        }
+      } catch {
+        // Keep the normal controls usable when browser storage is unavailable.
+      }
+    }
   },
   methods: {
+    activateReleaseHistoryPage() {
+      this.releaseHistoryActive = true;
+      this.releaseNotesPageActive = true;
+    },
     activateReleaseNotesPage() {
+      this.releaseHistoryActive = false;
       this.releaseNotesPageActive = true;
     },
     activateTroubleshootingPage() {
+      this.mainActiveTab = 'settings';
       this.pageTransitionName = 'page-enter';
       this.troubleshootingPageIsActive = true;
       this.updateViewHash('troubleshooting');
@@ -187,6 +214,7 @@ export default {
         this.notificationMessageSet(this.$t('ADMIN_NOTIFICATIONS.SITE_SETTINGS_UPDATED_SUCCESS'));
       }
     },
+
     async deleteScheduledRefresh(timestamp) {
       const success = await this.requestDeleteScheduledRefresh(timestamp);
       if (success) {
@@ -196,13 +224,27 @@ export default {
       }
     },
     exitAdminWindow() {
+      if (this.announcingVersion) {
+        try {
+          window.localStorage.setItem('force-refresh-whats-new-version', this.troubleshootingInformation.versions.forceRefresh.version);
+        } catch {
+          // Dismissal must still work when browser storage is unavailable.
+        }
+        this.announcingVersion = false;
+      }
+      // Leave releaseHistoryActive alone so the content doesn't swap during the close animation.
       this.releaseNotesPageActive = false;
       this.scheduleRefreshPageActive = false;
     },
     exitTroubleshooting() {
       this.pageTransitionName = 'page-exit';
       this.troubleshootingPageIsActive = false;
-      this.updateViewHash(null);
+      this.updateViewHash('settings');
+    },
+
+    mainTabWasChanged(tab) {
+      this.mainActiveTab = tab;
+      this.updateViewHash(tab === 'settings' ? 'settings' : null);
     },
     notificationMessageClear() {
       this.notificationMessage = null;
@@ -223,29 +265,46 @@ export default {
       this.notificationMessageSetError(message);
     },
     async refreshSite() {
-      const success = await this.requestRefreshSite();
-
-      if (success) {
-        const [refreshIntervalValue, refreshIntervalUnit] = getRefreshIntervalUnitAndValue(this.refreshInterval);
-        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_SUCCESS', {
-          refreshIntervalUnit,
-          refreshIntervalValue,
-        }));
-      } else {
+      if (this.isRefreshing) return;
+      this.isRefreshing = true;
+      try {
+        const success = await this.requestRefreshSite();
+        if (success) {
+          // The refresh card confirms success inline, so only failures use the page notice.
+          this.notificationMessageClear();
+          this.lastRefreshAt = new Date();
+        } else {
+          this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE'));
+        }
+      } catch {
         this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SITE_REFRESHED_FAILURE'));
+      } finally {
+        this.isRefreshing = false;
       }
     },
     async refreshWasScheduled(scheduledRefresh) {
-      const success = await this.requestScheduledRefresh(scheduledRefresh);
-      this.scheduleRefreshPageActive = false;
-      if (success) {
-        await this.requestScheduledRefreshes();
-        this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_SUCCESS'));
-      } else {
-        this.notificationMessageSetError(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE'));
+      if (this.scheduleRefreshSubmitting) return;
+      this.scheduleRefreshSubmitting = true;
+      this.scheduleRefreshError = null;
+      try {
+        const success = await this.requestScheduledRefresh(scheduledRefresh);
+        if (success) {
+          this.scheduleRefreshPageActive = false;
+          await this.requestScheduledRefreshes();
+          this.notificationMessageSetSuccess(this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_SUCCESS'));
+        } else {
+          // The modal stays open, so the error must render inside it rather than behind the backdrop.
+          this.scheduleRefreshError = this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE');
+        }
+      } catch {
+        this.scheduleRefreshError = this.$t('ADMIN_NOTIFICATIONS.SCHEDULED_REFRESH_FAILURE');
+      } finally {
+        this.scheduleRefreshSubmitting = false;
       }
     },
+
     scheduleRefresh() {
+      this.scheduleRefreshError = null;
       this.scheduleRefreshPageActive = true;
     },
     async syncScheduledRefreshes() {
@@ -265,6 +324,7 @@ export default {
       const success = await this.updateForceRefreshSettings(updatedOptions);
 
       if (success) {
+        this.mainTabWasChanged('settings');
         // If we've updated the menu bar option, we need to manually reload the page in order
         // to have the menu item rerendered server side
         if (updatedOptions.showRefreshInMenuBar !== previousRefreshFromAdminBar) {
@@ -307,6 +367,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 22px;
 }
 
 .header-row__badges {
@@ -335,12 +396,15 @@ export default {
 }
 
 .admin-section__notifications {
-  margin-top: 1rem;
+  margin: 0 0 16px;
+
+  // The notice slides in from the side; clip it so narrow screens don't scroll horizontally.
+  overflow-x: clip;
 }
 
 .admin-section {
   position: relative;
-  padding-top: var.$space-medium;
+  padding-top: 0;
 }
 
 .admin-section__main,
@@ -385,5 +449,74 @@ export default {
 .page-exit-leave-to {
   opacity: 0;
   transform: translateY(1rem);
+}
+
+.force-refresh-redesign.wrap {
+  box-sizing: border-box;
+  width: 100%;
+
+  // Shared by the main and Troubleshooting views so switching between them doesn't shift the layout.
+  max-width: 1256px;
+  margin: 0 auto;
+  padding: 28px 28px 80px;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  font-size: 13.5px;
+  line-height: 1.45;
+  -webkit-font-smoothing: antialiased;
+}
+
+.force-refresh-redesign .header {
+  margin: 0;
+  padding: 0;
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 600;
+  letter-spacing: -0.4px;
+}
+
+@media (width <= 600px) {
+  .force-refresh-redesign.wrap { padding: 20px 16px 48px; }
+}
+</style>
+
+<style lang="scss">
+body[class~="tools_page_force_refresh"] #wpcontent { padding-left: 0; }
+
+// Modals teleport to <body>, so they need the same rules as the plugin root.
+body[class~="tools_page_force_refresh"] :is(.force-refresh-redesign, .modal-window)
+  :is(a, button, select, summary, input):focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 2px;
+}
+
+@media (width <= 600px) {
+  body[class~="tools_page_force_refresh"] .force-refresh-redesign :is(
+    .force-refresh-admin-options-footer .button,
+    .force-refresh-admin__options-utility .button,
+    .options-review,
+    .admin-review a
+  ) {
+    height: auto;
+    min-height: 44px;
+  }
+
+  body[class~="tools_page_force_refresh"] .modal-window .modal__close {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body[class~="tools_page_force_refresh"] .force-refresh-redesign :is(*, *::before, *::after) {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body[class~="tools_page_force_refresh"] #wpbody-content {
+  min-height: calc(100vh - 32px);
+  padding-bottom: 0;
 }
 </style>

@@ -1,9 +1,9 @@
 /**
- * Returns true if the given date is in the past (before today), false otherwise.
+ * Returns true if the given date is in the past (before the day of `now`), false otherwise.
  * Used by the date picker to disable past dates.
  */
-export function filterAvailableDates(date) {
-  const today = new Date();
+export function filterAvailableDates(date, now = new Date()) {
+  const today = new Date(now);
   today.setHours(0, 0, 0, 0);
 
   const checkDate = new Date(date);
@@ -18,8 +18,7 @@ export function filterAvailableDates(date) {
  * - Today: only future times allowed.
  * - Past dates: all times disabled.
  */
-export function filterAvailableTimes(date) {
-  const now = new Date();
+export function filterAvailableTimes(date, now = new Date()) {
   const selectedDate = new Date(date);
 
   const endOfToday = new Date(now);

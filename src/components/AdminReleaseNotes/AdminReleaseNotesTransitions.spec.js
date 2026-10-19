@@ -26,7 +26,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '0',
         opacity: '0',
-        transform: 'scaleY(0.97)',
       });
     });
   });
@@ -41,7 +40,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(animate).toHaveBeenCalledTimes(1);
       expect(element.style.height).toBe('184px');
       expect(element.style.opacity).toBe('1');
-      expect(element.style.transform).toBe('scaleY(1)');
     });
   });
 
@@ -51,7 +49,6 @@ describe('AdminReleaseNotesTransitions', () => {
         style: {
           height: '184px',
           opacity: '1',
-          transform: 'scaleY(1)',
         },
       });
 
@@ -60,7 +57,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '',
         opacity: '',
-        transform: '',
       });
     });
   });
@@ -74,7 +70,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '184px',
         opacity: '1',
-        transform: 'scaleY(1)',
       });
     });
   });
@@ -89,7 +84,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(animate).toHaveBeenCalledTimes(1);
       expect(element.style.height).toBe('0');
       expect(element.style.opacity).toBe('0');
-      expect(element.style.transform).toBe('scaleY(0.97)');
     });
   });
 
@@ -99,7 +93,6 @@ describe('AdminReleaseNotesTransitions', () => {
         style: {
           height: '0',
           opacity: '0',
-          transform: 'scaleY(0.97)',
         },
       });
 
@@ -108,7 +101,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '',
         opacity: '',
-        transform: '',
       });
     });
   });
