@@ -4,7 +4,7 @@
       <div class="plugin-versions__label">
         <BaseTooltip :content="versionTooltipContent">
           <span class="status-indicator" :class="statusClass">
-            <font-awesome-icon :icon="statusIcon" />
+            <Icon :name="statusIcon" />
           </span>
         </BaseTooltip>
         {{ label }} {{ $t('ADMIN_TROUBLESHOOTING.TROUBLESHOOTING_LABEL_VERSION') }}
@@ -17,26 +17,16 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import {
-  faCheck,
-  faInfo,
-  faExclamation,
-  faExclamationTriangle,
-} from '@fortawesome/free-solid-svg-icons';
+
 import VueTypes from 'vue-types';
 import BaseDescriptiveList from '@/components/BaseDescriptiveList/BaseDescriptiveList.vue';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
+import Icon from '@/components/Icon/Icon.vue';
 import { versionSatisfies, isDevelopmentVersion, getSanitizedVersion } from '@/js/admin/compare-versions.js';
-
-library.add(faCheck, faInfo, faExclamation, faExclamationTriangle);
 
 export default {
   name: 'TroubleshootingVersions',
-  components: {
-    BaseDescriptiveList,
-    BaseTooltip,
-  },
+  components: { BaseDescriptiveList, BaseTooltip, Icon },
   props: {
     eolDate: VueTypes.oneOfType([String, null]).def(null),
     label: VueTypes.string.isRequired,
@@ -57,10 +47,10 @@ export default {
       return 'status-indicator--okay';
     },
     statusIcon() {
-      if (this.versionIsOutdated) return faExclamation;
-      if (this.versionIsDevelopmentVersion) return faInfo;
-      if (this.versionIsEol) return faExclamationTriangle;
-      return faCheck;
+      if (this.versionIsOutdated) return 'exclamation';
+      if (this.versionIsDevelopmentVersion) return 'info';
+      if (this.versionIsEol) return 'triangle-exclamation';
+      return 'check';
     },
     versionIsDevelopmentVersion() {
       return isDevelopmentVersion(this.version);

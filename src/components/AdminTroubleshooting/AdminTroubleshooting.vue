@@ -208,7 +208,6 @@ export default {
 
 .force-refresh-troubleshooting {
   width: 100%;
-  background: var.$surface-subtle;
 }
 
 .troubleshooting {
@@ -267,7 +266,9 @@ export default {
   &__card-title {
     font-size: 0.6875rem;
     font-weight: 600;
-    color: var.$text-tertiary;
+
+    // Matches the main page's card headers and keeps 4.5:1 contrast at this size.
+    color: #6e6e73;
     text-transform: uppercase;
     letter-spacing: 0.07em;
   }
@@ -276,6 +277,26 @@ export default {
     display: flex;
     justify-content: flex-end;
     margin-top: var.$space-large;
+
+    // WordPress 7 recolors primary buttons; match the plugin's other primary actions.
+    .button-primary {
+      background: #2271b1;
+      border-color: #2271b1;
+      color: #fff;
+
+      &:hover,
+      &:focus {
+        background: #135e96;
+        border-color: #135e96;
+      }
+    }
+  }
+}
+
+@media (width <= 600px) {
+  .troubleshooting__content--with-terminal,
+  .troubleshooting__col-left {
+    grid-template-columns: 1fr;
   }
 }
 </style>

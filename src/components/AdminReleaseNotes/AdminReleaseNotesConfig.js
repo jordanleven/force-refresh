@@ -4,6 +4,23 @@ import {
   getNextExpandedMinorVersions,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesUtils.js';
 
+// What's New highlights describe one release. Update both values when a release has new
+// highlights; until then the modal only opens on demand.
+export const WHATS_NEW_MINOR_VERSION = '3.3';
+export const WHATS_NEW_FEATURES = [
+  { icon: 'tag', key: 'INTERFACE' },
+  { icon: 'clock', key: 'PICKER' },
+];
+
+export function getMinorVersion(version) {
+  return String(version ?? '').split('.').slice(0, 2).join('.');
+}
+
+export function shouldAnnounceWhatsNew(installedVersion, seenVersion) {
+  return getMinorVersion(installedVersion) === WHATS_NEW_MINOR_VERSION
+    && getMinorVersion(seenVersion) !== WHATS_NEW_MINOR_VERSION;
+}
+
 export function createReleaseNotesData() {
   return {
     expandedMinorVersions: {},

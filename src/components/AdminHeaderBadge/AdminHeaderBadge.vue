@@ -5,7 +5,7 @@
       :class="componentClass"
       :href="componentHref"
     >
-      <font-awesome-icon class="admin-header-badge__icon" :icon="icon" />
+      <Icon class="admin-header-badge__icon" :name="icon" />
       <span class="admin-header-badge__label">{{ label }}</span>
     </component>
   </Tooltip>
@@ -14,15 +14,17 @@
 <script>
 import VueTypes from 'vue-types';
 import Tooltip from '@/components/BaseTooltip/BaseTooltip.vue';
+import Icon from '@/components/Icon/Icon.vue';
 
 export default {
   name: 'AdminHeaderBadge',
   components: {
+    Icon,
     Tooltip,
   },
   props: {
     href: VueTypes.string,
-    icon: VueTypes.object.isRequired,
+    icon: VueTypes.string.isRequired,
     label: VueTypes.string.isRequired,
     tooltip: VueTypes.string,
     variant: VueTypes.oneOf(['update', 'prerelease', 'debug']).isRequired,
