@@ -16,11 +16,10 @@
     "SITE_SETTINGS_UPDATED_SUCCESS": "You've successfully updated settings for Force Refresh."
   },
   "ADMIN_SETTINGS": {
-    "OPTIONS_HEADER": "Options",
-    "OPTIONS_UTILITY_LEAVE_REVIEW": "Leave review",
-    "OPTIONS_UTILITY_VIEW_RELEASE_NOTES": "View release notes",
-    "OPTION_REFRESH_FROM_ADMIN_BAR": "Refresh from Admin Bar",
-    "OPTION_REFRESH_INTERVAL": "Refresh interval",
+    "OPTIONS_UTILITY_LEAVE_REVIEW": "Leave a review",
+    "OPTIONS_UTILITY_VIEW_RELEASE_NOTES": "Release Notes",
+    "OPTION_REFRESH_FROM_ADMIN_BAR": "Show in Admin Bar",
+    "OPTION_REFRESH_INTERVAL": "Check interval",
     "OPTION_UPDATE_METHOD": "Update method",
     "OPTION_UPDATE_METHOD_WORDPRESS_API": "WordPress API",
     "OPTION_UPDATE_METHOD_DESCRIPTION": "Controls how browsers check for updates. Static file polling is faster and puts less strain on your server, which is a good fit for busy or high-traffic sites.",
@@ -100,19 +99,18 @@
     "PLUGIN_BADGE_PRE_RELEASE_TOOLTIP": "You're running a pre-release version ({installedVersion}). This build is intended for debugging only.",
     "PLUGIN_BADGE_OUTDATED": "Update to {latestVersion}",
     "PLUGIN_BADGE_OUTDATED_TOOLTIP": "Your installed version ({installedVersion}) is outdated. Click to visit the Plugins page.",
-    "REFRESH_DIRECTIONS": "Here, you can force all currently-connected users to manually reload the site \"{siteName}\".",
-    "REFRESH_DIRECTIONS_NO_SITE_NAME": "Here, you can force all currently-connected users to manually reload this site."
+    "REFRESH_DIRECTIONS": "Refresh \u201c{siteName}\u201d",
+    "REFRESH_DIRECTIONS_NO_SITE_NAME": "Refresh your site"
   },
   "FORM_BUTTONS_GENERIC": {
     "FORCE_REFRESH_SITE_NOW": "Force Refresh Site",
-    "FORCE_REFRESH_SITE_SCHEDULE": "Schedule Force Refresh",
-    "TOGGLE": "Toggle",
-    "UPDATE": "Update"
+    "FORCE_REFRESH_SITE_SCHEDULE": "Schedule",
+    "TOGGLE": "Toggle"
   },
   "RELEASE_NOTES": {
     "BADGE_CURRENT": "Current",
     "BADGE_PRERELEASE": "Pre-release",
-    "HEADER": "Release Notes",
+    "HEADER": "What\u2019s New",
     "MINOR_VERSION_HIDE": "Hide",
     "MINOR_VERSION_LABEL": "Version {minorVersion}",
     "MINOR_VERSION_SHOW": "Show",
@@ -122,17 +120,46 @@
   "SCHEDULE_REFRESH": {
     "BUTTON_DELETE": "Delete",
     "DATE_TIME_LABEL": "Select date and time",
-    "DESCRIPTION": "Please select the date and time you'd like to schedule a refresh.",
-    "HEADER": "Schedule Refresh",
+    "DESCRIPTION": "Pick a date and time to request a refresh for your site.",
+    "HEADER": "Schedule a Refresh",
     "HEADER_SCHEDULED_REFRESHES": "Scheduled Refresh",
     "HEADER_SCHEDULED_REFRESHES_PLURAL": "Scheduled Refreshes",
     "SCHEDULED_REFRESH_TIMING_IMMINENT": "imminent",
     "SCHEDULED_REFRESH_TIMING_SECOND": "{count} second",
     "SCHEDULED_REFRESH_TIMING_SECONDS": "{count} seconds",
-    "SUBMIT_BUTTON": "Schedule refresh",
-    "SUBMIT_BUTTON_WITH_DATE": "Schedule refresh for {scheduledDate}"
+    "SUBMIT_BUTTON": "Schedule refresh"
   },
   "MODAL": {
     "CLOSE": "Close"
+  },
+  "REDESIGN": {
+    "SECTIONS": "Force Refresh sections",
+    "TAB_REFRESH": "Refresh",
+    "TAB_SETTINGS": "Settings",
+    "REFRESH_DESCRIPTION": "Request a page reload for every visitor viewing your site.",
+    "REFRESH_SENT_DESCRIPTION": "Connected browsers will reload within {refreshIntervalValue} {refreshIntervalUnit}.",
+    "LAST_REFRESH": "Last refreshed at {time}",
+    "ADMIN_BAR_DESCRIPTION": "Add a Force Refresh shortcut to the WordPress admin bar.",
+    "INTERVAL_DESCRIPTION": "How often visitors\u2019 browsers check for a refresh request.",
+    "SAVE_SETTINGS": "Save Settings",
+    "GET_STARTED": "Get started",
+    "HOUR": "Hour",
+    "MINUTE": "Minute",
+    "CANCEL": "Cancel",
+    "PREVIOUS_MONTH": "Previous month",
+    "NEXT_MONTH": "Next month",
+    "SCHEDULE_TIMEZONE": "Times are in {timezone}.",
+    "FUTURE_TIME": "Choose a date and time in the future.",
+    "PERIOD": "AM or PM",
+    "ADVANCED": "Advanced",
+    "WHATS_NEW_INTERFACE_TITLE": "Redesigned Interface",
+    "WHATS_NEW_INTERFACE_BODY": "A cleaner, faster admin page with tabbed navigation and a refreshed settings layout.",
+    "WHATS_NEW_PICKER_TITLE": "Improved Date & Time Picker",
+    "WHATS_NEW_PICKER_BODY": "The new modal makes selecting a refresh time feel natural and effortless.",
+    "SENDING_REFRESH": "Sending refresh request to all connected browsers\u2026",
+    "REFRESHING": "Refreshing\u2026",
+    "REFRESH_REQUESTED": "Refresh requested",
+    "CLEAR_DATE": "Clear date",
+    "WHATS_NEW": "What's New"
   }
 }

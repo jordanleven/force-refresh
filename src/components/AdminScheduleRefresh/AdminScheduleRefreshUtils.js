@@ -18,8 +18,7 @@ export function filterAvailableDates(date) {
  * - Today: only future times allowed.
  * - Past dates: all times disabled.
  */
-export function filterAvailableTimes(date) {
-  const now = new Date();
+export function filterAvailableTimes(date, now = new Date()) {
   const selectedDate = new Date(date);
 
   const endOfToday = new Date(now);

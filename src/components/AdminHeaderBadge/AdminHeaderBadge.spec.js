@@ -1,10 +1,5 @@
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faBug } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
 import AdminHeaderBadge from './AdminHeaderBadge.vue';
-
-library.add(faBug);
 
 // Render the slot so we can inspect the badge element inside
 const TooltipStub = {
@@ -15,11 +10,10 @@ const TooltipStub = {
 
 const getWrapper = (props = {}) => shallowMount(AdminHeaderBadge, {
   global: {
-    components: { FontAwesomeIcon },
     stubs: { Tooltip: TooltipStub },
   },
   props: {
-    icon: faBug,
+    icon: 'bug',
     label: 'Debug mode active',
     variant: 'debug',
     ...props,

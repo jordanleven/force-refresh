@@ -6,10 +6,10 @@
     @click="refreshSite"
   >
     <span class="force-refresh__admin-bar-inner">
-      <font-awesome-icon
+      <Icon
         class="force-refresh-logo"
         :class="logoClass"
-        :icon="forceRefreshIcon"
+        :name="forceRefreshIcon"
       />
       {{ $t('FORM_BUTTONS_GENERIC.FORCE_REFRESH_SITE_NOW') }}
     </span>
@@ -24,26 +24,22 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSyncAlt } from '@fortawesome/free-solid-svg-icons';
+
 import VueTypes from 'vue-types';
 import { mapActions, mapGetters } from 'vuex';
 import AdminFooterNotification from '@/components/AdminFooterNotification/AdminFooterNotification.vue';
+import Icon from '@/components/Icon/Icon.vue';
 import { getRefreshIntervalUnitAndValue } from '@/js/utilities/getRefreshIntervalUnitAndValue.js';
-
-library.add([faSyncAlt]);
 
 export default {
   name: 'LayoutAdminBar',
-  components: {
-    AdminFooterNotification,
-  },
+  components: { AdminFooterNotification, Icon },
   props: {
     targetNotificationContainer: VueTypes.string.isRequired,
   },
   data() {
     return {
-      forceRefreshIcon: faSyncAlt,
+      forceRefreshIcon: 'refresh',
       isNotificationActive: false,
       notificationMessage: null,
       refreshTriggered: false,
