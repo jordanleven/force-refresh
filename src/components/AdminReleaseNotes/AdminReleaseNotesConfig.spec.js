@@ -8,8 +8,10 @@ import {
   getMinorVersionToggleLabel,
   hasMinorVersionGrouping,
   isMinorVersionExpanded,
+  shouldAnnounceWhatsNew,
   syncExpandedMinorVersions,
   toggleMinorVersionGroup,
+  WHATS_NEW_MINOR_VERSION,
 } from './AdminReleaseNotesConfig.js';
 
 const RELEASE_NOTES_FIXTURE = {
@@ -180,5 +182,15 @@ describe('AdminReleaseNotesConfig', () => {
     it('returns the show label when the section is collapsed', () => {
       expect(getMinorVersionToggleLabel(createVm(), '2.16')).toBe('RELEASE_NOTES.MINOR_VERSION_SHOW:{}');
     });
+  });
+});
+
+describe('shouldAnnounceWhatsNew', () => {
+  it('announces only the release the highlights describe, once per minor version', () => {
+    expect(shouldAnnounceWhatsNew(`${WHATS_NEW_MINOR_VERSION}.0`, null)).toBe(true);
+    expect(shouldAnnounceWhatsNew(`${WHATS_NEW_MINOR_VERSION}.1`, `${WHATS_NEW_MINOR_VERSION}.0`)).toBe(false);
+    expect(shouldAnnounceWhatsNew(`${WHATS_NEW_MINOR_VERSION}.0-beta.1`, '3.2.1')).toBe(true);
+    expect(shouldAnnounceWhatsNew('3.2.1', null)).toBe(false);
+    expect(shouldAnnounceWhatsNew('9.0.0', null)).toBe(false);
   });
 });

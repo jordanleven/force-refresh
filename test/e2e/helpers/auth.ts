@@ -45,16 +45,24 @@ export async function loginAsAdmin(page: Page): Promise<void> {
   throw new Error(`Failed to reach wp-admin after ${LOGIN_MAX_ATTEMPTS} login attempts`);
 }
 
-export async function goToPluginPage(page: Page): Promise<void> {
+export async function goToPluginPage(page: Page, section: 'refresh' | 'settings' = 'refresh'): Promise<void> {
   await page.goto('/wp-admin/tools.php?page=force_refresh');
-  await page.locator('select[name="refresh-interval"]')
+  await page.locator('#force-refresh-tab-refresh')
     .waitFor({ timeout: 15_000 })
     .catch(async () => {
       // Retry once — in CI, WordPress admin may not be fully ready
       // immediately after the healthcheck passes
       await page.goto('/wp-admin/tools.php?page=force_refresh');
-      await page.locator('select[name="refresh-interval"]').waitFor();
+      await page.locator('#force-refresh-tab-refresh').waitFor();
     });
+  const getStarted = page.locator('.whats-new').getByRole('button', { name: 'Get started', exact: true });
+  if (await getStarted.isVisible()) await getStarted.click();
+  if (section === 'settings') await page.locator('#force-refresh-tab-settings').click();
+}
+
+export async function goToPluginSettings(page: Page, advanced = false): Promise<void> {
+  await goToPluginPage(page, 'settings');
+  if (advanced) await page.locator('.advanced-options summary').click();
 }
 
 export function getDebugBadge(page: Page) {

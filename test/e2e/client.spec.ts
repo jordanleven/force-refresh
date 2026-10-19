@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import {
   goToPluginPage,
+  goToPluginSettings,
   waitForDebugModeDisabled,
   waitForDebugModeEnabled,
 } from './helpers/auth';
@@ -11,7 +12,7 @@ test.describe('Client', () => {
   test.beforeAll(async ({ browser, baseURL }) => {
     const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
     const page = await context.newPage();
-    await goToPluginPage(page);
+    await goToPluginSettings(page);
 
     // Set the refresh interval to 30 seconds so the reload tests don't
     // have to wait the default 2 minutes, and enable the admin bar button
@@ -44,7 +45,7 @@ test.describe('Client', () => {
     test.beforeAll(async ({ browser, baseURL }) => {
       const adminContext = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
       const adminPage = await adminContext.newPage();
-      await goToPluginPage(adminPage);
+      await goToPluginSettings(adminPage);
 
       // Enable debug mode and check if it actually took effect
       await adminPage.locator('[data-test="btn-troubleshooting"]').click();
@@ -59,6 +60,7 @@ test.describe('Client', () => {
       }
 
       await adminPage.locator('[data-test="btn-exit-troubleshooting"]').click();
+      await adminPage.locator('#force-refresh-tab-refresh').click();
 
       // Open visitor page after debug mode is active so it initializes with debug on
       const visitorContext = await browser.newContext({ baseURL });
@@ -93,7 +95,7 @@ test.describe('Client', () => {
 
       const adminContext = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
       const adminPage = await adminContext.newPage();
-      await goToPluginPage(adminPage);
+      await goToPluginSettings(adminPage);
       await adminPage.locator('[data-test="btn-troubleshooting"]').click();
       await adminPage.locator('[data-test="toggle-debug-mode"] label').click();
       await waitForDebugModeDisabled(adminPage);

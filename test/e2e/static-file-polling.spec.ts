@@ -1,26 +1,28 @@
 import { test, expect } from '@playwright/test';
-import { goToPluginPage } from './helpers/auth';
+import { goToPluginPage, goToPluginSettings } from './helpers/auth';
 import { triggerRefreshAndWaitForReload } from './helpers/client';
 import { getAuthFile } from './helpers/constants';
 
 const VERSION_FILE_PATH = '/wp-content/uploads/force-refresh/version.json';
 
 async function enableStaticFilePolling(adminPage: Parameters<typeof goToPluginPage>[0]) {
-  await goToPluginPage(adminPage);
+  await goToPluginSettings(adminPage, true);
   await adminPage.locator('[data-test="select-static-file-polling"]').selectOption({ index: 0 });
   await Promise.all([
     adminPage.waitForResponse((r) => r.url().includes('/options') && r.status() === 201),
     adminPage.locator('[data-test="btn-update-options"]').click(),
   ]);
+  await adminPage.locator('#force-refresh-tab-refresh').click();
 }
 
 async function disableStaticFilePolling(adminPage: Parameters<typeof goToPluginPage>[0]) {
-  await goToPluginPage(adminPage);
+  await goToPluginSettings(adminPage, true);
   await adminPage.locator('[data-test="select-static-file-polling"]').selectOption({ index: 1 });
   await Promise.all([
     adminPage.waitForResponse((r) => r.url().includes('/options') && r.status() === 201),
     adminPage.locator('[data-test="btn-update-options"]').click(),
   ]);
+  await adminPage.locator('#force-refresh-tab-refresh').click();
 }
 
 test.describe('Static file polling', () => {

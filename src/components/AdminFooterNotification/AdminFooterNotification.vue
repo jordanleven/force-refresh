@@ -9,7 +9,7 @@
             class="admin-notice--force-refresh__button"
             @click="notificationClosed"
           >
-            <span class="dashicons dashicons-dismiss" />
+            <Icon name="close" class="notification-dismiss-icon" />
             <span
               class="screen-reader-text"
             >
@@ -24,11 +24,13 @@
 
 <script>
 import VueTypes from 'vue-types';
+import Icon from '@/components/Icon/Icon.vue';
 
 const EVENT_NOTIFICATION_CLOSED = 'notification-closed';
 
 export default {
   name: 'BaseNotice',
+  components: { Icon },
   props: {
     message: VueTypes.string.isRequired,
   },

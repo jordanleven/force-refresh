@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { goToPluginPage } from './helpers/auth';
+import { goToPluginPage, goToPluginSettings } from './helpers/auth';
 import { getAuthFile } from './helpers/constants';
 
 test.describe('Admin', () => {
@@ -22,7 +22,7 @@ test.describe('Admin', () => {
       expect(afterVersion).not.toBe(beforeVersion);
     });
 
-    test.describe('Success banner', () => {
+    test.describe('Success confirmation', () => {
       test.describe.configure({ mode: 'serial' });
       let page: Page;
 
@@ -37,22 +37,27 @@ test.describe('Admin', () => {
         await page.close();
       });
 
-      test('Clicking Force Refresh shows a success banner', async () => {
-        await expect(page.locator('.notice-force-refresh.notice-success')).toBeVisible();
+      test('Clicking Force Refresh confirms the request inside the refresh card', async () => {
+        await expect(page.locator('.refresh-hero__success')).toBeVisible();
       });
 
-      test('Clicking the dismiss button hides the banner', async () => {
-        const banner = page.locator('.notice-force-refresh.notice-success');
-        await expect(banner).toBeVisible();
-        await banner.locator('.notice-force-refresh__button').click();
-        await expect(banner).not.toBeVisible();
+      test('A successful refresh explains when connected browsers reload', async () => {
+        await expect(page.locator('[data-test="refresh-hero-description"]')).toContainText('Connected browsers will reload within');
+      });
+
+      test('A successful refresh shows the last refresh time', async () => {
+        await expect(page.locator('.refresh-hero__status')).toBeVisible();
+      });
+
+      test('A successful refresh does not also show a page notice', async () => {
+        await expect(page.locator('.notice-force-refresh.notice-success')).toHaveCount(0);
       });
     });
   });
 
   test.describe('Admin bar option', () => {
     test('Setting the option to Show displays the admin bar button', async ({ page }) => {
-      await goToPluginPage(page);
+      await goToPluginSettings(page);
       await page.selectOption('select[name="show-in-wp-admin-bar"]', { label: 'Show' });
       await page.locator('[data-test="btn-update-options"]').click();
 
@@ -60,7 +65,7 @@ test.describe('Admin', () => {
     });
 
     test('Setting the option to Hide removes the admin bar button', async ({ page }) => {
-      await goToPluginPage(page);
+      await goToPluginSettings(page);
       await page.selectOption('select[name="show-in-wp-admin-bar"]', { label: 'Hide' });
       await page.locator('[data-test="btn-update-options"]').click();
 
@@ -70,7 +75,7 @@ test.describe('Admin', () => {
 
   test.describe('Troubleshooting', () => {
     test('Clicking the Troubleshooting button navigates to the troubleshooting section', async ({ page }) => {
-      await goToPluginPage(page);
+      await goToPluginSettings(page);
       await page.locator('[data-test="btn-troubleshooting"]').click();
       await expect(page.locator('.force-refresh-troubleshooting')).toBeVisible();
     });
@@ -82,7 +87,7 @@ test.describe('Admin', () => {
       test.beforeAll(async ({ browser, baseURL }) => {
         const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
         page = await context.newPage();
-        await goToPluginPage(page);
+        await goToPluginSettings(page);
         await page.locator('[data-test="btn-troubleshooting"]').click();
       });
 
@@ -110,7 +115,7 @@ test.describe('Admin', () => {
       test.beforeAll(async ({ browser, baseURL }) => {
         const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
         page = await context.newPage();
-        await goToPluginPage(page);
+        await goToPluginSettings(page);
         await page.locator('[data-test="btn-troubleshooting"]').click();
       });
 
@@ -151,7 +156,7 @@ test.describe('Admin', () => {
       test.beforeAll(async ({ browser, baseURL }) => {
         const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
         page = await context.newPage();
-        await goToPluginPage(page);
+        await goToPluginSettings(page);
         await page.locator('[data-test="btn-troubleshooting"]').click();
         await page.locator('[data-test="toggle-debug-mode"] label').click();
       });
@@ -167,9 +172,19 @@ test.describe('Admin', () => {
         await page.close();
       });
 
+      test('The support dialog has an accessible name', async () => {
+        await page.locator('[data-test="btn-submit-debug-info"]').click();
+        try {
+          await expect(page.getByRole('dialog', { name: 'Submit Debug Report', exact: true })).toBeVisible();
+        } finally {
+          await page.locator('[data-test="btn-cancel-debug-email"]').click();
+          await page.locator('.modal-window').waitFor({ state: 'hidden' });
+        }
+      });
+
       test('Clicking Submit Debug Info opens the debug email modal', async () => {
         await page.locator('[data-test="btn-submit-debug-info"]').click();
-        await expect(page.locator('.modal-window')).toBeVisible();
+        await expect(page.locator('.modal-window--open')).toBeVisible();
       });
 
       test('The modal shows a loading state while fetching data', async () => {
@@ -216,10 +231,18 @@ test.describe('Admin', () => {
     });
 
     test('Clicking Exit Troubleshooting returns to the main admin page', async ({ page }) => {
-      await goToPluginPage(page);
+      await goToPluginSettings(page);
       await page.locator('[data-test="btn-troubleshooting"]').click();
       await page.locator('[data-test="btn-exit-troubleshooting"]').click();
-      await expect(page.locator('.force-refresh-admin__options')).toBeVisible();
+      await expect(page.locator('#force-refresh-tab-refresh')).toBeVisible();
+    });
+
+    test('Settings remain available after exiting Troubleshooting', async ({ page }) => {
+      await goToPluginSettings(page);
+      await page.locator('[data-test="btn-troubleshooting"]').click();
+      await page.locator('[data-test="btn-exit-troubleshooting"]').click();
+      await page.locator('#force-refresh-tab-settings').click();
+      await expect(page.locator('select[name="refresh-interval"]')).toBeVisible();
     });
   });
 
@@ -232,7 +255,7 @@ test.describe('Admin', () => {
     test.beforeAll(async ({ browser, baseURL }) => {
       const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
       page = await context.newPage();
-      await goToPluginPage(page);
+      await goToPluginSettings(page);
       await page.locator('[data-test="btn-release-notes"]').click();
       await page.waitForLoadState('networkidle');
       firstToggle = page.locator('[data-test="toggle-release-note-group-0"]');
@@ -244,7 +267,10 @@ test.describe('Admin', () => {
     });
 
     test('Clicking View Release Notes shows the release notes modal', async () => {
-      await expect(page.locator('.modal-window')).toBeVisible();
+      await expect(page.locator('.modal-window--open')).toBeVisible();
+    });
+
+    test('The release notes modal shows its content', async () => {
       await expect(page.locator('[data-test="release-notes-modal-content"]')).toBeVisible();
     });
 
