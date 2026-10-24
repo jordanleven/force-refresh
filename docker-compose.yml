@@ -1,4 +1,3 @@
-version: '3.4'
 services:
   traefik:
     image: traefik:v2.1.3
@@ -49,7 +48,7 @@ services:
       - db-qa
       - mailpit
       - traefik
-    image: 'wordpress:7-php8.3-apache'
+    image: 'wordpress:7.1.3-php8.3-apache'
     ports:
       - '8086:80'
     healthcheck:
@@ -96,7 +95,14 @@ services:
       - db-wp5
       - mailpit
       - traefik
-    image: 'wordpress:5.9-php7.4-apache'
+    image: 'force-refresh-wordpress-wp5:5.9.19'
+    build:
+      context: ./docker
+      dockerfile: wordpress-archive.Dockerfile
+      args:
+        WORDPRESS_BASE_IMAGE: wordpress:6.1.1-php7.4-apache
+        WORDPRESS_VERSION: 5.9.19
+        WORDPRESS_SHA1: b4b60b99f3b7eb0494c82725e17f9d5b346374f1
     ports:
       - '8083:80'
     healthcheck:
@@ -143,7 +149,14 @@ services:
       - db-wp6
       - mailpit
       - traefik
-    image: 'wordpress:6.9-php8.3-apache'
+    image: 'force-refresh-wordpress-wp6:6.9.10'
+    build:
+      context: ./docker
+      dockerfile: wordpress-archive.Dockerfile
+      args:
+        WORDPRESS_BASE_IMAGE: wordpress:7.1.3-php8.3-apache
+        WORDPRESS_VERSION: 6.9.10
+        WORDPRESS_SHA1: a68c82de3042bf095d6ecf9001aa06447b86232f
     ports:
       - '8084:80'
     healthcheck:
@@ -190,7 +203,7 @@ services:
       - db-wp7
       - mailpit
       - traefik
-    image: 'wordpress:beta-7.1-php8.3-apache'
+    image: 'wordpress:7.1.3-php8.3-apache'
     ports:
       - '8085:80'
     healthcheck:
