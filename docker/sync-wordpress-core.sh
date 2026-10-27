@@ -24,8 +24,8 @@ mkdir -p "$backup_dir"
 
 case "$1" in
   wp5) image=force-refresh-wordpress-wp5:5.9.19 ;;
-  wp6) image=force-refresh-wordpress-wp6:6.9.10 ;;
-  *) image=wordpress:7.1.3-php8.3-apache ;;
+  wp6) image=force-refresh-wordpress-wp6:6.9.10-php8.3.36 ;;
+  *) image=wordpress:7.1.3-php8.3-apache@sha256:e5a724ec7ad9055f48b2941ac1b674b08e77ed60edb8937a6254fb89ec45ddf7 ;;
 esac
 
 if [[ "$1" == wp5 || "$1" == wp6 ]]; then
