@@ -42,6 +42,8 @@ npm run changelog:note
 
 changie will prompt for a kind and a human-readable description. Commit the resulting `.changes/unreleased/*.yaml` file with your code.
 
+Feature notes appear in the admin's What's New dialog, which uses the first sentence as the title and the rest as the description. changie also asks for an icon to show beside the feature; choose `none` to use the default star.
+
 | Kind | Semver impact |
 | --- | --- |
 | Added, Changed, Deprecated | minor bump |

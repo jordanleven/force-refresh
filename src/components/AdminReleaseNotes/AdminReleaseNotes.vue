@@ -26,7 +26,7 @@
       <ul v-if="!historyOnly" class="whats-new__highlights">
         <li v-for="feature in visibleFeatures" :key="`${feature.versionNumber}-${feature.title}`">
           <span class="whats-new__bullet" aria-hidden="true">
-            <Icon :size="14" name="star" />
+            <Icon :size="14" :name="feature.icon" />
           </span>
           <div>
             <h3>
@@ -140,7 +140,7 @@
                         v-for="sectionNote, sectionNoteIndex in releaseNote.sectionNotes"
                         :key="sectionNoteIndex"
                       >
-                        {{ sectionNote }}
+                        {{ getReleaseNoteText(sectionNote) }}
                       </li>
                     </ul>
                   </div>
@@ -193,7 +193,7 @@
                   v-for="sectionNote, sectionNoteIndex in releaseNote.sectionNotes"
                   :key="sectionNoteIndex"
                 >
-                  {{ sectionNote }}
+                  {{ getReleaseNoteText(sectionNote) }}
                 </li>
               </ul>
             </div>
@@ -223,6 +223,7 @@ import {
   getMinorVersionToggleLabel,
   hasMinorVersionGrouping,
   isMinorVersionExpanded,
+  parseReleaseNote,
   syncExpandedMinorVersions,
   toggleMinorVersionGroup,
   WHATS_NEW_MAX_FEATURES,
@@ -306,6 +307,9 @@ export default {
     },
     getMinorVersionToggleLabel(minorVersion) {
       return getMinorVersionToggleLabel(this, minorVersion);
+    },
+    getReleaseNoteText(note) {
+      return parseReleaseNote(note).text;
     },
     getReleaseNotesClass(release) {
       return [

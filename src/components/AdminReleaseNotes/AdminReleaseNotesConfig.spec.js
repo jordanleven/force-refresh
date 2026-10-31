@@ -9,10 +9,12 @@ import {
   hasMinorVersionGrouping,
   isMinorVersionExpanded,
   getWhatsNewFeatures,
+  parseReleaseNote,
   shouldAnnounceWhatsNew,
   splitFeatureNote,
   syncExpandedMinorVersions,
   toggleMinorVersionGroup,
+  WHATS_NEW_DEFAULT_ICON,
 } from './AdminReleaseNotesConfig.js';
 
 const RELEASE_NOTES_FIXTURE = {
@@ -216,6 +218,24 @@ describe('splitFeatureNote', () => {
   });
 });
 
+describe('parseReleaseNote', () => {
+  it('reads the icon named in a note comment', () => {
+    expect(parseReleaseNote('Redesigned admin. A cleaner page. <!-- icon: palette -->').icon).toBe('palette');
+  });
+  it('removes the icon comment from the note text', () => {
+    expect(parseReleaseNote('Redesigned admin. A cleaner page. <!-- icon: palette -->').text).toBe('Redesigned admin. A cleaner page.');
+  });
+  it('reads no icon from a note without a comment', () => {
+    expect(parseReleaseNote('Redesigned admin.').icon).toBeNull();
+  });
+  it('keeps a note without a comment unchanged', () => {
+    expect(parseReleaseNote('Redesigned admin.').text).toBe('Redesigned admin.');
+  });
+  it('removes other comments from the note text', () => {
+    expect(parseReleaseNote('Redesigned admin. <!-- reviewed -->').text).toBe('Redesigned admin.');
+  });
+});
+
 describe('getWhatsNewFeatures', () => {
   const release = (...features) => ({
     notes: [
@@ -258,5 +278,25 @@ describe('getWhatsNewFeatures', () => {
   });
   it('excludes the minor version the user last saw as a patch prerelease', () => {
     expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '3.2.1-beta.1'))).toEqual(['3.3.0', '3.3.0']);
+  });
+  it('gives each feature the icon named in its note', () => {
+    const [{ icon }] = getWhatsNewFeatures({ '3.3.0': release('Redesign. <!-- icon: palette -->') }, '3.3.0', null);
+    expect(icon).toBe('palette');
+  });
+  it('keeps the icon comment out of the feature title', () => {
+    const [{ title }] = getWhatsNewFeatures({ '3.3.0': release('Redesign. <!-- icon: palette -->') }, '3.3.0', null);
+    expect(title).toBe('Redesign.');
+  });
+  it('keeps the icon comment out of the feature description', () => {
+    const [{ description }] = getWhatsNewFeatures({ '3.3.0': release('Redesign. A cleaner page. <!-- icon: palette -->') }, '3.3.0', null);
+    expect(description).toBe('A cleaner page.');
+  });
+  it('gives features without an icon the default icon', () => {
+    const [{ icon }] = getWhatsNewFeatures({ '3.3.0': release('Redesign.') }, '3.3.0', null);
+    expect(icon).toBe(WHATS_NEW_DEFAULT_ICON);
+  });
+  it('gives features with an unknown icon the default icon', () => {
+    const [{ icon }] = getWhatsNewFeatures({ '3.3.0': release('Redesign. <!-- icon: unicorn -->') }, '3.3.0', null);
+    expect(icon).toBe(WHATS_NEW_DEFAULT_ICON);
   });
 });

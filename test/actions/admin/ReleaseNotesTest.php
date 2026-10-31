@@ -29,6 +29,7 @@ Plugin header content
 
  ##### **New Features**
 * Update minimum PHP version to 8.2.
+* Redesign the admin page. Settings have their own tab. <!-- icon: palette -->
 README;
 
 /**
@@ -121,5 +122,17 @@ final class ReleaseNotesTest extends TestCase {
 
         $this->assertArrayHasKey( '1984.1.24', $result );
         $this->assertArrayHasKey( '2007.6.29', $result );
+    }
+
+    /**
+     * Test that a feature note keeps its icon comment for the What's New dialog.
+     */
+    public function testFeatureNoteKeepsIconComment() {
+        $result = $this->parseReadme( '2007.6.29' );
+
+        $this->assertEquals(
+            'Redesign the admin page. Settings have their own tab. <!-- icon: palette -->',
+            $result['2007.6.29']['notes'][0]['sectionNotes'][1]
+        );
     }
 }

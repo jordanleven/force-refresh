@@ -75,6 +75,7 @@
     "globals": "^17.13.0",
     "jest": "^30.5.2",
     "jest-environment-jsdom": "^30.5.2",
+    "js-yaml": "^4.3.2",
     "md-2-json": "^2.0.0",
     "postcss": "^8.5.32",
     "postcss-html": "^2.0.0",
