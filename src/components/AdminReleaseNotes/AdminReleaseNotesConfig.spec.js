@@ -32,7 +32,6 @@ const RELEASE_NOTES_FIXTURE = {
     notes: [],
   },
 };
-
 function createVm(overrides = {}) {
   return {
     ...createReleaseNotesData(),
@@ -40,7 +39,6 @@ function createVm(overrides = {}) {
     ...overrides,
   };
 }
-
 describe('AdminReleaseNotesConfig', () => {
   describe('getFlatReleaseNotes', () => {
     it('returns release entries in render-ready shape', () => {
@@ -60,7 +58,6 @@ describe('AdminReleaseNotesConfig', () => {
       ]);
     });
   });
-
   describe('getGroupedMinorReleaseNotes', () => {
     it('groups releases by minor version for the component view', () => {
       expect(getGroupedMinorReleaseNotes(RELEASE_NOTES_FIXTURE)).toEqual([
@@ -91,12 +88,10 @@ describe('AdminReleaseNotesConfig', () => {
       ]);
     });
   });
-
   describe('hasMinorVersionGrouping', () => {
     it('returns true when more than one minor version is present', () => {
       expect(hasMinorVersionGrouping(RELEASE_NOTES_FIXTURE)).toBe(true);
     });
-
     it('returns false when only one minor version exists', () => {
       expect(hasMinorVersionGrouping({
         '2.16.2': RELEASE_NOTES_FIXTURE['2.16.2'],
@@ -104,7 +99,6 @@ describe('AdminReleaseNotesConfig', () => {
       })).toBe(false);
     });
   });
-
   describe('syncExpandedMinorVersions', () => {
     it('opens the current minor version by default', () => {
       expect(syncExpandedMinorVersions(RELEASE_NOTES_FIXTURE)).toEqual({
@@ -112,7 +106,6 @@ describe('AdminReleaseNotesConfig', () => {
       });
     });
   });
-
   describe('toggleMinorVersionGroup', () => {
     it('switches the open accordion section to the selected minor version', () => {
       const vm = createVm({
@@ -120,23 +113,19 @@ describe('AdminReleaseNotesConfig', () => {
           2.16: true,
         },
       });
-
       expect(toggleMinorVersionGroup(vm, '2.15')).toEqual({
         2.15: true,
       });
     });
-
     it('closes the open section when it is toggled again', () => {
       const vm = createVm({
         expandedMinorVersions: {
           2.15: true,
         },
       });
-
       expect(toggleMinorVersionGroup(vm, '2.15')).toEqual({});
     });
   });
-
   describe('isMinorVersionExpanded', () => {
     it('returns true when a minor version is expanded', () => {
       const vm = createVm({
@@ -144,23 +133,19 @@ describe('AdminReleaseNotesConfig', () => {
           2.16: true,
         },
       });
-
       expect(isMinorVersionExpanded(vm, '2.16')).toBe(true);
     });
   });
-
   describe('getMinorVersionLabel', () => {
     it('returns the translated minor version label', () => {
       expect(getMinorVersionLabel(createVm(), '2.16')).toBe('RELEASE_NOTES.MINOR_VERSION_LABEL:{"minorVersion":"2.16"}');
     });
   });
-
   describe('getMinorVersionHeaderDate', () => {
     it('returns the most recent release date in the visible group header', () => {
       expect(getMinorVersionHeaderDate(getGroupedMinorReleaseNotes(RELEASE_NOTES_FIXTURE)[0]))
         .toBe('Released on June 29, 2007');
     });
-
     it('returns an empty string when the group has no releases', () => {
       expect(getMinorVersionHeaderDate({
         minorVersion: '2.16',
@@ -168,7 +153,6 @@ describe('AdminReleaseNotesConfig', () => {
       })).toBe('');
     });
   });
-
   describe('getMinorVersionToggleLabel', () => {
     it('returns the hide label when the section is expanded', () => {
       const vm = createVm({
@@ -176,10 +160,8 @@ describe('AdminReleaseNotesConfig', () => {
           2.16: true,
         },
       });
-
       expect(getMinorVersionToggleLabel(vm, '2.16')).toBe('RELEASE_NOTES.MINOR_VERSION_HIDE:{}');
     });
-
     it('returns the show label when the section is collapsed', () => {
       expect(getMinorVersionToggleLabel(createVm(), '2.16')).toBe('RELEASE_NOTES.MINOR_VERSION_SHOW:{}');
     });
@@ -187,13 +169,25 @@ describe('AdminReleaseNotesConfig', () => {
 });
 
 describe('shouldAnnounceWhatsNew', () => {
-  it('announces each new major or minor version once and never for patches or prereleases', () => {
+  it('announces a release with no last-seen version', () => {
     expect(shouldAnnounceWhatsNew('3.3.0', null)).toBe(true);
+  });
+  it('announces a newer minor version', () => {
     expect(shouldAnnounceWhatsNew('3.3.0', '3.2.4')).toBe(true);
+  });
+  it('announces a newer major version', () => {
     expect(shouldAnnounceWhatsNew('4.0.0', '3.9.1')).toBe(true);
+  });
+  it('does not announce patch updates', () => {
     expect(shouldAnnounceWhatsNew('3.3.2', '3.3.0')).toBe(false);
+  });
+  it('does not repeat an already-seen minor version', () => {
     expect(shouldAnnounceWhatsNew('3.3.0', '3.3.0')).toBe(false);
+  });
+  it('does not announce prereleases', () => {
     expect(shouldAnnounceWhatsNew('3.3.0-beta.1', '3.2.1')).toBe(false);
+  });
+  it('ignores invalid versions', () => {
     expect(shouldAnnounceWhatsNew('not-a-version', null)).toBe(false);
   });
   it('announces the final release after a prerelease of that minor version', () => {
@@ -211,11 +205,13 @@ describe('shouldAnnounceWhatsNew', () => {
 });
 
 describe('splitFeatureNote', () => {
-  it('uses the first sentence as the title and keeps versions like 7.1 intact', () => {
+  it('uses the first sentence as the feature title', () => {
     expect(splitFeatureNote('Static file polling is available. Enable it to reduce load.')).toEqual({
       description: 'Enable it to reduce load.',
       title: 'Static file polling is available.',
     });
+  });
+  it('keeps version numbers intact in feature titles', () => {
     expect(splitFeatureNote('Add support for WordPress 7.1.')).toEqual({ description: '', title: 'Add support for WordPress 7.1.' });
   });
 });
@@ -237,22 +233,23 @@ describe('getWhatsNewFeatures', () => {
     '3.4.0-beta.1': release('Beta.'),
   };
   const versionsOf = (features) => features.map(({ versionNumber }) => versionNumber);
-
   it('gathers features newer than the last-seen minor version, newest first', () => {
     expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '3.1.2'))).toEqual(['3.3.0', '3.3.0', '3.2.0']);
   });
-
-  it('caps the range at the installed major version', () => {
+  it('caps features at the installed major after a major upgrade', () => {
     expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '2.16.0'))).toEqual(['3.3.0', '3.3.0', '3.2.0', '3.1.0', '3.0.0']);
+  });
+  it('caps features at the installed major without a last-seen version', () => {
     expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', null))).toEqual(['3.3.0', '3.3.0', '3.2.0', '3.1.0', '3.0.0']);
   });
-
-  it('only includes New Features entries and skips prereleases', () => {
+  it('excludes non-feature changelog sections', () => {
     const titles = getWhatsNewFeatures(notes, '3.3.0', null).map(({ title }) => title);
     expect(titles).not.toContain('Not a feature.');
+  });
+  it('excludes prerelease features', () => {
+    const titles = getWhatsNewFeatures(notes, '3.3.0', null).map(({ title }) => title);
     expect(titles).not.toContain('Beta.');
   });
-
   it('returns nothing when the user has already seen the installed minor version', () => {
     expect(getWhatsNewFeatures(notes, '3.3.0', '3.3.0')).toEqual([]);
   });
