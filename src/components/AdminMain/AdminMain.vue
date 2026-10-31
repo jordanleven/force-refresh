@@ -40,11 +40,13 @@
         v-if="refreshOptions"
         class="force-refresh__options"
         :detected-cdn="detectedCdn"
+        :has-whats-new="hasWhatsNew"
         :refresh-options="refreshOptions"
         @notify-user-of-error="$emit('notify-user-of-error', $event)"
         @options-were-updated="$emit('options-were-updated', $event)"
         @release-notes-page-clicked="$emit('release-notes-page-clicked')"
         @troubleshooting-page-clicked="$emit('troubleshooting-page-clicked')"
+        @whats-new-page-clicked="$emit('whats-new-page-clicked')"
       />
     </div>
     <footer v-if="activeTab === 'refresh'" class="admin-review">
@@ -66,6 +68,7 @@ export default {
   components: { AdminMainOptions, AdminMainRefresh, Icon },
   props: {
     detectedCdn: VueTypes.string.def(null),
+    hasWhatsNew: VueTypes.bool.def(false),
     initialTab: VueTypes.oneOf(['refresh', 'settings']).def('refresh'),
     isRefreshing: VueTypes.bool.def(false),
     isScheduledRefreshEnabled: VueTypes.bool.def(false),
@@ -85,6 +88,7 @@ export default {
     'scheduled-refreshes-sync-requested',
     'tab-changed',
     'troubleshooting-page-clicked',
+    'whats-new-page-clicked',
   ],
   data() {
     return { activeTab: this.initialTab };

@@ -58,6 +58,7 @@
           v-if="!troubleshootingActive"
           class="admin-section__main"
           :detected-cdn="detectedCdn"
+          :has-whats-new="latestWhatsNewFeatures.length > 0"
           :is-scheduled-refresh-enabled="isScheduledRefreshEnabled"
           :refresh-options="refreshOptions"
           :scheduled-refreshes="scheduledRefreshes"
@@ -75,6 +76,7 @@
           @notify-user-of-error="notifyUserOfError"
           @release-notes-page-clicked="activateReleaseHistoryPage"
           @troubleshooting-page-clicked="activateTroubleshootingPage"
+          @whats-new-page-clicked="activateWhatsNewPage"
         />
       </transition>
       <AdminReleaseNotes
@@ -82,7 +84,7 @@
         :is-open="releaseNotesPageActive"
         :release-notes="releaseNotes"
         :history-only="releaseHistoryActive"
-        :whats-new-features="whatsNewFeatures"
+        :whats-new-features="whatsNewReopened ? latestWhatsNewFeatures : whatsNewFeatures"
         @modal-was-closed="exitAdminWindow"
         @view-release-history="activateReleaseHistoryPage"
       />
@@ -105,7 +107,11 @@ import AdminHeaderBadge from '@/components/AdminHeaderBadge/AdminHeaderBadge.vue
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
-import { getWhatsNewFeatures, shouldAnnounceWhatsNew } from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
+import {
+  getLatestWhatsNewFeatures,
+  getWhatsNewFeatures,
+  shouldAnnounceWhatsNew,
+} from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
 import AdminScheduleRefresh from '@/components/AdminScheduleRefresh/AdminScheduleRefresh.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
@@ -142,6 +148,7 @@ export default {
       troubleshootingPageIsActive: isTroubleshootingViewActiveOnLoad(),
       whatsNewPreviewActive: process.env.NODE_ENV === 'development'
         && new URLSearchParams(window.location.search).get('force-refresh-whats-new') === '1',
+      whatsNewReopened: false,
     };
   },
   computed: {
@@ -165,6 +172,10 @@ export default {
     isVersionPreRelease() {
       const { version } = this.troubleshootingInformation.versions.forceRefresh;
       return isDevelopmentVersion(version);
+    },
+    latestWhatsNewFeatures() {
+      const { version } = this.troubleshootingInformation.versions.forceRefresh;
+      return getLatestWhatsNewFeatures(this.releaseNotes, version);
     },
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
@@ -201,6 +212,12 @@ export default {
       this.pageTransitionName = 'page-enter';
       this.troubleshootingPageIsActive = true;
       this.updateViewHash('troubleshooting');
+    },
+    // Reopening leaves the seen state alone, so it never changes when the announcement appears.
+    activateWhatsNewPage() {
+      this.whatsNewReopened = true;
+      this.releaseHistoryActive = false;
+      this.releaseNotesPageActive = true;
     },
     checkForOptionsUpdated() {
       if (window.location.href.indexOf('optionsUpdated') > -1) {
