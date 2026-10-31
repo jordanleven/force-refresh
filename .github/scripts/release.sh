@@ -115,7 +115,7 @@ if [ "$current_branch" != "$production_branch" ]; then
 fi
 
 if ! hasUnreleasedFragments; then
-  printf "\033[1;31mNo unreleased changie fragments found. Run 'npm run changelog:note' before releasing.\n\033[0m"
+  printf "\033[1;31mNo unreleased changie fragments found. Run 'npm run changelog:new' before releasing.\n\033[0m"
   exit 1
 fi
 
