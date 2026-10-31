@@ -5,8 +5,8 @@
 <script>
 import { faClock as clockOutline } from '@fortawesome/free-regular-svg-icons';
 import {
-  faArrowsRotate, faCheck, faSpinner, faClock, faChevronLeft, faChevronRight,
-  faChevronDown, faXmark, faStar, faCalendarDays, faTag, faArrowUpRightFromSquare,
+  faArrowsRotate, faCheck, faSpinner, faChevronLeft, faChevronRight,
+  faChevronDown, faXmark, faStar, faArrowUpRightFromSquare,
   faCircleInfo, faCircleExclamation, faPaperPlane, faBug, faTriangleExclamation, faInfo, faExclamation, faArrowUp, faFlask,
 } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
@@ -15,14 +15,12 @@ const icons = {
   'arrow-up': faArrowUp,
   'arrow-up-right': faArrowUpRightFromSquare,
   bug: faBug,
-  calendar: faCalendarDays,
   check: faCheck,
   'chevron-down': faChevronDown,
   'chevron-left': faChevronLeft,
   'chevron-right': faChevronRight,
   'circle-exclamation': faCircleExclamation,
   'circle-info': faCircleInfo,
-  clock: faClock,
   'clock-outline': clockOutline,
   close: faXmark,
   exclamation: faExclamation,
@@ -32,7 +30,6 @@ const icons = {
   refresh: faArrowsRotate,
   spinner: faSpinner,
   star: faStar,
-  tag: faTag,
   'triangle-exclamation': faTriangleExclamation,
 };
 
