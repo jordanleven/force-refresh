@@ -31,20 +31,15 @@ it('preserves CDN restrictions and rejects an invalid custom interval', async ()
   expect(wrapper.emitted('notify-user-of-error')).toHaveLength(1);
 });
 
-it('provides one footer release history control and a separate feature summary control', async () => {
+it('provides one footer release history control', async () => {
   const wrapper = shallowMount(AdminMainOptions, { global: buildVueTestGlobals(), props: { refreshOptions: props } });
   const advanced = wrapper.find('details.advanced-options');
   expect(advanced.find('button').exists()).toBe(false);
   const utilities = wrapper.find('.force-refresh-admin__options-utilities');
   expect(wrapper.findAll('[data-test="btn-release-notes"]')).toHaveLength(1);
   expect(utilities.findAll('button').map((button) => button.attributes('data-test'))).toEqual([
-    'btn-whats-new', 'btn-release-notes', 'btn-troubleshooting',
+    'btn-release-notes', 'btn-troubleshooting',
   ]);
-  const star = utilities.find('[data-test="btn-whats-new"]').findComponent({ name: 'Icon' });
-  expect(star.props()).toEqual({ name: 'star', size: 12 });
   await utilities.find('[data-test="btn-release-notes"]').trigger('click');
   expect(wrapper.emitted('release-notes-page-clicked')).toHaveLength(1);
-  expect(wrapper.emitted('whats-new-page-clicked')).toBeUndefined();
-  await utilities.find('[data-test="btn-whats-new"]').trigger('click');
-  expect(wrapper.emitted('whats-new-page-clicked')).toHaveLength(1);
 });

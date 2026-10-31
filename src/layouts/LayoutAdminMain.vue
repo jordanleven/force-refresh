@@ -74,7 +74,6 @@
           @options-were-updated="updateOptions"
           @notify-user-of-error="notifyUserOfError"
           @release-notes-page-clicked="activateReleaseHistoryPage"
-          @whats-new-page-clicked="activateReleaseNotesPage"
           @troubleshooting-page-clicked="activateTroubleshootingPage"
         />
       </transition>
@@ -83,7 +82,9 @@
         :is-open="releaseNotesPageActive"
         :release-notes="releaseNotes"
         :history-only="releaseHistoryActive"
+        :whats-new-features="whatsNewFeatures"
         @modal-was-closed="exitAdminWindow"
+        @view-release-history="activateReleaseHistoryPage"
       />
       <AdminScheduleRefresh
         v-if="isScheduledRefreshEnabled && !troubleshootingActive"
@@ -104,7 +105,7 @@ import AdminHeaderBadge from '@/components/AdminHeaderBadge/AdminHeaderBadge.vue
 import AdminMain from '@/components/AdminMain/AdminMain.vue';
 import AdminNotification from '@/components/AdminNotification/AdminNotification.vue';
 import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
-import { shouldAnnounceWhatsNew } from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
+import { getWhatsNewFeatures, shouldAnnounceWhatsNew } from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
 import AdminScheduleRefresh from '@/components/AdminScheduleRefresh/AdminScheduleRefresh.vue';
 import AdminTroubleshooting from '@/components/AdminTroubleshooting/AdminTroubleshooting.vue';
 import { versionSatisfies, getSanitizedVersion, isDevelopmentVersion } from '@/js/admin/compare-versions.js';
@@ -128,7 +129,6 @@ export default {
   },
   data() {
     return {
-      announcingVersion: false,
       isRefreshing: false,
       lastRefreshAt: null,
       mainActiveTab: ['#settings', '#troubleshooting'].includes(window.location.hash) ? 'settings' : 'refresh',
@@ -167,6 +167,10 @@ export default {
     troubleshootingActive() {
       return this.troubleshootingPageIsActive;
     },
+    whatsNewFeatures() {
+      const { version } = this.troubleshootingInformation.versions.forceRefresh;
+      return getWhatsNewFeatures(this.releaseNotes, version, this.whatsNewLastSeenVersion);
+    },
     ...mapGetters([
       'detectedCdn',
       'isDebugActive',
@@ -177,30 +181,17 @@ export default {
       'scheduledRefreshes',
       'siteName',
       'troubleshootingInformation',
+      'whatsNewLastSeenVersion',
       'wordPressNonce',
     ]),
   },
   mounted() {
     this.checkForOptionsUpdated();
-    if (!this.troubleshootingActive) {
-      try {
-        const { version } = this.troubleshootingInformation.versions.forceRefresh;
-        if (shouldAnnounceWhatsNew(version, window.localStorage.getItem('force-refresh-whats-new-version'))) {
-          this.announcingVersion = true;
-          this.releaseNotesPageActive = true;
-        }
-      } catch {
-        // Keep the normal controls usable when browser storage is unavailable.
-      }
-    }
+    this.maybeAnnounceWhatsNew();
   },
   methods: {
     activateReleaseHistoryPage() {
       this.releaseHistoryActive = true;
-      this.releaseNotesPageActive = true;
-    },
-    activateReleaseNotesPage() {
-      this.releaseHistoryActive = false;
       this.releaseNotesPageActive = true;
     },
     activateTroubleshootingPage() {
@@ -224,14 +215,6 @@ export default {
       }
     },
     exitAdminWindow() {
-      if (this.announcingVersion) {
-        try {
-          window.localStorage.setItem('force-refresh-whats-new-version', this.troubleshootingInformation.versions.forceRefresh.version);
-        } catch {
-          // Dismissal must still work when browser storage is unavailable.
-        }
-        this.announcingVersion = false;
-      }
       // Leave releaseHistoryActive alone so the content doesn't swap during the close animation.
       this.releaseNotesPageActive = false;
       this.scheduleRefreshPageActive = false;
@@ -245,6 +228,17 @@ export default {
     mainTabWasChanged(tab) {
       this.mainActiveTab = tab;
       this.updateViewHash(tab === 'settings' ? 'settings' : null);
+    },
+    maybeAnnounceWhatsNew() {
+      if (this.troubleshootingActive) return;
+      const { version } = this.troubleshootingInformation.versions.forceRefresh;
+      if (!shouldAnnounceWhatsNew(version, this.whatsNewLastSeenVersion)) return;
+      if (this.whatsNewFeatures.length) {
+        this.releaseHistoryActive = false;
+        this.releaseNotesPageActive = true;
+      }
+      // Opening counts as seeing it, so it only appears once; a release without new features is marked quietly.
+      this.requestMarkWhatsNewSeen();
     },
     notificationMessageClear() {
       this.notificationMessage = null;
@@ -349,6 +343,7 @@ export default {
     },
     ...mapActions([
       'requestDeleteScheduledRefresh',
+      'requestMarkWhatsNewSeen',
       'requestRefreshSite',
       'requestScheduledRefresh',
       'requestScheduledRefreshes',

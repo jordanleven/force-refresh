@@ -155,14 +155,14 @@
     "PERIOD_PM": "PM",
     "MISSING_TIME": "That time is skipped by the daylight saving time change. Choose another time.",
     "ADVANCED": "Advanced",
-    "WHATS_NEW_INTERFACE_TITLE": "Redesigned Interface",
-    "WHATS_NEW_INTERFACE_BODY": "A cleaner, faster admin page with tabbed navigation and a refreshed settings layout.",
-    "WHATS_NEW_PICKER_TITLE": "Improved Date & Time Picker",
-    "WHATS_NEW_PICKER_BODY": "The new modal makes selecting a refresh time feel natural and effortless.",
+    "WHATS_NEW_TITLE_SINGLE": "New in Force Refresh {version}",
+    "WHATS_NEW_TITLE_MULTIPLE": "New since you were last here",
+    "WHATS_NEW_VERSION_RANGE": "Versions {from} – {to}",
+    "WHATS_NEW_VIEW_ALL": "See all release notes",
+    "WHATS_NEW_VIEW_MORE": "See {count} more in the release notes",
     "SENDING_REFRESH": "Sending refresh request to all connected browsers\u2026",
     "REFRESHING": "Refreshing\u2026",
     "REFRESH_REQUESTED": "Refresh requested",
-    "CLEAR_DATE": "Clear date",
-    "WHATS_NEW": "What's New"
+    "CLEAR_DATE": "Clear date"
   }
 }
