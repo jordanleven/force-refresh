@@ -8,10 +8,11 @@ import {
   getMinorVersionToggleLabel,
   hasMinorVersionGrouping,
   isMinorVersionExpanded,
+  getWhatsNewFeatures,
   shouldAnnounceWhatsNew,
+  splitFeatureNote,
   syncExpandedMinorVersions,
   toggleMinorVersionGroup,
-  WHATS_NEW_MINOR_VERSION,
 } from './AdminReleaseNotesConfig.js';
 
 const RELEASE_NOTES_FIXTURE = {
@@ -186,11 +187,79 @@ describe('AdminReleaseNotesConfig', () => {
 });
 
 describe('shouldAnnounceWhatsNew', () => {
-  it('announces only the release the highlights describe, once per minor version', () => {
-    expect(shouldAnnounceWhatsNew(`${WHATS_NEW_MINOR_VERSION}.0`, null)).toBe(true);
-    expect(shouldAnnounceWhatsNew(`${WHATS_NEW_MINOR_VERSION}.1`, `${WHATS_NEW_MINOR_VERSION}.0`)).toBe(false);
-    expect(shouldAnnounceWhatsNew(`${WHATS_NEW_MINOR_VERSION}.0-beta.1`, '3.2.1')).toBe(true);
-    expect(shouldAnnounceWhatsNew('3.2.1', null)).toBe(false);
-    expect(shouldAnnounceWhatsNew('9.0.0', null)).toBe(false);
+  it('announces each new major or minor version once and never for patches or prereleases', () => {
+    expect(shouldAnnounceWhatsNew('3.3.0', null)).toBe(true);
+    expect(shouldAnnounceWhatsNew('3.3.0', '3.2.4')).toBe(true);
+    expect(shouldAnnounceWhatsNew('4.0.0', '3.9.1')).toBe(true);
+    expect(shouldAnnounceWhatsNew('3.3.2', '3.3.0')).toBe(false);
+    expect(shouldAnnounceWhatsNew('3.3.0', '3.3.0')).toBe(false);
+    expect(shouldAnnounceWhatsNew('3.3.0-beta.1', '3.2.1')).toBe(false);
+    expect(shouldAnnounceWhatsNew('not-a-version', null)).toBe(false);
+  });
+  it('announces the final release after a prerelease of that minor version', () => {
+    expect(shouldAnnounceWhatsNew('4.1.0', '4.1.0-beta.1')).toBe(true);
+  });
+  it('announces the final release after a legacy-format prerelease of that minor version', () => {
+    expect(shouldAnnounceWhatsNew('3.3.0', '3.3.0-1921AF.0')).toBe(true);
+  });
+  it('announces a patch release after a prerelease of its minor version', () => {
+    expect(shouldAnnounceWhatsNew('4.1.2', '4.1.0-beta.1163.2')).toBe(true);
+  });
+  it('does not announce the final release after a prerelease of a patch version', () => {
+    expect(shouldAnnounceWhatsNew('4.1.1', '4.1.1-beta.1')).toBe(false);
+  });
+});
+
+describe('splitFeatureNote', () => {
+  it('uses the first sentence as the title and keeps versions like 7.1 intact', () => {
+    expect(splitFeatureNote('Static file polling is available. Enable it to reduce load.')).toEqual({
+      description: 'Enable it to reduce load.',
+      title: 'Static file polling is available.',
+    });
+    expect(splitFeatureNote('Add support for WordPress 7.1.')).toEqual({ description: '', title: 'Add support for WordPress 7.1.' });
+  });
+});
+
+describe('getWhatsNewFeatures', () => {
+  const release = (...features) => ({
+    notes: [
+      { sectionHeader: 'Changes', sectionNotes: ['Not a feature.'] },
+      { sectionHeader: 'New Features', sectionNotes: features },
+    ],
+  });
+  const notes = {
+    '2.17.0': release('Old major.'),
+    '3.0.0': release('Three oh.'),
+    '3.1.0': release('Three one.'),
+    '3.2.0': release('Three two.'),
+    '3.2.1': { notes: [{ sectionHeader: 'Changes', sectionNotes: ['Bug fixes.'] }] },
+    '3.3.0': release('Three three a.', 'Three three b.'),
+    '3.4.0-beta.1': release('Beta.'),
+  };
+  const versionsOf = (features) => features.map(({ versionNumber }) => versionNumber);
+
+  it('gathers features newer than the last-seen minor version, newest first', () => {
+    expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '3.1.2'))).toEqual(['3.3.0', '3.3.0', '3.2.0']);
+  });
+
+  it('caps the range at the installed major version', () => {
+    expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '2.16.0'))).toEqual(['3.3.0', '3.3.0', '3.2.0', '3.1.0', '3.0.0']);
+    expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', null))).toEqual(['3.3.0', '3.3.0', '3.2.0', '3.1.0', '3.0.0']);
+  });
+
+  it('only includes New Features entries and skips prereleases', () => {
+    const titles = getWhatsNewFeatures(notes, '3.3.0', null).map(({ title }) => title);
+    expect(titles).not.toContain('Not a feature.');
+    expect(titles).not.toContain('Beta.');
+  });
+
+  it('returns nothing when the user has already seen the installed minor version', () => {
+    expect(getWhatsNewFeatures(notes, '3.3.0', '3.3.0')).toEqual([]);
+  });
+  it('includes features of the minor version the user last saw as a prerelease', () => {
+    expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '3.3.0-beta.1'))).toEqual(['3.3.0', '3.3.0']);
+  });
+  it('excludes the minor version the user last saw as a patch prerelease', () => {
+    expect(versionsOf(getWhatsNewFeatures(notes, '3.3.0', '3.2.1-beta.1'))).toEqual(['3.3.0', '3.3.0']);
   });
 });

@@ -91,15 +91,6 @@
       <div class="force-refresh-admin__options-utility">
         <button
           class="button button-secondary"
-          data-test="btn-whats-new"
-          @click="pageClickedWhatsNew"
-        >
-          <Icon name="star" :size="12" /> {{ $t("REDESIGN.WHATS_NEW") }}
-        </button>
-      </div>
-      <div class="force-refresh-admin__options-utility">
-        <button
-          class="button button-secondary"
           data-test="btn-release-notes"
           @click="pageClickedReleaseNotes"
         >
@@ -167,7 +158,6 @@ export default {
     'options-were-updated',
     'release-notes-page-clicked',
     'troubleshooting-page-clicked',
-    'whats-new-page-clicked',
   ],
   data() {
     return {
@@ -257,9 +247,6 @@ export default {
     },
     pageClickedTroubleshooting() {
       this.$emit('troubleshooting-page-clicked');
-    },
-    pageClickedWhatsNew() {
-      this.$emit('whats-new-page-clicked');
     },
     updateOptionsWasClicked() {
       const refreshInterval = this.isSelectedRefreshIntervalCustom ? this.customRefreshIntervalInSeconds : this.optionSelectedRefreshInterval;

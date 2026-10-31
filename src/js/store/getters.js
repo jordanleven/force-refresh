@@ -47,5 +47,6 @@ export default {
     },
   }),
   useStaticFilePolling: ({ settings }) => settings.useStaticFilePolling,
+  whatsNewLastSeenVersion: ({ site }) => site.whatsNewLastSeenVersion,
   wordPressNonce: ({ nonce }) => nonce,
 };
