@@ -3,6 +3,7 @@ import {
   createReleaseNotesData,
   getFlatReleaseNotes,
   getLatestWhatsNewFeatures,
+  getNewestReleaseVersion,
   getGroupedMinorReleaseNotes,
   getMinorVersionHeaderDate,
   getMinorVersionLabel,
@@ -351,5 +352,17 @@ describe('getLatestWhatsNewFeatures', () => {
   });
   it('returns nothing for an unreadable version', () => {
     expect(getLatestWhatsNewFeatures({ '4.0.0': release('Four oh.') }, 'not-a-version')).toEqual([]);
+  });
+});
+
+describe('getNewestReleaseVersion', () => {
+  it('finds the newest version in the release notes', () => {
+    expect(getNewestReleaseVersion({ '3.2.1': {}, '4.0.0': {}, '3.10.0': {} })).toBe('4.0.0');
+  });
+  it('ignores unreadable versions', () => {
+    expect(getNewestReleaseVersion({ '3.2.1': {}, unreleased: {} })).toBe('3.2.1');
+  });
+  it('finds nothing without release notes', () => {
+    expect(getNewestReleaseVersion(null)).toBeNull();
   });
 });

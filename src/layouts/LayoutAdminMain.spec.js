@@ -112,7 +112,6 @@ describe('What’s New', () => {
   const originalNodeEnv = process.env.NODE_ENV;
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
-    window.history.replaceState({}, '', window.location.pathname);
   });
   const releaseNotes = {
     '3.2.0': {
@@ -156,25 +155,6 @@ describe('What’s New', () => {
       wrapper,
     };
   };
-  it('previews seen features on prerelease development builds without saving seen state', () => {
-    process.env.NODE_ENV = 'development';
-    window.history.replaceState({}, '', '?force-refresh-whats-new=1');
-    const { store, wrapper } = mountLayout('3.3.0', '3.3.0-beta.1');
-    expect(wrapper.vm.releaseNotesPageActive).toBe(true);
-    expect(wrapper.vm.whatsNewFeatures).toHaveLength(2);
-    expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
-    wrapper.unmount();
-  });
-
-  it.each(['production', 'development'])('keeps normal behavior in %s when preview is disabled', (environment) => {
-    process.env.NODE_ENV = environment;
-    window.history.replaceState({}, '', `?force-refresh-whats-new=${environment === 'production' ? '1' : '0'}`);
-    const { store, wrapper } = mountLayout('3.3.0');
-    expect(wrapper.vm.releaseNotesPageActive).toBe(false);
-    expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
-    wrapper.unmount();
-  });
-
   describe('opens once after a minor update and marks it seen for the user', () => {
     let store;
     let wrapper;
@@ -318,6 +298,50 @@ describe('What’s New', () => {
     it('leaves the seen state unchanged', () => {
       expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
     });
+  });
+  it.each(['development', 'production'])('marks the announcement seen in %s builds', (environment) => {
+    process.env.NODE_ENV = environment;
+    const { store, wrapper } = mountLayout('3.2.0');
+    expect(store.dispatch).toHaveBeenCalledWith('requestMarkWhatsNewSeen');
+    wrapper.unmount();
+  });
+  describe('previews the upcoming release from Settings in development builds', () => {
+    let wrapper;
+    beforeEach(async () => {
+      process.env.NODE_ENV = 'development';
+      ({
+        wrapper,
+      } = mountLayout('3.3.0', '3.2.1'));
+      wrapper.findComponent({
+        name: 'AdminMain',
+      }).vm.$emit('whats-new-page-clicked');
+      await wrapper.vm.$nextTick();
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+
+    it('shows the newest version in the release notes', () => {
+      expect(wrapper.findComponent({
+        name: 'AdminReleaseNotes',
+      }).props('whatsNewFeatures').map(({
+        versionNumber,
+      }) => versionNumber)).toEqual(['3.3.0']);
+    });
+  });
+  it('shows the installed minor version from Settings in production builds', async () => {
+    process.env.NODE_ENV = 'production';
+    const { wrapper } = mountLayout('3.3.0', '3.2.1');
+    wrapper.findComponent({
+      name: 'AdminMain',
+    }).vm.$emit('whats-new-page-clicked');
+    await wrapper.vm.$nextTick();
+    expect(wrapper.findComponent({
+      name: 'AdminReleaseNotes',
+    }).props('whatsNewFeatures').map(({
+      versionNumber,
+    }) => versionNumber)).toEqual(['3.2.0']);
+    wrapper.unmount();
   });
   it('offers What’s New in Settings when a release has features', () => {
     const { wrapper } = mountLayout('3.3.0');

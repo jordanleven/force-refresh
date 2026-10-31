@@ -88,6 +88,13 @@ export function getWhatsNewFeatures(releaseNotes, installedVersion, lastSeenVers
     .flatMap(getReleaseFeatures);
 }
 
+export function getNewestReleaseVersion(releaseNotes) {
+  const [newest] = getReleaseEntries(releaseNotes)
+    .filter(({ version }) => version)
+    .sort((a, b) => compareVersions(b.version, a.version));
+  return newest?.versionNumber ?? null;
+}
+
 // Reopening What's New shows one minor version: the given version's, or the newest earlier one with features.
 // Other prereleases are skipped like in the announcement, but a prerelease can show its own features.
 export function getLatestWhatsNewFeatures(releaseNotes, currentVersion) {

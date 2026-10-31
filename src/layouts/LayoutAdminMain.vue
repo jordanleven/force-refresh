@@ -109,6 +109,7 @@ import AdminNotification from '@/components/AdminNotification/AdminNotification.
 import AdminReleaseNotes from '@/components/AdminReleaseNotes/AdminReleaseNotes.vue';
 import {
   getLatestWhatsNewFeatures,
+  getNewestReleaseVersion,
   getWhatsNewFeatures,
   shouldAnnounceWhatsNew,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
@@ -146,8 +147,6 @@ export default {
       scheduleRefreshPageActive: false,
       scheduleRefreshSubmitting: false,
       troubleshootingPageIsActive: isTroubleshootingViewActiveOnLoad(),
-      whatsNewPreviewActive: process.env.NODE_ENV === 'development'
-        && new URLSearchParams(window.location.search).get('force-refresh-whats-new') === '1',
       whatsNewReopened: false,
     };
   },
@@ -174,7 +173,10 @@ export default {
       return isDevelopmentVersion(version);
     },
     latestWhatsNewFeatures() {
-      const { version } = this.troubleshootingInformation.versions.forceRefresh;
+      // Development builds add the upcoming release to the release notes, so they preview it instead.
+      const version = process.env.NODE_ENV === 'development'
+        ? getNewestReleaseVersion(this.releaseNotes)
+        : this.troubleshootingInformation.versions.forceRefresh.version;
       return getLatestWhatsNewFeatures(this.releaseNotes, version);
     },
     troubleshootingActive() {
@@ -182,7 +184,7 @@ export default {
     },
     whatsNewFeatures() {
       const { version } = this.troubleshootingInformation.versions.forceRefresh;
-      return getWhatsNewFeatures(this.releaseNotes, version, this.whatsNewPreviewActive ? null : this.whatsNewLastSeenVersion);
+      return getWhatsNewFeatures(this.releaseNotes, version, this.whatsNewLastSeenVersion);
     },
     ...mapGetters([
       'detectedCdn',
@@ -251,7 +253,7 @@ export default {
     maybeAnnounceWhatsNew() {
       if (this.troubleshootingActive) return;
       const { version } = this.troubleshootingInformation.versions.forceRefresh;
-      if (!this.whatsNewPreviewActive && !shouldAnnounceWhatsNew(version, this.whatsNewLastSeenVersion)) return;
+      if (!shouldAnnounceWhatsNew(version, this.whatsNewLastSeenVersion)) return;
       // Without release notes there's nothing to show, so leave it unseen and try again next visit.
       if (!this.releaseNotes) return;
       if (this.whatsNewFeatures.length) {
@@ -259,7 +261,7 @@ export default {
         this.releaseNotesPageActive = true;
       }
       // Opening counts as seeing it, so it only appears once; a release without new features is marked quietly.
-      if (!this.whatsNewPreviewActive) this.requestMarkWhatsNewSeen();
+      this.requestMarkWhatsNewSeen();
     },
     notificationMessageClear() {
       this.notificationMessage = null;
