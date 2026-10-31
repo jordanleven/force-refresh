@@ -280,6 +280,59 @@ describe('What’s New', () => {
       expect(store.dispatch).toHaveBeenCalledWith('requestMarkWhatsNewSeen');
     });
   });
+  describe('reopens the latest What’s New from Settings', () => {
+    let store;
+    let wrapper;
+    let modal;
+    beforeEach(async () => {
+      ({
+        store,
+        wrapper,
+      } = mountLayout('3.3.0'));
+      wrapper.findComponent({
+        name: 'AdminMain',
+      }).vm.$emit('whats-new-page-clicked');
+      await wrapper.vm.$nextTick();
+      modal = wrapper.findComponent({
+        name: 'AdminReleaseNotes',
+      });
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+
+    it('opens the dialog', () => {
+      expect(modal.attributes('is-open')).toBe('true');
+    });
+
+    it('shows highlights rather than full history', () => {
+      expect(modal.props('historyOnly')).toBe(false);
+    });
+
+    it('shows only the installed minor version’s features', () => {
+      expect(modal.props('whatsNewFeatures').map(({
+        versionNumber,
+      }) => versionNumber)).toEqual(['3.3.0']);
+    });
+
+    it('leaves the seen state unchanged', () => {
+      expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
+    });
+  });
+  it('offers What’s New in Settings when a release has features', () => {
+    const { wrapper } = mountLayout('3.3.0');
+    expect(wrapper.findComponent({
+      name: 'AdminMain',
+    }).props('hasWhatsNew')).toBe(true);
+    wrapper.unmount();
+  });
+  it('hides What’s New in Settings when no release has features', () => {
+    const { wrapper } = mountLayout('3.3.0', '3.3.0', {});
+    expect(wrapper.findComponent({
+      name: 'AdminMain',
+    }).props('hasWhatsNew')).toBe(false);
+    wrapper.unmount();
+  });
   describe('switches to the full history from the What’s New link', () => {
     let wrapper;
     let modal;

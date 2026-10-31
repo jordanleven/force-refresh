@@ -18,6 +18,7 @@
   "ADMIN_SETTINGS": {
     "OPTIONS_UTILITY_LEAVE_REVIEW": "Leave a review",
     "OPTIONS_UTILITY_VIEW_RELEASE_NOTES": "Release Notes",
+    "OPTIONS_UTILITY_VIEW_WHATS_NEW": "What\u2019s New",
     "OPTION_REFRESH_FROM_ADMIN_BAR": "Show in Admin Bar",
     "OPTION_REFRESH_INTERVAL": "Check interval",
     "OPTION_UPDATE_METHOD": "Update method",

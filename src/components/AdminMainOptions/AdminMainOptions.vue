@@ -97,6 +97,15 @@
           {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_RELEASE_NOTES") }}
         </button>
       </div>
+      <div v-if="hasWhatsNew" class="force-refresh-admin__options-utility">
+        <button
+          class="button button-secondary"
+          data-test="btn-whats-new"
+          @click="pageClickedWhatsNew"
+        >
+          {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_WHATS_NEW") }}
+        </button>
+      </div>
       <div class="force-refresh-admin__options-utility">
         <button
           class="button button-secondary"
@@ -145,6 +154,7 @@ export default {
   },
   props: {
     detectedCdn: VueTypes.string.def(null),
+    hasWhatsNew: VueTypes.bool.def(false),
     refreshOptions: VueTypes.shape({
       customRefreshIntervalMaximumInMinutes: VueTypes.isRequired,
       customRefreshIntervalMinimumInMinutes: VueTypes.isRequired,
@@ -158,6 +168,7 @@ export default {
     'options-were-updated',
     'release-notes-page-clicked',
     'troubleshooting-page-clicked',
+    'whats-new-page-clicked',
   ],
   data() {
     return {
@@ -247,6 +258,9 @@ export default {
     },
     pageClickedTroubleshooting() {
       this.$emit('troubleshooting-page-clicked');
+    },
+    pageClickedWhatsNew() {
+      this.$emit('whats-new-page-clicked');
     },
     updateOptionsWasClicked() {
       const refreshInterval = this.isSelectedRefreshIntervalCustom ? this.customRefreshIntervalInSeconds : this.optionSelectedRefreshInterval;
