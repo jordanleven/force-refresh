@@ -140,6 +140,8 @@ export default {
       scheduleRefreshPageActive: false,
       scheduleRefreshSubmitting: false,
       troubleshootingPageIsActive: isTroubleshootingViewActiveOnLoad(),
+      whatsNewPreviewActive: process.env.NODE_ENV === 'development'
+        && new URLSearchParams(window.location.search).get('force-refresh-whats-new') === '1',
     };
   },
   computed: {
@@ -169,7 +171,7 @@ export default {
     },
     whatsNewFeatures() {
       const { version } = this.troubleshootingInformation.versions.forceRefresh;
-      return getWhatsNewFeatures(this.releaseNotes, version, this.whatsNewLastSeenVersion);
+      return getWhatsNewFeatures(this.releaseNotes, version, this.whatsNewPreviewActive ? null : this.whatsNewLastSeenVersion);
     },
     ...mapGetters([
       'detectedCdn',
@@ -232,13 +234,15 @@ export default {
     maybeAnnounceWhatsNew() {
       if (this.troubleshootingActive) return;
       const { version } = this.troubleshootingInformation.versions.forceRefresh;
-      if (!shouldAnnounceWhatsNew(version, this.whatsNewLastSeenVersion)) return;
+      if (!this.whatsNewPreviewActive && !shouldAnnounceWhatsNew(version, this.whatsNewLastSeenVersion)) return;
+      // Without release notes there's nothing to show, so leave it unseen and try again next visit.
+      if (!this.releaseNotes) return;
       if (this.whatsNewFeatures.length) {
         this.releaseHistoryActive = false;
         this.releaseNotesPageActive = true;
       }
       // Opening counts as seeing it, so it only appears once; a release without new features is marked quietly.
-      this.requestMarkWhatsNewSeen();
+      if (!this.whatsNewPreviewActive) this.requestMarkWhatsNewSeen();
     },
     notificationMessageClear() {
       this.notificationMessage = null;

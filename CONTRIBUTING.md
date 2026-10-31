@@ -24,6 +24,12 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 
 **Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
 
+## Previewing What's New
+
+Run `npm run dev` (watch mode) or `npm run build:dev`, then open the Force Refresh admin page and append `&force-refresh-whats-new=1` to its URL. Reload to reopen the dialog after dismissing it.
+
+The preview includes all feature highlights for the installed major version up to the installed minor version, even on prerelease builds and when you've already seen them. It leaves your saved last-seen version untouched. Remove the parameter or set it to `0` to return to normal behavior. The toggle only works in development builds; `npm run build` ignores it. Open the main Force Refresh page rather than the Troubleshooting view to see the dialog.
+
 ## Adding Release Notes
 
 This project uses [changie] to manage release notes.
