@@ -15,7 +15,9 @@ const create = (props = {}) => mount(AdminReleaseNotes, {
   global: buildVueTestGlobals({ stubs: { teleport: true } }),
   props: { releaseNotes, ...props },
 });
-const feature = (versionNumber, title) => ({ description: `${title} details.`, title: `${title}.`, versionNumber });
+const feature = (versionNumber, title, icon = 'star') => ({
+  description: `${title} details.`, icon, title: `${title}.`, versionNumber,
+});
 
 const features = [
   feature('3.3.0', 'A'), feature('3.3.0', 'B'), feature('3.2.0', 'C'),
@@ -50,6 +52,17 @@ it('omits per-item version tags for a single release', () => {
 it('hides full history in the highlights view', () => {
   const wrapper = create({ whatsNewFeatures: [feature('3.3.0', 'Redesign'), feature('3.3.0', 'Picker')] });
   expect(wrapper.find('.whats-new__history').exists()).toBe(false);
+});
+
+it('shows each feature with its own icon', () => {
+  const wrapper = create({ whatsNewFeatures: [feature('3.3.0', 'Redesign', 'palette'), feature('3.3.0', 'Picker', 'calendar')] });
+  const icons = wrapper.findAll('.whats-new__bullet svg').map((icon) => icon.attributes('data-icon'));
+  expect(icons).toEqual(['palette', 'calendar-days']);
+});
+
+it('hides feature icons from assistive technology', () => {
+  const wrapper = create({ whatsNewFeatures: [feature('3.3.0', 'Redesign', 'palette')] });
+  expect(wrapper.find('.whats-new__bullet').attributes('aria-hidden')).toBe('true');
 });
 
 it('closes highlights from the primary footer button', async () => {
@@ -99,6 +112,19 @@ it('hides highlights in the history view', () => {
 it('preserves the complete release history', () => {
   const wrapper = create({ historyOnly: true });
   expect(wrapper.find('.whats-new__history').text()).toContain('Full release history remains available.');
+});
+
+it('hides icon comments in the release history', () => {
+  const wrapper = create({
+    historyOnly: true,
+    releaseNotes: {
+      '3.3.0': {
+        date: '2026-10-31',
+        notes: [{ sectionHeader: 'New Features', sectionNotes: ['Redesigned admin. <!-- icon: palette -->'] }],
+      },
+    },
+  });
+  expect(wrapper.find('.release-notes-note li').text()).toBe('Redesigned admin.');
 });
 
 it('keeps the closed overlay hidden', async () => {
