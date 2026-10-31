@@ -52,13 +52,22 @@ This generates `README.txt` locally without committing anything. Inspect it, the
 
 ## Cutting a Release
 
-**Beta release** (from a feature branch — for testing and previewing release notes):
+**Beta release** (from a feature branch with an open pull request — for testing and previewing release notes):
 
 ```sh
 npm run release:beta
 ```
 
-The beta GitHub Release will show upcoming release notes (from changie fragments) alongside the raw commit log since the last beta.
+The script checks that your local `HEAD` matches the pull request's head on GitHub, then dispatches the **Release Beta Build** workflow for that pull request and prints the run URL. Maintainers can also run the workflow from the Actions tab and enter the PR number.
+
+The workflow builds the pull request's head commit, runs linting, unit tests and e2e tests, and only then publishes a GitHub prerelease. Nothing is committed to the branch:
+
+- The version is set on the runner as `<next version>-beta.<PR>.<run number>`, for example `3.3.0-beta.412.7`. It sorts below the final `3.3.0` release, so sites running a beta are offered the release when it ships. The next version comes from the unreleased changie fragments, or is the next patch version when the pull request has none, so every pull request can get a beta.
+- The prerelease is tagged on the pull request's head commit, and the pull request keeps only its latest beta. Its betas are deleted when it closes.
+- The prerelease shows upcoming release notes (from changie fragments, or a note that there are none) alongside the commit log since the last stable release, and a comment on the pull request links to the download.
+- The workflow sets a **Beta Release** status on the head commit, which is required to merge into `master`. Pushing a new commit clears it, so release a new beta after every push.
+
+Branches created before this workflow existed need to be rebased onto `master` first, since the workflow runs the beta scripts from the branch.
 
 **Production release** (from `master` only):
 
