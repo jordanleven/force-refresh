@@ -6,7 +6,7 @@
 **Contributors:** [jordanleven](https://profiles.wordpress.org/jordanleven)\
 **Tags:** refresh, reload, live reload, page refresh, scheduled\
 **Requires PHP:** 7.4\
-**Requires at least:** 5.9\
+**Requires at least:** 7.0\
 **Tested up to:** 7.1\
 **License:** GPLv2 or later
 

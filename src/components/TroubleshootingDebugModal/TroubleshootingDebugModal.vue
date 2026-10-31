@@ -1,5 +1,6 @@
 <template>
   <BaseModal
+    :accessible-label="$t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_TITLE')"
     :is-open="isOpen"
     variant="bottom-sheet"
     max-width="40rem"
@@ -22,9 +23,9 @@
       #subheader
     >
       <div class="debug-modal__note">
-        <font-awesome-icon
+        <Icon
           class="debug-modal__note-icon"
-          :icon="faCircleInfo"
+          name="circle-info"
         />
         <span>{{ noteText }}</span>
       </div>
@@ -36,7 +37,7 @@
       data-test="debug-email-sent"
     >
       <div class="debug-modal__sent-icon">
-        <font-awesome-icon :icon="faCheck" />
+        <Icon name="check" />
       </div>
       <p class="debug-modal__sent-title">
         {{ $t('ADMIN_TROUBLESHOOTING.DEBUG_MODAL_SENT_TITLE') }}
@@ -85,7 +86,7 @@
             v-if="supportTopicUrlError"
             class="debug-modal__field-error"
           >
-            <font-awesome-icon :icon="faCircleExclamation" />
+            <Icon name="circle-exclamation" />
             {{ supportTopicUrlError }}
           </p>
         </div>
@@ -138,13 +139,11 @@
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCheck, faCircleExclamation, faCircleInfo } from '@fortawesome/free-solid-svg-icons';
+
 import VueTypes from 'vue-types';
 import BaseModal from '@/components/BaseModal/BaseModal.vue';
+import Icon from '@/components/Icon/Icon.vue';
 import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
-
-library.add(faCheck, faCircleExclamation, faCircleInfo);
 
 const STATUS = {
   ERROR: 'error',
@@ -156,9 +155,7 @@ const STATUS = {
 
 export default {
   name: 'TroubleshootingDebugModal',
-  components: {
-    BaseModal,
-  },
+  components: { BaseModal, Icon },
   props: {
     isOpen: VueTypes.bool.isRequired,
   },
@@ -236,11 +233,6 @@ export default {
         }, 450);
       }
     },
-  },
-  created() {
-    this.faCheck = faCheck;
-    this.faCircleExclamation = faCircleExclamation;
-    this.faCircleInfo = faCircleInfo;
   },
   methods: {
     getPayloadRowLabel(row) {

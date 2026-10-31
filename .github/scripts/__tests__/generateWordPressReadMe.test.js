@@ -74,6 +74,17 @@ const CHANGELOG_FIXTURE_MAJOR_MINOR_FEATURES = `\
 * Redesign the troubleshooting section.
 `;
 
+const CHANGELOG_FIXTURE_FEATURE_ICONS = `\
+# Changelog
+
+## 4.0.0 - 2026-10-31
+### Feature (major)
+* The admin page has been redesigned. Settings now have their own tab. <!-- icon: palette -->
+
+### Feature (minor)
+* Add a notification sound.
+`;
+
 const CHANGELOG_FIXTURE_PARENTHESES_DATE = `\
 # Changelog
 
@@ -96,6 +107,11 @@ describe('generateWordPressReadMe', () => {
   it('keeps both major and minor feature notes in the merged feature section', async () => {
     const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE_MAJOR_MINOR_FEATURES, '3.0.0');
     expect(result).toMatchSnapshot();
+  });
+
+  it('keeps feature icon comments for the admin What’s New dialog', async () => {
+    const result = await generateWordPressReadMe(README_FIXTURE, CHANGELOG_FIXTURE_FEATURE_ICONS, '4.0.0');
+    expect(result).toContain('* The admin page has been redesigned. Settings now have their own tab. <!-- icon: palette -->\n');
   });
 
   it('formats releases with parenthesized changelog dates without git lookup', async () => {

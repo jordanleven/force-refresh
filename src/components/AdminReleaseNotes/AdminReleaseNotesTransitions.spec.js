@@ -26,22 +26,36 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '0',
         opacity: '0',
-        transform: 'scaleY(0.97)',
       });
     });
   });
 
   describe('onReleaseGroupEnter', () => {
-    it('animates the group to its full height', () => {
+    it('requests one animation frame for expansion', () => {
       const element = createElement();
       const animate = jest.fn((callback) => callback());
 
       onReleaseGroupEnter(element, animate);
 
       expect(animate).toHaveBeenCalledTimes(1);
+    });
+
+    it('animates expansion to its target height', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupEnter(element, animate);
+
       expect(element.style.height).toBe('184px');
+    });
+
+    it('animates expansion to its target opacity', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupEnter(element, animate);
+
       expect(element.style.opacity).toBe('1');
-      expect(element.style.transform).toBe('scaleY(1)');
     });
   });
 
@@ -51,7 +65,6 @@ describe('AdminReleaseNotesTransitions', () => {
         style: {
           height: '184px',
           opacity: '1',
-          transform: 'scaleY(1)',
         },
       });
 
@@ -60,7 +73,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '',
         opacity: '',
-        transform: '',
       });
     });
   });
@@ -74,22 +86,36 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '184px',
         opacity: '1',
-        transform: 'scaleY(1)',
       });
     });
   });
 
   describe('onReleaseGroupLeave', () => {
-    it('animates the group back to a collapsed state', () => {
+    it('requests one animation frame for collapse', () => {
       const element = createElement();
       const animate = jest.fn((callback) => callback());
 
       onReleaseGroupLeave(element, animate);
 
       expect(animate).toHaveBeenCalledTimes(1);
+    });
+
+    it('animates collapse to its target height', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupLeave(element, animate);
+
       expect(element.style.height).toBe('0');
+    });
+
+    it('animates collapse to its target opacity', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupLeave(element, animate);
+
       expect(element.style.opacity).toBe('0');
-      expect(element.style.transform).toBe('scaleY(0.97)');
     });
   });
 
@@ -99,7 +125,6 @@ describe('AdminReleaseNotesTransitions', () => {
         style: {
           height: '0',
           opacity: '0',
-          transform: 'scaleY(0.97)',
         },
       });
 
@@ -108,7 +133,6 @@ describe('AdminReleaseNotesTransitions', () => {
       expect(element.style).toEqual({
         height: '',
         opacity: '',
-        transform: '',
       });
     });
   });

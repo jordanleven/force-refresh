@@ -7,11 +7,11 @@ To get started, follow the steps below:
 ## Starting the development environment
 
 1. Download Docker for your Mac or PC.
-2. Start the environment by running `docker compose up -d --build` in the project directory. This will build the legacy WordPress images and launch all docker containers. See [docker/README.md](docker/README.md) for version details and for updating an existing installation.
+2. Start the environment by running `docker compose up -d --build` in the project directory. This will build the PHP 7.4 WordPress image and launch all docker containers. See [docker/README.md](docker/README.md) for version details and for updating an existing installation.
 
-| WordPress Version | QA (7.1.3) | 7.1.3 | 6.9.10 | 5.9.19 |
+| WordPress Version | QA (7.1.3) | 7.1.3 | 7.1.3 | 7.0.8 |
 | --- | --- | --- | --- | --- |
-| PHP Version | 8.3 | 8.3 | 8.3 | 7.4 |
+| PHP Version | 8.3 | 8.3 | 8.5 | 7.4 |
 | Port | 8086 | 8085 | 8084 | 8083 |
 | Homepage | [qa.force-refresh.localhost][wpqa] | [wp7.force-refresh.localhost][wp7] | [wp6.force-refresh.localhost][wp6] | [wp5.force-refresh.localhost][wp5] |
 | Admin page | [qa.force-refresh.localhost/wp-admin][wpqa-admin] | [wp7.force-refresh.localhost/wp-admin][wp7-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [wp5.force-refresh.localhost/wp-admin][wp5-admin] |
@@ -24,6 +24,12 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 
 **Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
 
+## Previewing What's New
+
+Run `npm run dev` (watch mode) or `npm run build:dev`, then open the Force Refresh admin page and choose **Settings → What's New**. Development builds add the unreleased changie fragments to `README.txt` as the next version, and the What's New link shows that version, icons included, exactly as the next release will.
+
+Previewing leaves your saved last-seen version untouched, and it doesn't change `CHANGELOG.md` or the fragments. Restart `npm run dev` or re-run `npm run build:dev` after adding or editing a fragment, since watch mode only rebuilds the scripts. Production builds show the installed version's features instead; run `npm run changelog:build` to drop the unreleased version from `README.txt`.
+
 ## Adding Release Notes
 
 This project uses [changie] to manage release notes.
@@ -35,6 +41,8 @@ npm run changelog:note
 ```
 
 changie will prompt for a kind and a human-readable description. Commit the resulting `.changes/unreleased/*.yaml` file with your code.
+
+Feature notes appear in the admin's What's New dialog, which uses the first sentence as the title and the rest as the description. changie also asks for an icon to show beside the feature; choose `none` to use the default star.
 
 | Kind | Semver impact |
 | --- | --- |

@@ -1,5 +1,3 @@
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { createApp } from 'vue';
 import i18n from '@/js/i18n/index.js';
 import Store from '@/js/store/index.js';
@@ -37,8 +35,6 @@ const maybeRenderVueInstance = ({ target, layout, props }) => {
   const app = createApp(layout, props);
   app.use(storeInitialized);
   app.use(i18nInitialized);
-  app.component('FontAwesomeIcon', FontAwesomeIcon);
-  app.provide('fontAwesomeLibrary', library);
   app.mount(target);
 };
 
