@@ -2,9 +2,8 @@
 set -euo pipefail
 
 case "${1:-}" in
-  wp5) expected_version=5.9.19 ;;
-  wp6) expected_version=6.9.10 ;;
-  wp7|qa) expected_version=7.1.3 ;;
+  wp5) expected_version=7.0.8 ;;
+  wp6|wp7|qa) expected_version=7.1.3 ;;
   *) echo "Usage: $0 {wp5|wp6|wp7|qa}" >&2; exit 2 ;;
 esac
 
@@ -23,12 +22,12 @@ backup_dir=".docker-build/backups/$1-$(date -u +%Y%m%dT%H%M%SZ)"
 mkdir -p "$backup_dir"
 
 case "$1" in
-  wp5) image=force-refresh-wordpress-wp5:5.9.19 ;;
-  wp6) image=force-refresh-wordpress-wp6:6.9.10-php8.3.36 ;;
+  wp5) image=force-refresh-wordpress-wp5:7.0.8 ;;
+  wp6) image=wordpress:7.1.3-php8.5-apache@sha256:89e44e84974773a97b5ca5fa21b95377d372956fc9d7d1ad363e9fe062d5fe56 ;;
   *) image=wordpress:7.1.3-php8.3-apache@sha256:e5a724ec7ad9055f48b2941ac1b674b08e77ed60edb8937a6254fb89ec45ddf7 ;;
 esac
 
-if [[ "$1" == wp5 || "$1" == wp6 ]]; then
+if [[ "$1" == wp5 ]]; then
   docker compose build --pull "$site_service"
 else
   docker compose pull "$site_service"
