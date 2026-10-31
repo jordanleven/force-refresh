@@ -13,7 +13,7 @@
     "dealerdirect/phpcodesniffer-composer-installer": "^1.1",
     "wp-coding-standards/wpcs": "^3.3",
     "phpcsstandards/php_codesniffer": "^4.0",
-    "phpunit/phpunit": "^11",
+    "phpunit/phpunit": "^13",
     "php-mock/php-mock": "^2.7"
   },
   "config": {
