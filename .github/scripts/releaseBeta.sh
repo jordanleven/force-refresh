@@ -1,180 +1,81 @@
 #!/bin/sh
+# Dispatches the Release Beta Build workflow for the current branch's pull
+# request. The workflow builds the PR's head commit on GitHub, so the local
+# branch must match it.
 
 production_branch="master"
+workflow="release-beta.yml"
+
+fail() {
+  printf "\033[1;31m%s\n\033[0m" "$1"
+  exit 1
+}
 
 getCurrentBranchName() {
-  git branch | sed -n -e 's/^\* \(.*\)/\1/p'
+  git rev-parse --abbrev-ref HEAD
 }
 
-getPrereleaseName() {
-  current_branch_name=$(getCurrentBranchName)
-  commit_sha=$(git log master.."$current_branch_name" --oneline --format=format:%H | tail -1)
-  if [ -z "$commit_sha" ]; then
-    commit_sha=$(git rev-parse HEAD)
-  fi
-  prerelease_name=$(echo "$commit_sha" | cut -c1-6 | awk '{ print toupper($0) }')
-  echo "$prerelease_name"
-}
+findRunUrl() {
+  pr_number=$1
+  dispatched_at=$2
+  attempt=0
 
-getCurrentPackageVersion() {
-  node -e "process.stdout.write(require('./package.json').version)"
-}
-
-getCurrentBaseVersion() {
-  getCurrentPackageVersion | sed 's/-.*//'
-}
-
-hasUnreleasedFragments() {
-  [ -n "$(ls .changes/unreleased/*.yaml 2>/dev/null)" ]
-}
-
-getNextBaseVersion() {
-  release_kind=$1
-  npx changie next "$release_kind"
-}
-
-getExistingBuildNumber() {
-  current_package_version=$(getCurrentPackageVersion)
-  if echo "$current_package_version" | grep -q "-"
-  then
-      build_version=$(echo "$current_package_version" | sed 's/.*\.//')
-      echo "$build_version"
-  fi
-}
-
-getNextBuildNumber() {
-  existing_build_number=$(getExistingBuildNumber)
-  if [ -z "$existing_build_number" ]
-    then
-      echo 0
-    else
-      echo $((existing_build_number+1))
-  fi
-}
-
-bumpVersionPackage() {
-  release_version=$1
-  npm version "$release_version" --no-git-tag-version >/dev/null
-  git add package*
-  ./.github/scripts/bumpWordPressPluginVersion.sh
-  git commit -m "chore(release): ${release_version}"
-  git tag -a "v$release_version" -m "v$release_version"
-}
-
-getNextBetaReleaseVersion() {
-  current_release_version=$1
-  next_build_number=$(getNextBuildNumber)
-  release_without_build=$(echo "$current_release_version" | sed 's![^.]*$!!')
-  echo "${release_without_build}${next_build_number}"
-}
-
-getBetaReleaseVersion() {
-  next_base=$1
-  current_base=$(getCurrentBaseVersion)
-  prerelease_name=$(getPrereleaseName)
-
-  if [ "$current_base" = "$next_base" ] && getCurrentPackageVersion | grep -q "-"; then
-    beta_release_version="$(getNextBetaReleaseVersion "$(getCurrentPackageVersion)")"
-  else
-    beta_release_version="${next_base}-${prerelease_name}.0"
-  fi
-
-  echo "$beta_release_version"
-}
-
-appendUniqueOption() {
-  version=$1
-  label=$2
-
-  [ -n "$version" ] || return
-  [ "$version" = "$option_1_version" ] && return
-  [ "$version" = "$option_2_version" ] && return
-  [ "$version" = "$option_3_version" ] && return
-  [ "$version" = "$option_4_version" ] && return
-
-  if [ -z "$option_1_version" ]; then
-    option_1_version=$version
-    option_1="${version}  (${label})"
-  elif [ -z "$option_2_version" ]; then
-    option_2_version=$version
-    option_2="${version}  (${label})"
-  elif [ -z "$option_3_version" ]; then
-    option_3_version=$version
-    option_3="${version}  (${label})"
-  elif [ -z "$option_4_version" ]; then
-    option_4_version=$version
-    option_4="${version}  (${label})"
-  fi
-}
-
-selectReleaseVersion() {
-  auto_version=$(getBetaReleaseVersion "$(getNextBaseVersion auto)")
-  major_version=$(getBetaReleaseVersion "$(getNextBaseVersion major)")
-  minor_version=$(getBetaReleaseVersion "$(getNextBaseVersion minor)")
-  patch_version=$(getBetaReleaseVersion "$(getNextBaseVersion patch)")
-
-  option_1_version=''
-  option_2_version=''
-  option_3_version=''
-  option_4_version=''
-  option_1=''
-  option_2=''
-  option_3=''
-  option_4=''
-
-  appendUniqueOption "$auto_version" auto
-  appendUniqueOption "$major_version" major
-  appendUniqueOption "$minor_version" minor
-  appendUniqueOption "$patch_version" patch
-
-  if [ -n "$option_4" ]; then
-    node "$(dirname "$0")/selectVersion.js" \
-      "Select a version to release" \
-      "$option_1" \
-      "$option_2" \
-      "$option_3" \
-      "$option_4"
-  elif [ -n "$option_3" ]; then
-    node "$(dirname "$0")/selectVersion.js" \
-      "Select a version to release" \
-      "$option_1" \
-      "$option_2" \
-      "$option_3"
-  elif [ -n "$option_2" ]; then
-    node "$(dirname "$0")/selectVersion.js" \
-      "Select a version to release" \
-      "$option_1" \
-      "$option_2"
-  else
-    node "$(dirname "$0")/selectVersion.js" \
-      "Select a version to release" \
-      "$option_1"
-  fi
+  while [ "$attempt" -lt 10 ]; do
+    run_url=$(gh run list \
+      --workflow "$workflow" \
+      --event workflow_dispatch \
+      --limit 10 \
+      --json url,displayTitle,createdAt \
+      --jq "map(select(.displayTitle == \"Beta release for PR #${pr_number}\" and .createdAt >= \"${dispatched_at}\")) | .[0].url // empty")
+    if [ -n "$run_url" ]; then
+      echo "$run_url"
+      return
+    fi
+    attempt=$((attempt+1))
+    sleep 2
+  done
 }
 
 current_branch=$(getCurrentBranchName)
 
-if ! hasUnreleasedFragments; then
-  printf "\033[1;31mNo unreleased changie fragments found. Add one with 'npm run changelog:new' before releasing a beta.\n\033[0m"
-  exit 1
+if [ "$current_branch" = "$production_branch" ]; then
+  fail "Cannot release betas while on branch ${production_branch}."
 fi
 
-if [ "$current_branch" = "$production_branch" ]
-  then
-  printf "\033[1;31mCannot release betas while on branch %s\n\033[0m" "$production_branch"
-  exit 1
+pr_info=$(gh pr view --json number,headRefOid,state --jq '[.number, .headRefOid, .state] | @tsv' 2>/dev/null) ||
+  fail "No pull request found for branch ${current_branch}. Open one before releasing a beta."
+
+pr_number=$(echo "$pr_info" | cut -f1)
+pr_head_sha=$(echo "$pr_info" | cut -f2)
+pr_state=$(echo "$pr_info" | cut -f3)
+
+if [ "$pr_state" != "OPEN" ]; then
+  fail "PR #${pr_number} is ${pr_state}. Betas can only be released from open pull requests."
 fi
 
-selection=$(selectReleaseVersion) || {
-  printf "\033[1;31mRelease was aborted.\033[0m\n\n"
-  exit 1
-}
+local_head_sha=$(git rev-parse HEAD)
 
-next_version=${selection%%  *}
+if [ "$local_head_sha" != "$pr_head_sha" ]; then
+  fail "Local HEAD ($(echo "$local_head_sha" | cut -c1-7)) does not match the head of PR #${pr_number} ($(echo "$pr_head_sha" | cut -c1-7)). Push or pull so they match, since the beta is built from the PR on GitHub."
+fi
+
+if [ -n "$(git status --porcelain)" ]; then
+  printf "\033[1;33mUncommitted changes will not be included in the beta.\n\033[0m"
+fi
 
 printf "\033[37m=====================\033[0m\n"
-printf "\033[37mPreparing to release beta version %s.\033[0m\n\n" "$next_version"
+printf "\033[37mRequesting a beta release of PR #%s at %s.\033[0m\n\n" "$pr_number" "$(echo "$pr_head_sha" | cut -c1-7)"
 
-bumpVersionPackage "$next_version"
-git push --force-with-lease --follow-tags
-printf "\033[1;32m\n\nPackage succesfully updated and pushed to the remote.\033[0m\n\n"
+dispatched_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+dispatch_output=$(gh workflow run "$workflow" -f pr="$pr_number" 2>&1) || fail "$dispatch_output"
+
+run_url=$(echo "$dispatch_output" | grep -Eo 'https://github\.com/[^ ]+/actions/runs/[0-9]+' | head -1)
+if [ -z "$run_url" ]; then
+  run_url=$(findRunUrl "$pr_number" "$dispatched_at")
+fi
+
+if [ -n "$run_url" ]; then
+  printf "\033[1;32mBeta release started: %s\033[0m\n\n" "$run_url"
+else
+  printf "\033[1;32mBeta release started. Follow it with 'gh run list --workflow %s'.\033[0m\n\n" "$workflow"
+fi
