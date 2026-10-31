@@ -31,14 +31,30 @@ describe('AdminReleaseNotesTransitions', () => {
   });
 
   describe('onReleaseGroupEnter', () => {
-    it('animates the group to its full height', () => {
+    it('requests one animation frame for expansion', () => {
       const element = createElement();
       const animate = jest.fn((callback) => callback());
 
       onReleaseGroupEnter(element, animate);
 
       expect(animate).toHaveBeenCalledTimes(1);
+    });
+
+    it('animates expansion to its target height', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupEnter(element, animate);
+
       expect(element.style.height).toBe('184px');
+    });
+
+    it('animates expansion to its target opacity', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupEnter(element, animate);
+
       expect(element.style.opacity).toBe('1');
     });
   });
@@ -75,14 +91,30 @@ describe('AdminReleaseNotesTransitions', () => {
   });
 
   describe('onReleaseGroupLeave', () => {
-    it('animates the group back to a collapsed state', () => {
+    it('requests one animation frame for collapse', () => {
       const element = createElement();
       const animate = jest.fn((callback) => callback());
 
       onReleaseGroupLeave(element, animate);
 
       expect(animate).toHaveBeenCalledTimes(1);
+    });
+
+    it('animates collapse to its target height', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupLeave(element, animate);
+
       expect(element.style.height).toBe('0');
+    });
+
+    it('animates collapse to its target opacity', () => {
+      const element = createElement();
+      const animate = jest.fn((callback) => callback());
+
+      onReleaseGroupLeave(element, animate);
+
       expect(element.style.opacity).toBe('0');
     });
   });
