@@ -10,21 +10,41 @@ const refreshOptions = {
   useStaticFilePolling: false,
 };
 
-it('supports keyboard tab navigation while keeping settings mounted', async () => {
-  const wrapper = shallowMount(AdminMain, {
+let wrapper;
+
+beforeEach(async () => {
+  wrapper = shallowMount(AdminMain, {
     attachTo: document.body,
     global: buildVueTestGlobals(),
     props: { refreshOptions, scheduledRefreshes: [], siteName: 'Test Site' },
   });
-  try {
-    const settings = wrapper.find('#force-refresh-tab-settings');
-    await wrapper.find('#force-refresh-tab-refresh').trigger('keydown', { key: 'ArrowRight' });
-    expect(settings.attributes('aria-selected')).toBe('true');
-    expect(document.activeElement).toBe(settings.element);
-    expect(wrapper.find('#force-refresh-panel-refresh').isVisible()).toBe(false);
-    expect(wrapper.find('#force-refresh-panel-settings').isVisible()).toBe(true);
-    await settings.trigger('keydown', { key: 'Home' });
-    expect(wrapper.find('#force-refresh-panel-settings').exists()).toBe(true);
-    expect(wrapper.find('#force-refresh-panel-settings').isVisible()).toBe(false);
-  } finally { wrapper.unmount(); }
+  await wrapper.find('#force-refresh-tab-refresh').trigger('keydown', { key: 'ArrowRight' });
+});
+
+afterEach(() => wrapper.unmount());
+
+it('selects Settings with the right arrow', () => {
+  expect(wrapper.find('#force-refresh-tab-settings').attributes('aria-selected')).toBe('true');
+});
+
+it('focuses Settings with the right arrow', () => {
+  expect(document.activeElement).toBe(wrapper.find('#force-refresh-tab-settings').element);
+});
+
+it('hides Refresh when Settings is selected', () => {
+  expect(wrapper.find('#force-refresh-panel-refresh').isVisible()).toBe(false);
+});
+
+it('shows Settings after right-arrow navigation', () => {
+  expect(wrapper.find('#force-refresh-panel-settings').isVisible()).toBe(true);
+});
+
+it('keeps Settings mounted after Home', async () => {
+  await wrapper.find('#force-refresh-tab-settings').trigger('keydown', { key: 'Home' });
+  expect(wrapper.find('#force-refresh-panel-settings').exists()).toBe(true);
+});
+
+it('hides Settings after Home', async () => {
+  await wrapper.find('#force-refresh-tab-settings').trigger('keydown', { key: 'Home' });
+  expect(wrapper.find('#force-refresh-panel-settings').isVisible()).toBe(false);
 });
