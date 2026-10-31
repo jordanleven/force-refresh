@@ -4,21 +4,58 @@ import {
   getNextExpandedMinorVersions,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesUtils.js';
 
-// What's New highlights describe one release. Update both values when a release has new
-// highlights; until then the modal only opens on demand.
-export const WHATS_NEW_MINOR_VERSION = '3.3';
-export const WHATS_NEW_FEATURES = [
-  { icon: 'tag', key: 'INTERFACE' },
-  { icon: 'clock', key: 'PICKER' },
-];
+const WHATS_NEW_SECTION_HEADER = 'New Features';
 
-export function getMinorVersion(version) {
-  return String(version ?? '').split('.').slice(0, 2).join('.');
+export const WHATS_NEW_MAX_FEATURES = 6;
+
+export function parseVersion(version) {
+  const match = /^(\d+)\.(\d+)(?:\.(\d+))?(-.+)?$/.exec(String(version ?? '').trim());
+  if (!match) return null;
+  return {
+    major: Number(match[1]),
+    minor: Number(match[2]),
+    patch: Number(match[3] ?? 0),
+    prerelease: Boolean(match[4]),
+  };
 }
 
-export function shouldAnnounceWhatsNew(installedVersion, seenVersion) {
-  return getMinorVersion(installedVersion) === WHATS_NEW_MINOR_VERSION
-    && getMinorVersion(seenVersion) !== WHATS_NEW_MINOR_VERSION;
+const compareMinorVersions = (a, b) => (a.major - b.major) || (a.minor - b.minor);
+
+const compareVersions = (a, b) => compareMinorVersions(a, b) || (a.patch - b.patch);
+
+// Changelog entries lead with a sentence that works as a title; the rest becomes the description.
+export function splitFeatureNote(note) {
+  const match = /^(.+?[.!?])\s+(.+)$/s.exec(note.trim());
+  return match
+    ? { description: match[2], title: match[1] }
+    : { description: '', title: note.trim() };
+}
+
+// Prereleases never announce, so beta testers still see What's New when the final release ships.
+export function shouldAnnounceWhatsNew(installedVersion, lastSeenVersion) {
+  const installed = parseVersion(installedVersion);
+  if (!installed || installed.prerelease) return false;
+  const lastSeen = parseVersion(lastSeenVersion);
+  return !lastSeen || compareMinorVersions(installed, lastSeen) > 0;
+}
+
+// Collect every new feature since the user's last-seen minor version, capped at the installed major.
+export function getWhatsNewFeatures(releaseNotes, installedVersion, lastSeenVersion) {
+  const installed = parseVersion(installedVersion);
+  if (!installed) return [];
+  const lastSeen = parseVersion(lastSeenVersion);
+
+  return Object.entries(releaseNotes || {})
+    .map(([versionNumber, release]) => ({ release, version: parseVersion(versionNumber), versionNumber }))
+    .filter(({ version }) => version
+      && !version.prerelease
+      && version.major === installed.major
+      && compareMinorVersions(version, installed) <= 0
+      && (!lastSeen || compareMinorVersions(version, lastSeen) > 0))
+    .sort((a, b) => compareVersions(b.version, a.version))
+    .flatMap(({ release, versionNumber }) => (release?.notes ?? [])
+      .filter(({ sectionHeader }) => sectionHeader?.trim() === WHATS_NEW_SECTION_HEADER)
+      .flatMap(({ sectionNotes }) => sectionNotes.map((note) => ({ ...splitFeatureNote(note), versionNumber }))));
 }
 
 export function createReleaseNotesData() {
