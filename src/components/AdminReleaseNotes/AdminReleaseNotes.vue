@@ -15,20 +15,28 @@
           <Icon name="star" :size="24" />
         </span>
         <div>
-          <h2>{{ $t('RELEASE_NOTES.HEADER') }}</h2>
-          <p v-if="currentRelease">
-            {{ $t('PLUGIN_NAME_FORCE_REFRESH') }} {{ currentRelease.versionNumber }}
+          <h2>{{ whatsNewTitle }}</h2>
+          <p v-if="whatsNewSubtitle">
+            {{ whatsNewSubtitle }}
           </p>
         </div>
       </div>
     </template>
     <div data-test="release-notes-modal-content">
       <ul v-if="!historyOnly" class="whats-new__highlights">
-        <li v-for="feature in features" :key="feature.key">
+        <li v-for="feature in visibleFeatures" :key="`${feature.versionNumber}-${feature.title}`">
           <span class="whats-new__bullet" aria-hidden="true">
-            <Icon :size="14" :name="feature.icon" />
+            <Icon :size="14" name="star" />
           </span>
-          <div><h3>{{ $t(`REDESIGN.WHATS_NEW_${feature.key}_TITLE`) }}</h3><p>{{ $t(`REDESIGN.WHATS_NEW_${feature.key}_BODY`) }}</p></div>
+          <div>
+            <h3>
+              {{ feature.title }}
+              <span v-if="spansMultipleVersions" class="whats-new__version">{{ getMinorVersion(feature.versionNumber) }}</span>
+            </h3>
+            <p v-if="feature.description">
+              {{ feature.description }}
+            </p>
+          </div>
         </li>
       </ul>
       <div v-else class="whats-new__history">
@@ -196,6 +204,9 @@
         <button type="button" class="button button-primary" @click="$emit('modal-was-closed')">
           {{ $t('REDESIGN.GET_STARTED') }}
         </button>
+        <button type="button" class="whats-new__view-all" data-test="btn-whats-new-view-all" @click="$emit('view-release-history')">
+          {{ hiddenFeatureCount ? $t('REDESIGN.WHATS_NEW_VIEW_MORE', { count: hiddenFeatureCount }) : $t('REDESIGN.WHATS_NEW_VIEW_ALL') }}
+        </button>
       </div>
     </div>
   </BaseModal>
@@ -214,7 +225,7 @@ import {
   isMinorVersionExpanded,
   syncExpandedMinorVersions,
   toggleMinorVersionGroup,
-  WHATS_NEW_FEATURES,
+  WHATS_NEW_MAX_FEATURES,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesConfig.js';
 import {
   onAfterReleaseGroupEnter as handleAfterReleaseGroupEnter,
@@ -224,7 +235,7 @@ import {
   onReleaseGroupEnter as handleReleaseGroupEnter,
   onReleaseGroupLeave as handleReleaseGroupLeave,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesTransitions.js';
-import { getReleaseUrlByVersionNumber, isPrereleaseVersion } from '@/components/AdminReleaseNotes/AdminReleaseNotesUtils.js';
+import { getMinorVersion, getReleaseUrlByVersionNumber, isPrereleaseVersion } from '@/components/AdminReleaseNotes/AdminReleaseNotesUtils.js';
 import BaseModal from '@/components/BaseModal/BaseModal.vue';
 import Icon from '@/components/Icon/Icon.vue';
 
@@ -235,18 +246,18 @@ export default {
   props: {
     historyOnly: VueTypes.bool.def(false),
     releaseNotes: VueTypes.object,
+    whatsNewFeatures: VueTypes.array.def([]),
   },
-  emits: ['modal-was-closed'],
+  emits: ['modal-was-closed', 'view-release-history'],
   data() {
     return {
-      features: WHATS_NEW_FEATURES,
       minorVersionChevronIcon: 'chevron-down',
       ...createReleaseNotesData(),
     };
   },
   computed: {
-    currentRelease() {
-      return this.flatReleaseNotes.find(({ release }) => release?.isCurrentVersion) ?? this.flatReleaseNotes[0];
+    featureMinorVersions() {
+      return [...new Set(this.whatsNewFeatures.map(({ versionNumber }) => getMinorVersion(versionNumber)))];
     },
     flatReleaseNotes() {
       return getFlatReleaseNotes(this.releaseNotes);
@@ -256,6 +267,26 @@ export default {
     },
     hasMinorVersionGrouping() {
       return hasMinorVersionGrouping(this.releaseNotes);
+    },
+    hiddenFeatureCount() {
+      return Math.max(this.whatsNewFeatures.length - WHATS_NEW_MAX_FEATURES, 0);
+    },
+    spansMultipleVersions() {
+      return this.featureMinorVersions.length > 1;
+    },
+    visibleFeatures() {
+      return this.whatsNewFeatures.slice(0, WHATS_NEW_MAX_FEATURES);
+    },
+    whatsNewSubtitle() {
+      if (!this.spansMultipleVersions) return '';
+      // Features are sorted newest first.
+      const versions = this.featureMinorVersions;
+      return this.$t('REDESIGN.WHATS_NEW_VERSION_RANGE', { from: versions[versions.length - 1], to: versions[0] });
+    },
+    whatsNewTitle() {
+      return this.spansMultipleVersions
+        ? this.$t('REDESIGN.WHATS_NEW_TITLE_MULTIPLE')
+        : this.$t('REDESIGN.WHATS_NEW_TITLE_SINGLE', { version: this.featureMinorVersions[0] ?? '' });
     },
   },
   watch: {
@@ -267,6 +298,9 @@ export default {
     },
   },
   methods: {
+    getMinorVersion(versionNumber) {
+      return getMinorVersion(versionNumber);
+    },
     getMinorVersionLabel(minorVersion) {
       return getMinorVersionLabel(this, minorVersion);
     },
@@ -599,7 +633,36 @@ export default {
 .whats-new__footer {
   padding: 8px 0 0;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.whats-new__view-all {
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  background: none;
+  color: #0071e3;
+  font: inherit;
+  font-size: 12.5px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+
+  }
+}
+
+.whats-new__version {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgb(0, 0, 0, 5%);
+  color: #6e6e73;
+  font-size: 11px;
+  font-weight: 500;
+  vertical-align: 1px;
 }
 
 .whats-new__footer .button {

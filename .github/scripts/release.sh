@@ -85,6 +85,17 @@ hasUnreleasedFragments() {
   [ -n "$(ls .changes/unreleased/*.yaml 2>/dev/null)" ]
 }
 
+hasUnreleasedFeatureFragments() {
+  grep -lE '^kind: Feature \((major|minor)\)$' .changes/unreleased/*.yaml >/dev/null 2>&1
+}
+
+isMajorOrMinorRelease() {
+  case "$1" in
+    *.*.0) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
 prependToChangelog() {
   version=$1
   {
@@ -125,6 +136,12 @@ selection=$(selectReleaseVersion) || {
 }
 
 next_version=${selection%%  *}
+
+# What's New shows feature fragments to admins after each major or minor update.
+if isMajorOrMinorRelease "$next_version" && ! hasUnreleasedFeatureFragments; then
+  printf "\033[1;31mVersion %s is a major or minor release and needs at least one Feature fragment for What's New. Run 'npm run changelog:new' and choose a Feature kind.\n\033[0m" "$next_version"
+  exit 1
+fi
 
 printf "\033[37m=====================\033[0m\n"
 printf "\033[37m%s\033[0m\n" "Preparing to release version ${next_version}."
