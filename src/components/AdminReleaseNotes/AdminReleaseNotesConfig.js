@@ -3,8 +3,11 @@ import {
   getGroupedReleaseNotes,
   getNextExpandedMinorVersions,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesUtils.js';
+import { isIconName } from '@/components/Icon/IconConfig.js';
 
 const WHATS_NEW_SECTION_HEADER = 'New Features';
+
+export const WHATS_NEW_DEFAULT_ICON = 'star';
 
 export const WHATS_NEW_MAX_FEATURES = 6;
 
@@ -38,6 +41,32 @@ export function splitFeatureNote(note) {
     : { description: '', title: note.trim() };
 }
 
+// Repeat until nothing changes, since removing one comment can join the pieces of another.
+const stripHtmlComments = (value) => {
+  let previous;
+  let current = value;
+  do {
+    previous = current;
+    current = current.replace(/\s*<!--.*?-->/gs, '');
+  } while (current !== previous);
+  return current;
+};
+
+// Feature notes name their icon in an HTML comment, which the WordPress.org plugin directory hides.
+export function parseReleaseNote(note) {
+  const [, icon = null] = /<!--\s*icon:\s*([\w-]+)\s*-->/.exec(note) ?? [];
+  return { icon, text: stripHtmlComments(note).trim() };
+}
+
+const getWhatsNewFeature = (note, versionNumber) => {
+  const { icon, text } = parseReleaseNote(note);
+  return {
+    ...splitFeatureNote(text),
+    icon: isIconName(icon) ? icon : WHATS_NEW_DEFAULT_ICON,
+    versionNumber,
+  };
+};
+
 // Prereleases never announce, so beta testers still see What's New when the final release ships.
 export function shouldAnnounceWhatsNew(installedVersion, lastSeenVersion) {
   const installed = parseVersion(installedVersion);
@@ -62,7 +91,7 @@ export function getWhatsNewFeatures(releaseNotes, installedVersion, lastSeenVers
     .sort((a, b) => compareVersions(b.version, a.version))
     .flatMap(({ release, versionNumber }) => (release?.notes ?? [])
       .filter(({ sectionHeader }) => sectionHeader?.trim() === WHATS_NEW_SECTION_HEADER)
-      .flatMap(({ sectionNotes }) => sectionNotes.map((note) => ({ ...splitFeatureNote(note), versionNumber }))));
+      .flatMap(({ sectionNotes }) => sectionNotes.map((note) => getWhatsNewFeature(note, versionNumber))));
 }
 
 export function createReleaseNotesData() {

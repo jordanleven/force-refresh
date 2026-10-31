@@ -3,35 +3,8 @@
 </template>
 
 <script>
-import { faClock as clockOutline } from '@fortawesome/free-regular-svg-icons';
-import {
-  faArrowsRotate, faCheck, faSpinner, faChevronLeft, faChevronRight,
-  faChevronDown, faXmark, faStar, faArrowUpRightFromSquare,
-  faCircleInfo, faCircleExclamation, faPaperPlane, faBug, faTriangleExclamation, faInfo, faExclamation, faArrowUp, faFlask,
-} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-
-const icons = {
-  'arrow-up': faArrowUp,
-  'arrow-up-right': faArrowUpRightFromSquare,
-  bug: faBug,
-  check: faCheck,
-  'chevron-down': faChevronDown,
-  'chevron-left': faChevronLeft,
-  'chevron-right': faChevronRight,
-  'circle-exclamation': faCircleExclamation,
-  'circle-info': faCircleInfo,
-  'clock-outline': clockOutline,
-  close: faXmark,
-  exclamation: faExclamation,
-  flask: faFlask,
-  info: faInfo,
-  'paper-plane': faPaperPlane,
-  refresh: faArrowsRotate,
-  spinner: faSpinner,
-  star: faStar,
-  'triangle-exclamation': faTriangleExclamation,
-};
+import { icons, isIconName } from '@/components/Icon/IconConfig.js';
 
 export default {
   // Public component name follows the product's shared Icon API.
@@ -39,7 +12,7 @@ export default {
   name: 'Icon',
   components: { FontAwesomeIcon },
   props: {
-    name: { type: String, required: true, validator: (value) => Object.hasOwn(icons, value) },
+    name: { type: String, required: true, validator: isIconName },
     size: { type: [Number, String], default: null },
   },
   computed: {

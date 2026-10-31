@@ -9,8 +9,33 @@ changeFormat: "* {{.Body}}"
 kinds:
   - label: Feature (major)
     auto: major
+    # Feature notes keep their What's New icon in an HTML comment, which the
+    # WordPress.org readme parser strips before display.
+    changeFormat: &featureChangeFormat "* {{.Body}}{{if and .Custom.Icon (ne .Custom.Icon \"none\")}} <!-- icon: {{.Custom.Icon}} -->{{end}}"
+    additionalChoices: &featureChoices
+      - key: Icon
+        label: What's New icon
+        type: enum
+        optional: true
+        # The prompt always requires a choice, so "none" keeps the default icon.
+        enumOptions:
+          - none
+          - bell
+          - bolt
+          - calendar
+          - clock-outline
+          - gauge
+          - gear
+          - gift
+          - palette
+          - refresh
+          - shield
+          - sliders
+          - star
   - label: Feature (minor)
     auto: minor
+    changeFormat: *featureChangeFormat
+    additionalChoices: *featureChoices
   - label: Changed (major)
     auto: major
   - label: Changed (minor)
