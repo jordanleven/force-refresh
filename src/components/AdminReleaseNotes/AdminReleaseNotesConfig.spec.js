@@ -2,6 +2,7 @@
 import {
   createReleaseNotesData,
   getFlatReleaseNotes,
+  getLatestWhatsNewFeatures,
   getGroupedMinorReleaseNotes,
   getMinorVersionHeaderDate,
   getMinorVersionLabel,
@@ -298,5 +299,57 @@ describe('getWhatsNewFeatures', () => {
   it('gives features with an unknown icon the default icon', () => {
     const [{ icon }] = getWhatsNewFeatures({ '3.3.0': release('Redesign. <!-- icon: unicorn -->') }, '3.3.0', null);
     expect(icon).toBe(WHATS_NEW_DEFAULT_ICON);
+  });
+});
+
+describe('getLatestWhatsNewFeatures', () => {
+  const release = (...features) => ({
+    notes: [
+      { sectionHeader: 'Changes', sectionNotes: ['Not a feature.'] },
+      { sectionHeader: 'New Features', sectionNotes: features },
+    ],
+  });
+  const fixes = { notes: [{ sectionHeader: 'Fixes', sectionNotes: ['A fix.'] }] };
+  const titlesOf = (features) => features.map(({ title }) => title);
+  it('shows the features of the installed minor version', () => {
+    const notes = { '4.0.0': release('Four oh.'), '4.1.0': release('Four one.') };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.1.0'))).toEqual(['Four one.']);
+  });
+  it('includes features from patch releases of the installed minor version', () => {
+    const notes = { '4.1.0': release('Four one.'), '4.1.1': release('Four one one.') };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.1.1'))).toEqual(['Four one one.', 'Four one.']);
+  });
+  it('includes features from later patch releases of the installed minor version', () => {
+    const notes = { '4.1.0': release('Four one.'), '4.1.1': release('Four one one.') };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.1.0'))).toEqual(['Four one one.', 'Four one.']);
+  });
+  it('falls back to the newest earlier minor version with features', () => {
+    const notes = { '4.0.0': release('Four oh.'), '4.1.0': fixes, '4.2.0': fixes };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.2.0'))).toEqual(['Four oh.']);
+  });
+  it('falls back to an earlier major version with features', () => {
+    const notes = { '3.9.0': release('Three nine.'), '4.0.0': fixes };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.0.0'))).toEqual(['Three nine.']);
+  });
+  it('ignores features newer than the installed minor version', () => {
+    const notes = { '4.1.0': release('Four one.'), '4.2.0': release('Four two.') };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.1.3'))).toEqual(['Four one.']);
+  });
+  it('ignores features from other prereleases', () => {
+    const notes = { '4.1.0': release('Four one.'), '4.2.0-beta.1': release('Beta.') };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.1.0'))).toEqual(['Four one.']);
+  });
+  it('shows the features of an installed prerelease', () => {
+    const notes = { '4.1.0': release('Four one.'), '4.2.0-beta.1': release('Beta.') };
+    expect(titlesOf(getLatestWhatsNewFeatures(notes, '4.2.0-beta.1'))).toEqual(['Beta.']);
+  });
+  it('returns nothing when no release has features', () => {
+    expect(getLatestWhatsNewFeatures({ '4.0.0': fixes }, '4.0.0')).toEqual([]);
+  });
+  it('returns nothing without release notes', () => {
+    expect(getLatestWhatsNewFeatures(null, '4.0.0')).toEqual([]);
+  });
+  it('returns nothing for an unreadable version', () => {
+    expect(getLatestWhatsNewFeatures({ '4.0.0': release('Four oh.') }, 'not-a-version')).toEqual([]);
   });
 });

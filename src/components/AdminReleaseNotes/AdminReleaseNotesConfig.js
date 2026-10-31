@@ -1,6 +1,7 @@
 import {
   getDefaultExpandedMinorVersions,
   getGroupedReleaseNotes,
+  getMinorVersion,
   getNextExpandedMinorVersions,
 } from '@/components/AdminReleaseNotes/AdminReleaseNotesUtils.js';
 import { isIconName } from '@/components/Icon/IconConfig.js';
@@ -64,23 +65,44 @@ export function shouldAnnounceWhatsNew(installedVersion, lastSeenVersion) {
   return !lastSeen || !hasSeenMinorVersion(installed, lastSeen);
 }
 
+const getReleaseEntries = (releaseNotes) => Object.entries(releaseNotes || {})
+  .map(([versionNumber, release]) => ({ release, version: parseVersion(versionNumber), versionNumber }));
+
+const getReleaseFeatures = ({ release, versionNumber }) => (release?.notes ?? [])
+  .filter(({ sectionHeader }) => sectionHeader?.trim() === WHATS_NEW_SECTION_HEADER)
+  .flatMap(({ sectionNotes }) => sectionNotes.map((note) => getWhatsNewFeature(note, versionNumber)));
+
 // Collect every new feature since the user's last-seen minor version, capped at the installed major.
 export function getWhatsNewFeatures(releaseNotes, installedVersion, lastSeenVersion) {
   const installed = parseVersion(installedVersion);
   if (!installed) return [];
   const lastSeen = parseVersion(lastSeenVersion);
 
-  return Object.entries(releaseNotes || {})
-    .map(([versionNumber, release]) => ({ release, version: parseVersion(versionNumber), versionNumber }))
+  return getReleaseEntries(releaseNotes)
     .filter(({ version }) => version
       && !version.prerelease
       && version.major === installed.major
       && compareMinorVersions(version, installed) <= 0
       && (!lastSeen || !hasSeenMinorVersion(version, lastSeen)))
     .sort((a, b) => compareVersions(b.version, a.version))
-    .flatMap(({ release, versionNumber }) => (release?.notes ?? [])
-      .filter(({ sectionHeader }) => sectionHeader?.trim() === WHATS_NEW_SECTION_HEADER)
-      .flatMap(({ sectionNotes }) => sectionNotes.map((note) => getWhatsNewFeature(note, versionNumber))));
+    .flatMap(getReleaseFeatures);
+}
+
+// Reopening What's New shows one minor version: the given version's, or the newest earlier one with features.
+// Other prereleases are skipped like in the announcement, but a prerelease can show its own features.
+export function getLatestWhatsNewFeatures(releaseNotes, currentVersion) {
+  const current = parseVersion(currentVersion);
+  if (!current) return [];
+
+  const features = getReleaseEntries(releaseNotes)
+    .filter(({ version, versionNumber }) => version
+      && (!version.prerelease || versionNumber === currentVersion)
+      && compareMinorVersions(version, current) <= 0)
+    .sort((a, b) => compareVersions(b.version, a.version))
+    .flatMap(getReleaseFeatures);
+  const latestMinorVersion = features[0] && getMinorVersion(features[0].versionNumber);
+
+  return features.filter(({ versionNumber }) => getMinorVersion(versionNumber) === latestMinorVersion);
 }
 
 export function createReleaseNotesData() {

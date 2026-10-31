@@ -62,6 +62,7 @@ describe('forwarding to the panels', () => {
       global: buildVueTestGlobals(),
       props: {
         detectedCdn: 'Cloudflare',
+        hasWhatsNew: true,
         isScheduledRefreshEnabled: true,
         refreshOptions,
         scheduledRefreshes: [],
@@ -100,6 +101,10 @@ describe('forwarding to the panels', () => {
     expect(wrapper.findComponent(AdminMainOptions).props('detectedCdn')).toBe('Cloudflare');
   });
 
+  it('tells the Settings panel that What’s New is available', () => {
+    expect(wrapper.findComponent(AdminMainOptions).props('hasWhatsNew')).toBe(true);
+  });
+
   it.each([
     ['delete-scheduled-refresh', [42]],
     ['refresh-requested', []],
@@ -115,6 +120,7 @@ describe('forwarding to the panels', () => {
     ['options-were-updated', [{ refreshInterval: 30 }]],
     ['release-notes-page-clicked', []],
     ['troubleshooting-page-clicked', []],
+    ['whats-new-page-clicked', []],
   ])('forwards %s from the Settings panel', async (event, payload) => {
     wrapper.findComponent(AdminMainOptions).vm.$emit(event, ...payload);
     expect(wrapper.emitted(event)).toEqual([payload]);

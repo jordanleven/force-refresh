@@ -71,3 +71,26 @@ it('opens release history from the footer', async () => {
   await utilities.find('[data-test="btn-release-notes"]').trigger('click');
   expect(wrapper.emitted('release-notes-page-clicked')).toHaveLength(1);
 });
+
+it('hides the What’s New link when there is nothing to show', async () => {
+  const wrapper = shallowMount(AdminMainOptions, { global: buildVueTestGlobals(), props: { refreshOptions: props } });
+  expect(wrapper.find('[data-test="btn-whats-new"]').exists()).toBe(false);
+});
+
+it('places the What’s New link next to release history', async () => {
+  const wrapper = shallowMount(AdminMainOptions, {
+    global: buildVueTestGlobals(), props: { hasWhatsNew: true, refreshOptions: props },
+  });
+  const utilities = wrapper.find('.force-refresh-admin__options-utilities');
+  expect(utilities.findAll('button').map((button) => button.attributes('data-test'))).toEqual([
+    'btn-release-notes', 'btn-whats-new', 'btn-troubleshooting',
+  ]);
+});
+
+it('opens What’s New from the footer', async () => {
+  const wrapper = shallowMount(AdminMainOptions, {
+    global: buildVueTestGlobals(), props: { hasWhatsNew: true, refreshOptions: props },
+  });
+  await wrapper.find('[data-test="btn-whats-new"]').trigger('click');
+  expect(wrapper.emitted('whats-new-page-clicked')).toHaveLength(1);
+});
