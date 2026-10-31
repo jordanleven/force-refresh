@@ -1,0 +1,31 @@
+name: Clean Up Beta Releases
+on:
+  # pull_request_target runs from the base branch, so the token can delete
+  # releases for fork PRs too. It never checks out the PR's code.
+  pull_request_target:
+    types:
+      - closed
+
+permissions:
+  contents: read
+
+jobs:
+  delete-beta-releases:
+    name: Delete Beta Releases
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Delete this PR's beta releases
+        run: .github/scripts/deleteBetaReleases.sh "$PR_NUMBER"
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
