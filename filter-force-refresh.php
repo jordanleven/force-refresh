@@ -14,7 +14,7 @@ Plugin Name: Force Refresh
 Plugin URI: https://github.com/jordanleven/force-refresh
 Description: Force Refresh is a simple plugin that allows you to force a page refresh for users currently visiting your site.
 Version: 3.2.1
-Requires at least: 5.9
+Requires at least: 7.0
 Requires PHP: 7.4
 Author: Jordan Leven
 Author URI: https://github.com/jordanleven
