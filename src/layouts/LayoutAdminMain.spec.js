@@ -109,6 +109,11 @@ describe('opens full history from Release Notes', () => {
   });
 });
 describe('What’s New', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    window.history.replaceState({}, '', window.location.pathname);
+  });
   const releaseNotes = {
     '3.2.0': {
       notes: [{
@@ -123,7 +128,7 @@ describe('What’s New', () => {
       }],
     },
   };
-  const mountLayout = (whatsNewLastSeenVersion, version = '3.3.0') => {
+  const mountLayout = (whatsNewLastSeenVersion, version = '3.3.0', layoutReleaseNotes = releaseNotes) => {
     const store = createStore({
       featureFlags: {},
       refreshOptions: {},
@@ -143,7 +148,7 @@ describe('What’s New', () => {
         plugins: [store],
       }),
       props: {
-        releaseNotes,
+        releaseNotes: layoutReleaseNotes,
       },
     });
     return {
@@ -151,6 +156,25 @@ describe('What’s New', () => {
       wrapper,
     };
   };
+  it('previews seen features on prerelease development builds without saving seen state', () => {
+    process.env.NODE_ENV = 'development';
+    window.history.replaceState({}, '', '?force-refresh-whats-new=1');
+    const { store, wrapper } = mountLayout('3.3.0', '3.3.0-beta.1');
+    expect(wrapper.vm.releaseNotesPageActive).toBe(true);
+    expect(wrapper.vm.whatsNewFeatures).toHaveLength(2);
+    expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
+    wrapper.unmount();
+  });
+
+  it.each(['production', 'development'])('keeps normal behavior in %s when preview is disabled', (environment) => {
+    process.env.NODE_ENV = environment;
+    window.history.replaceState({}, '', `?force-refresh-whats-new=${environment === 'production' ? '1' : '0'}`);
+    const { store, wrapper } = mountLayout('3.3.0');
+    expect(wrapper.vm.releaseNotesPageActive).toBe(false);
+    expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
+    wrapper.unmount();
+  });
+
   describe('opens once after a minor update and marks it seen for the user', () => {
     let store;
     let wrapper;
@@ -208,6 +232,52 @@ describe('What’s New', () => {
 
     it('does not mark an already seen minor version again', () => {
       expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
+    });
+  });
+  describe('waits for another visit when release notes are unavailable', () => {
+    let store;
+    let wrapper;
+    beforeEach(() => {
+      ({
+        store,
+        wrapper,
+      } = mountLayout('3.1.4', '3.3.0', null));
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+
+    it('keeps the announcement closed', () => {
+      expect(wrapper.findComponent({
+        name: 'AdminReleaseNotes',
+      }).attributes('is-open')).toBe('false');
+    });
+
+    it('does not mark the announcement seen', () => {
+      expect(store.dispatch).not.toHaveBeenCalledWith('requestMarkWhatsNewSeen');
+    });
+  });
+  describe('quietly marks a release without new features as seen', () => {
+    let store;
+    let wrapper;
+    beforeEach(() => {
+      ({
+        store,
+        wrapper,
+      } = mountLayout('3.1.4', '3.3.0', {}));
+    });
+    afterEach(() => {
+      wrapper.unmount();
+    });
+
+    it('keeps the announcement closed', () => {
+      expect(wrapper.findComponent({
+        name: 'AdminReleaseNotes',
+      }).attributes('is-open')).toBe('false');
+    });
+
+    it('marks the announcement seen', () => {
+      expect(store.dispatch).toHaveBeenCalledWith('requestMarkWhatsNewSeen');
     });
   });
   describe('switches to the full history from the What’s New link', () => {
