@@ -31,16 +31,18 @@ This project uses [changie] to manage release notes.
 **When you finish a meaningful change** (feature, fix, dependency update, etc.), create a release note fragment before or alongside your commit:
 
 ```sh
-npm run changelog:note
+npm run changelog:new
 ```
 
 changie will prompt for a kind and a human-readable description. Commit the resulting `.changes/unreleased/*.yaml` file with your code.
 
 | Kind | Semver impact |
 | --- | --- |
-| Added, Changed, Deprecated | minor bump |
-| Fixed, Security | patch bump |
-| Removed | major bump |
+| Feature (major), Changed (major) | major bump |
+| Feature (minor), Changed (minor) | minor bump |
+| Bug fix, Dependencies & security | patch bump |
+
+Dependencies & security fragments skip the description prompt and always render as "Performance enhancements and bug fixes."
 
 To preview what the release notes and WordPress.org readme will look like before cutting a release, run:
 
