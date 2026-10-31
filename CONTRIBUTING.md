@@ -26,9 +26,9 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 
 ## Previewing What's New
 
-Run `npm run dev` (watch mode) or `npm run build:dev`, then open the Force Refresh admin page and append `&force-refresh-whats-new=1` to its URL. Reload to reopen the dialog after dismissing it.
+Run `npm run dev` (watch mode) or `npm run build:dev`, then open the Force Refresh admin page and choose **Settings → What's New**. Development builds add the unreleased changie fragments to `README.txt` as the next version, and the What's New link shows that version, icons included, exactly as the next release will.
 
-The preview includes all feature highlights for the installed major version up to the installed minor version, even on prerelease builds and when you've already seen them. It leaves your saved last-seen version untouched. Remove the parameter or set it to `0` to return to normal behavior. The toggle only works in development builds; `npm run build` ignores it. Open the main Force Refresh page rather than the Troubleshooting view to see the dialog.
+Previewing leaves your saved last-seen version untouched, and it doesn't change `CHANGELOG.md` or the fragments. Restart `npm run dev` or re-run `npm run build:dev` after adding or editing a fragment, since watch mode only rebuilds the scripts. Production builds show the installed version's features instead; run `npm run changelog:build` to drop the unreleased version from `README.txt`.
 
 ## Adding Release Notes
 
