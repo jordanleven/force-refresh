@@ -7,11 +7,11 @@ To get started, follow the steps below:
 ## Starting the development environment
 
 1. Download Docker for your Mac or PC.
-2. Start the environment by running `docker compose up -d --build` in the project directory. This will build the legacy WordPress images and launch all docker containers. See [docker/README.md](docker/README.md) for version details and for updating an existing installation.
+2. Start the environment by running `docker compose up -d --build` in the project directory. This will build the PHP 7.4 WordPress image and launch all docker containers. See [docker/README.md](docker/README.md) for version details and for updating an existing installation.
 
-| WordPress Version | QA (7.1.3) | 7.1.3 | 6.9.10 | 5.9.19 |
+| WordPress Version | QA (7.1.3) | 7.1.3 | 7.1.3 | 7.0.8 |
 | --- | --- | --- | --- | --- |
-| PHP Version | 8.3 | 8.3 | 8.3 | 7.4 |
+| PHP Version | 8.3 | 8.3 | 8.5 | 7.4 |
 | Port | 8086 | 8085 | 8084 | 8083 |
 | Homepage | [qa.force-refresh.localhost][wpqa] | [wp7.force-refresh.localhost][wp7] | [wp6.force-refresh.localhost][wp6] | [wp5.force-refresh.localhost][wp5] |
 | Admin page | [qa.force-refresh.localhost/wp-admin][wpqa-admin] | [wp7.force-refresh.localhost/wp-admin][wp7-admin] | [wp6.force-refresh.localhost/wp-admin][wp6-admin] | [wp5.force-refresh.localhost/wp-admin][wp5-admin] |
