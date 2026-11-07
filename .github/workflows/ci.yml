@@ -145,7 +145,7 @@ jobs:
         run: |
           version="${{ needs.set-variables.outputs.release-version }}"
           if echo "$version" | grep -q "-"; then
-            echo "::error::Version $version is a beta release and cannot be merged into this branch."
+            echo "::error::Version $version is a beta release and cannot be merged into this branch. Beta versions are set at build time by the Release Beta Build workflow and should never be committed."
             exit 1
           fi
 

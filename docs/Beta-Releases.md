@@ -2,6 +2,8 @@
 
 If you're encountering errors with Force Refresh, I may ask for you to download a beta release that contains bug fixes or other debugging features. Beta versions will be distributed exclusively through GitHub and will always be composed of [signed commits] to confirm that the code is genuine.
 
+Beta versions are numbered after the release they lead up to, such as `3.3.0-beta.412.7`. WordPress treats a beta as older than the final release, so once that release is publicly available it will be offered as a normal update.
+
 ## Installing Beta Versions
 
 1. Download the beta release `.zip` from GitHub using the provided link.
@@ -17,7 +19,7 @@ Once debugging is complete, or you've verified that the beta release fixes your 
 ### Staying on Beta Until Next Release
 
 1. Under "Plugins", [delete][help_delete_plugin] the previously active public release of Force Refresh.
-1. Once the new version of Force Refresh is publicly available, updated like normal.
+1. Once the new version of Force Refresh is publicly available, update like normal.
 
 ### Reverting to Previous Version
 
