@@ -19,3 +19,7 @@ RUN set -eux; \
     rm -rf /tmp/docker-files; \
     rm /tmp/wordpress.tar.gz; \
     chown -R www-data:www-data /usr/src/wordpress
+
+# Optional space-separated list of bundled PHP extensions to enable.
+ARG PHP_EXTENSIONS
+RUN if [ -n "${PHP_EXTENSIONS}" ]; then docker-php-ext-install ${PHP_EXTENSIONS}; fi
