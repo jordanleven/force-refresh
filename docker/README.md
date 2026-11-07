@@ -2,7 +2,9 @@
 
 The Compose matrix uses WordPress 5.9.19 on PHP 7.4, WordPress 6.9.10 on PHP 8.3, and WordPress 7.1.3 on PHP 8.3 for both WP7 and QA. The 5.9 and 6.9 images build from Docker Official WordPress images with the official WordPress release archives and published SHA-1 checksums. Docker does not publish image tags for those newer legacy-branch patches. The WP5 image uses the final official PHP 7.4 image; PHP 7.4 itself is end of life, so this service remains a legacy compatibility target.
 
-The PHP 8.3 services pin `wordpress:7.1.3-php8.3-apache` by digest to the build with PHP 8.3.36, which fixes CVE-2026-109618 and CVE-2026-109619 from the 21 October 2026 PHP security release. Docker republishes official tags in place when PHP ships a patch, so a tag alone lets a machine keep a cached, vulnerable build. To pick up a future PHP patch, update the digest from `docker buildx imagetools inspect wordpress:7.1.3-php8.3-apache` and bump the WP6 image tag so Compose rebuilds it. PHP 7.4 received no fix for these vulnerabilities, so the WP5 service remains exposed; run it only when testing PHP 7.4 compatibility.
+The WP6 and QA images also enable the bundled PHP sockets extension, which the official images leave out, so the troubleshooting page's WebSocket health check can report support.
+
+The PHP 8.3 services pin `wordpress:7.1.3-php8.3-apache` by digest to the build with PHP 8.3.36, which fixes CVE-2026-109618 and CVE-2026-109619 from the 21 October 2026 PHP security release. Docker republishes official tags in place when PHP ships a patch, so a tag alone lets a machine keep a cached, vulnerable build. To pick up a future PHP patch, update the digest from `docker buildx imagetools inspect wordpress:7.1.3-php8.3-apache` and bump the WP6 and QA image tags so Compose rebuilds them. PHP 7.4 received no fix for these vulnerabilities, so the WP5 service remains exposed; run it only when testing PHP 7.4 compatibility.
 
 For a new checkout, run `docker compose up -d --build`. The official image entrypoint copies the bundled core into each empty `.docker-build/wordpress_*` directory.
 
