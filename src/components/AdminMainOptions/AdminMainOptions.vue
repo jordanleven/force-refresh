@@ -1,12 +1,11 @@
 <template>
   <div class="force-refresh-admin__options">
     <div class="force-refresh-admin__options-inner">
-      <h3 class="force-refresh-options-header">
-        {{ $t('ADMIN_SETTINGS.OPTIONS_HEADER') }}
-      </h3>
-      <form class="force-refresh-admin__options-form" @submit.prevent="">
+      <form class="force-refresh-admin__options-form" @submit.prevent="updateOptionsWasClicked">
         <div class="option-group">
-          <label for="show-in-wp-admin-bar">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_FROM_ADMIN_BAR') }}</label>
+          <label for="show-in-wp-admin-bar">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_FROM_ADMIN_BAR') }}
+            <span>{{ $t('REDESIGN.ADMIN_BAR_DESCRIPTION') }}</span>
+          </label>
           <select
             id="show-in-wp-admin-bar"
             v-model="optionSelectedShowRefreshInMenuBar"
@@ -22,7 +21,9 @@
           </select>
         </div>
         <div class="option-group">
-          <label for="refresh-interval">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_INTERVAL') }}</label>
+          <label for="refresh-interval">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_INTERVAL') }}
+            <span>{{ $t('REDESIGN.INTERVAL_DESCRIPTION') }}</span>
+          </label>
           <select
             id="refresh-interval"
             v-model="optionSelectedRefreshInterval"
@@ -38,8 +39,9 @@
           </select>
         </div>
         <div v-if="isSelectedRefreshIntervalCustom" class="option-group" :class="classCustomRefreshInterval">
-          <label for="show-in-wp-admin-bar">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_INTERVAL_CUSTOM') }}</label>
+          <label for="custom-refresh-interval">{{ $t('ADMIN_SETTINGS.OPTION_REFRESH_INTERVAL_CUSTOM') }}</label>
           <input
+            id="custom-refresh-interval"
             v-model="optionSelectedRefreshIntervalCustom"
             type="number"
             step="any"
@@ -47,51 +49,45 @@
             :min="refreshOptions.customRefreshIntervalMinimumInMinutes"
           >
         </div>
-        <div class="option-group">
-          <label for="use-static-file-polling">
-            {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD') }}
-            <BaseTooltip :content="staticFilePollingTooltip">
-              <font-awesome-icon class="option-group__info-icon" :icon="infoIcon" />
-            </BaseTooltip>
-          </label>
-          <select
-            id="use-static-file-polling"
-            v-model="optionSelectedUseStaticFilePolling"
-            name="use-static-file-polling"
-            data-test="select-static-file-polling"
-            :disabled="isUsingCdn"
-          >
-            <option :value="true">
-              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE') }}
-            </option>
-            <option :value="false">
-              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API') }}
-            </option>
-          </select>
-        </div>
+        <details class="advanced-options">
+          <summary>
+            <Icon class="advanced-options__chevron" name="chevron-right" /> {{ $t('REDESIGN.ADVANCED') }}
+          </summary>
+          <div class="option-group">
+            <label for="use-static-file-polling">
+              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD') }}
+              <BaseTooltip :content="staticFilePollingTooltip">
+                <Icon class="option-group__info-icon" name="circle-info" />
+              </BaseTooltip>
+            </label>
+            <select
+              id="use-static-file-polling"
+              v-model="optionSelectedUseStaticFilePolling"
+              name="use-static-file-polling"
+              data-test="select-static-file-polling"
+              :disabled="isUsingCdn"
+            >
+              <option :value="true">
+                {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE') }}
+              </option>
+              <option :value="false">
+                {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API') }}
+              </option>
+            </select>
+          </div>
+        </details>
         <div class="force-refresh-admin-options-footer">
-          <hr>
           <button
             type="submit"
             class="button button-primary"
             data-test="btn-update-options"
-            @click="updateOptionsWasClicked"
           >
-            {{ $t('FORM_BUTTONS_GENERIC.UPDATE') }}
+            {{ $t('REDESIGN.SAVE_SETTINGS') }}
           </button>
         </div>
       </form>
     </div>
     <div class="force-refresh-admin__options-utilities">
-      <div class="force-refresh-admin__options-utility">
-        <button
-          class="button button-secondary"
-          data-test="btn-troubleshooting"
-          @click="pageClickedTroubleshooting"
-        >
-          {{ $t("ADMIN_TROUBLESHOOTING.BUTTON_ENTER_TROUBLESHOOTING_MODE") }}
-        </button>
-      </div>
       <div class="force-refresh-admin__options-utility">
         <button
           class="button button-secondary"
@@ -101,26 +97,33 @@
           {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_RELEASE_NOTES") }}
         </button>
       </div>
-      <div class="force-refresh-admin__options-utility force-refresh-admin__options-utility-leave-review">
-        <a href="https://wordpress.org/support/plugin/force-refresh/reviews/#new-post" target="_blank">
-          <font-awesome-icon
-            class="leave-review-icon"
-            :icon="leaveReviewLogo"
-          />
-          {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_LEAVE_REVIEW") }}
-        </a>
+      <div v-if="hasWhatsNew" class="force-refresh-admin__options-utility">
+        <button
+          class="button button-secondary"
+          data-test="btn-whats-new"
+          @click="pageClickedWhatsNew"
+        >
+          {{ $t("ADMIN_SETTINGS.OPTIONS_UTILITY_VIEW_WHATS_NEW") }}
+        </button>
       </div>
+      <div class="force-refresh-admin__options-utility">
+        <button
+          class="button button-secondary"
+          data-test="btn-troubleshooting"
+          @click="pageClickedTroubleshooting"
+        >
+          {{ $t("ADMIN_TROUBLESHOOTING.BUTTON_ENTER_TROUBLESHOOTING_MODE") }}
+        </button>
+      </div>
+      <a class="options-review" href="https://wordpress.org/support/plugin/force-refresh/reviews/#new-post" target="_blank" rel="noopener noreferrer">{{ $t('ADMIN_SETTINGS.OPTIONS_UTILITY_LEAVE_REVIEW') }} <Icon name="arrow-up-right" :size="11" /></a>
     </div>
   </div>
 </template>
 
 <script>
-import { library } from '@fortawesome/fontawesome-svg-core';
-import { faCircleQuestion, faHeart } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
-
-library.add([faCircleQuestion, faHeart]);
+import Icon from '@/components/Icon/Icon.vue';
 
 const OPTIONS_REFRESH_FROM_ADMIN_BAR = [
   {
@@ -147,9 +150,11 @@ export default {
   name: 'AdminMainOptions',
   components: {
     BaseTooltip,
+    Icon,
   },
   props: {
     detectedCdn: VueTypes.string.def(null),
+    hasWhatsNew: VueTypes.bool.def(false),
     refreshOptions: VueTypes.shape({
       customRefreshIntervalMaximumInMinutes: VueTypes.isRequired,
       customRefreshIntervalMinimumInMinutes: VueTypes.isRequired,
@@ -158,12 +163,16 @@ export default {
       useStaticFilePolling: VueTypes.bool.isRequired,
     }),
   },
-  emits: ['notify-user-of-error', 'options-were-updated', 'release-notes-page-clicked', 'troubleshooting-page-clicked'],
+  emits: [
+    'notify-user-of-error',
+    'options-were-updated',
+    'release-notes-page-clicked',
+    'troubleshooting-page-clicked',
+    'whats-new-page-clicked',
+  ],
   data() {
     return {
-      infoIcon: faCircleQuestion,
       isCustomIntervalWithinBounds: true,
-      leaveReviewLogo: faHeart,
       optionSelectedRefreshInterval: null,
       optionSelectedRefreshIntervalCustom: null,
       optionSelectedShowRefreshInMenuBar: null,
@@ -172,6 +181,7 @@ export default {
     };
   },
   computed: {
+
     classCustomRefreshInterval() {
       return [
         !this.isCustomIntervalWithinBounds && 'option-group--error',
@@ -249,6 +259,9 @@ export default {
     pageClickedTroubleshooting() {
       this.$emit('troubleshooting-page-clicked');
     },
+    pageClickedWhatsNew() {
+      this.$emit('whats-new-page-clicked');
+    },
     updateOptionsWasClicked() {
       const refreshInterval = this.isSelectedRefreshIntervalCustom ? this.customRefreshIntervalInSeconds : this.optionSelectedRefreshInterval;
 
@@ -285,132 +298,139 @@ export default {
 
 <style lang="scss" scoped>
 @use "@/scss/utilities" as utils;
-@use "@/scss/variables" as var;
-
-@include utils.generate-animation("logo-excited") {
-  0% { transform: translateY(0) }
-  25% { transform: translateY(2px) }
-  50% { transform: translateY(-2px) }
-  75% { transform: translateY(2px) }
-  100% { transform: translateY(0) }
-}
-
-@include utils.generate-animation('line-grow-and-face') {
-  0% {
-    opacity: 0;
-  }
-
-  100% {
-    opacity: 1;
-    width: 100%;
-  }
-}
 
 .force-refresh-admin__options-inner {
-  padding: 0 20px 10px;
-
-  @include utils.card-surface;
-
-  @include utils.small {
-    margin-left: 10px;
-  }
-
-  .force-refresh-options-header {
-    text-align: center;
-  }
-
-  .option-group {
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-
-    > label {
-      flex: 1;
-      display: flex;
-      align-items: center;
-    }
-
-    > input,
-    > select {
-      flex: 1;
-    }
-
-    &__info-icon {
-      font-size: 0.68rem;
-      opacity: 0.5;
-      margin-left: 0.25rem;
-    }
-
-    &--error {
-      color: var.$status-error;
-
-      input {
-        color: var.$status-error;
-      }
-    }
-  }
+  @include utils.card-surface-raised;
 }
 
-.force-refresh-admin__options-utilities {
-  text-align: right;
-  margin-top: 20px;
+.option-group {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 18px;
+  border-bottom: 1px solid rgb(0, 0, 0, 4%);
+}
 
-  @include utils.small {
-    margin: 50px 0 0 20px;
-  }
+.option-group label {
+  flex: 1;
+  font-size: 13.5px;
+  font-weight: 400;
+}
 
-  .force-refresh-admin__options-utility {
-    margin-bottom: 0.5rem;
+.option-group label span {
+  display: block;
+  color: #6e6e73;
+  font-weight: 400;
+  font-size: 12px;
+  margin-top: 2px;
+}
 
-    &.force-refresh-admin__options-utility-leave-review {
-      margin-top: 2rem;
+.option-group select, .option-group input {
+  width: auto;
+  max-width: 45%;
+  min-height: 30px;
+  height: 30px;
+  box-sizing: border-box;
+  line-height: 1.3;
+  font-size: 13px;
+  font-family: inherit;
+  color: #1d1d1f;
+  background-color: rgb(255, 255, 255, 60%);
+  border: 1px solid rgb(0, 0, 0, 10%);
+  border-radius: 8px;
+  padding: 4px 24px 4px 10px;
+  cursor: pointer;
+}
 
-      a {
-        color: var.$blue;
-        text-decoration: none;
-        display: inline-block;
-        position: relative;
+.option-group__info-icon {
+  margin-left: 4px;
+  color: #86868b;
+}
 
-        &::after {
-          display: block;
-          right: auto;
-          left: 0;
-          position: absolute;
-          content: '';
-          height: 1px;
-          width: 0;
-          background-color: var.$blue;
-        }
+.option-group--error {
+  color: #d63638;
+}
 
-        .leave-review-icon {
-          transition: color var.$transition-short;
-        }
+.advanced-options__chevron {
+  margin-right: 5px;
+  transition: transform 0.15s;
+}
 
-        &:hover {
-          .leave-review-icon {
-            color: var.$red;
+.advanced-options[open] .advanced-options__chevron {
+  transform: rotate(90deg);
+}
 
-            @include utils.animation("logo-excited", var.$transition-medium, ease);
-          }
+.advanced-options summary::marker {
+  content: "";
+}
 
-          &::after {
-            @include utils.animation('line-grow-and-face', var.$transition-medium, ease);
+.advanced-options summary::-webkit-details-marker {
+  display: none;
+}
 
-            animation-fill-mode: forwards;
-          }
-        }
-      }
-    }
-  }
+.advanced-options summary {
+  list-style: none;
+  padding: 10px 18px;
+  color: #6e6e73;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .force-refresh-admin-options-footer {
-  margin-top: 20px;
-  text-align: right;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
-  button {
-    margin-top: 10px;
+.force-refresh-admin-options-footer .button, .force-refresh-admin__options-utility .button, .options-review {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  min-height: 30px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  font: inherit;
+  font-size: 13px;
+  border-radius: 3px;
+  background: #f6f7f7;
+  border: 1px solid #2271b1;
+  color: #2271b1;
+  text-decoration: none;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+.force-refresh-admin-options-footer .button {
+  color: #fff;
+  background: #2271b1;
+  box-shadow: 0 1px 0 rgb(0, 0, 0, 10%);
+}
+
+.force-refresh-admin__options-utilities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+  justify-content: flex-end;
+}
+
+.options-review {
+  color: #0071e3;
+}
+
+@media (width <= 600px) {
+  .option-group {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .option-group select, .option-group input {
+    width: 100%;
+    max-width: 100%;
   }
 }
 </style>

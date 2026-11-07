@@ -50,7 +50,7 @@ async function getScheduledRefreshesViaApi(page: Page): Promise<Array<{ id: stri
     };
   });
 
-  expect(response.status).toBe(200);
+  if (response.status !== 200) throw new Error(`Fetching scheduled refreshes failed: ${response.status}`);
   return response.json.data.scheduled_refreshes as Array<{ id: string; timestamp: number }>;
 }
 
@@ -62,7 +62,7 @@ async function scheduleRefreshViaApi(page: Page, scheduledDate: Date): Promise<s
     schedule_refresh_timestamp: scheduledDate.toISOString(),
   });
 
-  expect(response.status).toBe(201);
+  if (response.status !== 201) throw new Error(`Scheduling refresh failed: ${response.status}`);
   return response.json.data.id as string;
 }
 
@@ -71,7 +71,7 @@ async function scheduleRefreshViaApi(page: Page, scheduledDate: Date): Promise<s
  */
 async function deleteScheduledRefreshViaApi(page: Page, id: string): Promise<void> {
   const response = await scheduleRefreshApiRequest(page, 'DELETE', `/${id}`);
-  expect(response.status).toBe(202);
+  if (response.status !== 202) throw new Error(`Deleting scheduled refresh failed: ${response.status}`);
 }
 
 /**
@@ -107,27 +107,26 @@ function tomorrowAtTenThirtyPm(): Date {
  * Selects a scheduled refresh date and time using the modal's real date picker UI.
  */
 async function selectScheduledRefreshInUi(page: Page, scheduledDate: Date): Promise<void> {
-  const dateTitle = scheduledDate.toISOString().slice(0, 10);
-  const hour12 = new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    hour12: true,
-    timeZone: 'UTC',
-  }).format(scheduledDate).slice(0, 2);
-  const minute = new Intl.DateTimeFormat('en-US', {
-    minute: '2-digit',
-    timeZone: 'UTC',
-  }).format(scheduledDate);
-  const meridiem = new Intl.DateTimeFormat('en-US', {
-    hour: '2-digit',
-    hour12: true,
-    timeZone: 'UTC',
-  }).format(scheduledDate).slice(-2);
-
-  await page.locator('#schedule-datetime-picker').click();
-  await page.locator(`.mx-table-date td.cell[title="${dateTitle}"]`).click();
-  await page.locator('.mx-time-column [data-type="hour"] .mx-time-item', { hasText: hour12 }).click();
-  await page.locator('.mx-time-column [data-type="minute"] .mx-time-item', { hasText: minute }).click();
-  await page.locator('.mx-time-column [data-type="ampm"] .mx-time-item', { hasText: meridiem }).click();
+  const values = await page.evaluate((iso) => {
+    const date = new Date(iso);
+    return {
+      label: date.toLocaleDateString(undefined, { dateStyle: 'full' }),
+      hour: String(date.getHours() % 12 || 12).padStart(2, '0'),
+      minute: String(date.getMinutes()).padStart(2, '0'),
+      period: date.getHours() >= 12 ? 'PM' : 'AM',
+      monthOffset: (() => {
+        const initial = new Date(Math.ceil((Date.now() + 60000) / 300000) * 300000);
+        return (date.getFullYear() - initial.getFullYear()) * 12 + date.getMonth() - initial.getMonth();
+      })(),
+    };
+  }, scheduledDate.toISOString());
+  // Navigation depends on the previous month transition.
+  // eslint-disable-next-line no-await-in-loop
+  for (let i = 0; i < values.monthOffset; i += 1) await page.getByRole('button', { name: 'Next month' }).click();
+  await page.getByRole('button', { name: values.label, exact: true }).click();
+  await page.locator('.schedule-time__column').nth(0).getByRole('button', { name: values.hour, exact: true }).click();
+  await page.locator('.schedule-time__column').nth(1).getByRole('button', { name: values.minute, exact: true }).click();
+  await page.locator('.schedule-time__period').getByRole('button', { name: values.period, exact: true }).click();
 }
 
 test.describe('Schedule Refresh', () => {
@@ -160,37 +159,147 @@ test.describe('Schedule Refresh', () => {
     });
 
     test('The modal contains a date picker', async () => {
-      await expect(page.locator('#schedule-datetime-picker')).toBeVisible();
+      await expect(page.locator('.schedule-calendar')).toBeVisible();
     });
 
-    test('The submit button is disabled when no date is selected', async () => {
+    test('The modal opens with one selected day', async () => {
+      await expect(page.locator('.schedule-calendar__grid button[aria-pressed="true"]')).toHaveCount(1);
+    });
+
+    test('The modal opens with an enabled submit button', async () => {
+      await expect(page.locator('[data-test="btn-submit-schedule-refresh"]')).toBeEnabled();
+    });
+
+    test('Clearing the selected date disables submission', async () => {
+      await page.locator('.schedule-sheet__selection button').click();
       await expect(page.locator('[data-test="btn-submit-schedule-refresh"]')).toBeDisabled();
     });
   });
 
+  test('Clearing a selected date returns keyboard focus to that calendar date', async ({ page }) => {
+    await goToPluginPage(page);
+    await page.locator('[data-test="btn-schedule-refresh"]').click();
+    const selectedDateLabel = await page.locator('.schedule-calendar__grid button[aria-pressed="true"]').getAttribute('aria-label');
+    await page.locator('.schedule-sheet__selection button').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('button', { name: selectedDateLabel!, exact: true })).toBeFocused();
+  });
+
   test.describe('Scheduling through the UI', () => {
-    test('Submitting the scheduling modal creates a scheduled refresh', async ({ page }) => {
-      const scheduledDate = tomorrowAtTenThirtyPm();
+    [
+      { name: 'the default selection', chooseDate: false },
+      { name: 'a chosen date', chooseDate: true },
+    ].forEach(({ name, chooseDate }) => {
+      test.describe(`Scheduling ${name}`, () => {
+        test.describe.configure({ mode: 'serial' });
+        let page: Page;
+        let scheduledRefreshLabel: string;
 
-      await goToPluginPage(page);
-      await page.locator('[data-test="btn-schedule-refresh"]').click();
+        test.beforeAll(async ({ browser, baseURL }) => {
+          const context = await browser.newContext({ baseURL, storageState: getAuthFile(baseURL!) });
+          page = await context.newPage();
+          await goToPluginPage(page);
+          await page.locator('[data-test="btn-schedule-refresh"]').click();
+          if (chooseDate) await selectScheduledRefreshInUi(page, tomorrowAtTenThirtyPm());
+          // Use the browser's label to avoid timezone drift from the test runner.
+          scheduledRefreshLabel = (await page.locator('.schedule-sheet__selection > span').innerText()).trim();
+        });
 
-      await selectScheduledRefreshInUi(page, scheduledDate);
-      const submitButton = page.locator('[data-test="btn-submit-schedule-refresh"]');
-      await expect(submitButton).toBeEnabled();
+        test.afterAll(async () => {
+          await clearScheduledRefreshesViaApi(page);
+          await page.context().close();
+        });
 
-      // Reuse the browser-formatted label instead of rebuilding it in Node,
-      // which avoids timezone drift between the test runner and the page.
-      const scheduledRefreshLabel = (await submitButton.innerText()).replace(/^Schedule refresh for /, '');
-      await submitButton.click({ force: true });
+        test('The calendar has one selected day', async () => {
+          await expect(page.locator('.schedule-calendar__grid button[aria-pressed="true"]')).toHaveCount(1);
+        });
 
-      const scheduledRefreshItem = page.locator('.scheduled-refreshes__list li').filter({ hasText: scheduledRefreshLabel });
+        test('The selected date can be submitted', async () => {
+          await expect(page.locator('[data-test="btn-submit-schedule-refresh"]')).toBeEnabled();
+        });
 
-      await expect(page.locator('.notice-force-refresh.notice-success')).toBeVisible();
-      await expect(scheduledRefreshItem).toBeVisible();
+        test('Submitting shows a success notice', async () => {
+          await page.locator('[data-test="btn-submit-schedule-refresh"]').click();
+          await expect(page.locator('.notice-force-refresh.notice-success')).toBeVisible();
+        });
 
-      await scheduledRefreshItem.getByRole('button', { name: 'Delete' }).click();
-      await expect(scheduledRefreshItem).toHaveCount(0);
+        test('The scheduled date appears in the list', async () => {
+          const item = page.locator('.scheduled-refreshes__list li').filter({ hasText: scheduledRefreshLabel });
+          await expect(item).toBeVisible();
+        });
+
+        test('Deleting the scheduled date removes it from the list', async () => {
+          const item = page.locator('.scheduled-refreshes__list li').filter({ hasText: scheduledRefreshLabel });
+          await item.getByRole('button', { name: 'Delete' }).click();
+          await expect(item).toHaveCount(0);
+        });
+      });
+    });
+
+    [
+      { timezoneId: 'America/New_York', label: 'Eastern Time' },
+      { timezoneId: 'America/Los_Angeles', label: 'Pacific Time' },
+    ].forEach(({ timezoneId, label }) => {
+      test.describe(`Scheduling in the browser's ${label} zone`, () => {
+        test.describe.configure({ mode: 'serial' });
+        let page: Page;
+        let scheduledId: string | undefined;
+        let iso: string;
+        let status: number;
+        let responseTimestamp: number;
+        let timezoneText: string;
+
+        test.beforeAll(async ({ browser, baseURL }) => {
+          const context = await browser.newContext({
+            baseURL, storageState: getAuthFile(baseURL!), timezoneId, locale: 'en-US',
+          });
+          page = await context.newPage();
+          await goToPluginPage(page);
+          await page.locator('[data-test="btn-schedule-refresh"]').click();
+          timezoneText = await page.locator('.schedule-sheet__timezone').innerText();
+          iso = await page.evaluate(() => {
+            const date = new Date();
+            date.setDate(date.getDate() + 1);
+            date.setHours(22, 30, 0, 0);
+            return date.toISOString();
+          });
+          await selectScheduledRefreshInUi(page, new Date(iso));
+          const responsePromise = page.waitForResponse((response) => (
+            response.url().includes('/schedule-site-version') && response.request().method() === 'POST'
+          ));
+          await page.locator('[data-test="btn-submit-schedule-refresh"]').click();
+          const response = await responsePromise;
+          const { data } = await response.json();
+          scheduledId = data.id;
+          status = response.status();
+          responseTimestamp = data.scheduled_refresh_time;
+        });
+
+        test.afterAll(async () => {
+          try {
+            if (scheduledId) await deleteScheduledRefreshViaApi(page, scheduledId);
+          } finally {
+            await page.context().close();
+          }
+        });
+
+        test('The dialog identifies the browser timezone', () => {
+          expect(timezoneText).toBe(`Times are in ${label}.`);
+        });
+
+        test('Scheduling returns a created response', () => {
+          expect(status).toBe(201);
+        });
+
+        test('The response timestamp matches the chosen local time', () => {
+          expect(responseTimestamp).toBe(Date.parse(iso) / 1000);
+        });
+
+        test('The stored timestamp matches the chosen local time', async () => {
+          const stored = await getScheduledRefreshesViaApi(page);
+          expect(stored.find(({ id }) => id === scheduledId)?.timestamp).toBe(Date.parse(iso) / 1000);
+        });
+      });
     });
   });
 

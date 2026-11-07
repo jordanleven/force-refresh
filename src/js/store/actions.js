@@ -2,6 +2,7 @@ import {
   deleteScheduledRefresh,
   getCronStatus,
   getScheduledRefreshes,
+  markWhatsNewSeen,
   requestPostRefreshByPostID,
   requestSiteRefresh,
   scheduleRequestSiteRefresh,
@@ -35,6 +36,7 @@ export default {
 
     return success;
   },
+  requestMarkWhatsNewSeen: async () => isSuccess(await markWhatsNewSeen()),
   requestRefreshPost: (_, postId) => requestPostRefreshByPostID(postId),
   requestRefreshSite: requestSiteRefresh,
   requestScheduledRefresh: async ({ commit }, scheduledRefresh) => {

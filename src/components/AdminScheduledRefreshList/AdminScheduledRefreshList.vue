@@ -1,7 +1,9 @@
 <template>
   <div v-if="scheduledRefreshes.length > 0" class="scheduled-refreshes">
-    <hr>
-    <h3>{{ scheduledRefreshesHeader }}</h3>
+    <h3>
+      {{ scheduledRefreshesHeader
+      }}
+    </h3>
     <template v-if="shouldGroupScheduledRefreshes">
       <div
         v-for="group in groupedScheduledRefreshes"
@@ -9,7 +11,8 @@
         class="scheduled-refreshes__group"
       >
         <h4 class="scheduled-refreshes__group-header">
-          {{ group.dateLabel }}
+          {{ group.dateLabel
+          }}
         </h4>
         <ul class="scheduled-refreshes__list">
           <li
@@ -17,12 +20,14 @@
             :key="schedule.id"
             :data-test="`scheduled-refresh-${schedule.id}`"
           >
-            {{ schedule.timeLabel }}
+            {{ schedule.timeLabel
+            }}
             <span
               v-if="schedule.countdownLabel"
               class="scheduled-refreshes__countdown"
             >
-              ({{ getCountdownLabel(schedule.countdownLabel) }})
+              ({{ getCountdownLabel(schedule.countdownLabel)
+              }})
             </span>
             <button
               class="button-link button-link-delete"
@@ -30,7 +35,8 @@
               :disabled="schedule.deleteDisabled"
               @click="deleteButtonWasClicked(schedule.id)"
             >
-              {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE") }}
+              {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE")
+              }}
             </button>
           </li>
         </ul>
@@ -42,12 +48,14 @@
         :key="schedule.id"
         :data-test="`scheduled-refresh-${schedule.id}`"
       >
-        {{ schedule.label }}
+        {{ schedule.label
+        }}
         <span
           v-if="schedule.countdownLabel"
           class="scheduled-refreshes__countdown"
         >
-          ({{ getCountdownLabel(schedule.countdownLabel) }})
+          ({{ getCountdownLabel(schedule.countdownLabel)
+          }})
         </span>
         <button
           class="button-link button-link-delete"
@@ -55,7 +63,8 @@
           :disabled="schedule.deleteDisabled"
           @click="deleteButtonWasClicked(schedule.id)"
         >
-          {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE") }}
+          {{ $t("SCHEDULE_REFRESH.BUTTON_DELETE")
+          }}
         </button>
       </li>
     </ul>
@@ -81,6 +90,7 @@ export default {
   name: 'AdminScheduledRefreshList',
   props: {
     scheduledRefreshes: VueTypes.array,
+
   },
   emits: [
     'delete-scheduled-refresh',
@@ -92,6 +102,7 @@ export default {
       countdownTimeoutId: null,
       currentTimestamp: Math.floor(Date.now() / 1000),
       scheduledRefreshSyncIntervalId: null,
+
     };
   },
   computed: {
@@ -114,6 +125,7 @@ export default {
     shouldGroupScheduledRefreshes() {
       return shouldGroupScheduledRefreshes(this.scheduledRefreshes);
     },
+
   },
   watch: {
     hasImminentScheduledRefresh(isImminentNow, wasImminent) {
@@ -130,7 +142,9 @@ export default {
       handler() {
         this.scheduleScheduledRefreshTimers();
       },
+
     },
+
   },
   mounted() {
     this.scheduleScheduledRefreshTimers();
@@ -172,11 +186,13 @@ export default {
       if (countdownLabel.secondsUntilRefresh === 1) {
         return this.$t('SCHEDULE_REFRESH.SCHEDULED_REFRESH_TIMING_SECOND', {
           count: countdownLabel.secondsUntilRefresh,
+
         });
       }
 
       return this.$t('SCHEDULE_REFRESH.SCHEDULED_REFRESH_TIMING_SECONDS', {
         count: countdownLabel.secondsUntilRefresh,
+
       });
     },
     scheduleScheduledRefreshTimers() {
@@ -231,44 +247,96 @@ export default {
       window.clearInterval(this.scheduledRefreshSyncIntervalId);
       this.scheduledRefreshSyncIntervalId = null;
     },
+
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/variables" as var;
-
 .scheduled-refreshes {
+  border-top: 1px solid rgb(0, 0, 0, 6%);
+  padding: 18px 40px 22px;
   text-align: left;
+}
 
-  .scheduled-refreshes__group + .scheduled-refreshes__group {
-    margin-top: var.$space-medium;
+.scheduled-refreshes h3 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6e6e73;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.scheduled-refreshes__group + .scheduled-refreshes__group {
+  margin-top: 16px;
+}
+
+.scheduled-refreshes__group-header {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #6e6e73;
+}
+
+.scheduled-refreshes__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scheduled-refreshes__list li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 0;
+  margin: 0;
+  font-size: 13.5px;
+}
+
+.scheduled-refreshes__list li + li {
+  border-top: 1px solid rgb(0, 0, 0, 4%);
+}
+
+.scheduled-refreshes__list li::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #0071e3;
+  opacity: 0.7;
+  flex: none;
+}
+
+.scheduled-refreshes .button-link {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #d70015;
+  font: inherit;
+  font-size: 12.5px;
+  padding: 4px 0;
+  text-decoration: none;
+}
+
+.scheduled-refreshes .button-link:disabled {
+  color: #6e6e73;
+  cursor: not-allowed;
+}
+
+.scheduled-refreshes__countdown {
+  color: #6e6e73;
+  font-size: 12px;
+}
+
+@media (width <= 600px) {
+  .scheduled-refreshes {
+    padding: 18px 20px 22px;
   }
 
-  .scheduled-refreshes__group-header {
-    margin: 0 0 var.$space-small;
-  }
-
-  hr {
-    margin: var.$space-large 0;
-  }
-
-  .scheduled-refreshes__list {
-    list-style: disc;
-    padding-left: var.$space-medium;
-  }
-
-  .button-link {
-    margin-left: var.$space-small;
-
-    &:disabled {
-      color: var.$medium-grey;
-      cursor: not-allowed;
-    }
-  }
-
-  .scheduled-refreshes__countdown {
-    color: var.$status-error;
+  .scheduled-refreshes__list li {
+    flex-wrap: wrap;
   }
 }
 </style>

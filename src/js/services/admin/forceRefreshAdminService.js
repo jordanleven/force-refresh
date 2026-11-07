@@ -53,6 +53,11 @@ export const getDebugEmailData = async () => {
   return apiClient.get(adminEndpoints.debugEmail);
 };
 
+export const markWhatsNewSeen = async () => {
+  debug('Marking What\'s New as seen');
+  return apiClient.post(adminEndpoints.whatsNew);
+};
+
 export const sendDebugEmail = async (data) => {
   debug('Sending debug email report');
   return apiClient.post(adminEndpoints.debugEmail, { supportTopicUrl: data?.supportTopicUrl });

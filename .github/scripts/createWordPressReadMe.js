@@ -1,5 +1,6 @@
 /* eslint-disable */
 const fs = require('fs');
+const { addUnreleasedRelease } = require('./addUnreleasedRelease');
 const { generateWordPressReadMe } = require('./generateWordPressReadMe');
 const pluginVersion = require('../../package.json').version;
 
@@ -16,12 +17,18 @@ const writeWordPressReadMeFile = (contents) => {
 };
 
 /**
+ * Development builds pass this flag to preview unreleased changes in the admin.
+ */
+const includeUnreleased = process.argv.includes('--unreleased');
+
+/**
  * Main function to create the WordPress README.txt file.
  * @return  {void}
  */
 const createWordPressReadMeFile = async () => {
   const readmeMd = fs.readFileSync('./README.md', 'utf8');
-  const changelogMd = fs.readFileSync('./CHANGELOG.md', 'utf8');
+  const releasedChangelogMd = fs.readFileSync('./CHANGELOG.md', 'utf8');
+  const changelogMd = includeUnreleased ? addUnreleasedRelease(releasedChangelogMd) : releasedChangelogMd;
   const contents = await generateWordPressReadMe(readmeMd, changelogMd, pluginVersion);
   writeWordPressReadMeFile(contents);
 };
