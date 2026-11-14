@@ -1,17 +1,59 @@
 <template>
   <div class="force-refresh__container">
-    <AdminMainRefresh
-      class="force-refresh__main"
-      :site-name="siteName"
-      :scheduled-refreshes="scheduledRefreshes"
-      v-bind="$attrs"
-    />
-    <AdminMainOptions
-      v-if="refreshOptions"
-      class="force-refresh__options"
-      :refresh-options="refreshOptions"
-      v-bind="$attrs"
-    />
+    <div class="admin-tabs" role="tablist" :aria-label="$t('REDESIGN.SECTIONS')">
+      <button
+        v-for="tab in ['refresh', 'settings']"
+        :id="`force-refresh-tab-${tab}`"
+        :key="tab"
+        :ref="`tab-${tab}`"
+        type="button"
+        role="tab"
+        :aria-selected="activeTab === tab"
+        :aria-controls="`force-refresh-panel-${tab}`"
+        :tabindex="activeTab === tab ? 0 : -1"
+        @click="selectTab(tab)"
+        @keydown.right.prevent="selectTab(activeTab === 'refresh' ? 'settings' : 'refresh', true)"
+        @keydown.left.prevent="selectTab(activeTab === 'refresh' ? 'settings' : 'refresh', true)"
+        @keydown.home.prevent="selectTab('refresh', true)"
+        @keydown.end.prevent="selectTab('settings', true)"
+      >
+        {{ $t(`REDESIGN.TAB_${tab.toUpperCase()}`) }}
+      </button>
+    </div>
+    <div v-show="activeTab === 'refresh'" id="force-refresh-panel-refresh" role="tabpanel" aria-labelledby="force-refresh-tab-refresh">
+      <AdminMainRefresh
+        class="force-refresh__main"
+        :site-name="siteName"
+        :last-refresh-at="lastRefreshAt"
+        :refresh-interval="refreshInterval"
+        :is-refreshing="isRefreshing"
+        :is-scheduled-refresh-enabled="isScheduledRefreshEnabled"
+        :scheduled-refreshes="scheduledRefreshes"
+        @delete-scheduled-refresh="$emit('delete-scheduled-refresh', $event)"
+        @refresh-requested="$emit('refresh-requested')"
+        @schedule-refresh-requested="$emit('schedule-refresh-requested')"
+        @scheduled-refreshes-sync-requested="$emit('scheduled-refreshes-sync-requested')"
+      />
+    </div>
+    <div v-show="activeTab === 'settings'" id="force-refresh-panel-settings" role="tabpanel" aria-labelledby="force-refresh-tab-settings">
+      <AdminMainOptions
+        v-if="refreshOptions"
+        class="force-refresh__options"
+        :detected-cdn="detectedCdn"
+        :has-whats-new="hasWhatsNew"
+        :refresh-options="refreshOptions"
+        @notify-user-of-error="$emit('notify-user-of-error', $event)"
+        @options-were-updated="$emit('options-were-updated', $event)"
+        @release-notes-page-clicked="$emit('release-notes-page-clicked')"
+        @troubleshooting-page-clicked="$emit('troubleshooting-page-clicked')"
+        @whats-new-page-clicked="$emit('whats-new-page-clicked')"
+      />
+    </div>
+    <footer v-if="activeTab === 'refresh'" class="admin-review">
+      <a href="https://wordpress.org/support/plugin/force-refresh/reviews/#new-post" target="_blank" rel="noopener noreferrer">
+        {{ $t('ADMIN_SETTINGS.OPTIONS_UTILITY_LEAVE_REVIEW') }} <Icon name="arrow-up-right" :size="11" />
+      </a>
+    </footer>
   </div>
 </template>
 
@@ -19,59 +61,103 @@
 import VueTypes from 'vue-types';
 import AdminMainOptions from '@/components/AdminMainOptions/AdminMainOptions.vue';
 import AdminMainRefresh from '@/components/AdminMainRefresh/AdminMainRefresh.vue';
+import Icon from '@/components/Icon/Icon.vue';
 
 export default {
   name: 'AdminMain',
-  components: {
-    AdminMainOptions,
-    AdminMainRefresh,
-  },
-  inheritAttrs: false,
+  components: { AdminMainOptions, AdminMainRefresh, Icon },
   props: {
+    detectedCdn: VueTypes.string.def(null),
+    hasWhatsNew: VueTypes.bool.def(false),
+    initialTab: VueTypes.oneOf(['refresh', 'settings']).def('refresh'),
+    isRefreshing: VueTypes.bool.def(false),
+    isScheduledRefreshEnabled: VueTypes.bool.def(false),
+    lastRefreshAt: VueTypes.object.def(null),
+    refreshInterval: VueTypes.number,
     refreshOptions: VueTypes.object.isRequired,
     scheduledRefreshes: VueTypes.array,
     siteName: VueTypes.string.isRequired,
+  },
+  emits: [
+    'delete-scheduled-refresh',
+    'notify-user-of-error',
+    'options-were-updated',
+    'refresh-requested',
+    'release-notes-page-clicked',
+    'schedule-refresh-requested',
+    'scheduled-refreshes-sync-requested',
+    'tab-changed',
+    'troubleshooting-page-clicked',
+    'whats-new-page-clicked',
+  ],
+  data() {
+    return { activeTab: this.initialTab };
+  },
+  methods: {
+    selectTab(tab, focus = false) {
+      this.activeTab = tab;
+      this.$emit('tab-changed', tab);
+      if (focus) this.$nextTick(() => this.$refs[`tab-${tab}`][0].focus());
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-@use "@/scss/utilities" as utils;
-@use "@/scss/variables" as var;
-
-$main-window-width: 50%;
-$options-max-width: 30rem;
-
 .force-refresh__container {
-  @include utils.small {
-    align-items: flex-start;
-    display: flex;
-  }
-}
-
-.force-refresh__main,
-.force-refresh-admin__options {
-  box-sizing: border-box;
   width: 100%;
-  margin-bottom: 1rem;
 }
 
-@include utils.small {
-  .force-refresh__main {
-    width: $main-window-width;
+.admin-tabs {
+  display: flex;
+  border-bottom: 1px solid rgb(0, 0, 0, 8%);
+  margin-bottom: 20px;
+}
 
-    @include utils.large {
-      width: calc(100% - $options-max-width);
-    }
-  }
+.admin-tabs button {
+  padding: 0 0 12px;
+  margin-right: 24px;
+  margin-bottom: -1px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: -0.1px;
+  color: #6e6e73;
+  cursor: pointer;
+  transition: all 0.15s;
+}
 
-  .force-refresh-admin__options {
-    width: 100% - $main-window-width;
+.admin-tabs button[aria-selected="true"] {
+  color: #1d1d1f;
+  font-weight: 600;
+  border-bottom-color: #2271b1;
+}
 
-    @include utils.large {
-      width: 100%;
-      max-width: $options-max-width;
-    }
-  }
+.admin-tabs button:focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 2px;
+}
+
+.admin-review {
+  margin-top: 16px;
+  text-align: right;
+}
+
+.admin-review a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  font-size: 13px;
+  border-radius: 3px;
+  background: #f6f7f7;
+  border: 1px solid #2271b1;
+  color: #0071e3;
+  text-decoration: none;
 }
 </style>

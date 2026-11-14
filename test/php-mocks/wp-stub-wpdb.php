@@ -41,6 +41,13 @@ if ( ! class_exists( 'wpdb' ) ) {
         private array $next_results = array();
 
         /**
+         * Value returned by the next get_var() call.
+         *
+         * @var string|null
+         */
+        private ?string $next_var = null;
+
+        /**
          * Arguments passed to the last delete() call.
          *
          * @var array|null
@@ -66,6 +73,17 @@ if ( ! class_exists( 'wpdb' ) ) {
         }
 
         /**
+         * Set the value that get_var() will return on the next call.
+         *
+         * @param string|null $value The value to return.
+         *
+         * @return void
+         */
+        public function set_next_var( ?string $value ): void {
+            $this->next_var = $value;
+        }
+
+        /**
          * Stub for wpdb::prepare().
          *
          * @param string $query  The query template.
@@ -87,6 +105,17 @@ if ( ! class_exists( 'wpdb' ) ) {
          */
         public function get_results( string $query ): array { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
             return $this->next_results;
+        }
+
+        /**
+         * Stub for wpdb::get_var().
+         *
+         * @param string $query Unused in this stub.
+         *
+         * @return string|null The pre-set value.
+         */
+        public function get_var( string $query ): ?string { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
+            return $this->next_var;
         }
 
         /**

@@ -5,9 +5,9 @@ import {
   faExclamation,
   faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { shallowMount } from '@vue/test-utils';
 import { BaseDescriptiveListStub, BaseTooltipStub, buildVueTestGlobals } from '../../../test/helpers/vue.js';
+import Icon from '@/components/Icon/Icon.vue';
 import TroubleshootingVersions from './TroubleshootingVersions.vue';
 
 library.add(faCheck, faInfo, faExclamation, faExclamationTriangle);
@@ -17,7 +17,7 @@ const FUTURE_DATE = '2099-01-01';
 
 const getWrapper = (props = {}) => shallowMount(TroubleshootingVersions, {
   global: buildVueTestGlobals({
-    components: { FontAwesomeIcon },
+    components: { Icon },
     stubs: {
       BaseDescriptiveList: BaseDescriptiveListStub,
       BaseTooltip: BaseTooltipStub,
@@ -39,8 +39,8 @@ describe('TroubleshootingVersions', () => {
   describe('EOL state', () => {
     it('shows the warning triangle icon when eolDate is in the past', () => {
       const wrapper = getWrapper({ eolDate: PAST_DATE });
-      const icon = wrapper.findComponent(FontAwesomeIcon);
-      expect(icon.props('icon').iconName).toBe('triangle-exclamation');
+      const icon = wrapper.findComponent(Icon);
+      expect(icon.props('name')).toBe('triangle-exclamation');
     });
 
     it('applies the warning status class when eolDate is in the past', () => {
@@ -62,8 +62,8 @@ describe('TroubleshootingVersions', () => {
   describe('Non-EOL state (null eolDate)', () => {
     it('shows the checkmark icon when eolDate is null and version is current', () => {
       const wrapper = getWrapper({ eolDate: null });
-      const icon = wrapper.findComponent(FontAwesomeIcon);
-      expect(icon.props('icon').iconName).toBe('check');
+      const icon = wrapper.findComponent(Icon);
+      expect(icon.props('name')).toBe('check');
     });
 
     it('applies the okay status class when eolDate is null and version is current', () => {
@@ -83,8 +83,8 @@ describe('TroubleshootingVersions', () => {
 
     it('shows the checkmark icon when eolDate is in the future', () => {
       const wrapper = getWrapper({ eolDate: FUTURE_DATE });
-      const icon = wrapper.findComponent(FontAwesomeIcon);
-      expect(icon.props('icon').iconName).toBe('check');
+      const icon = wrapper.findComponent(Icon);
+      expect(icon.props('name')).toBe('check');
     });
 
     it('applies the okay status class when eolDate is in the future', () => {
@@ -96,8 +96,8 @@ describe('TroubleshootingVersions', () => {
   describe('Outdated version (below minimum)', () => {
     it('shows the exclamation icon regardless of eolDate', () => {
       const wrapper = getWrapper({ eolDate: PAST_DATE, version: '6.0.0', versionRequired: '7.2' });
-      const icon = wrapper.findComponent(FontAwesomeIcon);
-      expect(icon.props('icon').iconName).toBe('exclamation');
+      const icon = wrapper.findComponent(Icon);
+      expect(icon.props('name')).toBe('exclamation');
     });
 
     it('applies the error status class regardless of eolDate', () => {

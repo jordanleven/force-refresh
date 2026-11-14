@@ -123,11 +123,14 @@ function get_force_refresh_plugin_url( $file = null ) {
 /**
  * Gets the current plugin data from the main plugin file.
  *
+ * Values are untranslated so this is safe to call before `init`, when loading translations
+ * would trigger a notice.
+ *
  * @return array The plugin data.
  */
 function get_force_refresh_plugin_data(): array {
     require_once ABSPATH . 'wp-admin/includes/plugin.php';
-    return get_plugin_data( get_main_plugin_file() );
+    return get_plugin_data( get_main_plugin_file(), false, false );
 }
 
 /**

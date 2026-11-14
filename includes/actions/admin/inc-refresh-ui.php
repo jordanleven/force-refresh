@@ -13,11 +13,13 @@ use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Page;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Refresh_Site;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Debug_Email;
 use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Schedule_Refresh_Site;
+use JordanLeven\Plugins\ForceRefresh\Api\Api_Handler_Admin_Whats_New;
 use JordanLeven\Plugins\ForceRefresh\Services\Cdn_Detection_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Debug_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Eol_Storage_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 use JordanLeven\Plugins\ForceRefresh\Services\Options_Storage_Service;
+use JordanLeven\Plugins\ForceRefresh\Services\Whats_New_Service;
 
 // The name of the main admin JS file.
 define( 'FILE_NAME_ADMIN_MAIN', 'force-refresh-admin' );
@@ -101,6 +103,7 @@ function get_admin_api_endpoints(): array {
         'cronStatus'          => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint_cron_status(),
         'scheduleRefreshSite' => Api_Handler_Admin_Schedule_Refresh_Site::get_rest_endpoint(),
         'debugEmail'          => Api_Handler_Admin_Debug_Email::get_rest_endpoint(),
+        'whatsNew'            => Api_Handler_Admin_Whats_New::get_rest_endpoint(),
     );
 }
 
@@ -137,6 +140,7 @@ function get_localized_data(): array {
             'siteUrl'                     => get_bloginfo( 'url' ),
             'versions'                    => $versions,
             'featureFlags'                => Feature_Flag_Service::get_all(),
+            'whatsNewLastSeenVersion'     => Whats_New_Service::get_last_seen_version( get_current_user_id() ),
         ),
     );
 }

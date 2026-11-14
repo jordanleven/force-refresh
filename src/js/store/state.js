@@ -26,5 +26,6 @@ export default (localizedData) => ({
     versionWordPressEolDate: localizedData.versions.wordPress.eolDate ?? null,
     versionWordPressInstalled: localizedData.versions.wordPress.version,
     versionWordPressRequired: localizedData.versions.wordPress.versionRequired,
+    whatsNewLastSeenVersion: localizedData.whatsNewLastSeenVersion ?? null,
   },
 });

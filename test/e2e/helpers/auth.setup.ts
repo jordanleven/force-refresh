@@ -3,6 +3,7 @@ import {
   isDebugModeEnabled,
   loginAsAdmin,
   goToPluginPage,
+  goToPluginSettings,
   waitForDebugModeDisabled,
 } from './auth';
 import { getAuthFile } from './constants';
@@ -16,6 +17,8 @@ setup('authenticate and verify initial state', async ({ page, baseURL }) => {
   const isDebugActive = await isDebugModeEnabled(page);
 
   if (isDebugActive) {
+    // The Troubleshooting button lives on the Settings tab.
+    await goToPluginSettings(page);
     await page.locator('[data-test="btn-troubleshooting"]').click();
     await page.locator('[data-test="toggle-debug-mode"] label').click();
     await waitForDebugModeDisabled(page);

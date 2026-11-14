@@ -1,6 +1,7 @@
 import {
   deleteScheduledRefresh,
   getScheduledRefreshes,
+  markWhatsNewSeen,
   scheduleRequestSiteRefresh,
 } from '../services/admin/forceRefreshAdminService.js';
 import actions from './actions.js';
@@ -9,6 +10,7 @@ import actions from './actions.js';
 jest.mock('../services/admin/forceRefreshAdminService.js', () => ({
   deleteScheduledRefresh: jest.fn(),
   getScheduledRefreshes: jest.fn(),
+  markWhatsNewSeen: jest.fn(),
   requestPostRefreshByPostID: jest.fn(),
   requestSiteRefresh: jest.fn(),
   scheduleRequestSiteRefresh: jest.fn(),
@@ -19,6 +21,18 @@ jest.mock('../services/admin/forceRefreshAdminService.js', () => ({
 describe('Store Actions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('requestMarkWhatsNewSeen', () => {
+    it('returns true when the server records the version', async () => {
+      markWhatsNewSeen.mockResolvedValue({ code: 201 });
+      await expect(actions.requestMarkWhatsNewSeen()).resolves.toBe(true);
+    });
+
+    it('returns false when the request fails', async () => {
+      markWhatsNewSeen.mockResolvedValue({ code: 500 });
+      await expect(actions.requestMarkWhatsNewSeen()).resolves.toBe(false);
+    });
   });
 
   describe('requestDeleteScheduledRefresh', () => {
