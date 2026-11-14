@@ -231,7 +231,10 @@ jobs:
 
   testing-e2e:
     name: Testing – E2E
-    runs-on: ubuntu-latest
+    # Pinned: ubuntu-latest moved to 26.04 (Docker 29), which the pinned
+    # Traefik v2.1.3 in docker-compose.yml can't route through. Unpin once
+    # Traefik is upgraded.
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     needs:
       - install-dependencies
