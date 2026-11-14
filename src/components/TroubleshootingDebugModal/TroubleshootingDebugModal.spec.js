@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { mount } from '@vue/test-utils';
 import { buildVueTestGlobals } from '../../../test/helpers/vue.js';
 import { getDebugEmailData, sendDebugEmail } from '@/js/services/admin/forceRefreshAdminService.js';
+import locale from '@/locale/en.json';
 import TroubleshootingDebugModal from './TroubleshootingDebugModal.vue';
 
 jest.mock('@/js/services/admin/forceRefreshAdminService.js', () => ({
@@ -116,6 +117,33 @@ describe('TroubleshootingDebugModal', () => {
 
       const values = wrapper.findAll('.debug-modal__row-value').map((el) => el.text());
       expect(values).toEqual(mockDebugData.map((row) => row.value));
+    });
+
+    it('renders the update method rows the server sends when WebSockets falls back', async () => {
+      const updateMethodRows = [
+        { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_UPDATE_METHOD', value: 'WebSockets' },
+        { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_EFFECTIVE_UPDATE_METHOD', value: 'WordPress API' },
+        { key: 'ADMIN_TROUBLESHOOTING.DEBUG_MODAL_LABEL_WEBSOCKETS', value: 'Unavailable (no relay is configured)' },
+      ];
+      getDebugEmailData.mockResolvedValueOnce({ code: 200, data: { ...mockPayload, debugData: updateMethodRows } });
+      const wrapper = getWrapper({ isOpen: false });
+
+      await wrapper.setProps({ isOpen: true });
+      await wrapper.vm.$nextTick();
+
+      const rows = wrapper.findAll('.debug-modal__row').map((row) => ({
+        key: row.find('.debug-modal__row-label').text(),
+        value: row.find('.debug-modal__row-value').text(),
+      }));
+      expect(rows).toEqual(updateMethodRows);
+    });
+
+    it.each([
+      'DEBUG_MODAL_LABEL_UPDATE_METHOD',
+      'DEBUG_MODAL_LABEL_EFFECTIVE_UPDATE_METHOD',
+      'DEBUG_MODAL_LABEL_WEBSOCKETS',
+    ])('has a translation for the %s row the server sends', (key) => {
+      expect(locale.ADMIN_TROUBLESHOOTING[key]).toEqual(expect.any(String));
     });
   });
 

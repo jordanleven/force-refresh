@@ -1,3 +1,5 @@
+import { UPDATE_METHOD_REST } from '@/js/admin/updateMethods.js';
+
 export default (localizedData) => ({
   featureFlags: localizedData.featureFlags ?? {},
   network: {
@@ -7,9 +9,10 @@ export default (localizedData) => ({
     customRefreshIntervalMaximumInMinutes: localizedData.refreshOptions.customRefreshIntervalMaximumInMinutes,
     customRefreshIntervalMinimumInMinutes: localizedData.refreshOptions.customRefreshIntervalMinimumInMinutes,
     isDebugActive: localizedData.isDebugActive,
+    isRelayConfigured: localizedData.refreshOptions.isRelayConfigured ?? false,
     refreshFromAdminBar: localizedData.refreshOptions.showRefreshInMenuBar,
     refreshInterval: localizedData.refreshOptions.refreshInterval,
-    useStaticFilePolling: localizedData.refreshOptions.useStaticFilePolling ?? false,
+    updateMethod: localizedData.refreshOptions.updateMethod ?? UPDATE_METHOD_REST,
   },
   site: {
     isMultiSite: localizedData.isMultiSite,

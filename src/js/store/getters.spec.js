@@ -1,13 +1,15 @@
+import { createStore } from 'vuex';
 import getters from './getters.js';
 
-const makeSiteState = (siteOverrides = {}, networkOverrides = {}, settingsOverrides = {}) => ({
-  featureFlags: {},
+const makeSiteState = (siteOverrides = {}, networkOverrides = {}, settingsOverrides = {}, featureFlags = {}) => ({
+  featureFlags,
   network: {
     detectedCdn: null,
     ...networkOverrides,
   },
   settings: {
-    useStaticFilePolling: false,
+    isRelayConfigured: false,
+    updateMethod: 'rest',
     ...settingsOverrides,
   },
   site: {
@@ -29,6 +31,13 @@ const makeSiteState = (siteOverrides = {}, networkOverrides = {}, settingsOverri
   },
 });
 
+// Getters that build on other getters are read through a real store.
+const makeStoreGetters = (state) => createStore({ getters, state }).getters;
+
+const makeUpdateMethodGetters = ({ isRelayConfigured = false, isWebSocketsEnabled = false, updateMethod = 'rest' } = {}) => (
+  makeStoreGetters(makeSiteState({}, {}, { isRelayConfigured, updateMethod }, { websockets: isWebSocketsEnabled }))
+);
+
 describe('Getters', () => {
   describe('detectedCdn', () => {
     it('returns null when no CDN is detected', () => {
@@ -44,15 +53,24 @@ describe('Getters', () => {
 
   describe('troubleshootingInformationSettings', () => {
     it('includes detectedCdn when null', () => {
-      const state = makeSiteState();
-      const result = getters.troubleshootingInformationSettings(state);
+      const result = makeStoreGetters(makeSiteState()).troubleshootingInformationSettings;
       expect(result.detectedCdn).toBeNull();
     });
 
     it('includes detectedCdn when a CDN is detected', () => {
-      const state = makeSiteState({}, { detectedCdn: 'Cloudflare' });
-      const result = getters.troubleshootingInformationSettings(state);
+      const result = makeStoreGetters(makeSiteState({}, { detectedCdn: 'Cloudflare' })).troubleshootingInformationSettings;
       expect(result.detectedCdn).toBe('Cloudflare');
+    });
+
+    it('includes the selected update method', () => {
+      const result = makeUpdateMethodGetters({ updateMethod: 'static_file' }).troubleshootingInformationSettings;
+      expect(result.updateMethod).toBe('static_file');
+    });
+
+    it('includes the effective update method', () => {
+      const result = makeUpdateMethodGetters({ isWebSocketsEnabled: true, updateMethod: 'websockets' }).troubleshootingInformationSettings;
+      expect(result.updateMethod).toBe('websockets');
+      expect(result.effectiveUpdateMethod).toBe('rest');
     });
   });
 
@@ -77,15 +95,70 @@ describe('Getters', () => {
     });
   });
 
-  describe('useStaticFilePolling', () => {
-    it('returns false by default', () => {
-      const state = makeSiteState();
-      expect(getters.useStaticFilePolling(state)).toBe(false);
+  describe('updateMethod', () => {
+    it.each(['rest', 'static_file', 'websockets'])('returns %s when it is selected', (updateMethod) => {
+      const state = makeSiteState({}, {}, { updateMethod });
+      expect(getters.updateMethod(state)).toBe(updateMethod);
+    });
+  });
+
+  describe('refreshOptions', () => {
+    it('includes the selected update method', () => {
+      const { refreshOptions } = makeUpdateMethodGetters({ updateMethod: 'static_file' });
+      expect(refreshOptions.updateMethod).toBe('static_file');
+    });
+  });
+
+  describe('isRelayConfigured', () => {
+    it.each([true, false])('returns %s from settings', (isRelayConfigured) => {
+      const state = makeSiteState({}, {}, { isRelayConfigured });
+      expect(getters.isRelayConfigured(state)).toBe(isRelayConfigured);
+    });
+  });
+
+  describe('isWebSocketsEnabled', () => {
+    it('returns false when the websockets flag is missing', () => {
+      expect(makeStoreGetters(makeSiteState()).isWebSocketsEnabled).toBe(false);
     });
 
-    it('returns true when the option is enabled', () => {
-      const state = makeSiteState({}, {}, { useStaticFilePolling: true });
-      expect(getters.useStaticFilePolling(state)).toBe(true);
+    it.each([true, false])('returns %s from the websockets flag', (isWebSocketsEnabled) => {
+      expect(makeUpdateMethodGetters({ isWebSocketsEnabled }).isWebSocketsEnabled).toBe(isWebSocketsEnabled);
+    });
+  });
+
+  describe('isWebSocketsAvailable', () => {
+    it.each([
+      { expected: false, isRelayConfigured: false, isWebSocketsEnabled: false },
+      { expected: false, isRelayConfigured: true, isWebSocketsEnabled: false },
+      { expected: false, isRelayConfigured: false, isWebSocketsEnabled: true },
+      { expected: true, isRelayConfigured: true, isWebSocketsEnabled: true },
+    ])('returns $expected when flag is $isWebSocketsEnabled and relay is $isRelayConfigured', ({ expected, ...settings }) => {
+      expect(makeUpdateMethodGetters(settings).isWebSocketsAvailable).toBe(expected);
+    });
+  });
+
+  describe('effectiveUpdateMethod', () => {
+    it.each(['rest', 'static_file'])('returns %s as selected', (updateMethod) => {
+      expect(makeUpdateMethodGetters({ updateMethod }).effectiveUpdateMethod).toBe(updateMethod);
+    });
+
+    it('falls back to rest when websockets is selected and the flag is off', () => {
+      const { effectiveUpdateMethod } = makeUpdateMethodGetters({ isRelayConfigured: true, updateMethod: 'websockets' });
+      expect(effectiveUpdateMethod).toBe('rest');
+    });
+
+    it('falls back to rest when websockets is selected and no relay is configured', () => {
+      const { effectiveUpdateMethod } = makeUpdateMethodGetters({ isWebSocketsEnabled: true, updateMethod: 'websockets' });
+      expect(effectiveUpdateMethod).toBe('rest');
+    });
+
+    it('returns websockets when it is selected and available', () => {
+      const { effectiveUpdateMethod } = makeUpdateMethodGetters({
+        isRelayConfigured: true,
+        isWebSocketsEnabled: true,
+        updateMethod: 'websockets',
+      });
+      expect(effectiveUpdateMethod).toBe('websockets');
     });
   });
 

@@ -2,6 +2,7 @@ import {
   deleteScheduledRefresh,
   getScheduledRefreshes,
   scheduleRequestSiteRefresh,
+  updateForceRefreshOptions,
 } from '../services/admin/forceRefreshAdminService.js';
 import actions from './actions.js';
 
@@ -162,6 +163,54 @@ describe('Store Actions', () => {
       });
 
       const result = await actions.requestScheduledRefreshes({ commit });
+
+      expect(commit).not.toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
+  });
+
+  describe('updateForceRefreshSettings', () => {
+    const updatedOptions = {
+      refreshInterval: 60,
+      showRefreshInMenuBar: true,
+      updateMethod: 'static_file',
+    };
+
+    it('sends the update method with the other options', async () => {
+      updateForceRefreshOptions.mockResolvedValue({ code: 201 });
+
+      await actions.updateForceRefreshSettings({ commit: jest.fn() }, updatedOptions);
+
+      expect(updateForceRefreshOptions).toHaveBeenCalledWith(updatedOptions);
+    });
+
+    it('commits the update method when the options are saved', async () => {
+      const commit = jest.fn();
+      updateForceRefreshOptions.mockResolvedValue({ code: 201 });
+
+      const result = await actions.updateForceRefreshSettings({ commit }, updatedOptions);
+
+      expect(commit).toHaveBeenCalledWith('SET_REFRESH_INTERVAL', 60);
+      expect(commit).toHaveBeenCalledWith('SET_SHOW_REFRESH_IN_MENU_BAR', true);
+      expect(commit).toHaveBeenCalledWith('SET_UPDATE_METHOD', 'static_file');
+      expect(result).toBe(true);
+    });
+
+    it('keeps the stored update method when none is sent', async () => {
+      const commit = jest.fn();
+      updateForceRefreshOptions.mockResolvedValue({ code: 201 });
+
+      await actions.updateForceRefreshSettings({ commit }, { ...updatedOptions, updateMethod: undefined });
+
+      expect(commit).toHaveBeenCalledWith('SET_REFRESH_INTERVAL', 60);
+      expect(commit.mock.calls.map(([mutation]) => mutation)).not.toContain('SET_UPDATE_METHOD');
+    });
+
+    it('commits nothing when the options are rejected', async () => {
+      const commit = jest.fn();
+      updateForceRefreshOptions.mockResolvedValue({ code: 400 });
+
+      const result = await actions.updateForceRefreshSettings({ commit }, updatedOptions);
 
       expect(commit).not.toHaveBeenCalled();
       expect(result).toBe(false);

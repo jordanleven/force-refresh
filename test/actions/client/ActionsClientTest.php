@@ -7,8 +7,10 @@
 
 namespace JordanLeven\Plugins\ForceRefresh;
 
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\TestCase;
 use JordanLeven\Plugins\ForceRefresh\Mocks;
+use JordanLeven\Plugins\ForceRefresh\Services\Feature_Flag_Service;
 
 if ( ! defined( 'WP_FORCE_REFRESH_PLUGIN_DIR' ) ) {
     define( 'WP_FORCE_REFRESH_PLUGIN_DIR', __DIR__ . '/../../../' );
@@ -119,6 +121,39 @@ final class ActionsClientTest extends TestCase {
     }
 
     /**
+     * Reset per-test mock state.
+     *
+     * @return void
+     */
+    protected function setUp(): void {
+        self::$mock_get_option_services->clear_option_map();
+        $this->set_flags( array( 'websockets' => false ) );
+    }
+
+    /**
+     * Leave the feature flag cache empty for other test classes.
+     *
+     * @return void
+     */
+    protected function tearDown(): void {
+        self::$mock_get_option_services->clear_option_map();
+        $this->set_flags( null );
+    }
+
+    /**
+     * Inject feature flags into the flag service's cache.
+     *
+     * @param array|null $flags The flags to set, or null to clear the cache.
+     *
+     * @return void
+     */
+    private function set_flags( ?array $flags ): void {
+        $flags_prop = ( new \ReflectionClass( Feature_Flag_Service::class ) )->getProperty( 'flags' );
+        $flags_prop->setAccessible( true );
+        $flags_prop->setValue( null, $flags );
+    }
+
+    /**
      * Test that versionFileUrl is null when static file polling is disabled.
      */
     public function testVersionFileUrlIsNullWhenOptionIsDisabled(): void {
@@ -139,5 +174,38 @@ final class ActionsClientTest extends TestCase {
 
         $this->assertNotNull( $data['versionFileUrl'] );
         $this->assertStringContainsString( 'version.json', $data['versionFileUrl'] );
+    }
+
+    /**
+     * Test that versionFileUrl is present when the static file method is selected.
+     */
+    public function testVersionFileUrlIsNonNullWhenStaticFileMethodIsSelected(): void {
+        self::$mock_get_option_services->set_option_value( 'force_refresh_update_method', 'static_file' );
+        self::$mock_get_option_services->set_option_value( 'force_refresh_use_static_file_polling', true );
+
+        $data = get_client_localized_data();
+
+        $this->assertStringContainsString( 'version.json', $data['versionFileUrl'] );
+    }
+
+    /**
+     * Test that the version file is never the version source when WebSockets is selected.
+     *
+     * A WebSocket nudge is answered by REST, whether WebSockets is in use or
+     * has fallen back to REST polling because it is unavailable. No relay can
+     * be configured yet, so only the fallback can be reached from here.
+     *
+     * @param bool $is_websockets_flag_enabled Whether the WebSockets feature flag is on.
+     */
+    #[TestWith( array( false ) )]
+    #[TestWith( array( true ) )]
+    public function testVersionFileUrlIsNullWhenWebsocketsMethodIsSelected( bool $is_websockets_flag_enabled ): void {
+        $this->set_flags( array( 'websockets' => $is_websockets_flag_enabled ) );
+        self::$mock_get_option_services->set_option_value( 'force_refresh_update_method', 'websockets' );
+        self::$mock_get_option_services->set_option_value( 'force_refresh_use_static_file_polling', false );
+
+        $data = get_client_localized_data();
+
+        $this->assertNull( $data['versionFileUrl'] );
     }
 }

@@ -63,6 +63,18 @@ describe('forceRefreshAdminService', () => {
         },
       );
     });
+
+    it.each(['rest', 'static_file', 'websockets'])('sends %s as the update method', async (updateMethod) => {
+      await service.updateForceRefreshOptions({ updateMethod });
+
+      expect(mockApiClient.put.mock.calls[0][1]).toEqual({ update_method: updateMethod });
+    });
+
+    it('does not send the legacy static file polling parameter', async () => {
+      await service.updateForceRefreshOptions({ updateMethod: 'static_file' });
+
+      expect(mockApiClient.put.mock.calls[0][1]).not.toHaveProperty('use_static_file_polling');
+    });
   });
 
   describe('updateForceRefreshDebugMode', () => {
