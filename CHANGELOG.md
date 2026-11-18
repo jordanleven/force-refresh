@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## 3.2.2 - 2026-11-17
+### Dependencies & security
+* Performance enhancements and bug fixes.
 ## 3.2.1 - 2026-09-13
 ### Dependencies & security
 * Performance enhancements and bug fixes.
