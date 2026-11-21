@@ -58,7 +58,7 @@
     "@eslint/compat": "^2.1.1",
     "@eslint/eslintrc": "^3.3.7",
     "@playwright/test": "^1.65.0",
-    "@typescript-eslint/eslint-plugin": "^8.72.2",
+    "@typescript-eslint/eslint-plugin": "^8.73.0",
     "@typescript-eslint/parser": "^8.72.2",
     "@vue/compiler-sfc": "^3.5.45",
     "@vue/test-utils": "^2.5.1",
