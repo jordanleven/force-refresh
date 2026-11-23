@@ -31,6 +31,16 @@ export const error = (message) => {
 };
 
 /**
+ * Method used to log information to console
+ * @param     {string | object}    message    The message or object to log
+ * @return    {void}
+ * @instance
+ */
+export const info = (message) => {
+  console.info(`${formattedPackageName} - ${message}`);
+};
+
+/**
  * Method used to log warnings to console
  * @param     {string | object}    message    The message or object to log
  * @return    {void}

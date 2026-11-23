@@ -110,17 +110,11 @@ describe('Store Mutations', () => {
     });
   });
 
-  describe('SET_USE_STATIC_FILE_POLLING', () => {
-    it('sets useStaticFilePolling to true', () => {
-      const state = { settings: { useStaticFilePolling: false } };
-      mutations.SET_USE_STATIC_FILE_POLLING(state, true);
-      expect(state.settings.useStaticFilePolling).toBe(true);
-    });
-
-    it('sets useStaticFilePolling to false', () => {
-      const state = { settings: { useStaticFilePolling: true } };
-      mutations.SET_USE_STATIC_FILE_POLLING(state, false);
-      expect(state.settings.useStaticFilePolling).toBe(false);
+  describe('SET_UPDATE_METHOD', () => {
+    it.each(['rest', 'static_file', 'websockets'])('sets the update method to %s', (updateMethod) => {
+      const state = { settings: { updateMethod: 'other' } };
+      mutations.SET_UPDATE_METHOD(state, updateMethod);
+      expect(state.settings.updateMethod).toBe(updateMethod);
     });
   });
 

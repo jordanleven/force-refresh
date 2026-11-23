@@ -20,7 +20,11 @@ use JordanLeven\Plugins\ForceRefresh\Services\Version_File_Service;
  * @return array
  */
 function get_client_localized_data(): array {
-    $use_static_file_polling = Options_Storage_Service::get_use_static_file_polling();
+    // The version file is only a version source when browsers are polling it.
+    // A WebSocket nudge must be answered by REST, which is never served stale
+    // from a cache that was filled before the refresh.
+    $effective_update_method = Options_Storage_Service::get_effective_update_method();
+    $use_static_file_polling = Options_Storage_Service::UPDATE_METHOD_STATIC_FILE === $effective_update_method;
 
     return array(
         'apiEndpoint'     => Api_Handler_Client::get_rest_endpoint(),

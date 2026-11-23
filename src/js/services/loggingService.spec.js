@@ -1,5 +1,10 @@
 import { setDebugMode } from './debugService.js';
-import { debug, error, warn } from './loggingService.js';
+import {
+  debug,
+  error,
+  info,
+  warn,
+} from './loggingService.js';
 
 const PACKAGE_PREFIX = 'ForceRefresh';
 
@@ -8,6 +13,7 @@ describe('loggingService', () => {
     setDebugMode(false);
     jest.spyOn(console, 'debug').mockImplementation(() => {});
     jest.spyOn(console, 'error').mockImplementation(() => {});
+    jest.spyOn(console, 'info').mockImplementation(() => {});
     jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
@@ -32,6 +38,13 @@ describe('loggingService', () => {
     it('always logs to console.error', () => {
       error('something went wrong');
       expect(console.error).toHaveBeenCalledWith(`${PACKAGE_PREFIX} - something went wrong`);
+    });
+  });
+
+  describe('info', () => {
+    it('always logs to console.info', () => {
+      info('something happened');
+      expect(console.info).toHaveBeenCalledWith(`${PACKAGE_PREFIX} - something happened`);
     });
   });
 

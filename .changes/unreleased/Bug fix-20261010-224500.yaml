@@ -1,0 +1,3 @@
+kind: Bug fix
+body: Fix an issue where a temporary network error stopped a page from checking for refreshes until it was reloaded. A page that missed a check while its tab was asleep, offline or in the back/forward cache now checks as soon as it resumes, without checking more often than the refresh interval.
+time: 2026-10-10T22:45:00.000000-04:00

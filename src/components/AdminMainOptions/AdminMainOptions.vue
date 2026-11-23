@@ -48,27 +48,35 @@
           >
         </div>
         <div class="option-group">
-          <label for="use-static-file-polling">
+          <label for="update-method">
             {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD') }}
-            <BaseTooltip :content="staticFilePollingTooltip">
+            <BaseTooltip :content="updateMethodTooltip">
               <font-awesome-icon class="option-group__info-icon" :icon="infoIcon" />
             </BaseTooltip>
           </label>
           <select
-            id="use-static-file-polling"
-            v-model="optionSelectedUseStaticFilePolling"
-            name="use-static-file-polling"
-            data-test="select-static-file-polling"
-            :disabled="isUsingCdn"
+            id="update-method"
+            v-model="optionSelectedUpdateMethod"
+            name="update-method"
+            data-test="select-update-method"
           >
-            <option :value="true">
-              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_STATIC_FILE') }}
-            </option>
-            <option :value="false">
-              {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WORDPRESS_API') }}
+            <option
+              v-for="{ disabled, label, value } in optionsUpdateMethod"
+              :key="value"
+              :value="value"
+              :disabled="disabled"
+            >
+              {{ label }}
             </option>
           </select>
         </div>
+        <p
+          v-if="isWebSocketsUnavailable"
+          class="option-group-note"
+          data-test="update-method-websockets-unavailable"
+        >
+          {{ $t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_WEBSOCKETS_UNAVAILABLE') }}
+        </p>
         <div class="force-refresh-admin-options-footer">
           <hr>
           <button
@@ -118,7 +126,15 @@
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faCircleQuestion, faHeart } from '@fortawesome/free-solid-svg-icons';
 import VueTypes from 'vue-types';
+import { mapGetters } from 'vuex';
 import BaseTooltip from '@/components/BaseTooltip/BaseTooltip.vue';
+import {
+  UPDATE_METHOD_REST,
+  UPDATE_METHOD_STATIC_FILE,
+  UPDATE_METHOD_WEBSOCKETS,
+  UPDATE_METHODS,
+  getUpdateMethodLabelKey,
+} from '@/js/admin/updateMethods.js';
 
 library.add([faCircleQuestion, faHeart]);
 
@@ -155,7 +171,7 @@ export default {
       customRefreshIntervalMinimumInMinutes: VueTypes.isRequired,
       refreshInterval: VueTypes.number.isRequired,
       showRefreshInMenuBar: VueTypes.bool.isRequired,
-      useStaticFilePolling: VueTypes.bool.isRequired,
+      updateMethod: VueTypes.oneOf(UPDATE_METHODS).isRequired,
     }),
   },
   emits: ['notify-user-of-error', 'options-were-updated', 'release-notes-page-clicked', 'troubleshooting-page-clicked'],
@@ -167,7 +183,7 @@ export default {
       optionSelectedRefreshInterval: null,
       optionSelectedRefreshIntervalCustom: null,
       optionSelectedShowRefreshInMenuBar: null,
-      optionSelectedUseStaticFilePolling: false,
+      optionSelectedUpdateMethod: UPDATE_METHOD_REST,
       optionsForceRefreshInMenuBar: OPTIONS_REFRESH_FROM_ADMIN_BAR,
     };
   },
@@ -186,8 +202,15 @@ export default {
     isSelectedRefreshIntervalCustom() {
       return this.optionSelectedRefreshInterval === OPTIONS_REFRESH_INTERVAL_CUSTOM;
     },
+    isSelectedUpdateMethodSaveable() {
+      // A selected WebSockets that cannot be used was saved earlier. Asking to save it again would be refused.
+      return !(this.optionSelectedUpdateMethod === UPDATE_METHOD_WEBSOCKETS && this.isWebSocketsUnavailable);
+    },
     isUsingCdn() {
       return this.detectedCdn !== null;
+    },
+    isWebSocketsUnavailable() {
+      return this.isWebSocketsEnabled && !this.isRelayConfigured;
     },
     optionsRefreshIntervals() {
       const coreOptions = OPTIONS_REFRESH_INTERVALS_IN_SECONDS.map((value) => {
@@ -215,11 +238,26 @@ export default {
         },
       ];
     },
-    staticFilePollingTooltip() {
+    optionsUpdateMethod() {
+      const isDisabled = {
+        [UPDATE_METHOD_STATIC_FILE]: this.isUsingCdn,
+        [UPDATE_METHOD_WEBSOCKETS]: this.isWebSocketsUnavailable,
+      };
+
+      return UPDATE_METHODS
+        .filter((value) => value !== UPDATE_METHOD_WEBSOCKETS || this.isWebSocketsEnabled)
+        .map((value) => ({
+          disabled: Boolean(isDisabled[value]),
+          label: this.$t(getUpdateMethodLabelKey(value)),
+          value,
+        }));
+    },
+    updateMethodTooltip() {
       return this.isUsingCdn
         ? this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_DISABLED_CDN')
         : this.$t('ADMIN_SETTINGS.OPTION_UPDATE_METHOD_DESCRIPTION');
     },
+    ...mapGetters(['isRelayConfigured', 'isWebSocketsEnabled']),
   },
   created() {
     const existingRefreshInterval = this.refreshOptions?.refreshInterval;
@@ -227,7 +265,7 @@ export default {
 
     this.optionSelectedShowRefreshInMenuBar = this.refreshOptions?.showRefreshInMenuBar;
     this.optionSelectedRefreshIntervalCustom = this.getMinutesFromSeconds(existingRefreshInterval);
-    this.optionSelectedUseStaticFilePolling = this.refreshOptions?.useStaticFilePolling ?? false;
+    this.optionSelectedUpdateMethod = this.refreshOptions?.updateMethod ?? UPDATE_METHOD_REST;
 
     // If the currently-selected option isn't one of our selections, then we can assume it's a custom
     // value.
@@ -276,7 +314,7 @@ export default {
       this.$emit('options-were-updated', {
         refreshInterval,
         showRefreshInMenuBar: this.optionSelectedShowRefreshInMenuBar,
-        useStaticFilePolling: this.optionSelectedUseStaticFilePolling,
+        updateMethod: this.isSelectedUpdateMethodSaveable ? this.optionSelectedUpdateMethod : undefined,
       });
     },
   },
@@ -349,6 +387,13 @@ export default {
         color: var.$status-error;
       }
     }
+  }
+
+  .option-group-note {
+    margin: -5px 0 10px;
+    font-size: 0.75rem;
+    color: var.$text-secondary;
+    text-align: right;
   }
 }
 

@@ -78,13 +78,26 @@ function get_refresh_options(): array {
     $interval_minimum_minutes = REFRESH_INTERVAL_CUSTOM_MINIMUM_IN_SECONDS / 60;
     $interval_maximum_minutes = REFRESH_INTERVAL_CUSTOM_MAXIMUM_IN_SECONDS / 60;
 
-    return array(
+    $is_websockets_enabled = Feature_Flag_Service::is_enabled( Options_Storage_Service::FEATURE_FLAG_WEBSOCKETS );
+
+    $refresh_options = array(
         'customRefreshIntervalMaximumInMinutes' => (float) $interval_maximum_minutes,
         'customRefreshIntervalMinimumInMinutes' => (float) $interval_minimum_minutes,
         'refreshInterval'                       => Options_Storage_Service::get_refresh_interval(),
         'showRefreshInMenuBar'                  => Options_Storage_Service::get_show_in_admin_bar(),
+        // While WebSockets is hidden, show the method that is really in use instead of a hidden selection.
+        'updateMethod'                          => $is_websockets_enabled
+            ? Options_Storage_Service::get_update_method()
+            : Options_Storage_Service::get_effective_update_method(),
+        // Still read by admin scripts that were cached before there were three update methods.
         'useStaticFilePolling'                  => Options_Storage_Service::get_use_static_file_polling(),
     );
+
+    if ( $is_websockets_enabled ) {
+        $refresh_options['isRelayConfigured'] = Options_Storage_Service::is_relay_configured();
+    }
+
+    return $refresh_options;
 }
 
 /**

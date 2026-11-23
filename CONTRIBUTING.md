@@ -24,6 +24,18 @@ To log into the WordPress admin, visit the admin page of the and log in with the
 
 **Password**: `dross_dread_motto1polopony9treacle*SERAGLIO.unctuous8sighted`
 
+## Feature Flags
+
+Unreleased features are gated by the flags in `config/feature-flags.php`. To turn a flag on or off for a single site without editing that file, define `FORCE_REFRESH_FEATURE_FLAGS` in the site's `wp-config.php`, above the "stop editing" line:
+
+```php
+define( 'FORCE_REFRESH_FEATURE_FLAGS', array( 'websockets' => true ) );
+```
+
+Flags left out of the array keep their value from `config/feature-flags.php`, and names that are not in that file are ignored.
+
+The Docker sites set this override through `WORDPRESS_CONFIG_EXTRA` in `docker-compose.yml`, so flags that are off in `config/feature-flags.php` can still be developed and covered by the end-to-end tests. After changing it, run `docker compose up -d` to recreate the WordPress containers.
+
 ## Adding Release Notes
 
 This project uses [changie] to manage release notes.

@@ -95,8 +95,21 @@ test.describe('Client', () => {
       const adminPage = await adminContext.newPage();
       await goToPluginPage(adminPage);
       await adminPage.locator('[data-test="btn-troubleshooting"]').click();
-      await adminPage.locator('[data-test="toggle-debug-mode"] label').click();
+      // The badge is also hidden while the page is still rendering, so wait
+      // for the server to confirm. Debug mode left on suppresses every reload
+      // on this site for 48 hours, which fails the specs that run after this.
+      await Promise.all([
+        adminPage.waitForResponse(
+          (r) => r.url().includes('/debugging') && r.request().method() === 'PUT' && r.ok(),
+        ),
+        adminPage.locator('[data-test="toggle-debug-mode"] label').click(),
+      ]);
       await waitForDebugModeDisabled(adminPage);
+
+      // Confirm with what a visitor is actually served.
+      const response = await adminPage.request.get('/');
+      expect(await response.text()).not.toMatch(/"isDebugActive":"1"/);
+      await adminContext.close();
     });
 
     test('Shows a countdown log to the next refresh', () => {

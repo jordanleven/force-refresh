@@ -47,7 +47,8 @@ class Migration_Service {
      */
     private static function get_migrations(): array {
         return array(
-            'consolidate_page_versions_to_option' => array( __CLASS__, 'migrate_page_versions_to_option' ),
+            'consolidate_page_versions_to_option'    => array( __CLASS__, 'migrate_page_versions_to_option' ),
+            'update_method_from_static_file_polling' => array( __CLASS__, 'migrate_static_file_polling_to_update_method' ),
         );
     }
 
@@ -85,5 +86,21 @@ class Migration_Service {
 
         // phpcs:ignore WordPress.DB.DirectDatabaseQuery, WordPress.DB.SlowDBQuery.slow_db_query_meta_key
         $wpdb->delete( $wpdb->postmeta, array( 'meta_key' => $legacy_key ) );
+    }
+
+    /**
+     * Store the update method for sites that only have the static file polling option.
+     *
+     * Sites that used static file polling keep it and every other site gets
+     * REST. Reading through the options service means a re-run leaves a method
+     * that was already stored untouched.
+     *
+     * @return void
+     */
+    private static function migrate_static_file_polling_to_update_method(): void {
+        update_option(
+            Options_Storage_Service::OPTION_UPDATE_METHOD,
+            Options_Storage_Service::get_update_method()
+        );
     }
 }

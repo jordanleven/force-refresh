@@ -77,7 +77,7 @@ export default {
     const response = await updateForceRefreshOptions({
       refreshInterval: updatedOptions?.refreshInterval,
       showRefreshInMenuBar: updatedOptions?.showRefreshInMenuBar,
-      useStaticFilePolling: updatedOptions?.useStaticFilePolling,
+      updateMethod: updatedOptions?.updateMethod,
     });
 
     const success = isSuccess(response);
@@ -85,7 +85,11 @@ export default {
     if (success) {
       commit('SET_REFRESH_INTERVAL', updatedOptions?.refreshInterval);
       commit('SET_SHOW_REFRESH_IN_MENU_BAR', updatedOptions?.showRefreshInMenuBar);
-      commit('SET_USE_STATIC_FILE_POLLING', updatedOptions?.useStaticFilePolling);
+
+      // The update method is left out when the saved one has to stay as it is.
+      if (updatedOptions?.updateMethod !== undefined) {
+        commit('SET_UPDATE_METHOD', updatedOptions.updateMethod);
+      }
     }
 
     return success;
