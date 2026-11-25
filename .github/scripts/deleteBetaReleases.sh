@@ -1,14 +1,16 @@
 #!/bin/sh
-# Usage: deleteBetaReleases.sh <pr_number>
+# Usage: deleteBetaReleases.sh <pr_number> [keep_tag]
 # Deletes every beta prerelease built for the pull request, along with its
-# tag. Tags left without a release are deleted too.
+# tag. Tags left without a release are deleted too. Pass keep_tag to spare
+# the beta that was just published.
 
 set -eu
 
 pr_number=${1:-}
+keep_tag=${2:-}
 
 if ! echo "$pr_number" | grep -qE '^[1-9][0-9]*$'; then
-  echo "Usage: $0 <pr_number>" >&2
+  echo "Usage: $0 <pr_number> [keep_tag]" >&2
   exit 1
 fi
 
@@ -18,11 +20,12 @@ beta_tags=$(
   gh api --paginate "repos/{owner}/{repo}/git/matching-refs/tags/v" --jq '.[].ref' \
     | sed 's!^refs/tags/!!' \
     | grep -E "$beta_tag_pattern" \
+    | grep -vxF "${keep_tag:-}" \
     || true
 )
 
 if [ -z "$beta_tags" ]; then
-  echo "No beta releases found for PR #${pr_number}."
+  echo "No earlier beta releases found for PR #${pr_number}."
   exit 0
 fi
 

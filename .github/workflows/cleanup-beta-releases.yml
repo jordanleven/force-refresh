@@ -1,7 +1,7 @@
 name: Clean Up Beta Releases
 on:
-  # pull_request_target runs from the base branch, so the token can delete
-  # releases for fork PRs too. It never checks out the PR's code.
+  # pull_request_target runs from the base branch with a token that can
+  # delete releases. It never checks out the PR's code.
   pull_request_target:
     types:
       - closed
