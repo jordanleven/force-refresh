@@ -4,9 +4,10 @@ import { WP_INSTANCES, getAuthFile } from './test/e2e/helpers/constants';
 export default defineConfig({
   testDir: './test/e2e',
   timeout: 120_000,
-  reporter: 'list',
+  reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
   use: {
-    trace: 'on-first-retry',
+    trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
+    screenshot: 'only-on-failure',
     launchOptions: {
       slowMo: process.env.PLAYWRIGHT_SLOW_MO ? 800 : 0,
     },
