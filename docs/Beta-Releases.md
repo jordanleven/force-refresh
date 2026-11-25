@@ -1,6 +1,6 @@
 # Beta Versions
 
-If you're encountering errors with Force Refresh, I may ask for you to download a beta release that contains bug fixes or other debugging features. Beta versions will be distributed exclusively through GitHub and will always be composed of [signed commits] to confirm that the code is genuine.
+If you're encountering errors with Force Refresh, I may ask for you to download a beta release that contains bug fixes or other debugging features. Beta versions are distributed exclusively through GitHub. Each one is built from a pull request opened from a branch of the Force Refresh repository, and is deleted once that pull request is closed or merged, so download links stop working after that. If a link no longer works, install the latest public release or ask for a new beta.
 
 Beta versions are numbered after the release they lead up to, such as `3.3.0-beta.412.7`. WordPress treats a beta as older than the final release, so once that release is publicly available it will be offered as a normal update.
 
@@ -24,8 +24,7 @@ Once debugging is complete, or you've verified that the beta release fixes your 
 ### Reverting to Previous Version
 
 1. Under "Plugins", deactivate the beta Force Refresh plugin and [delete it][help_delete_plugin] from your WordPress installation.
-1. Active the previously active public release of Force Refresh.
+1. Activate the previously active public release of Force Refresh.
 
-[signed commits]: https://docs.github.com/en/authentication/managing-commit-signature-verification/displaying-verification-statuses-for-all-of-your-commits
 [help_deactivate_plugin]: https://wordpress.com/support/plugins/deactivate-or-delete-a-plugin/#deactivate-a-plugin
 [help_delete_plugin]: https://wordpress.com/support/plugins/deactivate-or-delete-a-plugin/#delete-a-plugin
