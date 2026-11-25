@@ -368,7 +368,11 @@ jobs:
           filters: |
             e2e:
               - '**'
-              - '!**/*.md'
+              # README.md and CHANGELOG.md are not ignored: they generate
+              # README.txt, which feeds the release notes modal.
+              - '!CONTRIBUTING.md'
+              - '!docker/README.md'
+              - '!.github/*.md'
               - '!docs/**'
               - '!.changes/**'
               - '!.changie.yaml'
@@ -431,6 +435,10 @@ jobs:
         with:
           name: dist
           path: dist
+
+      # README.txt is gitignored; the release notes modal reads it.
+      - name: Generate WordPress README
+        run: npm run changelog:build
 
       - name: Add WordPress hostnames
         run: echo "127.0.0.1 wp5.force-refresh.localhost wp6.force-refresh.localhost wp7.force-refresh.localhost" | sudo tee -a /etc/hosts
