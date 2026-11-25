@@ -1,43 +1,97 @@
 name: Release Beta Build
+run-name: Beta release for PR #${{ inputs.pr }}
 on:
-  push:
-    tags:
-      - "v[0-9]+.[0-9]+.[0-9]+-*.[0-9]+"
+  workflow_dispatch:
+    inputs:
+      pr:
+        description: Pull request number
+        required: true
+        type: number
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-beta-${{ inputs.pr }}
+  cancel-in-progress: false
+
+env:
+  GH_REPO: ${{ github.repository }}
+  PR_NUMBER: ${{ inputs.pr }}
+  RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
 jobs:
   set-variables:
     name: Set Variables
     runs-on: ubuntu-latest
     timeout-minutes: 2
+    permissions:
+      contents: read
+      pull-requests: read
+      statuses: write
     outputs:
       node-version: ${{ steps.nvm.outputs.NVMRC }}
       php-version: ${{ steps.php.outputs.PHP_VERSION }}
-      build-number: ${{ steps.build-number.outputs.BUILD_NUMBER }}
+      head-sha: ${{ steps.pull-request.outputs.HEAD_SHA }}
 
     steps:
+      - name: Resolve pull request head
+        id: pull-request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          read -r state head_sha head_repo <<< "$(gh api "repos/${GH_REPO}/pulls/${PR_NUMBER}" --jq '[.state, .head.sha, (.head.repo.full_name // "deleted")] | @tsv')"
+          if [ "$state" != "open" ]; then
+            echo "::error::PR #${PR_NUMBER} is ${state:-missing}. Betas can only be built from open pull requests."
+            exit 1
+          fi
+          if [ "$head_repo" != "$GH_REPO" ]; then
+            echo "::error::PR #${PR_NUMBER} comes from ${head_repo}, not ${GH_REPO}. Betas can only be built from pull requests opened from a branch of this repository."
+            exit 1
+          fi
+          echo "HEAD_SHA=${head_sha}" >> "$GITHUB_OUTPUT"
+
+      - name: Mark beta release as pending
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ steps.pull-request.outputs.HEAD_SHA }}
+        run: |
+          gh api "repos/${GH_REPO}/statuses/${HEAD_SHA}" \
+            -f state=pending \
+            -f context="Beta Release" \
+            -f description="Building a beta release." \
+            -f target_url="$RUN_URL" >/dev/null
+
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.pull-request.outputs.HEAD_SHA }}
+          persist-credentials: false
 
       - name: Get node version
-        run: echo "NVMRC=$(cat .nvmrc)" >> $GITHUB_OUTPUT
+        run: echo "NVMRC=$(cat .nvmrc)" >> "$GITHUB_OUTPUT"
         id: nvm
 
       - name: Get PHP version
-        run: echo "PHP_VERSION=8.4" >> $GITHUB_OUTPUT
+        run: echo "PHP_VERSION=8.4" >> "$GITHUB_OUTPUT"
         id: php
-
-      - name: Set Build Number
-        run: echo "BUILD_NUMBER=$(cat package.json | jq -r '.version')" >> $GITHUB_OUTPUT
-        id: build-number
 
   install-dependencies:
     name: Cache Dependencies
     runs-on: ubuntu-latest
     timeout-minutes: 20
     needs: set-variables
+    outputs:
+      version: ${{ steps.version.outputs.VERSION }}
+      # Includes the attempt so a re-run saves fresh caches. Jobs read the key
+      # from this output, so re-running only failed jobs still finds it.
+      cache-key: dependencies-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.set-variables.outputs.head-sha }}
+          persist-credentials: false
 
       - name: Set node version
         uses: actions/setup-node@v6
@@ -55,13 +109,19 @@ jobs:
       - name: Install Composer dependencies
         run: composer install
 
+      - name: Compute beta version
+        id: version
+        run: |
+          version=$(.github/scripts/getBetaVersion.sh "$PR_NUMBER" "$GITHUB_RUN_NUMBER")
+          echo "VERSION=${version}" >> "$GITHUB_OUTPUT"
+
       - name: Save to Cache
         uses: actions/cache/save@v5
         with:
           path: |
             vendor
             node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+          key: dependencies-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
 
   linting:
     name: Linting
@@ -74,6 +134,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.set-variables.outputs.head-sha }}
+          persist-credentials: false
 
       - name: Set node version
         uses: actions/setup-node@v6
@@ -87,7 +150,7 @@ jobs:
           path: |
             vendor
             node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+          key: ${{ needs.install-dependencies.outputs.cache-key }}
 
       - name: Lint JavaScript source code
         run: npm run lint
@@ -106,6 +169,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.set-variables.outputs.head-sha }}
+          persist-credentials: false
 
       - name: Set node version
         uses: actions/setup-node@v6
@@ -119,7 +185,7 @@ jobs:
           path: |
             vendor
             node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+          key: ${{ needs.install-dependencies.outputs.cache-key }}
 
       - name: Test JavaScript source code
         run: npm test
@@ -137,6 +203,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.set-variables.outputs.head-sha }}
+          persist-credentials: false
 
       - name: Set PHP version
         uses: shivammathur/setup-php@v2
@@ -146,10 +215,11 @@ jobs:
       - name: Pull dependencies from cache
         uses: actions/cache@v5
         with:
+          fail-on-cache-miss: true
           path: |
             vendor
             node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+          key: ${{ needs.install-dependencies.outputs.cache-key }}
 
       - name: Test PHP source code
         run: composer test
@@ -160,12 +230,16 @@ jobs:
     needs:
       - install-dependencies
       - set-variables
+    outputs:
+      cache-key: build-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v6
       with:
+        ref: ${{ needs.set-variables.outputs.head-sha }}
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Pull dependencies from cache
       uses: actions/cache@v5
@@ -174,12 +248,17 @@ jobs:
         path: |
           vendor
           node_modules
-        key: dependencies-${{ runner.os }}-${{ github.sha }}
+        key: ${{ needs.install-dependencies.outputs.cache-key }}
 
     - name: Set node version
       uses: actions/setup-node@v6
       with:
         node-version: ${{ needs.set-variables.outputs.node-version }}
+
+    - name: Set beta version
+      env:
+        VERSION: ${{ needs.install-dependencies.outputs.version }}
+      run: .github/scripts/setBuildVersion.sh "$VERSION"
 
     - name: Build JavaScript artifact
       run: npm run build
@@ -187,7 +266,7 @@ jobs:
     - name: Create release notes
       run: |
         node .github/scripts/dedupeUnreleasedDependencyFragments.js
-        NEXT_VERSION=$(npx changie next auto 2>/dev/null || echo "unreleased")
+        NEXT_VERSION=$(npx changie next auto 2>/dev/null) || NEXT_VERSION="unreleased"
         cp CHANGELOG.md CHANGELOG.md.bak
         npx changie batch "$NEXT_VERSION" 2>/dev/null || true
         if [ -f ".changes/${NEXT_VERSION}.md" ]; then
@@ -214,20 +293,32 @@ jobs:
 
     - name: Find files not included in distignore
       id: dist-files
-      run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> $GITHUB_OUTPUT
+      run: echo "DIST_FILES=$(find . -type f | grep -v -E -f .distignore | tr '\n' ' ')" >> "$GITHUB_OUTPUT"
 
     - name: Build plugin artifact
       uses: vimtor/action-zip@v1.3
       with:
         files: ${{ steps.dist-files.outputs.DIST_FILES }}
         recursive: false
-        dest: ./Force-Refresh-${{ needs.set-variables.outputs.build-number }}.zip
+        dest: ./Force-Refresh-${{ needs.install-dependencies.outputs.version }}.zip
 
     - name: Save build to cache
       uses: actions/cache/save@v5
       with:
         path: '**/'
-        key: build-${{ runner.os }}-${{ github.sha }}
+        key: build-${{ runner.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+
+    # The release job gets only the zip and release notes, never the rest of
+    # the workspace this PR's code built.
+    - name: Upload release files
+      uses: actions/upload-artifact@v7
+      with:
+        name: beta-release
+        path: |
+          Force-Refresh-${{ needs.install-dependencies.outputs.version }}.zip
+          release-notes.md
+        if-no-files-found: error
+        retention-days: 7
 
   testing-e2e:
     name: Testing – E2E
@@ -247,6 +338,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.set-variables.outputs.head-sha }}
+          persist-credentials: false
 
       - name: Set node version
         uses: actions/setup-node@v6
@@ -256,16 +350,18 @@ jobs:
       - name: Pull build artifact from cache
         uses: actions/cache@v5
         with:
+          fail-on-cache-miss: true
           path: '**/'
-          key: build-${{ runner.os }}-${{ github.sha }}
+          key: ${{ needs.build.outputs.cache-key }}
 
       - name: Pull dependencies from cache
         uses: actions/cache@v5
         with:
+          fail-on-cache-miss: true
           path: |
             vendor
             node_modules
-          key: dependencies-${{ runner.os }}-${{ github.sha }}
+          key: ${{ needs.install-dependencies.outputs.cache-key }}
 
       - name: Add WordPress hostnames
         run: echo "127.0.0.1 wp5.force-refresh.localhost wp6.force-refresh.localhost wp7.force-refresh.localhost" | sudo tee -a /etc/hosts
@@ -279,9 +375,53 @@ jobs:
       - name: Run e2e tests
         run: npm run test:e2e
 
+  # Kept out of the release job because it runs on the workspace this PR's
+  # code built, so it gets no secrets and only a read token.
+  wordpress-dry-run:
+    name: Simulate WordPress.org Deploy
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs:
+      - install-dependencies
+      - set-variables
+      - build
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ needs.set-variables.outputs.head-sha }}
+        persist-credentials: false
+
+    - name: Pull build from cache
+      uses: actions/cache@v5
+      with:
+        fail-on-cache-miss: true
+        path: '**/'
+        key: ${{ needs.build.outputs.cache-key }}
+
+    # A dry run checks out SVN anonymously and never commits. The action only
+    # requires the credentials to be non-empty, so no secrets are passed.
+    - name: Simulate deploy to WordPress.org
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        dry-run: true
+      env:
+        ASSETS_DIR: .wordpress-org
+        SVN_PASSWORD: dry-run
+        SVN_USERNAME: dry-run
+        SLUG: force-refresh
+        VERSION: ${{ needs.install-dependencies.outputs.version }}
+
+  # Holds a write token, so it runs scripts only from the workflow's own commit
+  # and reads the PR's checkout as data (git history), never as code.
   release:
     name: Release Beta
     runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: write
     needs:
       - set-variables
       - install-dependencies
@@ -289,59 +429,118 @@ jobs:
       - testing-javascript
       - testing-php
       - build
+      - testing-e2e
+      - wordpress-dry-run
+    env:
+      HEAD_SHA: ${{ needs.set-variables.outputs.head-sha }}
+      VERSION: ${{ needs.install-dependencies.outputs.version }}
 
     steps:
-    - uses: actions/checkout@v6
+    - name: Checkout release scripts
+      uses: actions/checkout@v6
       with:
+        ref: ${{ github.workflow_sha }}
+        path: trusted
+        persist-credentials: false
+
+    - name: Checkout pull request history
+      uses: actions/checkout@v6
+      with:
+        ref: ${{ needs.set-variables.outputs.head-sha }}
+        path: pull-request
         fetch-depth: 0
+        persist-credentials: false
 
     - name: Get commits since last stable release
       id: changes
+      working-directory: pull-request
       run: |
         PREV_STABLE_TAG=$(git tag --list 'v*' | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' | sort -V | tail -1)
-        bash .github/scripts/getCommitsSinceRelease.sh "$PREV_STABLE_TAG"
+        bash ../trusted/.github/scripts/getCommitsSinceRelease.sh "$PREV_STABLE_TAG"
 
-    - name: Pull build from cache
-      uses: actions/cache@v5
+    - name: Download release files
+      uses: actions/download-artifact@v8
       with:
-        path: '**/'
-        key: build-${{ runner.os }}-${{ github.sha }}
-
-    - name: Format asset name
-      id: asset-name
-      run: |
-        FORMATTED=$(echo "${{ needs.set-variables.outputs.build-number }}" | tr '.' '-')
-        echo "NAME=force-refresh-${FORMATTED}" >> $GITHUB_OUTPUT
+        name: beta-release
+        path: dist
 
     - name: Create GitHub release
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: ./Force-Refresh-${{ needs.set-variables.outputs.build-number }}.zip
-        asset_name: ${{ steps.asset-name.outputs.NAME }}.zip
-        tag: ${{ github.ref }}
-        release_name: Force Refresh ${{ needs.set-variables.outputs.build-number  }}
-        overwrite: true
-        prerelease: true
-        body: "This is a beta release of Force Refresh (v${{ needs.set-variables.outputs.build-number }}).
-          This release is intended to be used for debugging and **should not** be used on production sites unless directed.
-          Production-stable versions are available at https://wordpress.org/plugins/force-refresh.
-          \n\n## Commits Since Last Release\n\n${{ steps.changes.outputs.COMMITS }}"
+      env:
+        COMMITS: ${{ steps.changes.outputs.COMMITS }}
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        asset="force-refresh-$(echo "$VERSION" | tr '.' '-').zip"
+        cp "dist/Force-Refresh-${VERSION}.zip" "$asset"
+        {
+          echo "This is a beta release of Force Refresh (v${VERSION}) built from #${PR_NUMBER} at ${HEAD_SHA}."
+          echo "This release is intended to be used for debugging and **should not** be used on production sites unless directed."
+          echo "Production-stable versions are available at https://wordpress.org/plugins/force-refresh."
+          printf "\n## Upcoming Release Notes\n\n"
+          if [ -s dist/release-notes.md ]; then
+            cat dist/release-notes.md
+          else
+            echo "There are no unreleased notes for this pull request."
+          fi
+          printf "\n## Commits Since Last Release\n\n%s\n" "$COMMITS"
+        } > release-body.md
+        gh release create "v${VERSION}" "$asset" \
+          --target "$HEAD_SHA" \
+          --prerelease \
+          --title "Force Refresh ${VERSION}" \
+          --notes-file release-body.md
+
+    # Runs after the new beta exists, so a failed create never leaves the PR
+    # without one.
+    - name: Delete earlier betas for this PR
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: trusted/.github/scripts/deleteBetaReleases.sh "$PR_NUMBER" "v${VERSION}"
 
     - name: Comment on PR
-      uses: mshick/add-pr-comment@v3.9.0
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        message: Build ${{ needs.set-variables.outputs.build-number }} is [available for download](https://github.com/jordanleven/force-refresh/releases/download/v${{ needs.set-variables.outputs.build-number }}/${{ steps.asset-name.outputs.NAME }}.zip) under [Releases](https://github.com/jordanleven/force-refresh/releases/tag/v${{ needs.set-variables.outputs.build-number }}).
-        allow-repeats: true
+        GH_TOKEN: ${{ github.token }}
+      run: |
+        release_url=$(gh release view "v${VERSION}" --json url --jq '.url')
+        asset_url=$(gh release view "v${VERSION}" --json assets --jq '.assets[0].url')
+        gh pr comment "$PR_NUMBER" --body "Build ${VERSION} is [available for download](${asset_url}) under [Releases](${release_url})."
 
-    - name: Simulate deploy to WordPress.org
-      uses: 10up/action-wordpress-plugin-deploy@stable
-      with:
-        dry-run: true
-      env:
-        ASSETS_DIR: .wordpress-org
-        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
-        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: force-refresh
+  report-status:
+    name: Report Beta Release Status
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    if: always() && needs.set-variables.outputs.head-sha != ''
+    permissions:
+      statuses: write
+    needs:
+      - set-variables
+      - install-dependencies
+      - linting
+      - testing-javascript
+      - testing-php
+      - build
+      - testing-e2e
+      - wordpress-dry-run
+      - release
+
+    steps:
+      - name: Set Beta Release status
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ needs.set-variables.outputs.head-sha }}
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+          VERSION: ${{ needs.install-dependencies.outputs.version }}
+        run: |
+          state=success
+          description="Beta ${VERSION} was released."
+          for result in $RESULTS; do
+            if [ "$result" != "success" ]; then
+              state=failure
+              description="The beta release did not complete."
+            fi
+          done
+          echo "Job results: ${RESULTS}"
+          gh api "repos/${GH_REPO}/statuses/${HEAD_SHA}" \
+            -f state="$state" \
+            -f context="Beta Release" \
+            -f description="$description" \
+            -f target_url="$RUN_URL" >/dev/null
