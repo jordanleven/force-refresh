@@ -67,7 +67,7 @@ The workflow builds the pull request's head commit, runs linting, unit tests and
 - The version is set on the runner as `<next version>-beta.<PR>.<run number>`, for example `3.3.0-beta.412.7`. It sorts below the final `3.3.0` release, so sites running a beta are offered the release when it ships. The next version comes from the unreleased changie fragments, or is the next patch version when the pull request has none, so every pull request can get a beta.
 - The prerelease is tagged on the pull request's head commit, and the pull request keeps only its latest beta. Its betas are deleted when it closes.
 - The prerelease shows upcoming release notes (from changie fragments, or a note that there are none) alongside the commit log since the last stable release, and a comment on the pull request links to the download.
-- The workflow sets a **Beta Release** status on the head commit, which can be made a required check for merging into `master`. Pushing a new commit clears it, so release a new beta after every push.
+- The workflow sets a **Beta Release** status on the head commit so you can see which commit the latest beta was built from. It is informational and not required to merge. A new commit has no status until you release a beta for it.
 
 Branches created before this workflow existed need to be rebased onto `master` first, since the workflow runs the beta scripts from the branch.
 
