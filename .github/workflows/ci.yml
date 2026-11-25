@@ -8,9 +8,14 @@ on:
       - "!v[0-9]+.[0-9]+.[0-9]+"
       - "!v[0-9]+.[0-9]+.[0-9]+-"
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - master
       - release--*
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   check-commit-message:
@@ -338,6 +343,43 @@ jobs:
           retention-days: 1
           if-no-files-found: error
 
+  detect-e2e-changes:
+    name: Detect E2E Changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      e2e: ${{ steps.filter.outputs.e2e }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      # Anything outside this ignore list (package/composer manifests and
+      # lockfiles, src/, includes/, build config, docker-compose, workflows,
+      # tests, ...) can affect the plugin, so it runs the e2e suite.
+      - name: Filter changed paths
+        id: filter
+        uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
+        with:
+          predicate-quantifier: every
+          filters: |
+            e2e:
+              - '**'
+              - '!**/*.md'
+              - '!docs/**'
+              - '!.changes/**'
+              - '!.changie.yaml'
+              - '!screenshots/**'
+              - '!.wordpress-org/**'
+              - '!LICENSE*'
+              - '!.github/CODEOWNERS'
+              - '!.github/dependabot.yml'
+              - '!.github/workflows/release-*.yml'
+              - '!.github/workflows/label-dependabot.yml'
+
   testing-e2e:
     name: Testing – E2E
     # Pinned: ubuntu-latest moved to 26.04 (Docker 29), which the pinned
@@ -348,9 +390,22 @@ jobs:
     # Uses no secrets so it runs on Dependabot and fork PRs.
     permissions:
       contents: read
+    # Runs on ready (non-draft) PRs and on pushes to release--* branches.
+    # Pushes to master are skipped: branch protection requires PRs to be up
+    # to date, so the PR run already covered the merged code. A skipped job
+    # reports success, so this still works as a required check.
+    if: >-
+      needs.detect-e2e-changes.outputs.e2e == 'true' && (
+        (github.event_name == 'pull_request' && github.event.pull_request.draft != true) ||
+        (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/release--'))
+      )
     needs:
-      - install-dependencies
       - set-variables
+      - install-dependencies
+      - detect-e2e-changes
+      - linting
+      - testing-javascript
+      - testing-php
       - building
 
     steps:
