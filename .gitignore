@@ -14,3 +14,4 @@ coverage
 test/e2e/.auth/
 /playwright-last-run/
 /test-results/*
+/playwright-report/
